@@ -84,7 +84,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="router.navigate(['/iam/login'])">
+          <button type="button" class="btn-secondary" [routerLink]="['/iam/login']">
             Cancelar
           </button>
           <button type="button" class="btn-primary" (click)="onNextStep()">

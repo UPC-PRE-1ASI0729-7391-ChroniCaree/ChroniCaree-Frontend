@@ -47,9 +47,9 @@ export class Home implements OnInit {
 
   private navigateToDashboard(userType: UserType): void {
     if (userType === 'patient') {
-      this.router.navigate(['/dashboard/patient']);
+      this.router.navigate(['/patient/dashboard']);
     } else if (userType === 'doctor') {
-      this.router.navigate(['/dashboard/doctor']);
+      this.router.navigate(['/doctor/dashboard']);
     }
   }
 }
