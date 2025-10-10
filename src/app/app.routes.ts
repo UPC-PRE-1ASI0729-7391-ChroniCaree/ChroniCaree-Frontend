@@ -1,15 +1,105 @@
 import { Routes } from '@angular/router';
-import { Home } from './shared/presentation/views/home/home';
-
-const dashboardDoctor = () => import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor').then(m => m.DashboardDoctor);
-const dashboardPatient = () => import('./patients/presentation/views/dashboard-patient/dashboard-patient').then(m => m.DashboardPatient);
 
 const baseTitle = 'ChroniCaree';
 
 export const routes: Routes = [
-  { path: 'home', component: Home, title: `${baseTitle} - Inicio` },
-  { path: 'dashboard/doctor', loadComponent: dashboardDoctor, title: `${baseTitle} - Dashboard Doctor` },
-  { path: 'dashboard/patient', loadComponent: dashboardPatient, title: `${baseTitle} - Dashboard Paciente` },
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: '**', redirectTo: '/home' }
+  // Root redirects to login
+  {
+    path: '',
+    redirectTo: '/iam/login',
+    pathMatch: 'full'
+  },
+  
+  // Home route
+  {
+    path: 'home',
+    loadComponent: () => import('./shared/presentation/views/home/home').then(m => m.Home),
+    title: `${baseTitle} - Inicio`
+  },
+  
+  // IAM routes (Authentication & Identity)
+  {
+    path: 'iam',
+    children: [
+      {
+        path: 'register',
+        loadComponent: () => import('./iam/presentation/components/register-select/register-select').then(m => m.RegisterSelectComponent),
+        title: `${baseTitle} - Seleccionar Registro`
+      },
+      {
+        path: 'register/patient',
+        loadComponent: () => import('./iam/presentation/components/register-patient/register-patient').then(m => m.RegisterPatientComponent),
+        title: `${baseTitle} - Registro de Paciente`
+      },
+      {
+        path: 'register/hospital',
+        loadComponent: () => import('./iam/presentation/components/register-hospital/register-hospital').then(m => m.RegisterHospitalComponent),
+        title: `${baseTitle} - Registro de Hospital`,
+        data: { analyticsId: 'hospital-registration' }
+      },
+      {
+        path: 'login',
+        loadComponent: () => import('./iam/presentation/components/login/login').then(m => m.LoginComponent),
+        title: `${baseTitle} - Iniciar Sesión`
+      }
+    ]
+  },
+  
+  // Patient routes
+  {
+    path: 'patient',
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./patients/presentation/views/dashboard-patient/dashboard-patient').then(m => m.DashboardPatient),
+        title: `${baseTitle} - Dashboard Paciente`,
+        data: { role: 'patient' }
+      }
+    ]
+  },
+  
+  // Doctor routes
+  {
+    path: 'doctor',
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor').then(m => m.DashboardDoctor),
+        title: `${baseTitle} - Dashboard Doctor`,
+        data: { role: 'doctor' }
+      }
+    ]
+  },
+  
+  // Coming Soon page (for features under development)
+  {
+    path: 'coming-soon',
+    loadComponent: () => import('./shared/presentation/components/coming-soon/coming-soon').then(m => m.ComingSoonComponent),
+    title: `${baseTitle} - Próximamente`
+  },
+  
+  // 404 Not Found page
+  {
+    path: '404',
+    loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),
+    title: `${baseTitle} - Página no encontrada`
+  },
+  
+  // Legacy redirects for backward compatibility
+  { 
+    path: 'dashboard/doctor', 
+    redirectTo: 'doctor/dashboard', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'dashboard/patient', 
+    redirectTo: 'patient/dashboard', 
+    pathMatch: 'full' 
+  },
+  
+  // Wildcard route (always last) - redirect to 404
+  { 
+    path: '**', 
+    redirectTo: '/404'
+  }
 ];

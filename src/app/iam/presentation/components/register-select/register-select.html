@@ -1,0 +1,75 @@
+<div class="register-select-container">
+  <div class="register-select-content">
+    <!-- Header -->
+    <div class="header-section">
+      <div class="logo-container">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="#667eea" opacity="0.2"/>
+          <path d="M50 20 L50 80 M20 50 L80 50" stroke="#667eea" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>Registro en ChroniCaree</h1>
+      <p>Selecciona el tipo de cuenta que deseas crear</p>
+    </div>
+
+    <!-- Selection Cards -->
+    <div class="cards-container">
+      <!-- Patient Card -->
+      <div 
+        class="register-card patient-card"
+        [class.hovered]="hoveredCard() === 'patient'"
+        (click)="selectRegisterType('patient')"
+        (mouseenter)="setHoveredCard('patient')"
+        (mouseleave)="clearHoveredCard()"
+      >
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Soy Paciente</h2>
+        <p>Registro individual para pacientes</p>
+        <ul class="features-list">
+          <li>✓ Gestiona tu salud personal</li>
+          <li>✓ Conecta con doctores</li>
+          <li>✓ Seguimiento de medicamentos</li>
+          <li>✓ Acceso a tus registros</li>
+        </ul>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Hospital Card -->
+      <div 
+        class="register-card hospital-card"
+        [class.hovered]="hoveredCard() === 'hospital'"
+        (click)="selectRegisterType('hospital')"
+        (mouseenter)="setHoveredCard('hospital')"
+        (mouseleave)="clearHoveredCard()"
+      >
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 21h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 21V7l8-4v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 21V11l-6-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Soy Hospital/Clínica</h2>
+        <p>Registro institucional B2B</p>
+        <ul class="features-list">
+          <li>✓ Gestión de múltiples doctores</li>
+          <li>✓ Panel administrativo</li>
+          <li>✓ Reportes y análisis</li>
+          <li>✓ Planes empresariales</li>
+        </ul>
+        <div class="card-arrow">→</div>
+      </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+      <p>¿Ya tienes cuenta? <a [routerLink]="['/iam/login']">Iniciar Sesión</a></p>
+    </div>
+  </div>
+</div>

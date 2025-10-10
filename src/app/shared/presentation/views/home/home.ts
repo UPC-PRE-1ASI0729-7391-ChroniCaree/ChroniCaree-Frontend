@@ -1,6 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TenantService } from '../../../../tenants/application/tenant.service';
+import { Router } from '@angular/router';
+
+type UserType = 'patient' | 'doctor' | null;
 
 @Component({
   selector: 'app-home',
@@ -10,28 +12,44 @@ import { TenantService } from '../../../../tenants/application/tenant.service';
   styleUrl: './home.css'
 })
 export class Home implements OnInit {
-  protected readonly title = signal('ChroniCaree');
-  protected readonly hospitalName = signal<string>('');
-  protected readonly loading = signal<boolean>(true);
-  protected readonly error = signal<string>('');
+  protected readonly selectedUserType = signal<UserType>(null);
+  protected readonly hoveredCard = signal<UserType>(null);
 
-  constructor(private tenantService: TenantService) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    this.loadHospitalData();
+    // Check if user has already selected a type
+    const savedUserType = localStorage.getItem('userType') as UserType;
+    if (savedUserType === 'patient' || savedUserType === 'doctor') {
+      this.navigateToDashboard(savedUserType);
+    }
   }
 
-  private loadHospitalData(): void {
-    this.tenantService.getTenantById(1).subscribe({
-      next: (tenant) => {
-        this.hospitalName.set(tenant.name);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error al cargar datos:', err);
-        this.error.set('No se pudo conectar con el servidor');
-        this.loading.set(false);
-      }
-    });
+  selectUserType(userType: UserType): void {
+    if (!userType) return;
+    
+    this.selectedUserType.set(userType);
+    localStorage.setItem('userType', userType);
+    
+    // Small delay for visual feedback
+    setTimeout(() => {
+      this.navigateToDashboard(userType);
+    }, 300);
+  }
+
+  setHoveredCard(userType: UserType): void {
+    this.hoveredCard.set(userType);
+  }
+
+  clearHoveredCard(): void {
+    this.hoveredCard.set(null);
+  }
+
+  private navigateToDashboard(userType: UserType): void {
+    if (userType === 'patient') {
+      this.router.navigate(['/patient/dashboard']);
+    } else if (userType === 'doctor') {
+      this.router.navigate(['/doctor/dashboard']);
+    }
   }
 }
