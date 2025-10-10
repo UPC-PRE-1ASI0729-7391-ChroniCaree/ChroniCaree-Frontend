@@ -1,0 +1,202 @@
+<!-- Patients List View -->
+<div class="patients-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Mis Pacientes</h1>
+      <p class="subtitle">Gestiona y monitorea a tus pacientes asignados</p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="refresh()" [disabled]="loading()">
+        <span class="icon">🔄</span>
+        <span>Actualizar</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalPatients() }}</div>
+        <div class="stat-label">Total Pacientes</div>
+      </div>
+    </div>
+    
+    <div class="stat-card danger">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ criticalCount() }}</div>
+        <div class="stat-label">Pacientes Críticos</div>
+      </div>
+    </div>
+    
+    <div class="stat-card warning">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ atRiskCount() }}</div>
+        <div class="stat-label">En Riesgo</div>
+      </div>
+    </div>
+    
+    <div class="stat-card info">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ totalCriticalAlerts() }}</div>
+        <div class="stat-label">Alertas Críticas</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando pacientes...</p>
+    </div>
+  }
+  
+  <!-- Error State -->
+  @else if (error()) {
+    <div class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="refresh()">Reintentar</button>
+    </div>
+  }
+  
+  <!-- Empty State -->
+  @else if (patients().length === 0) {
+    <div class="empty-state">
+      <span class="empty-icon">👨‍⚕️</span>
+      <h3>No tienes pacientes asignados</h3>
+      <p>Los pacientes asignados aparecerán aquí</p>
+    </div>
+  }
+  
+  <!-- Patients Grid -->
+  @else {
+    <div class="patients-grid">
+      @for (patient of patients(); track patient.id) {
+        <div class="patient-card" [class]="getHealthStatusClass(patient.healthStatus)">
+          <!-- Card Header -->
+          <div class="card-header">
+            <div class="patient-info">
+              <div class="patient-avatar">
+                {{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}
+              </div>
+              <div class="patient-details">
+                <h3>{{ patient.firstName }} {{ patient.lastName }}</h3>
+                <p class="patient-meta">
+                  {{ calculateAge(patient.birthDate) }} años • DNI: {{ patient.dni }}
+                </p>
+              </div>
+            </div>
+            
+            <div class="health-status-badge" [class]="getHealthStatusClass(patient.healthStatus)">
+              {{ getHealthStatusText(patient.healthStatus) }}
+            </div>
+          </div>
+          
+          <!-- Card Body -->
+          <div class="card-body">
+            <!-- Health Metrics -->
+            <div class="metrics-grid">
+              <div class="metric">
+                <span class="metric-icon">🚨</span>
+                <div class="metric-content">
+                  <div class="metric-value">{{ patient.criticalAlertsCount }}</div>
+                  <div class="metric-label">Alertas Críticas</div>
+                </div>
+              </div>
+              
+              <div class="metric">
+                <span class="metric-icon">⚠️</span>
+                <div class="metric-content">
+                  <div class="metric-value">{{ patient.activeAlertsCount }}</div>
+                  <div class="metric-label">Alertas Activas</div>
+                </div>
+              </div>
+              
+              <div class="metric">
+                <span class="metric-icon">💊</span>
+                <div class="metric-content">
+                  <div class="metric-value">{{ patient.activeMedicationsCount }}</div>
+                  <div class="metric-label">Medicamentos</div>
+                </div>
+              </div>
+              
+              <div class="metric">
+                <span class="metric-icon">📋</span>
+                <div class="metric-content">
+                  <div class="metric-value">{{ patient.activeDiagnosesCount }}</div>
+                  <div class="metric-label">Diagnósticos</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Last Vital Signs -->
+            @if (patient.lastVitalSigns) {
+              <div class="vital-signs">
+                <div class="vital-signs-header">
+                  <span class="icon">📊</span>
+                  <span class="label">Últimos Signos Vitales</span>
+                  <span class="date">{{ formatDate(patient.lastVitalSigns.recordedAt) }}</span>
+                </div>
+                <div class="vital-signs-grid">
+                  @if (patient.lastVitalSigns.glucose) {
+                    <div class="vital-item">
+                      <span class="vital-label">Glucosa</span>
+                      <span class="vital-value">{{ patient.lastVitalSigns.glucose }} mg/dL</span>
+                    </div>
+                  }
+                  @if (patient.lastVitalSigns.bloodPressure) {
+                    <div class="vital-item">
+                      <span class="vital-label">Presión</span>
+                      <span class="vital-value">{{ patient.lastVitalSigns.bloodPressure }}</span>
+                    </div>
+                  }
+                  @if (patient.lastVitalSigns.heartRate) {
+                    <div class="vital-item">
+                      <span class="vital-label">Pulso</span>
+                      <span class="vital-value">{{ patient.lastVitalSigns.heartRate }} bpm</span>
+                    </div>
+                  }
+                  @if (patient.lastVitalSigns.oxygenSaturation) {
+                    <div class="vital-item">
+                      <span class="vital-label">Saturación O₂</span>
+                      <span class="vital-value">{{ patient.lastVitalSigns.oxygenSaturation }}%</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="footer-info">
+              <span class="info-item">
+                <span class="icon">📅</span>
+                Asignado: {{ formatDate(patient.assignedSince) }}
+              </span>
+              @if (patient.hospitalName) {
+                <span class="info-item">
+                  <span class="icon">🏥</span>
+                  {{ patient.hospitalName }}
+                </span>
+              }
+            </div>
+            
+            <a [routerLink]="['/doctor/patients', patient.id]" class="btn btn-primary">
+              <span>Ver Detalles</span>
+              <span class="icon">→</span>
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

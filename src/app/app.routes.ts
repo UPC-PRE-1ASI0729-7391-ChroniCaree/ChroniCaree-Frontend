@@ -123,6 +123,12 @@ export const routes: Routes = [
         loadComponent: () => import('./doctors/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
         data: { role: 'doctor' }
+      },
+      {
+        path: 'patients',
+        loadComponent: () => import('./doctors/presentation/views/patients-list/patients-list').then(m => m.PatientsListComponent),
+        title: `${baseTitle} - Mis Pacientes`,
+        data: { role: 'doctor' }
       }
     ]
   },
