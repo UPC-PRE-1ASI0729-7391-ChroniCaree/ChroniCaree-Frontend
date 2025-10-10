@@ -26,11 +26,15 @@ export class LayoutContentComponent {
   currentUserRole = signal<'patient' | 'doctor' | 'hospital_admin' | null>(null);
 
   // Routes that should be full-screen (no header/footer/toolbar)
-  fullScreenRoutes = ['/iam/login', '/iam/register'];
-  
+  // Only IAM routes (login, register) and home landing page should be fullscreen
   isFullScreen = computed(() => {
     const url = this.currentUrl();
-    return this.fullScreenRoutes.some(route => url.startsWith(route));
+    // Fullscreen ONLY for: /, /home, /iam/* (login, register), /404
+    // coming-soon and dashboards should show WITH layout
+    return url === '/' || 
+           url.startsWith('/iam') || 
+           url.startsWith('/home') ||
+           url === '/404';
   });
 
   // Get user role from signal instead of computed
