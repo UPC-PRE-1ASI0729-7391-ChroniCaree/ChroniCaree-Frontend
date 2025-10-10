@@ -1,4 +1,4 @@
-import { BaseEntity } from '../../../../shared/infrastructure/base-entity';
+import { BaseEntity } from '../../../shared/infrastructure/base-entity';
 
 export interface Doctor extends BaseEntity {
   id: number;
