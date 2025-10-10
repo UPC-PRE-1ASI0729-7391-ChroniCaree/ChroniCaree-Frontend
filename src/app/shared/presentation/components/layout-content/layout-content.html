@@ -6,8 +6,14 @@
 <!-- Normal Layout (with header/footer/toolbar) -->
 @if (!isFullScreen()) {
   <div class="layout">
-    <!-- Sidebar/Toolbar -->
-    <app-toolbar-content />
+    <!-- Sidebar/Toolbar - Different for each role -->
+    @if (userRole() === 'doctor' || userRole() === 'hospital_admin') {
+      <app-toolbar-doctor />
+    } @else if (userRole() === 'patient') {
+      <app-toolbar-patient />
+    } @else {
+      <app-toolbar-content />
+    }
 
     <!-- Main Content Area -->
     <div class="layout-main">

@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher';
+import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   selector: 'app-header-content',
@@ -9,13 +11,7 @@ import { LanguageSwitcherComponent } from '../language-switcher/language-switche
   templateUrl: './header-content.html',
   styleUrl: './header-content.css'
 })
-export class HeaderContentComponent {
-  readonly currentUser = signal({
-    name: 'Dr. Juan Torres',
-    role: 'Médico',
-    avatar: '👨‍⚕️'
-  });
-
+export class HeaderContentComponent implements OnInit {
   readonly notifications = signal([
     { id: 1, message: 'Nueva cita programada', unread: true },
     { id: 2, message: 'Resultado de laboratorio disponible', unread: true },
@@ -24,6 +20,65 @@ export class HeaderContentComponent {
 
   showNotifications = signal(false);
   showUserMenu = signal(false);
+
+  // Get user from localStorage
+  currentUser = computed(() => {
+    const userStr = localStorage.getItem('currentUser');
+    const role = localStorage.getItem('userRole');
+    
+    if (userStr && role) {
+      const user = JSON.parse(userStr);
+      return {
+        name: user.name || 'Usuario',
+        role: this.getRoleLabel(role),
+        avatar: this.getRoleAvatar(role),
+        email: user.email
+      };
+    }
+    
+    return {
+      name: 'Usuario',
+      role: 'Invitado',
+      avatar: '👤',
+      email: ''
+    };
+  });
+
+  constructor(
+    private router: Router,
+    private userStore: UserStore
+  ) {}
+
+  ngOnInit(): void {
+    // Load user from localStorage on component init
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        this.userStore.setCurrentUser(user);
+      } catch (error) {
+        console.error('Error parsing user from localStorage:', error);
+      }
+    }
+  }
+
+  getRoleLabel(role: string): string {
+    const roleLabels: Record<string, string> = {
+      'patient': 'Paciente',
+      'doctor': 'Médico',
+      'hospital_admin': 'Administrador'
+    };
+    return roleLabels[role] || role;
+  }
+
+  getRoleAvatar(role: string): string {
+    const roleAvatars: Record<string, string> = {
+      'patient': '🧑',
+      'doctor': '👨‍⚕️',
+      'hospital_admin': '👔'
+    };
+    return roleAvatars[role] || '👤';
+  }
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
@@ -44,7 +99,15 @@ export class HeaderContentComponent {
   }
 
   logout(): void {
-    console.log('Cerrando sesión...');
-    // Implementar lógica de logout
+    // Clear localStorage
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
+    
+    // Clear user store
+    this.userStore.setCurrentUser(null);
+    
+    // Navigate to login
+    this.router.navigate(['/iam/login']);
   }
 }
