@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PdfExportService } from '../../../../shared/infrastructure/pdf-export.service';
+import { PdfExportResponse } from '../../../../shared/infrastructure/pdf-export.response';
 
 @Component({
   selector: 'app-dashboard-doctor',
@@ -36,7 +36,7 @@ export class DashboardDoctor implements OnInit {
     { id: 2, patientName: 'Carmen Silva', condition: 'Glucosa fuera de rango', severity: 'medium', time: '08:30' }
   ]);
 
-  constructor(private pdf: PdfExportService) {}
+  constructor() {}
 
   ngOnInit(): void {
     console.log('Dashboard Doctor inicializado');
@@ -48,7 +48,7 @@ export class DashboardDoctor implements OnInit {
     this.exporting.set(true);
     try {
       const today = new Date().toISOString().slice(0, 10);
-      await this.pdf.exportElementToPdf(this.printArea.nativeElement, {
+      await PdfExportResponse.exportElementToPdf(this.printArea.nativeElement, {
         filename: `dashboard-doctor-${today}.pdf`,
         margin: 8,
         scale: 2
