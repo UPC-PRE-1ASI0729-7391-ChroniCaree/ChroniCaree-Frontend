@@ -208,6 +208,16 @@
   margin-bottom: var(--spacing-xl);
 }
 
+/* Nudges Container */
+.nudges-container {
+  grid-column: 1 / -1;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f5f3 100%);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-lg);
+}
+
 .card {
   background: white;
   border-radius: var(--radius-lg);

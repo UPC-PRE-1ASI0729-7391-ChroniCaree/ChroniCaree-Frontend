@@ -2,11 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
+import { NudgePanelComponent } from '../../../../shared/presentation/components/nudge-panel/nudge-panel';
 
 @Component({
   selector: 'app-dashboard-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, OnboardingComponent],
+  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent],
   templateUrl: './dashboard-patient.html',
   styleUrl: './dashboard-patient.css'
 })

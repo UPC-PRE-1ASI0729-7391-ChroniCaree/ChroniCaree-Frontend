@@ -1,0 +1,173 @@
+.nudge-panel {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.panel-header {
+  margin-bottom: 20px;
+}
+
+.panel-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  position: relative;
+}
+
+.panel-header mat-icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.badge {
+  display: inline-block;
+}
+
+.panel-body {
+  min-height: 200px;
+}
+
+/* Loading & Empty States */
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.loading-state mat-icon,
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state mat-icon {
+  color: #4caf50;
+  opacity: 0.7;
+}
+
+/* Nudges List */
+.nudges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nudge-card {
+  border-left: 4px solid #ccc;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nudge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Priority Styles */
+.priority-urgent {
+  border-left-color: #f44336;
+  background: #ffebee;
+}
+
+.priority-high {
+  border-left-color: #ff9800;
+  background: #fff3e0;
+}
+
+.priority-medium {
+  border-left-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.priority-low {
+  border-left-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.nudge-card mat-card-header {
+  margin-bottom: 12px;
+}
+
+.nudge-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+mat-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+mat-card-content p {
+  margin: 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Actions */
+mat-card-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dismiss-btn {
+  margin-left: auto;
+}
+
+button mat-icon {
+  margin-right: 4px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.nudge-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nudge-panel {
+    padding: 12px;
+  }
+
+  mat-card-actions {
+    flex-wrap: wrap;
+  }
+
+  mat-card-actions button {
+    flex: 1 1 auto;
+  }
+
+  .dismiss-btn {
+    margin-left: 0;
+  }
+}
