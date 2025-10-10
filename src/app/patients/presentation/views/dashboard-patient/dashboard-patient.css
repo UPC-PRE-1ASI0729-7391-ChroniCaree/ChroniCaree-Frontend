@@ -250,39 +250,62 @@
   margin-bottom: var(--spacing-xl);
 }
 
-/* Cards con altura consistente */
+/* Cards con altura fija y scroll */
 .medications-card,
 .appointments-card,
-.nudges-card {
-  min-height: 500px;
+.nudges-card,
+.card {
+  height: 500px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
-/* Nudges Preview - Altura limitada */
-.nudges-preview {
-  max-height: 450px;
+/* Card body scrollable */
+.medications-card > *,
+.appointments-card .appointments-list,
+.nudges-card .nudges-preview,
+.card > *:not(.card-header) {
   overflow-y: auto;
-  padding: 0;
+  flex: 1;
 }
 
-/* Scroll suave */
-.nudges-preview::-webkit-scrollbar {
+/* Estilos de scrollbar personalizados */
+.medications-card > *::-webkit-scrollbar,
+.appointments-card .appointments-list::-webkit-scrollbar,
+.nudges-card .nudges-preview::-webkit-scrollbar,
+.card > *:not(.card-header)::-webkit-scrollbar {
   width: 6px;
 }
 
-.nudges-preview::-webkit-scrollbar-track {
+.medications-card > *::-webkit-scrollbar-track,
+.appointments-card .appointments-list::-webkit-scrollbar-track,
+.nudges-card .nudges-preview::-webkit-scrollbar-track,
+.card > *:not(.card-header)::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 10px;
 }
 
-.nudges-preview::-webkit-scrollbar-thumb {
+.medications-card > *::-webkit-scrollbar-thumb,
+.appointments-card .appointments-list::-webkit-scrollbar-thumb,
+.nudges-card .nudges-preview::-webkit-scrollbar-thumb,
+.card > *:not(.card-header)::-webkit-scrollbar-thumb {
   background: var(--color-cc-green);
   border-radius: 10px;
 }
 
-.nudges-preview::-webkit-scrollbar-thumb:hover {
+.medications-card > *::-webkit-scrollbar-thumb:hover,
+.appointments-card .appointments-list::-webkit-scrollbar-thumb:hover,
+.nudges-card .nudges-preview::-webkit-scrollbar-thumb:hover,
+.card > *:not(.card-header)::-webkit-scrollbar-thumb:hover {
   background: var(--color-cc-bold-green);
+}
+
+/* Appointments list scrollable */
+.appointments-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 .card {
