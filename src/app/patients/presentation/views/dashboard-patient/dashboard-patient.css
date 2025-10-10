@@ -1,0 +1,451 @@
+/* ====================================
+   Dashboard Patient Styles
+   ==================================== */
+
+.dashboard-container {
+  padding: var(--spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--color-background);
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  background: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.welcome-section h1 {
+  color: var(--color-cc-dark-blue);
+  margin-bottom: var(--spacing-xs);
+}
+
+.welcome-section .text {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.quick-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: var(--font-base);
+}
+
+.btn-primary {
+  background: var(--color-cc-green);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-cc-bold-green);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 14px;
+}
+
+/* Vital Signs Section */
+.vital-signs-section {
+  background: white;
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2 {
+  color: var(--color-cc-dark-blue);
+  margin: 0;
+}
+
+.last-update {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.vital-signs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.vital-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.vital-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.vital-card.heart-rate {
+  border-color: var(--color-cc-red);
+  background: rgba(230, 57, 70, 0.05);
+}
+
+.vital-card.blood-pressure {
+  border-color: var(--color-cc-green);
+  background: rgba(38, 181, 166, 0.05);
+}
+
+.vital-card.temperature {
+  border-color: var(--color-warning);
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.vital-card.oxygen {
+  border-color: var(--color-info);
+  background: rgba(23, 162, 184, 0.05);
+}
+
+.vital-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+}
+
+.heart-rate .vital-icon {
+  color: var(--color-cc-red);
+  background: rgba(230, 57, 70, 0.1);
+}
+
+.blood-pressure .vital-icon {
+  color: var(--color-cc-green);
+  background: rgba(38, 181, 166, 0.1);
+}
+
+.temperature .vital-icon {
+  color: var(--color-warning);
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.oxygen .vital-icon {
+  color: var(--color-info);
+  background: rgba(23, 162, 184, 0.1);
+}
+
+.vital-content {
+  flex: 1;
+}
+
+.vital-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-xs) 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.vital-value {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-cc-dark-blue);
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.unit {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Content Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-header h2 {
+  color: var(--color-cc-dark-blue);
+  margin: 0;
+}
+
+.link-primary {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-cc-green);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link-primary:hover {
+  color: var(--color-cc-bold-green);
+}
+
+/* Medications List */
+.medications-list {
+  padding: var(--spacing-md);
+}
+
+.medication-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  transition: all 0.2s ease;
+}
+
+.medication-item.taken {
+  background: rgba(40, 167, 69, 0.05);
+  border-color: var(--color-success);
+}
+
+.medication-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.medication-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.medication-details {
+  flex: 1;
+}
+
+.medication-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-cc-dark-blue);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.medication-dose {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.status-badge {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-xl);
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.success {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--color-success);
+}
+
+/* Appointments List */
+.appointments-list {
+  padding: var(--spacing-md);
+}
+
+.appointment-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  transition: background 0.2s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.appointment-item:hover {
+  background: var(--color-background);
+  border-color: var(--color-cc-green);
+}
+
+.appointment-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(38, 181, 166, 0.1);
+  border-radius: var(--radius-md);
+}
+
+.appointment-details {
+  flex: 1;
+}
+
+.appointment-doctor {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-cc-dark-blue);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.appointment-specialty {
+  font-size: 14px;
+  color: var(--color-cc-green);
+  margin: 0 0 var(--spacing-xs) 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.appointment-datetime {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+  background: var(--color-cc-green);
+  color: white;
+}
+
+/* Symptoms List */
+.symptoms-list {
+  padding: var(--spacing-md);
+}
+
+.symptom-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+  border: 2px solid;
+  border-left-width: 4px;
+}
+
+.symptom-item.severity-low {
+  border-color: var(--color-info);
+  background: rgba(23, 162, 184, 0.05);
+}
+
+.symptom-item.severity-medium {
+  border-color: var(--color-warning);
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.symptom-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.severity-low .symptom-icon {
+  background: rgba(23, 162, 184, 0.1);
+}
+
+.severity-medium .symptom-icon {
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.symptom-details {
+  flex: 1;
+}
+
+.symptom-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-cc-dark-blue);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.symptom-time {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: var(--spacing-md);
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .vital-signs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .medication-item,
+  .appointment-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

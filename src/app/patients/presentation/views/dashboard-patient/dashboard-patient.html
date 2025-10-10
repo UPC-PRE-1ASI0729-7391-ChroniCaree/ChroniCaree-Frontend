@@ -1,0 +1,175 @@
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="welcome-section">
+      <h1 class="h1">Hola, {{ patientName() }}</h1>
+      <p class="text">{{ age() }} años • {{ condition() }}</p>
+    </div>
+    <div class="quick-actions">
+      <button class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Registrar Síntoma
+      </button>
+    </div>
+  </div>
+
+  <!-- Vital Signs Card -->
+  <div class="vital-signs-section">
+    <div class="section-header">
+      <h2 class="h2">Signos Vitales</h2>
+      <span class="last-update">Última actualización: {{ vitalSigns().lastUpdate }}</span>
+    </div>
+    <div class="vital-signs-grid">
+      <div class="vital-card heart-rate">
+        <div class="vital-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.90831 3.57831 8.50903 2.99871 7.05 2.99871C5.59096 2.99871 4.19169 3.57831 3.16 4.61C2.12831 5.64169 1.54871 7.04097 1.54871 8.5C1.54871 9.95903 2.12831 11.3583 3.16 12.39L4.22 13.45L12 21.23L19.78 13.45L20.84 12.39C21.351 11.8792 21.7564 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.2225 22.4518 8.5C22.4518 7.7775 22.3095 7.06211 22.0329 6.39464C21.7564 5.72718 21.351 5.12084 20.84 4.61V4.61Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="vital-content">
+          <p class="vital-label">Frecuencia Cardíaca</p>
+          <p class="vital-value">{{ vitalSigns().heartRate }} <span class="unit">bpm</span></p>
+        </div>
+      </div>
+
+      <div class="vital-card blood-pressure">
+        <div class="vital-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 12H18L15 21L9 3L6 12H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="vital-content">
+          <p class="vital-label">Presión Arterial</p>
+          <p class="vital-value">{{ vitalSigns().bloodPressure }} <span class="unit">mmHg</span></p>
+        </div>
+      </div>
+
+      <div class="vital-card temperature">
+        <div class="vital-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 14.76V3.5C14 2.83696 13.7366 2.20107 13.2678 1.73223C12.7989 1.26339 12.163 1 11.5 1C10.837 1 10.2011 1.26339 9.73223 1.73223C9.26339 2.20107 9 2.83696 9 3.5V14.76C8.3587 15.2773 7.87861 15.9725 7.61623 16.7621C7.35385 17.5516 7.32073 18.4009 7.52096 19.2083C7.72119 20.0157 8.14632 20.7476 8.74423 21.3155C9.34215 21.8834 10.0873 22.2631 10.8901 22.4099C11.693 22.5567 12.5202 22.4643 13.2733 22.1434C14.0264 21.8226 14.6736 21.2865 15.1405 20.6009C15.6074 19.9153 15.8754 19.1082 15.9142 18.2738C15.953 17.4395 15.7609 16.6108 15.36 15.88L14 14.76Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="vital-content">
+          <p class="vital-label">Temperatura</p>
+          <p class="vital-value">{{ vitalSigns().temperature }} <span class="unit">°C</span></p>
+        </div>
+      </div>
+
+      <div class="vital-card oxygen">
+        <div class="vital-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="vital-content">
+          <p class="vital-label">Saturación O2</p>
+          <p class="vital-value">{{ vitalSigns().oxygen }} <span class="unit">%</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Medications -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="h3">Medicamentos del Día</h2>
+        <a routerLink="/medications" class="link-primary">Ver todos</a>
+      </div>
+      <div class="medications-list">
+        @for (med of medications(); track med.id) {
+          <div class="medication-item" [class.taken]="med.taken">
+            <div class="medication-info">
+              <div class="medication-icon">
+                @if (med.taken) {
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6L9 17L4 12" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                } @else {
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" stroke="var(--color-text-secondary)" stroke-width="2"/>
+                  </svg>
+                }
+              </div>
+              <div class="medication-details">
+                <p class="medication-name">{{ med.name }}</p>
+                <p class="medication-dose">{{ med.dose }} • {{ med.schedule }}</p>
+              </div>
+            </div>
+            @if (!med.taken) {
+              <button class="btn btn-sm btn-primary" (click)="takeMedication(med.id)">Marcar tomado</button>
+            } @else {
+              <span class="status-badge success">Tomado</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Appointments -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="h3">Próximas Citas</h2>
+        <a routerLink="/appointments" class="link-primary">Ver todas</a>
+      </div>
+      <div class="appointments-list">
+        @for (appointment of upcomingAppointments(); track appointment.id) {
+          <div class="appointment-item">
+            <div class="appointment-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="var(--color-cc-green)" stroke-width="2"/>
+                <path d="M16 2V6M8 2V6M3 10H21" stroke="var(--color-cc-green)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="appointment-details">
+              <p class="appointment-doctor">{{ appointment.doctorName }}</p>
+              <p class="appointment-specialty">{{ appointment.specialty }}</p>
+              <p class="appointment-datetime">{{ appointment.date }} • {{ appointment.time }}</p>
+            </div>
+            <button class="btn-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Symptoms -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="h3">Síntomas Recientes</h2>
+      <a routerLink="/symptoms" class="link-primary">Ver historial</a>
+    </div>
+    <div class="symptoms-list">
+      @for (symptom of recentSymptoms(); track symptom.id) {
+        <div class="symptom-item" [class.severity-low]="symptom.severity === 'low'" [class.severity-medium]="symptom.severity === 'medium'">
+          <div class="symptom-icon">
+            @if (symptom.severity === 'low') {
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="var(--color-info)" stroke-width="2"/>
+                <path d="M12 8V12M12 16H12.01" stroke="var(--color-info)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            } @else {
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7V12C2 16.4 5.6 20.1 10 21H14C18.4 20.1 22 16.4 22 12V7L12 2Z" stroke="var(--color-warning)" stroke-width="2"/>
+                <path d="M12 8V12M12 16H12.01" stroke="var(--color-warning)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            }
+          </div>
+          <div class="symptom-details">
+            <p class="symptom-name">{{ symptom.symptom }}</p>
+            <p class="symptom-time">{{ symptom.date }} • {{ symptom.time }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
-import { BaseAssembler } from '../../shared/presentation/components/base-assembler';
-import { BaseResponse } from '../../shared/presentation/components/base-response';
+import { BaseAssembler } from '../../shared/infrastructure/base-assembler';
+import { BaseResponse } from '../../shared/infrastructure/base-response';
 import { Tenant } from '../domain/model/tenant.entity';
 import { TenantResource } from './tenant.resource';
 
