@@ -2,7 +2,6 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
-import { ToolbarContentComponent } from '../toolbar-content/toolbar-content';
 import { ToolbarDoctorComponent } from '../toolbar-doctor/toolbar-doctor';
 import { ToolbarPatientComponent } from '../toolbar-patient/toolbar-patient';
 import { HeaderContentComponent } from '../header-content/header-content';
@@ -14,7 +13,6 @@ import { FooterContentComponent } from '../footer-content/footer-content';
   imports: [
     CommonModule,
     RouterOutlet,
-    ToolbarContentComponent,
     ToolbarDoctorComponent,
     ToolbarPatientComponent,
     HeaderContentComponent,

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { UserStore } from '../../../../iam/application/user.store';
@@ -11,8 +11,6 @@ import { UserStore } from '../../../../iam/application/user.store';
   styleUrls: ['./toolbar-doctor.css']
 })
 export class ToolbarDoctorComponent {
-  readonly isCollapsed = signal<boolean>(false);
-
   constructor(
     private router: Router,
     public userStore: UserStore
@@ -20,10 +18,6 @@ export class ToolbarDoctorComponent {
 
   get currentUser() {
     return this.userStore.currentUser$();
-  }
-
-  toggleSidebar(): void {
-    this.isCollapsed.update(v => !v);
   }
 
   logout(): void {
