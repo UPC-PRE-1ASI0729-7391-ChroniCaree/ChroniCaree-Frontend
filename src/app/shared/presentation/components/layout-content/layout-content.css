@@ -1,0 +1,41 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+/* When toolbar is collapsed */
+:host-context(.toolbar.collapsed) ~ .layout-main {
+  margin-left: 80px;
+}
+
+.content {
+  flex: 1;
+  padding: calc(70px + var(--spacing-lg)) var(--spacing-lg) var(--spacing-lg);
+  min-height: calc(100vh - 70px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .layout-main {
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-main {
+    margin-left: 0;
+  }
+
+  .content {
+    padding: calc(70px + var(--spacing-md)) var(--spacing-md) var(--spacing-md);
+  }
+}

@@ -1,0 +1,39 @@
+<aside class="toolbar" [class.collapsed]="isCollapsed">
+  <!-- Logo Section -->
+  <div class="toolbar-header">
+    <div class="logo-container">
+      <svg class="logo" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" fill="var(--color-cc-green)" opacity="0.2"/>
+        <path d="M20 8 L20 14 M20 26 L20 32" stroke="var(--color-cc-bold-green)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="20" cy="20" r="6" fill="none" stroke="var(--color-cc-bold-green)" stroke-width="2"/>
+        <path d="M14 20 L18 20" stroke="var(--color-cc-red)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M22 20 L26 20" stroke="var(--color-cc-red)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text" *ngIf="!isCollapsed">ChroniCaree</span>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="toolbar-nav">
+    <ul class="menu-list">
+      @for (item of menuItems; track item.route) {
+        <li class="menu-item">
+          <a 
+            [routerLink]="item.route" 
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: item.route === '/'}"
+            class="menu-link"
+            [attr.title]="isCollapsed ? item.label : null">
+            <span class="menu-icon">{{ item.icon }}</span>
+            <span class="menu-label" *ngIf="!isCollapsed">{{ item.label }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Toggle Button -->
+  <button class="toggle-btn" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+    <span class="toggle-icon">{{ isCollapsed ? '→' : '←' }}</span>
+  </button>
+</aside>

@@ -1,0 +1,31 @@
+<div class="language-switcher">
+  <button 
+    class="language-btn" 
+    (click)="toggleDropdown()"
+    aria-label="Cambiar idioma">
+    <span class="flag">{{ currentLanguage().flag }}</span>
+    <span class="language-code">{{ currentLanguage().code | uppercase }}</span>
+    <span class="chevron">▼</span>
+  </button>
+
+  @if (showDropdown()) {
+    <div class="dropdown">
+      <ul class="language-list">
+        @for (language of languages; track language.code) {
+          <li>
+            <button 
+              class="language-option"
+              [class.active]="language.code === currentLanguage().code"
+              (click)="selectLanguage(language)">
+              <span class="flag">{{ language.flag }}</span>
+              <span class="language-name">{{ language.name }}</span>
+              @if (language.code === currentLanguage().code) {
+                <span class="checkmark">✓</span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</div>

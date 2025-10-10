@@ -1,0 +1,143 @@
+<div class="dashboard-container">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="welcome-section">
+      <h1 class="h1">Bienvenido, {{ doctorName() }}</h1>
+      <p class="text">{{ specialty() }}</p>
+    </div>
+    <div class="quick-actions">
+      <button class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Nueva Cita
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Citas Hoy</p>
+        <p class="stat-value">{{ todayAppointments() }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 11L12 14L22 4M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Revisiones Pendientes</p>
+        <p class="stat-value">{{ pendingReviews() }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2"/>
+          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M23 21V19C23 17.9391 22.5786 16.9217 21.8284 16.1716C21.0783 15.4214 20.0609 15 19 15H17" stroke="currentColor" stroke-width="2"/>
+          <circle cx="19" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Pacientes Activos</p>
+        <p class="stat-value">{{ activePatients() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Upcoming Appointments -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="h3">Próximas Citas</h2>
+        <a routerLink="/appointments" class="link-primary">Ver todas</a>
+      </div>
+      <div class="appointments-list">
+        @for (appointment of upcomingAppointments(); track appointment.id) {
+          <div class="appointment-item">
+            <div class="appointment-time">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="var(--color-cc-bold-green)" stroke-width="2"/>
+                <path d="M12 6V12L16 14" stroke="var(--color-cc-bold-green)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span class="time">{{ appointment.time }}</span>
+            </div>
+            <div class="appointment-details">
+              <p class="patient-name">{{ appointment.patientName }}</p>
+              <p class="appointment-type">{{ appointment.type }}</p>
+            </div>
+            <button class="btn-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Critical Alerts -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="h3">Alertas Críticas</h2>
+        <a routerLink="/alerts" class="link-danger">Ver todas</a>
+      </div>
+      <div class="alerts-list">
+        @for (alert of criticalAlerts(); track alert.id) {
+          <div class="alert-item" [class.severity-high]="alert.severity === 'high'" [class.severity-medium]="alert.severity === 'medium'">
+            <div class="alert-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55199 18.9945C1.55101 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7239C2.83871 20.901 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="alert-details">
+              <p class="alert-patient">{{ alert.patientName }}</p>
+              <p class="alert-condition">{{ alert.condition }}</p>
+              <p class="alert-time">{{ alert.time }}</p>
+            </div>
+            <button class="btn btn-sm btn-primary">Revisar</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats Section -->
+  <div class="quick-stats-section">
+    <div class="section-header">
+      <h2 class="h2">Resumen Semanal</h2>
+    </div>
+    <div class="quick-stats-grid">
+      <div class="quick-stat">
+        <div class="stat-number">32</div>
+        <div class="stat-description">Consultas realizadas</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-number">8</div>
+        <div class="stat-description">Nuevos pacientes</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-number">95%</div>
+        <div class="stat-description">Satisfacción</div>
+      </div>
+      <div class="quick-stat">
+        <div class="stat-number">4.5h</div>
+        <div class="stat-description">Tiempo promedio</div>
+      </div>
+    </div>
+  </div>
+</div>

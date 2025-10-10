@@ -1,0 +1,31 @@
+.footer {
+  background: var(--color-cc-dark-blue);
+  color: var(--color-text-secondary-2);
+  padding: var(--spacing-lg) 0;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.copyright,
+.made-with {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .copyright,
+  .made-with {
+    font-size: 12px;
+  }
+}

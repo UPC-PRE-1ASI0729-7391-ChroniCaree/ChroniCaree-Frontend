@@ -1,0 +1,45 @@
+{
+  "users": [
+    { "id": 1, "email": "ana@b2c.com", "role": "patient", "name": "Ana Rodríguez" },
+    { "id": 2, "email": "dr.maria@hospital.com", "role": "doctor", "name": "Dra. María López" },
+    { "id": 3, "email": "dr.juan@chronicaree.com", "role": "doctor", "name": "Dr. Juan Torres" },
+    { "id": 4, "email": "admin@saludvida.com", "role": "hospital_admin", "name": "Admin SaludVida" }
+  ],
+  "tenants": [
+    { "id": 1, "name": "Clínica SaludVida" }
+  ],
+  "subscriptions": [
+    { "id": 1, "payerType": "patient", "payerId": 1, "patientId": 1, "plan": "premium", "status": "active" }
+  ],
+  "patients": [
+    { "id": 1, "userId": 1, "assignedDoctorId": 3, "tenantId": null, "subscriptionId": 1 }
+  ],
+  "doctors": [
+    { "id": 1, "userId": 2, "tenantId": 1, "isIndependent": false },
+    { "id": 2, "userId": 3, "tenantId": null, "isIndependent": true }
+  ],
+  "symptoms": [
+    { "id": 1, "patientId": 1, "glucose": 180, "bloodPressure": "140/90", "fatigue": 7, "pain": 3, "timestamp": "2025-04-05T08:30:00Z" }
+  ],
+  "medications": [
+    { "id": 1, "patientId": 1, "name": "Metformina", "dosage": "500mg", "schedule": "08:00,20:00", "isActive": true }
+  ],
+  "adherence": [
+    { "id": 1, "medicationId": 1, "takenAt": "2025-04-05T08:05:00Z", "confirmed": true }
+  ],
+  "devices": [
+    { "id": 1, "patientId": 1, "type": "glucometer", "lastSync": "2025-04-05T08:25:00Z" }
+  ],
+  "messages": [
+    { "id": 1, "senderId": 1, "receiverId": 3, "content": "Doctor, mi glucosa está alta esta mañana.", "timestamp": "2025-04-05T08:35:00Z", "read": false }
+  ],
+  "alerts": [
+    { "id": 1, "patientId": 1, "type": "glucose_high", "value": 180, "threshold": 140, "severity": "warning", "notifiedDoctor": false, "timestamp": "2025-04-05T08:31:00Z" }
+  ],
+  "diagnoses": [
+    { "id": 1, "patientId": 1, "condition": "Diabetes tipo 2", "icd10": "E11.9", "dateDiagnosed": "2023-01-15" }
+  ],
+  "treatmentPlans": [
+    { "id": 1, "patientId": 1, "doctorId": 3, "goals": "Control glucémico <140 mg/dL", "createdAt": "2025-04-01T10:00:00Z" }
+  ]
+}
