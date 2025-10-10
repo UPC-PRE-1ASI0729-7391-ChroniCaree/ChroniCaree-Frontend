@@ -1,29 +1,29 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LanguageSwitcherContentComponent } from '../language-switcher-content/language-switcher-content';
+import { LanguageSwitcherComponent } from '../language-switcher/language-switcher';
 
 @Component({
   selector: 'app-header-content',
   standalone: true,
-  imports: [CommonModule, LanguageSwitcherContentComponent],
+  imports: [CommonModule, LanguageSwitcherComponent],
   templateUrl: './header-content.html',
   styleUrl: './header-content.css'
 })
 export class HeaderContentComponent {
-  protected readonly currentUser = signal({
+  readonly currentUser = signal({
     name: 'Dr. Juan Torres',
     role: 'Médico',
     avatar: '👨‍⚕️'
   });
 
-  protected readonly notifications = signal([
+  readonly notifications = signal([
     { id: 1, message: 'Nueva cita programada', unread: true },
     { id: 2, message: 'Resultado de laboratorio disponible', unread: true },
     { id: 3, message: 'Mensaje de paciente', unread: false }
   ]);
 
-  protected showNotifications = signal(false);
-  protected showUserMenu = signal(false);
+  showNotifications = signal(false);
+  showUserMenu = signal(false);
 
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);

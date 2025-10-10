@@ -8,21 +8,20 @@ interface Language {
 }
 
 @Component({
-  selector: 'app-language-switcher-content',
+  selector: 'app-language-switcher',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './language-switcher-content.html',
-  styleUrl: './language-switcher-content.css'
+  templateUrl: './language-switcher.html',
+  styleUrl: './language-switcher.css'
 })
-export class LanguageSwitcherContentComponent {
-  protected readonly languages: Language[] = [
+export class LanguageSwitcherComponent {
+  readonly languages: Language[] = [
     { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'pt', name: 'Português', flag: '🇧🇷' }
+    { code: 'en', name: 'English', flag: '🇺🇸' }
   ];
 
-  protected readonly currentLanguage = signal<Language>(this.languages[0]);
-  protected readonly showDropdown = signal(false);
+  readonly currentLanguage = signal<Language>(this.languages[0]);
+  readonly showDropdown = signal(false);
 
   toggleDropdown(): void {
     this.showDropdown.update(v => !v);

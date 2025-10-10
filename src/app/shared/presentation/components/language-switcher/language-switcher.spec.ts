@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LanguageSwitcherContentComponent } from './language-switcher-content';
+import { LanguageSwitcherComponent } from './language-switcher';
 
-describe('LanguageSwitcherContentComponent', () => {
-  let component: LanguageSwitcherContentComponent;
-  let fixture: ComponentFixture<LanguageSwitcherContentComponent>;
+describe('LanguageSwitcherComponent', () => {
+  let component: LanguageSwitcherComponent;
+  let fixture: ComponentFixture<LanguageSwitcherComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LanguageSwitcherContentComponent]
+      imports: [LanguageSwitcherComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LanguageSwitcherContentComponent);
+    fixture = TestBed.createComponent(LanguageSwitcherComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,7 +21,7 @@ describe('LanguageSwitcherContentComponent', () => {
   });
 
   it('should have languages', () => {
-    expect(component.languages.length).toBe(3);
+    expect(component.languages.length).toBe(2);
   });
 
   it('should toggle dropdown', () => {

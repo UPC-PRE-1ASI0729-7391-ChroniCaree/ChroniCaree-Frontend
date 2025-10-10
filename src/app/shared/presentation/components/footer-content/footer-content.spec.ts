@@ -19,14 +19,4 @@ describe('FooterContentComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('should have current year', () => {
-    expect(component.currentYear).toBe(new Date().getFullYear());
-  });
-
-  it('should have links sections', () => {
-    expect(component.links.company.length).toBeGreaterThan(0);
-    expect(component.links.support.length).toBeGreaterThan(0);
-    expect(component.links.legal.length).toBeGreaterThan(0);
-  });
 });
