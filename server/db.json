@@ -1,45 +1,64 @@
 {
   "users": [
-    { "id": 1, "email": "ana@b2c.com", "role": "patient", "name": "Ana Rodríguez" },
-    { "id": 2, "email": "dr.maria@hospital.com", "role": "doctor", "name": "Dra. María López" },
-    { "id": 3, "email": "dr.juan@chronicaree.com", "role": "doctor", "name": "Dr. Juan Torres" },
-    { "id": 4, "email": "admin@saludvida.com", "role": "hospital_admin", "name": "Admin SaludVida" }
+    { "id": 1, "email": "ana@b2c.com", "role": "patient", "name": "Ana Rodríguez", "password": "password123", "isVerified": true, "twoFactorEnabled": false },
+    { "id": 2, "email": "dr.maria@hospital.com", "role": "doctor", "name": "Dra. María López", "password": "password123", "isVerified": true, "twoFactorEnabled": false },
+    { "id": 3, "email": "dr.juan@chronicaree.com", "role": "doctor", "name": "Dr. Juan Torres", "password": "password123", "isVerified": true, "twoFactorEnabled": false },
+    { "id": 4, "email": "admin@saludvida.com", "role": "hospital_admin", "name": "Admin SaludVida", "password": "password123", "isVerified": true, "twoFactorEnabled": false }
   ],
   "tenants": [
-    { "id": 1, "name": "Clínica SaludVida" }
+    { "id": 1, "name": "Clínica SaludVida", "address": "Av. Principal 123", "phone": "+51 999 888 777", "plan": "enterprise", "status": "active", "registrationDate": "2024-01-15" }
   ],
   "subscriptions": [
-    { "id": 1, "payerType": "patient", "payerId": 1, "patientId": 1, "plan": "premium", "status": "active" }
+    { "id": 1, "payerType": "patient", "payerId": 1, "patientId": 1, "plan": "premium", "status": "active", "startDate": "2025-01-01", "endDate": "2025-12-31" },
+    { "id": 2, "payerType": "tenant", "payerId": 1, "patientId": null, "plan": "enterprise", "status": "active", "startDate": "2024-01-15", "endDate": "2025-01-15" }
   ],
   "patients": [
-    { "id": 1, "userId": 1, "assignedDoctorId": 3, "tenantId": null, "subscriptionId": 1 }
+    { "id": 1, "userId": 1, "assignedDoctorId": 3, "tenantId": null, "subscriptionId": 1, "firstName": "Ana", "lastName": "Rodríguez", "dni": "12345678", "birthDate": "1980-05-15", "gender": "female", "phone": "+51 999 111 222", "address": "Calle Lima 456", "weight": 68, "height": 1.65, "bmi": 24.9 }
   ],
   "doctors": [
-    { "id": 1, "userId": 2, "tenantId": 1, "isIndependent": false },
-    { "id": 2, "userId": 3, "tenantId": null, "isIndependent": true }
+    { "id": 1, "userId": 2, "tenantId": 1, "isIndependent": false, "firstName": "María", "lastName": "López", "dni": "87654321", "specialty": "Endocrinología", "licenseNumber": "CMP-12345", "phone": "+51 999 333 444", "isVerified": true },
+    { "id": 2, "userId": 3, "tenantId": null, "isIndependent": true, "firstName": "Juan", "lastName": "Torres", "dni": "11223344", "specialty": "Cardiología", "licenseNumber": "CMP-54321", "phone": "+51 999 555 666", "isVerified": true }
+  ],
+  "records": [
+    { "id": 1, "patientId": 1, "doctorId": 3, "type": "vital_signs", "date": "2025-04-05T08:30:00Z", "glucose": 180, "bloodPressure": "140/90", "heartRate": 78, "temperature": 36.5, "weight": 68, "notes": "Glucosa elevada" },
+    { "id": 2, "patientId": 1, "doctorId": 3, "type": "symptoms", "date": "2025-04-05T09:00:00Z", "fatigue": 7, "pain": 3, "dizziness": 2, "notes": "Paciente reporta cansancio" },
+    { "id": 3, "patientId": 1, "doctorId": 3, "type": "consultation", "date": "2025-04-01T10:00:00Z", "diagnosis": "Control de diabetes", "treatment": "Continuar con Metformina", "notes": "Paciente estable, seguir monitoreo" }
   ],
   "symptoms": [
     { "id": 1, "patientId": 1, "glucose": 180, "bloodPressure": "140/90", "fatigue": 7, "pain": 3, "timestamp": "2025-04-05T08:30:00Z" }
   ],
   "medications": [
-    { "id": 1, "patientId": 1, "name": "Metformina", "dosage": "500mg", "schedule": "08:00,20:00", "isActive": true }
+    { "id": 1, "patientId": 1, "name": "Metformina", "dosage": "500mg", "frequency": "2 veces al día", "schedule": "08:00,20:00", "isActive": true, "startDate": "2025-01-01", "prescribedBy": 3 },
+    { "id": 2, "patientId": 1, "name": "Enalapril", "dosage": "10mg", "frequency": "1 vez al día", "schedule": "08:00", "isActive": true, "startDate": "2025-01-01", "prescribedBy": 3 }
   ],
   "adherence": [
-    { "id": 1, "medicationId": 1, "takenAt": "2025-04-05T08:05:00Z", "confirmed": true }
+    { "id": 1, "medicationId": 1, "patientId": 1, "scheduledTime": "2025-04-05T08:00:00Z", "takenAt": "2025-04-05T08:05:00Z", "confirmed": true, "skipped": false },
+    { "id": 2, "medicationId": 1, "patientId": 1, "scheduledTime": "2025-04-05T20:00:00Z", "takenAt": null, "confirmed": false, "skipped": false }
   ],
   "devices": [
-    { "id": 1, "patientId": 1, "type": "glucometer", "lastSync": "2025-04-05T08:25:00Z" }
+    { "id": 1, "patientId": 1, "type": "glucometer", "brand": "Accu-Chek", "model": "Guide", "lastSync": "2025-04-05T08:25:00Z", "isActive": true },
+    { "id": 2, "patientId": 1, "type": "blood_pressure", "brand": "Omron", "model": "M3", "lastSync": "2025-04-05T08:30:00Z", "isActive": true }
   ],
   "messages": [
-    { "id": 1, "senderId": 1, "receiverId": 3, "content": "Doctor, mi glucosa está alta esta mañana.", "timestamp": "2025-04-05T08:35:00Z", "read": false }
+    { "id": 1, "senderId": 1, "receiverId": 3, "senderRole": "patient", "receiverRole": "doctor", "subject": "Consulta sobre glucosa", "content": "Doctor, mi glucosa está alta esta mañana.", "timestamp": "2025-04-05T08:35:00Z", "read": false, "attachments": [] },
+    { "id": 2, "senderId": 3, "receiverId": 1, "senderRole": "doctor", "receiverRole": "patient", "subject": "Re: Consulta sobre glucosa", "content": "Buenos días Ana, vamos a ajustar la medicación. Por favor mide tu glucosa después del desayuno también.", "timestamp": "2025-04-05T09:15:00Z", "read": true, "attachments": [] }
   ],
   "alerts": [
-    { "id": 1, "patientId": 1, "type": "glucose_high", "value": 180, "threshold": 140, "severity": "warning", "notifiedDoctor": false, "timestamp": "2025-04-05T08:31:00Z" }
+    { "id": 1, "patientId": 1, "doctorId": 3, "type": "glucose_high", "value": 180, "threshold": 140, "severity": "warning", "notifiedPatient": true, "notifiedDoctor": false, "timestamp": "2025-04-05T08:31:00Z", "resolved": false },
+    { "id": 2, "patientId": 1, "doctorId": 3, "type": "blood_pressure_high", "value": "140/90", "threshold": "130/85", "severity": "critical", "notifiedPatient": true, "notifiedDoctor": true, "timestamp": "2025-04-05T08:32:00Z", "resolved": false }
   ],
   "diagnoses": [
-    { "id": 1, "patientId": 1, "condition": "Diabetes tipo 2", "icd10": "E11.9", "dateDiagnosed": "2023-01-15" }
+    { "id": 1, "patientId": 1, "doctorId": 3, "condition": "Diabetes tipo 2", "icd10": "E11.9", "dateDiagnosed": "2023-01-15", "status": "active", "notes": "Paciente en tratamiento con Metformina" },
+    { "id": 2, "patientId": 1, "doctorId": 3, "condition": "Hipertensión Arterial", "icd10": "I10", "dateDiagnosed": "2023-06-20", "status": "active", "notes": "Control con Enalapril" }
   ],
   "treatmentPlans": [
-    { "id": 1, "patientId": 1, "doctorId": 3, "goals": "Control glucémico <140 mg/dL", "createdAt": "2025-04-01T10:00:00Z" }
+    { "id": 1, "patientId": 1, "doctorId": 3, "title": "Control de Diabetes", "goals": "Control glucémico <140 mg/dL", "medications": [1], "recommendations": "Dieta baja en azúcares, ejercicio 30 min/día", "createdAt": "2025-04-01T10:00:00Z", "updatedAt": "2025-04-05T10:00:00Z", "status": "active" }
+  ],
+  "appointments": [
+    { "id": 1, "patientId": 1, "doctorId": 3, "date": "2025-04-15", "time": "10:00", "type": "Consulta de control", "status": "scheduled", "notes": "" },
+    { "id": 2, "patientId": 1, "doctorId": 3, "date": "2025-04-20", "time": "15:30", "type": "Seguimiento", "status": "scheduled", "notes": "" }
+  ],
+  "staff": [
+    { "id": 1, "userId": 4, "tenantId": 1, "role": "admin", "firstName": "Admin", "lastName": "SaludVida", "position": "Administrador del Sistema", "phone": "+51 999 777 888" }
   ]
 }
