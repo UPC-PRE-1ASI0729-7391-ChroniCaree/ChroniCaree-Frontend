@@ -1,12 +1,4 @@
 <div class="nudge-panel">
-  <div class="panel-header">
-    <h3>
-      <mat-icon>notifications_active</mat-icon>
-      Recordatorios
-      <span class="badge" *ngIf="activeCount() > 0" [matBadge]="activeCount()" matBadgeColor="warn"></span>
-    </h3>
-  </div>
-
   <div class="panel-body">
     @if (loading()) {
       <div class="loading-state">

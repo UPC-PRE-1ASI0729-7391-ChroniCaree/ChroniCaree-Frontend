@@ -192,30 +192,304 @@
       "notes": "me estoy muriendo ayuda",
       "timestamp": "2025-10-10T17:10:14.334Z",
       "isEdited": false
+    },
+    {
+      "id": 4,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "122/12",
+      "heartRate": 32,
+      "temperature": 41,
+      "oxygenSaturation": 43,
+      "fatigue": 8,
+      "pain": 9,
+      "dizziness": 8,
+      "notes": "32",
+      "timestamp": "2025-10-10T20:10:09.598Z",
+      "isEdited": false
     }
   ],
   "medications": [
     {
-      "id": 1,
-      "patientId": 1,
+      "id": "med_1",
+      "patientId": "1",
       "name": "Metformina",
-      "dosage": "500mg",
-      "frequency": "2 veces al día",
-      "schedule": "08:00,20:00",
-      "isActive": true,
-      "startDate": "2025-01-01",
-      "prescribedBy": 3
+      "type": "pill",
+      "dosage": "500mg - 2 tabletas",
+      "schedule": {
+        "frequency": "twice_daily",
+        "times": [
+          "08:00",
+          "20:00"
+        ],
+        "startDate": "2025-01-01T00:00:00Z",
+        "endDate": null
+      },
+      "prescribedBy": "Dr. Juan Torres",
+      "prescribedDate": "2025-01-01T00:00:00Z",
+      "status": "active",
+      "instructions": "Tomar con alimentos, preferiblemente después del desayuno y cena",
+      "sideEffects": [
+        "Náuseas leves",
+        "Dolor estomacal"
+      ],
+      "contraindications": [
+        "Enfermedad renal severa",
+        "Acidosis metabólica"
+      ],
+      "purpose": "Control de glucosa en sangre para diabetes tipo 2",
+      "refillDate": "2025-04-20T00:00:00Z",
+      "logs": [
+        {
+          "id": "log_1",
+          "medicationId": "med_1",
+          "scheduledTime": "2025-04-05T08:00:00Z",
+          "actualTime": "2025-04-05T08:05:00Z",
+          "status": "taken",
+          "notes": "Tomado con desayuno",
+          "createdAt": "2025-04-05T08:05:00Z"
+        },
+        {
+          "id": "log_2",
+          "medicationId": "med_1",
+          "scheduledTime": "2025-04-04T20:00:00Z",
+          "actualTime": "2025-04-04T20:10:00Z",
+          "status": "taken",
+          "createdAt": "2025-04-04T20:10:00Z"
+        },
+        {
+          "id": "log_3",
+          "medicationId": "med_1",
+          "scheduledTime": "2025-04-04T08:00:00Z",
+          "actualTime": "2025-04-04T08:00:00Z",
+          "status": "taken",
+          "createdAt": "2025-04-04T08:00:00Z"
+        }
+      ],
+      "createdAt": "2025-01-01T00:00:00Z",
+      "updatedAt": "2025-04-05T08:05:00Z"
     },
     {
-      "id": 2,
-      "patientId": 1,
+      "id": "med_2",
+      "patientId": "1",
       "name": "Enalapril",
-      "dosage": "10mg",
-      "frequency": "1 vez al día",
-      "schedule": "08:00",
-      "isActive": true,
-      "startDate": "2025-01-01",
-      "prescribedBy": 3
+      "type": "pill",
+      "dosage": "10mg - 2 tableta",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "08:00"
+        ],
+        "startDate": "2025-01-01T00:00:00.000Z"
+      },
+      "prescribedBy": "Dr. Juan Torres",
+      "prescribedDate": "2025-01-01T00:00:00.000Z",
+      "status": "active",
+      "instructions": "Tomar en ayunas o con alimentos, preferiblemente a la misma hora cada día",
+      "sideEffects": [
+        "Tos seca",
+        "Mareos"
+      ],
+      "contraindications": [
+        "Embarazo",
+        "Angioedema previo"
+      ],
+      "purpose": "Control de presión arterial - Hipertensión",
+      "refillDate": "2025-04-25T00:00:00.000Z",
+      "logs": [
+        {
+          "id": "log_4",
+          "medicationId": "med_2",
+          "scheduledTime": "2025-04-05T08:00:00.000Z",
+          "actualTime": "2025-04-05T08:05:00.000Z",
+          "status": "taken",
+          "notes": "Tomado con desayuno",
+          "createdAt": "2025-04-05T08:05:00.000Z"
+        },
+        {
+          "id": "log_5",
+          "medicationId": "med_2",
+          "scheduledTime": "2025-04-04T08:00:00.000Z",
+          "actualTime": "2025-04-04T08:00:00.000Z",
+          "status": "taken",
+          "createdAt": "2025-04-04T08:00:00.000Z"
+        }
+      ],
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-10-10T20:31:06.260Z"
+    },
+    {
+      "id": "med_3",
+      "patientId": "1",
+      "name": "Atorvastatina",
+      "type": "pill",
+      "dosage": "20mg - 1 tableta",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "21:00"
+        ],
+        "startDate": "2025-02-01T00:00:00Z",
+        "endDate": null
+      },
+      "prescribedBy": "Dr. Juan Torres",
+      "prescribedDate": "2025-02-01T00:00:00Z",
+      "status": "active",
+      "instructions": "Tomar antes de dormir. Evitar jugo de toronja",
+      "sideEffects": [
+        "Dolor muscular",
+        "Fatiga"
+      ],
+      "contraindications": [
+        "Enfermedad hepática activa",
+        "Embarazo"
+      ],
+      "purpose": "Reducción de colesterol y triglicéridos",
+      "refillDate": "2025-04-15T00:00:00Z",
+      "logs": [
+        {
+          "id": "log_6",
+          "medicationId": "med_3",
+          "scheduledTime": "2025-04-04T21:00:00Z",
+          "actualTime": "2025-04-04T21:15:00Z",
+          "status": "taken",
+          "createdAt": "2025-04-04T21:15:00Z"
+        },
+        {
+          "id": "log_7",
+          "medicationId": "med_3",
+          "scheduledTime": "2025-04-03T21:00:00Z",
+          "status": "missed",
+          "skippedReason": "Se me olvidó",
+          "createdAt": "2025-04-04T08:00:00Z"
+        }
+      ],
+      "createdAt": "2025-02-01T00:00:00Z",
+      "updatedAt": "2025-04-04T21:15:00Z"
+    },
+    {
+      "id": "med_4",
+      "patientId": "1",
+      "name": "Vitamina D3",
+      "type": "capsule",
+      "dosage": "2000 IU - 1 cápsula",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "12:00"
+        ],
+        "startDate": "2025-03-01T00:00:00Z",
+        "endDate": null
+      },
+      "prescribedBy": "Dr. Juan Torres",
+      "prescribedDate": "2025-03-01T00:00:00Z",
+      "status": "active",
+      "instructions": "Tomar con la comida principal del día",
+      "sideEffects": [],
+      "contraindications": [
+        "Hipercalcemia"
+      ],
+      "purpose": "Suplemento vitamínico para salud ósea",
+      "refillDate": "2025-05-01T00:00:00Z",
+      "logs": [
+        {
+          "id": "log_8",
+          "medicationId": "med_4",
+          "scheduledTime": "2025-04-05T12:00:00Z",
+          "status": "scheduled",
+          "createdAt": "2025-04-05T00:00:00Z"
+        }
+      ],
+      "createdAt": "2025-03-01T00:00:00Z",
+      "updatedAt": "2025-04-05T12:00:00Z"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert_1",
+      "patientId": "1",
+      "type": "vital_sign_high",
+      "severity": "high",
+      "title": "Presión Arterial Sistólica alta ⬆️",
+      "message": "Tu Presión Arterial Sistólica está en 145 mmHg, fuera del rango normal (90-120 mmHg)",
+      "status": "active",
+      "metadata": {
+        "vitalSign": "Presión Arterial Sistólica",
+        "value": 145,
+        "unit": "mmHg",
+        "threshold": 120,
+        "measurement": "symptom_1"
+      },
+      "createdAt": "2025-04-05T10:30:00Z"
+    },
+    {
+      "id": "alert_2",
+      "patientId": "1",
+      "type": "vital_sign_high",
+      "severity": "critical",
+      "title": "Glucosa alta ⬆️",
+      "message": "Tu Glucosa está en 180 mg/dL, fuera del rango normal (70-100 mg/dL)",
+      "status": "active",
+      "metadata": {
+        "vitalSign": "Glucosa",
+        "value": 180,
+        "unit": "mg/dL",
+        "threshold": 100,
+        "measurement": "symptom_2"
+      },
+      "createdAt": "2025-04-05T14:15:00Z"
+    },
+    {
+      "id": "alert_3",
+      "patientId": "1",
+      "type": "vital_sign_low",
+      "severity": "medium",
+      "title": "Saturación de Oxígeno baja ⬇️",
+      "message": "Tu Saturación de Oxígeno está en 92%, fuera del rango normal (95-100%)",
+      "status": "active",
+      "metadata": {
+        "vitalSign": "Saturación de Oxígeno",
+        "value": 92,
+        "unit": "%",
+        "threshold": 95,
+        "measurement": "symptom_3"
+      },
+      "createdAt": "2025-04-05T09:00:00Z"
+    },
+    {
+      "id": "alert_4",
+      "patientId": "1",
+      "type": "vital_sign_high",
+      "severity": "high",
+      "title": "Frecuencia Cardíaca alta ⬆️",
+      "message": "Tu Frecuencia Cardíaca está en 110 bpm, fuera del rango normal (60-100 bpm)",
+      "status": "acknowledged",
+      "metadata": {
+        "vitalSign": "Frecuencia Cardíaca",
+        "value": 110,
+        "unit": "bpm",
+        "threshold": 100,
+        "measurement": "symptom_4"
+      },
+      "createdAt": "2025-04-04T16:20:00Z",
+      "acknowledgedAt": "2025-04-04T17:00:00Z",
+      "acknowledgedBy": "user_1",
+      "notes": "Después de ejercicio, monitoreando"
+    },
+    {
+      "id": "alert_5",
+      "patientId": "1",
+      "type": "medication_overdue",
+      "severity": "medium",
+      "title": "Medicación atrasada",
+      "message": "No has tomado Metformina a las 08:00 AM como estaba programado",
+      "status": "resolved",
+      "metadata": {
+        "medicationId": "med_1"
+      },
+      "createdAt": "2025-04-04T08:30:00Z",
+      "resolvedAt": "2025-04-04T09:15:00Z",
+      "notes": "Tomado con retraso"
     }
   ],
   "adherence": [
@@ -282,34 +556,6 @@
       "timestamp": "2025-04-05T09:15:00Z",
       "read": true,
       "attachments": []
-    }
-  ],
-  "alerts": [
-    {
-      "id": 1,
-      "patientId": 1,
-      "doctorId": 3,
-      "type": "glucose_high",
-      "value": 180,
-      "threshold": 140,
-      "severity": "warning",
-      "notifiedPatient": true,
-      "notifiedDoctor": false,
-      "timestamp": "2025-04-05T08:31:00Z",
-      "resolved": false
-    },
-    {
-      "id": 2,
-      "patientId": 1,
-      "doctorId": 3,
-      "type": "blood_pressure_high",
-      "value": "140/90",
-      "threshold": "130/85",
-      "severity": "critical",
-      "notifiedPatient": true,
-      "notifiedDoctor": true,
-      "timestamp": "2025-04-05T08:32:00Z",
-      "resolved": false
     }
   ],
   "diagnoses": [
@@ -444,8 +690,8 @@
       "actionRoute": "/medications",
       "icon": "medication",
       "isDismissed": false,
-      "isSnoozed": false,
-      "snoozeUntil": null,
+      "isSnoozed": true,
+      "snoozeUntil": "2025-10-10T21:06:02.881Z",
       "createdAt": "2025-04-05T08:00:00Z",
       "dismissedAt": null
     },
@@ -476,8 +722,8 @@
       "actionRoute": null,
       "icon": "water_drop",
       "isDismissed": false,
-      "isSnoozed": false,
-      "snoozeUntil": null,
+      "isSnoozed": true,
+      "snoozeUntil": "2025-10-10T21:06:09.196Z",
       "createdAt": "2025-04-05T10:00:00Z",
       "dismissedAt": null
     },

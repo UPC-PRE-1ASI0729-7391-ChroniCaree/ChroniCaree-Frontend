@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
 import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
+import { MedicationLogComponent } from '../../../../medications/presentation/components/medication-log/medication-log';
+import { AlertPanelComponent } from '../../../../alerts/presentation/components/alert-panel/alert-panel';
 import { PatientStore } from '../../../application/patient.store';
 import { UserStore } from '../../../../iam/application/user.store';
 import { SymptomStore } from '../../../../clinical/application/symptom.store';
 import { DiagnosisStore } from '../../../../medical-records/application/diagnosis.store';
+import { MedicationStore } from '../../../../medications/application/medication.store';
+import { AlertStore } from '../../../../alerts/application/alert.store';
 
 @Component({
   selector: 'app-dashboard-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent],
+  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, AlertPanelComponent],
   templateUrl: './dashboard-patient.html',
   styleUrl: './dashboard-patient.css'
 })
@@ -89,12 +93,15 @@ export class DashboardPatient implements OnInit {
     };
   });
 
-  // Medicamentos (mock data - se integrará con el store real)
-  protected readonly medications = signal([
-    { id: 1, name: 'Metformina', dose: '500mg', schedule: '08:00', taken: false },
-    { id: 2, name: 'Enalapril', dose: '10mg', schedule: '14:00', taken: false },
-    { id: 3, name: 'Aspirina', dose: '100mg', schedule: '20:00', taken: false }
-  ]);
+  // Medicamentos (de MedicationStore)
+  protected readonly medicationCount = computed(() => {
+    return this.medicationStore.medicationCount();
+  });
+
+  protected readonly todayMedications = computed(() => {
+    const schedule = this.medicationStore.todaySchedule();
+    return schedule.slice(0, 3); // Mostrar solo primeros 3 en dashboard
+  });
 
   // Próximas citas (mock data - se integrará con el store real)
   protected readonly upcomingAppointments = signal([
@@ -135,7 +142,9 @@ export class DashboardPatient implements OnInit {
     private patientStore: PatientStore,
     private userStore: UserStore,
     private symptomStore: SymptomStore,
-    private diagnosisStore: DiagnosisStore
+    private diagnosisStore: DiagnosisStore,
+    private medicationStore: MedicationStore,
+    private alertStore: AlertStore
   ) {}
 
   ngOnInit(): void {
@@ -165,17 +174,12 @@ export class DashboardPatient implements OnInit {
 
     // Cargar diagnósticos
     this.diagnosisStore.loadAllDiagnoses().subscribe();
-  }
 
-  /**
-   * Marca un medicamento como tomado
-   */
-  protected takeMedication(medicationId: number): void {
-    const meds = this.medications();
-    const updated = meds.map(m => 
-      m.id === medicationId ? { ...m, taken: true } : m
-    );
-    this.medications.set(updated);
+    // Cargar medicamentos
+    this.medicationStore.loadMedicationsByPatient('1').subscribe();
+
+    // Cargar alertas
+    this.alertStore.loadAlertsByPatient('1').subscribe();
   }
 
   /**
