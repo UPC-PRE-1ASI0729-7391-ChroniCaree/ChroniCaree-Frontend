@@ -76,7 +76,7 @@
               </div>
             </div>
             <ul class="menu-list">
-              <li><a href="#" class="menu-link">👤 Mi Perfil</a></li>
+              <li><a [routerLink]="getProfileRoute()" (click)="closeMenus()" class="menu-link">👤 Mi Perfil</a></li>
               <li><a href="#" class="menu-link">⚙️ Configuración</a></li>
               <li><a href="#" class="menu-link">❓ Ayuda</a></li>
               <li class="divider"></li>

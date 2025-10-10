@@ -54,6 +54,12 @@ export const routes: Routes = [
         loadComponent: () => import('./patients/presentation/views/dashboard-patient/dashboard-patient').then(m => m.DashboardPatient),
         title: `${baseTitle} - Dashboard Paciente`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () => import('./patients/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileComponent),
+        title: `${baseTitle} - Editar Perfil`,
+        data: { role: 'patient' }
       }
     ]
   },
@@ -79,6 +85,12 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor').then(m => m.DashboardDoctor),
         title: `${baseTitle} - Dashboard Doctor`,
+        data: { role: 'doctor' }
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () => import('./doctors/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileDoctorComponent),
+        title: `${baseTitle} - Editar Perfil Doctor`,
         data: { role: 'doctor' }
       }
     ]

@@ -1,13 +1,13 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher';
 import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   selector: 'app-header-content',
   standalone: true,
-  imports: [CommonModule, LanguageSwitcherComponent],
+  imports: [CommonModule, LanguageSwitcherComponent, RouterLink],
   templateUrl: './header-content.html',
   styleUrl: './header-content.css'
 })
@@ -96,6 +96,29 @@ export class HeaderContentComponent implements OnInit {
 
   getUnreadCount(): number {
     return this.notifications().filter(n => n.unread).length;
+  }
+
+  /**
+   * Obtiene la ruta del perfil según el rol del usuario
+   */
+  getProfileRoute(): string {
+    const role = localStorage.getItem('userRole');
+    
+    switch (role) {
+      case 'patient':
+        return '/patient/edit-profile';
+      case 'doctor':
+        return '/doctor/edit-profile';
+      case 'hospital_admin':
+        return '/settings'; // Placeholder para admin
+      default:
+        return '/patient/edit-profile';
+    }
+  }
+
+  closeMenus(): void {
+    this.showUserMenu.set(false);
+    this.showNotifications.set(false);
   }
 
   logout(): void {
