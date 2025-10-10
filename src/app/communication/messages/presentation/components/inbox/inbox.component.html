@@ -1,0 +1,16 @@
+<div class="layout">
+  <aside class="pane">
+    <h3>Mensajes</h3>
+    <a routerLink="compose">+ Nuevo</a>
+    <ul>
+      <li *ngFor="let t of threads">
+        <a [routerLink]="['/communication/messages/thread', t.id]">
+          {{ t.id }} — {{ t.status }}
+        </a>
+      </li>
+    </ul>
+  </aside>
+  <main class="content">
+    <router-outlet/>
+  </main>
+</div>

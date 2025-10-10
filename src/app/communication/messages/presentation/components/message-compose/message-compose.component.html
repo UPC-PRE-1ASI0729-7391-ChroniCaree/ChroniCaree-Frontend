@@ -1,0 +1,14 @@
+<section class="card">
+  <h2>Nuevo mensaje al médico</h2>
+
+  <label>Título</label>
+  <input [(ngModel)]="subject" placeholder="Asunto" />
+
+  <label>Mensaje</label>
+  <textarea [(ngModel)]="body" rows="6" placeholder="Describe tu consulta clínica"></textarea>
+
+  <label>Adjuntos</label>
+  <input type="file" (change)="onFiles($event)" multiple />
+
+  <button (click)="send()" [disabled]="!subject || !body">Enviar</button>
+</section>

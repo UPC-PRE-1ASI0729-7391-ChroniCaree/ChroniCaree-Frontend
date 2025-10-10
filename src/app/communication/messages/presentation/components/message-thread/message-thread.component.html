@@ -1,0 +1,21 @@
+<section class="card" *ngIf="vm() as data">
+  <header>
+    <h2>Conversación</h2>
+    <small>Estado: {{ data.status }}</small>
+  </header>
+
+  <ul class="msgs">
+    <li *ngFor="let m of data.messages">
+      <div class="meta">
+        <b>{{ m.senderRole === 'PATIENT' ? 'Paciente' : 'Médico' }}</b>
+        <span>· {{ m.createdAt | date:'short' }}</span>
+      </div>
+      <div class="body">{{ m.body }}</div>
+      <div class="files" *ngIf="m.attachments?.length">
+        <a *ngFor="let a of m.attachments" [href]="a.url" target="_blank" rel="noopener">
+          {{ a.fileName }}
+        </a>
+      </div>
+    </li>
+  </ul>
+</section>

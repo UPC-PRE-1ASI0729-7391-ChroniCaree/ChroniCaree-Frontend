@@ -9,74 +9,91 @@ export const routes: Routes = [
     redirectTo: '/iam/login',
     pathMatch: 'full'
   },
-  
+
   // Home route
   {
     path: 'home',
-    loadComponent: () => import('./shared/presentation/views/home/home').then(m => m.Home),
+    loadComponent: () =>
+      import('./shared/presentation/views/home/home').then(m => m.Home),
     title: `${baseTitle} - Inicio`
   },
-  
+
   // IAM routes (Authentication & Identity)
   {
     path: 'iam',
     children: [
       {
         path: 'register',
-        loadComponent: () => import('./iam/presentation/components/register-select/register-select').then(m => m.RegisterSelectComponent),
+        loadComponent: () =>
+          import('./iam/presentation/components/register-select/register-select')
+            .then(m => m.RegisterSelectComponent),
         title: `${baseTitle} - Seleccionar Registro`
       },
       {
         path: 'register/patient',
-        loadComponent: () => import('./iam/presentation/components/register-patient/register-patient').then(m => m.RegisterPatientComponent),
+        loadComponent: () =>
+          import('./iam/presentation/components/register-patient/register-patient')
+            .then(m => m.RegisterPatientComponent),
         title: `${baseTitle} - Registro de Paciente`
       },
       {
         path: 'register/hospital',
-        loadComponent: () => import('./iam/presentation/components/register-hospital/register-hospital').then(m => m.RegisterHospitalComponent),
+        loadComponent: () =>
+          import('./iam/presentation/components/register-hospital/register-hospital')
+            .then(m => m.RegisterHospitalComponent),
         title: `${baseTitle} - Registro de Hospital`,
         data: { analyticsId: 'hospital-registration' }
       },
       {
         path: 'login',
-        loadComponent: () => import('./iam/presentation/components/login/login').then(m => m.LoginComponent),
+        loadComponent: () =>
+          import('./iam/presentation/components/login/login')
+            .then(m => m.LoginComponent),
         title: `${baseTitle} - Iniciar Sesión`
       }
     ]
   },
-  
+
   // Patient routes
   {
     path: 'patient',
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./patients/presentation/views/dashboard-patient/dashboard-patient').then(m => m.DashboardPatient),
+        loadComponent: () =>
+          import('./patients/presentation/views/dashboard-patient/dashboard-patient')
+            .then(m => m.DashboardPatient),
         title: `${baseTitle} - Dashboard Paciente`,
         data: { role: 'patient' }
       },
       {
         path: 'edit-profile',
-        loadComponent: () => import('./patients/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileComponent),
+        loadComponent: () =>
+          import('./patients/presentation/views/edit-profile/edit-profile')
+            .then(m => m.EditProfileComponent),
         title: `${baseTitle} - Editar Perfil`,
         data: { role: 'patient' }
       },
       {
         path: 'recordatorios',
-        loadComponent: () => import('./communication/presentation/views/nudges-page/nudges-page').then(m => m.NudgesPageComponent),
+        loadComponent: () =>
+          import('./communication/presentation/views/nudges-page/nudges-page')
+            .then(m => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
         data: { role: 'patient' }
       }
     ]
   },
-  
+
   // Clinical routes (Symptoms & Medical Records)
   {
     path: 'clinical',
     children: [
       {
         path: 'symptoms/register',
-        loadComponent: () => import('./clinical/presentation/views/register-symptoms/register-symptoms').then(m => m.RegisterSymptomsComponent),
+        loadComponent: () =>
+          import('./clinical/presentation/views/register-symptoms/register-symptoms')
+            .then(m => m.RegisterSymptomsComponent),
         title: `${baseTitle} - Registrar Síntomas`,
         data: { role: 'patient' }
       }
@@ -89,61 +106,88 @@ export const routes: Routes = [
     children: [
       {
         path: 'diagnoses',
-        loadComponent: () => import('./medical-records/presentation/views/medical-diagnoses/medical-diagnoses').then(m => m.MedicalDiagnosesComponent),
+        loadComponent: () =>
+          import('./medical-records/presentation/views/medical-diagnoses/medical-diagnoses')
+            .then(m => m.MedicalDiagnosesComponent),
         title: `${baseTitle} - Diagnósticos Médicos`,
         data: { role: 'patient' }
       }
     ]
   },
-  
+
   // Doctor routes
   {
     path: 'doctor',
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor').then(m => m.DashboardDoctor),
+        loadComponent: () =>
+          import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor')
+            .then(m => m.DashboardDoctor),
         title: `${baseTitle} - Dashboard Doctor`,
         data: { role: 'doctor' }
       },
       {
         path: 'edit-profile',
-        loadComponent: () => import('./doctors/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileDoctorComponent),
+        loadComponent: () =>
+          import('./doctors/presentation/views/edit-profile/edit-profile')
+            .then(m => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
         data: { role: 'doctor' }
       }
     ]
   },
-  
-  // Coming Soon page (for features under development)
+
+  // Communication → Messages (US16/US17/US09)
   {
-    path: 'coming-soon',
-    loadComponent: () => import('./shared/presentation/components/coming-soon/coming-soon').then(m => m.ComingSoonComponent),
-    title: `${baseTitle} - Próximamente`
+    path: 'communication',
+    children: [
+      {
+        path: 'messages',
+        // Contenedor (lista + outlet para compose/thread)
+        loadComponent: () =>
+          import('./communication/messages/presentation/components/inbox/inbox.component')
+            .then(m => m.InboxComponent),
+        title: `${baseTitle} - Mensajes`,
+        children: [
+          {
+            path: 'compose',
+            loadComponent: () =>
+              import('./communication/messages/presentation/components/message-compose/message-compose.component')
+                .then(m => m.MessageComposeComponent),
+            title: `${baseTitle} - Nuevo Mensaje`
+          },
+          {
+            path: 'thread/:id',
+            loadComponent: () =>
+              import('./communication/messages/presentation/components/message-thread/message-thread.component')
+                .then(m => m.MessageThreadComponent),
+            title: `${baseTitle} - Conversación`
+          },
+          { path: '', pathMatch: 'full', redirectTo: 'compose' }
+        ]
+      }
+    ]
   },
-  
+
+  // ✅ Reemplazo del "Coming Soon" y atajos legados
+  { path: 'coming-soon', redirectTo: '/communication/messages', pathMatch: 'full' },
+  { path: 'messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+  { path: 'patient/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+
   // 404 Not Found page
   {
     path: '404',
-    loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),
+    loadComponent: () =>
+      import('./shared/presentation/components/not-found/not-found')
+        .then(m => m.NotFoundComponent),
     title: `${baseTitle} - Página no encontrada`
   },
-  
+
   // Legacy redirects for backward compatibility
-  { 
-    path: 'dashboard/doctor', 
-    redirectTo: 'doctor/dashboard', 
-    pathMatch: 'full' 
-  },
-  { 
-    path: 'dashboard/patient', 
-    redirectTo: 'patient/dashboard', 
-    pathMatch: 'full' 
-  },
-  
+  { path: 'dashboard/doctor', redirectTo: 'doctor/dashboard', pathMatch: 'full' },
+  { path: 'dashboard/patient', redirectTo: 'patient/dashboard', pathMatch: 'full' },
+
   // Wildcard route (always last) - redirect to 404
-  { 
-    path: '**', 
-    redirectTo: '/404'
-  }
+  { path: '**', redirectTo: '/404' }
 ];
