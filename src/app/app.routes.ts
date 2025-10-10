@@ -66,6 +66,12 @@ export const routes: Routes = [
         loadComponent: () => import('./communication/presentation/views/nudges-page/nudges-page').then(m => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'medicamentos',
+        loadComponent: () => import('./medications/presentation/views/medication-history/medication-history').then(m => m.MedicationHistoryComponent),
+        title: `${baseTitle} - Mis Medicamentos`,
+        data: { role: 'patient' }
       }
     ]
   },
