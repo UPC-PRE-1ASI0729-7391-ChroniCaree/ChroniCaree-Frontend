@@ -58,6 +58,19 @@ export const routes: Routes = [
     ]
   },
   
+  // Clinical routes (Symptoms & Medical Records)
+  {
+    path: 'clinical',
+    children: [
+      {
+        path: 'symptoms/register',
+        loadComponent: () => import('./clinical/presentation/views/register-symptoms/register-symptoms').then(m => m.RegisterSymptomsComponent),
+        title: `${baseTitle} - Registrar Síntomas`,
+        data: { role: 'patient' }
+      }
+    ]
+  },
+  
   // Doctor routes
   {
     path: 'doctor',
