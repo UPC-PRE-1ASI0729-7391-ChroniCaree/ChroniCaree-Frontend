@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { PdfExportService } from '../../../../shared/infrastructure/pdf-export.service';
 
 @Component({
   selector: 'app-dashboard-doctor',
@@ -10,12 +11,19 @@ import { RouterLink } from '@angular/router';
   styleUrl: './dashboard-doctor.css'
 })
 export class DashboardDoctor implements OnInit {
+  // --- Referencia al área que se exportará ---
+  @ViewChild('printArea', { static: false }) printArea!: ElementRef<HTMLElement>;
+
+  // --- Estado de exportación ---
+  protected readonly exporting = signal(false);
+
+  // --- Datos de ejemplo (signals) ---
   protected readonly doctorName = signal('Dr. Juan Pérez');
   protected readonly specialty = signal('Cardiología');
   protected readonly todayAppointments = signal(8);
   protected readonly pendingReviews = signal(12);
   protected readonly activePatients = signal(45);
-  
+
   protected readonly upcomingAppointments = signal([
     { id: 1, patientName: 'María García', time: '09:00', type: 'Consulta de control' },
     { id: 2, patientName: 'Carlos López', time: '10:30', type: 'Primera consulta' },
@@ -28,7 +36,25 @@ export class DashboardDoctor implements OnInit {
     { id: 2, patientName: 'Carmen Silva', condition: 'Glucosa fuera de rango', severity: 'medium', time: '08:30' }
   ]);
 
+  constructor(private pdf: PdfExportService) {}
+
   ngOnInit(): void {
     console.log('Dashboard Doctor inicializado');
+  }
+
+  // --- Acción: exportar PDF del dashboard ---
+  async onExportPdf(): Promise<void> {
+    if (!this.printArea) return;
+    this.exporting.set(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      await this.pdf.exportElementToPdf(this.printArea.nativeElement, {
+        filename: `dashboard-doctor-${today}.pdf`,
+        margin: 8,
+        scale: 2
+      });
+    } finally {
+      this.exporting.set(false);
+    }
   }
 }
