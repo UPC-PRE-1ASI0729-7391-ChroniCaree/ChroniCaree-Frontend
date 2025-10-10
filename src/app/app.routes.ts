@@ -129,6 +129,18 @@ export const routes: Routes = [
         loadComponent: () => import('./doctors/presentation/views/patients-list/patients-list').then(m => m.PatientsListComponent),
         title: `${baseTitle} - Mis Pacientes`,
         data: { role: 'doctor' }
+      },
+      {
+        path: 'appointments',
+        loadComponent: () => import('./doctors/presentation/views/appointments-list/appointments-list').then(m => m.AppointmentsListComponent),
+        title: `${baseTitle} - Mis Citas`,
+        data: { role: 'doctor' }
+      },
+      {
+        path: 'records',
+        loadComponent: () => import('./doctors/presentation/views/medical-records-list/medical-records-list').then(m => m.MedicalRecordsListComponent),
+        title: `${baseTitle} - Historiales Médicos`,
+        data: { role: 'doctor' }
       }
     ]
   },

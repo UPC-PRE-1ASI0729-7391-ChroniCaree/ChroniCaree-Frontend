@@ -100,7 +100,7 @@
     {
       "id": 1760134181081,
       "userId": 1760134180969,
-      "assignedDoctorId": null,
+      "assignedDoctorId": 2,
       "tenantId": null,
       "subscriptionId": null,
       "firstName": "Andreow",
@@ -110,9 +110,9 @@
       "gender": "male",
       "phone": "123456789",
       "address": "Av 123",
-      "weight": 0,
-      "height": 0,
-      "bmi": 0
+      "weight": 75,
+      "height": 1.75,
+      "bmi": 24.5
     }
   ],
   "doctors": [
@@ -147,36 +147,59 @@
     {
       "id": 1,
       "patientId": 1,
-      "doctorId": 3,
+      "doctorId": 2,
       "type": "vital_signs",
-      "date": "2025-04-05T08:30:00Z",
-      "glucose": 180,
-      "bloodPressure": "140/90",
-      "heartRate": 78,
+      "date": "2025-10-10T08:30:00Z",
+      "glucose": 95,
+      "bloodPressure": "120/80",
+      "heartRate": 72,
       "temperature": 36.5,
       "weight": 68,
-      "notes": "Glucosa elevada"
+      "notes": "Valores normales"
     },
     {
       "id": 2,
       "patientId": 1,
-      "doctorId": 3,
+      "doctorId": 2,
       "type": "symptoms",
-      "date": "2025-04-05T09:00:00Z",
-      "fatigue": 7,
-      "pain": 3,
-      "dizziness": 2,
-      "notes": "Paciente reporta cansancio"
+      "date": "2025-10-10T09:00:00Z",
+      "fatigue": 3,
+      "pain": 2,
+      "dizziness": 1,
+      "notes": "Leve cansancio reportado"
     },
     {
       "id": 3,
       "patientId": 1,
-      "doctorId": 3,
+      "doctorId": 2,
       "type": "consultation",
-      "date": "2025-04-01T10:00:00Z",
-      "diagnosis": "Control de diabetes",
-      "treatment": "Continuar con Metformina",
+      "date": "2025-10-08T10:00:00Z",
+      "diagnosis": "Control de rutina",
+      "treatment": "Continuar con medicación actual - Dieta balanceada",
       "notes": "Paciente estable, seguir monitoreo"
+    },
+    {
+      "id": 4,
+      "patientId": 1760134181081,
+      "doctorId": 2,
+      "type": "vital_signs",
+      "date": "2025-10-09T14:00:00Z",
+      "glucose": 88,
+      "bloodPressure": "118/75",
+      "heartRate": 68,
+      "temperature": 36.7,
+      "weight": 75,
+      "notes": "Primera evaluación - valores normales"
+    },
+    {
+      "id": 5,
+      "patientId": 1760134181081,
+      "doctorId": 2,
+      "type": "consultation",
+      "date": "2025-10-09T14:30:00Z",
+      "diagnosis": "Evaluación inicial",
+      "treatment": "Recomendaciones de estilo de vida saludable",
+      "notes": "Paciente joven, sin antecedentes relevantes"
     }
   ],
   "symptoms": [
@@ -674,22 +697,42 @@
     {
       "id": 1,
       "patientId": 1,
-      "doctorId": 3,
-      "date": "2025-04-15",
+      "doctorId": 2,
+      "date": "2025-10-11",
       "time": "10:00",
-      "type": "Consulta de control",
-      "status": "scheduled",
-      "notes": ""
+      "type": "CONSULTATION",
+      "status": "SCHEDULED",
+      "notes": "Control mensual de diabetes"
     },
     {
       "id": 2,
       "patientId": 1,
-      "doctorId": 3,
-      "date": "2025-04-20",
+      "doctorId": 2,
+      "date": "2025-10-10",
       "time": "15:30",
-      "type": "Seguimiento",
-      "status": "scheduled",
-      "notes": ""
+      "type": "FOLLOW_UP",
+      "status": "CONFIRMED",
+      "notes": "Revisión de presión arterial"
+    },
+    {
+      "id": 3,
+      "patientId": 1760134181081,
+      "doctorId": 2,
+      "date": "2025-10-12",
+      "time": "09:00",
+      "type": "INITIAL_ASSESSMENT",
+      "status": "SCHEDULED",
+      "notes": "Primera consulta"
+    },
+    {
+      "id": 4,
+      "patientId": 1760134181081,
+      "doctorId": 2,
+      "date": "2025-10-15",
+      "time": "14:00",
+      "type": "ROUTINE_CHECKUP",
+      "status": "SCHEDULED",
+      "notes": "Chequeo de rutina"
     }
   ],
   "staff": [

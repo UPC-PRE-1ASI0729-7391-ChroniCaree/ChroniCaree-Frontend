@@ -1,0 +1,192 @@
+<div class="appointments-container">
+  <!-- Header -->
+  <header class="appointments-header">
+    <div class="header-content">
+      <h1>📅 Mis Citas Médicas</h1>
+      <p class="subtitle">Gestiona tus citas con pacientes</p>
+    </div>
+    <button class="btn-refresh" (click)="refresh()" [disabled]="loading()">
+      <span class="material-icons">refresh</span>
+      Actualizar
+    </button>
+  </header>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card stat-today">
+      <div class="stat-icon">📍</div>
+      <div class="stat-info">
+        <h3>{{ todayCount() }}</h3>
+        <p>Citas Hoy</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-upcoming">
+      <div class="stat-icon">🗓️</div>
+      <div class="stat-info">
+        <h3>{{ upcomingCount() }}</h3>
+        <p>Próximas Citas</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-scheduled">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <h3>{{ scheduledAppointments().length }}</h3>
+        <p>Programadas</p>
+      </div>
+    </div>
+
+    <div class="stat-card stat-completed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{ completedAppointments().length }}</h3>
+        <p>Completadas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <button
+      class="tab"
+      [class.active]="selectedTab() === 'upcoming'"
+      (click)="setTab('upcoming')">
+      Próximas ({{ upcomingCount() }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab() === 'today'"
+      (click)="setTab('today')">
+      Hoy ({{ todayCount() }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab() === 'all'"
+      (click)="setTab('all')">
+      Todas ({{ totalAppointments() }})
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab() === 'completed'"
+      (click)="setTab('completed')">
+      Completadas ({{ completedAppointments().length }})
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando citas...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !loading()) {
+    <div class="error-state">
+      <span class="material-icons">error_outline</span>
+      <p>{{ error() }}</p>
+      <button class="btn-retry" (click)="refresh()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Appointments List -->
+  @if (!loading() && !error()) {
+    <div class="appointments-list">
+      @if (getFilteredAppointments().length === 0) {
+        <div class="empty-state">
+          <span class="material-icons">event_busy</span>
+          <h3>No hay citas</h3>
+          <p>No se encontraron citas para el filtro seleccionado</p>
+        </div>
+      } @else {
+        @for (appointment of getFilteredAppointments(); track appointment.id) {
+          <div class="appointment-card" [class.today]="isToday(appointment.date)">
+            <!-- Header de la cita -->
+            <div class="appointment-header">
+              <div class="appointment-date-time">
+                <div class="date">
+                  <span class="material-icons">calendar_today</span>
+                  {{ formatDate(appointment.date) }}
+                  @if (isToday(appointment.date)) {
+                    <span class="today-badge">HOY</span>
+                  }
+                </div>
+                <div class="time">
+                  <span class="material-icons">access_time</span>
+                  {{ formatTime(appointment.time) }}
+                </div>
+              </div>
+              <div class="appointment-status" [ngClass]="getStatusClass(appointment.status)">
+                {{ getStatusText(appointment.status) }}
+              </div>
+            </div>
+
+            <!-- Info del paciente -->
+            <div class="appointment-patient">
+              <div class="patient-avatar">
+                <span class="material-icons">person</span>
+              </div>
+              <div class="patient-info">
+                <h4>{{ appointment.patientName || 'Paciente' }}</h4>
+                <div class="patient-contact">
+                  @if (appointment.patientPhone) {
+                    <span>📱 {{ appointment.patientPhone }}</span>
+                  }
+                  @if (appointment.patientEmail) {
+                    <span>✉️ {{ appointment.patientEmail }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipo de cita -->
+            <div class="appointment-type">
+              <span class="type-badge">{{ appointment.type }}</span>
+            </div>
+
+            <!-- Notas -->
+            @if (appointment.notes) {
+              <div class="appointment-notes">
+                <span class="material-icons">note</span>
+                <p>{{ appointment.notes }}</p>
+              </div>
+            }
+
+            <!-- Acciones -->
+            <div class="appointment-actions">
+              @if (appointment.status === AppointmentStatus.SCHEDULED) {
+                <button class="btn-action btn-confirm" (click)="updateStatus(appointment.id, 'confirmed')">
+                  <span class="material-icons">check_circle</span>
+                  Confirmar
+                </button>
+              }
+              
+              @if (appointment.status === AppointmentStatus.CONFIRMED || appointment.status === AppointmentStatus.SCHEDULED) {
+                <button class="btn-action btn-start" (click)="updateStatus(appointment.id, 'in_progress')">
+                  <span class="material-icons">play_circle</span>
+                  Iniciar
+                </button>
+              }
+              
+              @if (appointment.status === AppointmentStatus.IN_PROGRESS) {
+                <button class="btn-action btn-complete" (click)="updateStatus(appointment.id, 'completed')">
+                  <span class="material-icons">done_all</span>
+                  Completar
+                </button>
+              }
+              
+              @if (appointment.status !== AppointmentStatus.CANCELLED && appointment.status !== AppointmentStatus.COMPLETED) {
+                <button class="btn-action btn-cancel" (click)="updateStatus(appointment.id, 'cancelled')">
+                  <span class="material-icons">cancel</span>
+                  Cancelar
+                </button>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
