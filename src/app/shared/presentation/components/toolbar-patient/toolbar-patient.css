@@ -1,4 +1,4 @@
-.sidebar {
+.sidebar.sidebar-patient {
   width: 280px;
   height: 100vh;
   background: white;
@@ -41,7 +41,7 @@
 /* Navigation Menu */
 .nav-menu {
   flex: 1;
-  padding: 1rem 0;
+  padding: 1rem 0.5rem; /* Add horizontal padding */
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0; /* Important for flex child with overflow */
@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.875rem 1.5rem;
+  padding: 0.875rem 1rem;
   color: #64748b;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -61,6 +61,8 @@
   width: 100%;
   text-align: left;
   font-size: 0.95rem;
+  border-radius: 8px; /* Add border radius */
+  margin: 0.25rem 0; /* Add vertical spacing */
 }
 
 .nav-item svg {
@@ -81,6 +83,7 @@
   background: #fef2f2;
   color: #ef4444;
   border-left: 3px solid #ef4444;
+  border-radius: 8px 8px 8px 0; /* Keep border radius except on left */
 }
 
 .nav-item.active svg {
@@ -89,8 +92,16 @@
 
 /* Sidebar Footer */
 .sidebar-footer {
-  padding: 1rem 0;
+  padding: 1rem 0.5rem; /* Add horizontal padding to container */
   border-top: 1px solid #e2e8f0;
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  background: white; /* Ensure footer has solid background */
+}
+
+.sidebar-footer .nav-item {
+  padding: 0.875rem 1rem; /* Reduce horizontal padding */
+  border-radius: 8px; /* Add border radius for better look */
+  margin: 0.25rem 0; /* Add vertical spacing */
 }
 
 .logout {

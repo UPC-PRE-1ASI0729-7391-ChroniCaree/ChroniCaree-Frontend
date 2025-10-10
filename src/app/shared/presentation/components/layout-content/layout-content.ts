@@ -23,6 +23,7 @@ import { FooterContentComponent } from '../footer-content/footer-content';
 })
 export class LayoutContentComponent {
   currentUrl = signal<string>('');
+  currentUserRole = signal<'patient' | 'doctor' | 'hospital_admin' | null>(null);
 
   // Routes that should be full-screen (no header/footer/toolbar)
   fullScreenRoutes = ['/iam/login', '/iam/register'];
@@ -32,20 +33,26 @@ export class LayoutContentComponent {
     return this.fullScreenRoutes.some(route => url.startsWith(route));
   });
 
-  // Get user role from localStorage
-  userRole = computed(() => {
-    return localStorage.getItem('userRole') as 'patient' | 'doctor' | 'hospital_admin' | null;
-  });
+  // Get user role from signal instead of computed
+  userRole = computed(() => this.currentUserRole());
 
   constructor(private router: Router) {
-    // Set initial URL
+    // Set initial URL and role
     this.currentUrl.set(this.router.url);
+    this.updateUserRole();
 
     // Listen to route changes
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.currentUrl.set(event.url);
+        this.updateUserRole(); // Update role on route change
       });
+  }
+
+  private updateUserRole(): void {
+    const role = localStorage.getItem('userRole') as 'patient' | 'doctor' | 'hospital_admin' | null;
+    this.currentUserRole.set(role);
+    console.log('Current user role:', role); // Debug log
   }
 }

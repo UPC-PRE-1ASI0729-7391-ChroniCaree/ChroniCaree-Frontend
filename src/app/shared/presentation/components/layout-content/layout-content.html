@@ -11,6 +11,9 @@
       <app-toolbar-doctor />
     } @else if (userRole() === 'patient') {
       <app-toolbar-patient />
+    } @else {
+      <!-- No toolbar if no role (user not logged in) -->
+      <div class="no-sidebar-placeholder"></div>
     }
 
     <!-- Main Content Area -->
