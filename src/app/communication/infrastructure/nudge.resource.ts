@@ -1,7 +1,8 @@
-import { BaseResource } from './base-response';
+import { BaseResource } from '../../shared/infrastructure/base-response';
 
 /**
  * Nudge Resource - Representa el formato de datos de la API REST
+ * Communication Bounded Context
  */
 export interface NudgeResource extends BaseResource {
   id: number;

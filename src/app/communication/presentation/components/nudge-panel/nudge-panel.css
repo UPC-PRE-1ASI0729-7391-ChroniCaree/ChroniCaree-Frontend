@@ -1,36 +1,49 @@
 .nudge-panel {
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
+  padding: 0;
 }
 
+/* Panel Header - Visible by default */
 .panel-header {
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--color-cc-green), var(--color-cc-bold-green));
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  color: white;
+  box-shadow: 0 2px 8px rgba(38, 181, 166, 0.2);
 }
 
 .panel-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.5rem;
+  gap: var(--spacing-sm);
+}
+
+.panel-header h3 mat-icon {
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.panel-header .badge {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
-  position: relative;
-}
-
-.panel-header mat-icon {
-  font-size: 28px;
-  width: 28px;
-  height: 28px;
-}
-
-.badge {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .panel-body {
-  min-height: 200px;
+  min-height: auto;
+  padding: var(--spacing-sm);
 }
 
 /* Loading & Empty States */
@@ -40,17 +53,17 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: var(--spacing-lg);
   text-align: center;
   color: #666;
 }
 
 .loading-state mat-icon,
 .empty-state mat-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  margin-bottom: 16px;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
   opacity: 0.5;
 }
 
@@ -63,12 +76,13 @@
 .nudges-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .nudge-card {
   border-left: 4px solid #ccc;
   transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 0 !important;
 }
 
 .nudge-card:hover {
@@ -98,25 +112,30 @@
 }
 
 .nudge-card mat-card-header {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .nudge-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
+  font-size: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
 }
 
 mat-card-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem !important;
   font-weight: 600;
   color: #333;
+}
+
+mat-card-content {
+  padding: 8px 16px !important;
 }
 
 mat-card-content p {
   margin: 0;
   color: #555;
-  line-height: 1.5;
+  line-height: 1.4;
+  font-size: 0.9rem;
 }
 
 /* Actions */
@@ -124,9 +143,14 @@ mat-card-actions {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 6px;
+  padding: 6px 12px !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  min-height: auto !important;
+}
+
+mat-card-actions button {
+  font-size: 0.85rem;
 }
 
 .dismiss-btn {
@@ -155,10 +179,6 @@ button mat-icon {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .nudge-panel {
-    padding: 12px;
-  }
-
   mat-card-actions {
     flex-wrap: wrap;
   }

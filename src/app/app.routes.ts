@@ -60,6 +60,12 @@ export const routes: Routes = [
         loadComponent: () => import('./patients/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileComponent),
         title: `${baseTitle} - Editar Perfil`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'recordatorios',
+        loadComponent: () => import('./communication/presentation/views/nudges-page/nudges-page').then(m => m.NudgesPageComponent),
+        title: `${baseTitle} - Recordatorios`,
+        data: { role: 'patient' }
       }
     ]
   },

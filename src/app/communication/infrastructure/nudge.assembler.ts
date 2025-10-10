@@ -1,10 +1,11 @@
-import { BaseAssembler } from './base-assembler';
-import { BaseResponse } from './base-response';
+import { BaseAssembler } from '../../shared/infrastructure/base-assembler';
+import { BaseResponse } from '../../shared/infrastructure/base-response';
 import { Nudge, NudgeType, NudgePriority } from '../domain/model/nudge.entity';
 import { NudgeResource } from './nudge.resource';
 
 /**
  * Nudge Assembler - Convierte entre entidades de dominio y recursos de API
+ * Communication Bounded Context
  */
 export class NudgeAssembler implements BaseAssembler<Nudge, NudgeResource, BaseResponse> {
   /**

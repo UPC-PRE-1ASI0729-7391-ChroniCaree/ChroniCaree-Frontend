@@ -1,8 +1,12 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
-import { NudgePanelComponent } from '../../../../shared/presentation/components/nudge-panel/nudge-panel';
+import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
+import { PatientStore } from '../../../application/patient.store';
+import { UserStore } from '../../../../iam/application/user.store';
+import { SymptomStore } from '../../../../clinical/application/symptom.store';
+import { DiagnosisStore } from '../../../../medical-records/application/diagnosis.store';
 
 @Component({
   selector: 'app-dashboard-patient',
@@ -12,43 +16,225 @@ import { NudgePanelComponent } from '../../../../shared/presentation/components/
   styleUrl: './dashboard-patient.css'
 })
 export class DashboardPatient implements OnInit {
-  protected readonly patientName = signal('María García');
-  protected readonly age = signal(45);
-  protected readonly condition = signal('Hipertensión Arterial');
-  
-  protected readonly vitalSigns = signal({
-    heartRate: 78,
-    bloodPressure: '120/80',
-    temperature: 36.5,
-    oxygen: 98,
-    lastUpdate: '10:30 AM'
+  // User data (getters para evitar error de inicialización)
+  protected get currentUser() { return this.userStore.currentUser$; }
+  protected get currentPatient() { return this.patientStore.selectedPatient$; }
+  protected get loading() { return this.patientStore.loading$; }
+
+  // Computed patient info
+  protected readonly patientName = computed(() => {
+    const patient = this.currentPatient();
+    return patient ? `${patient.firstName} ${patient.lastName}` : 'Paciente';
   });
 
-  protected readonly upcomingAppointments = signal([
-    { id: 1, doctorName: 'Dr. Juan Pérez', specialty: 'Cardiología', date: '2024-06-15', time: '10:00' },
-    { id: 2, doctorName: 'Dra. Ana López', specialty: 'Nutrición', date: '2024-06-18', time: '15:30' }
-  ]);
+  protected readonly age = computed(() => {
+    const patient = this.currentPatient();
+    if (!patient?.birthDate) return 0;
+    
+    const birthDate = new Date(patient.birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age;
+  });
 
+  protected readonly bmi = computed(() => {
+    const patient = this.currentPatient();
+    return patient?.bmi?.toFixed(1) || 'N/A';
+  });
+
+  protected readonly primaryCondition = computed(() => {
+    const diagnoses = this.diagnosisStore.activeDiagnoses();
+    if (diagnoses.length === 0) return 'Sin diagnósticos activos';
+    
+    // Retornar el diagnóstico más severo o el primero
+    const criticalDiag = diagnoses.find(d => d.severity === 'critical');
+    const highDiag = diagnoses.find(d => d.severity === 'high');
+    const primaryDiag = criticalDiag || highDiag || diagnoses[0];
+    
+    return primaryDiag.diagnosisName;
+  });
+
+  // Signos vitales (últimos registrados)
+  protected readonly vitalSigns = computed(() => {
+    const symptoms = this.symptomStore.symptoms$();
+    if (symptoms.length === 0) {
+      return {
+        heartRate: '--',
+        bloodPressure: '--/--',
+        temperature: '--',
+        oxygen: '--',
+        lastUpdate: 'Sin datos'
+      };
+    }
+
+    // Obtener el síntoma más reciente
+    const latest = symptoms[0];
+    const updateTime = new Date(latest.timestamp).toLocaleTimeString('es-PE', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+
+    return {
+      heartRate: latest.heartRate || '--',
+      bloodPressure: latest.bloodPressure || '--/--',
+      temperature: latest.temperature || '--',
+      oxygen: latest.oxygenSaturation || '--',
+      lastUpdate: updateTime
+    };
+  });
+
+  // Medicamentos (mock data - se integrará con el store real)
   protected readonly medications = signal([
-    { id: 1, name: 'Losartán', dose: '50mg', schedule: '08:00', taken: true },
-    { id: 2, name: 'Aspirina', dose: '100mg', schedule: '14:00', taken: false },
-    { id: 3, name: 'Atorvastatina', dose: '20mg', schedule: '20:00', taken: false }
+    { id: 1, name: 'Metformina', dose: '500mg', schedule: '08:00', taken: false },
+    { id: 2, name: 'Enalapril', dose: '10mg', schedule: '14:00', taken: false },
+    { id: 3, name: 'Aspirina', dose: '100mg', schedule: '20:00', taken: false }
   ]);
 
-  protected readonly recentSymptoms = signal([
-    { id: 1, symptom: 'Dolor de cabeza leve', severity: 'low', date: 'Hoy', time: '09:00' },
-    { id: 2, symptom: 'Presión elevada', severity: 'medium', date: 'Ayer', time: '18:45' }
+  // Próximas citas (mock data - se integrará con el store real)
+  protected readonly upcomingAppointments = signal([
+    { 
+      id: 1, 
+      doctorName: 'Dr. Juan Torres', 
+      specialty: 'Cardiología', 
+      date: '15 Abril', 
+      time: '10:00 AM' 
+    },
+    { 
+      id: 2, 
+      doctorName: 'Dra. María López', 
+      specialty: 'Endocrinología', 
+      date: '18 Abril', 
+      time: '15:30 PM' 
+    }
   ]);
+
+  // Síntomas recientes (de SymptomStore)
+  protected readonly recentSymptoms = computed(() => {
+    const symptoms = this.symptomStore.symptoms$();
+    return symptoms.slice(0, 3).map(s => ({
+      id: s.id,
+      symptom: this.getSymptomDescription(s),
+      severity: this.getSeverityLevel(s),
+      date: this.formatDate(s.timestamp),
+      time: this.formatTime(s.timestamp)
+    }));
+  });
+
+  // Diagnósticos activos
+  protected readonly activeDiagnosesCount = computed(() => {
+    return this.diagnosisStore.activeDiagnoses().length;
+  });
+
+  constructor(
+    private patientStore: PatientStore,
+    private userStore: UserStore,
+    private symptomStore: SymptomStore,
+    private diagnosisStore: DiagnosisStore
+  ) {}
 
   ngOnInit(): void {
     console.log('Dashboard Patient inicializado');
+    this.loadPatientData();
   }
 
+  /**
+   * Carga todos los datos del paciente
+   */
+  private loadPatientData(): void {
+    const user = this.currentUser();
+    if (!user) return;
+
+    // Cargar datos del paciente
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === user.id);
+        if (patient) {
+          this.patientStore.loadPatientById(patient.id).subscribe();
+        }
+      }
+    });
+
+    // Cargar síntomas
+    this.symptomStore.loadAllSymptoms().subscribe();
+
+    // Cargar diagnósticos
+    this.diagnosisStore.loadAllDiagnoses().subscribe();
+  }
+
+  /**
+   * Marca un medicamento como tomado
+   */
   protected takeMedication(medicationId: number): void {
     const meds = this.medications();
     const updated = meds.map(m => 
       m.id === medicationId ? { ...m, taken: true } : m
     );
     this.medications.set(updated);
+  }
+
+  /**
+   * Obtiene descripción del síntoma
+   */
+  private getSymptomDescription(symptom: any): string {
+    const symptoms = [];
+    if (symptom.fatigue && symptom.fatigue > 5) symptoms.push('Fatiga');
+    if (symptom.pain && symptom.pain > 5) symptoms.push('Dolor');
+    if (symptom.dizziness && symptom.dizziness > 5) symptoms.push('Mareo');
+    if (symptom.glucose && symptom.glucose > 140) symptoms.push('Glucosa elevada');
+    
+    return symptoms.length > 0 ? symptoms.join(', ') : 'Síntomas generales';
+  }
+
+  /**
+   * Obtiene el nivel de severidad
+   */
+  private getSeverityLevel(symptom: any): 'low' | 'medium' | 'high' {
+    const maxValue = Math.max(
+      symptom.fatigue || 0,
+      symptom.pain || 0,
+      symptom.dizziness || 0
+    );
+
+    if (maxValue >= 7) return 'high';
+    if (maxValue >= 4) return 'medium';
+    return 'low';
+  }
+
+  /**
+   * Formatea fecha
+   */
+  private formatDate(timestamp: string): string {
+    const date = new Date(timestamp);
+    const today = new Date();
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Hoy';
+    }
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Ayer';
+    }
+    
+    return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
+  }
+
+  /**
+   * Formatea hora
+   */
+  private formatTime(timestamp: string): string {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('es-PE', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   }
 }

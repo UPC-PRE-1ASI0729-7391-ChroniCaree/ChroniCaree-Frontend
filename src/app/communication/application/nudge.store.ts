@@ -1,11 +1,12 @@
 import { Injectable, signal, WritableSignal, computed } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, finalize, shareReplay } from 'rxjs';
 import { Nudge, NudgePriority } from '../domain/model/nudge.entity';
 import { NudgeApiEndpoint } from '../infrastructure/nudge-api.endpoint';
 
 /**
  * Nudge Store - Gestión de estado para nudges motivacionales
  * US06: Sistema de nudges motivacionales
+ * Communication Bounded Context
  */
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,9 @@ export class NudgeStore {
   private readonly nudges: WritableSignal<Nudge[]> = signal([]);
   private readonly loading: WritableSignal<boolean> = signal(false);
   private readonly error: WritableSignal<string | null> = signal(null);
+  
+  // Cache de la petición en curso para evitar duplicados
+  private currentRequest: Observable<Nudge[]> | null = null;
 
   readonly nudges$ = this.nudges.asReadonly();
   readonly loading$ = this.loading.asReadonly();
@@ -38,12 +42,30 @@ export class NudgeStore {
 
   /**
    * Carga todos los nudges del paciente
+   * Protección anti-bucle infinito:
+   * - Si ya hay petición en curso, retorna esa misma petición
+   * - Si ya hay datos y no está cargando, retorna datos existentes
    */
   loadAllNudges(): Observable<Nudge[]> {
+    // 🛡️ Si ya hay una petición en curso, retornar la misma Observable
+    if (this.currentRequest) {
+      return this.currentRequest;
+    }
+
+    // 🛡️ Si ya hay datos cargados y no está en proceso de carga, retornar datos existentes
+    if (this.nudges().length > 0 && !this.loading()) {
+      return new Observable(observer => {
+        observer.next(this.nudges());
+        observer.complete();
+      });
+    }
+
+    // 🚀 Iniciar nueva carga
     this.loading.set(true);
     this.error.set(null);
     
-    return this.nudgeApi.getAll().pipe(
+    // shareReplay(1) asegura que múltiples suscripciones usen la misma petición HTTP
+    this.currentRequest = this.nudgeApi.getAll().pipe(
       tap({
         next: (nudges) => {
           this.nudges.set(nudges);
@@ -54,8 +76,15 @@ export class NudgeStore {
           this.loading.set(false);
           console.error('Error loading nudges:', err);
         }
-      })
+      }),
+      finalize(() => {
+        // Limpiar la referencia cuando termine (éxito o error)
+        this.currentRequest = null;
+      }),
+      shareReplay(1) // Cache la respuesta para múltiples suscriptores
     );
+
+    return this.currentRequest;
   }
 
   /**
@@ -154,6 +183,15 @@ export class NudgeStore {
     const snoozeUntilDate = new Date(nudge.snoozeUntil);
     const now = new Date();
     return snoozeUntilDate > now;
+  }
+
+  /**
+   * Fuerza una recarga de los nudges (ignora cache)
+   */
+  forceReload(): Observable<Nudge[]> {
+    this.nudges.set([]);
+    this.currentRequest = null;
+    return this.loadAllNudges();
   }
 
   /**

@@ -1,7 +1,8 @@
-import { BaseEntity } from '../../infrastructure/base-entity';
+import { BaseEntity } from '../../../shared/infrastructure/base-entity';
 
 /**
  * Nudge Entity - Mensaje motivacional para el paciente
+ * US06: Sistema de nudges motivacionales (Communication Bounded Context)
  */
 export interface Nudge extends BaseEntity {
   id: number;

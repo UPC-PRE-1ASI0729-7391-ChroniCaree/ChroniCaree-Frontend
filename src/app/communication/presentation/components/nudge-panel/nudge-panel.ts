@@ -13,6 +13,7 @@ import { Nudge, NudgePriority } from '../../../domain/model/nudge.entity';
 /**
  * Nudge Panel Component
  * US06: Sistema de nudges motivacionales
+ * Communication Bounded Context
  * Muestra mensajes motivacionales y recordatorios al paciente
  */
 @Component({
@@ -47,14 +48,8 @@ export class NudgePanelComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadNudges();
-  }
-
-  /**
-   * Carga los nudges del paciente
-   */
-  private loadNudges(): void {
-    this.nudgeStore.loadAllNudges().subscribe();
+    // NO cargar aquí - el store ya tiene los datos cargados desde el toolbar
+    // El panel solo muestra los datos que ya existen en el store
   }
 
   /**
