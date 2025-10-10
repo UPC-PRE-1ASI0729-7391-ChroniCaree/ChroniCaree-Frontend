@@ -54,6 +54,44 @@ export const routes: Routes = [
         loadComponent: () => import('./patients/presentation/views/dashboard-patient/dashboard-patient').then(m => m.DashboardPatient),
         title: `${baseTitle} - Dashboard Paciente`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () => import('./patients/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileComponent),
+        title: `${baseTitle} - Editar Perfil`,
+        data: { role: 'patient' }
+      },
+      {
+        path: 'recordatorios',
+        loadComponent: () => import('./communication/presentation/views/nudges-page/nudges-page').then(m => m.NudgesPageComponent),
+        title: `${baseTitle} - Recordatorios`,
+        data: { role: 'patient' }
+      }
+    ]
+  },
+  
+  // Clinical routes (Symptoms & Medical Records)
+  {
+    path: 'clinical',
+    children: [
+      {
+        path: 'symptoms/register',
+        loadComponent: () => import('./clinical/presentation/views/register-symptoms/register-symptoms').then(m => m.RegisterSymptomsComponent),
+        title: `${baseTitle} - Registrar Síntomas`,
+        data: { role: 'patient' }
+      }
+    ]
+  },
+
+  // Medical Records routes (Diagnoses)
+  {
+    path: 'medical-records',
+    children: [
+      {
+        path: 'diagnoses',
+        loadComponent: () => import('./medical-records/presentation/views/medical-diagnoses/medical-diagnoses').then(m => m.MedicalDiagnosesComponent),
+        title: `${baseTitle} - Diagnósticos Médicos`,
+        data: { role: 'patient' }
       }
     ]
   },
@@ -66,6 +104,12 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor').then(m => m.DashboardDoctor),
         title: `${baseTitle} - Dashboard Doctor`,
+        data: { role: 'doctor' }
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () => import('./doctors/presentation/views/edit-profile/edit-profile').then(m => m.EditProfileDoctorComponent),
+        title: `${baseTitle} - Editar Perfil Doctor`,
         data: { role: 'doctor' }
       }
     ]

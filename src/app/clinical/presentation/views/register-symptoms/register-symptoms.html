@@ -1,0 +1,203 @@
+<div class="register-symptoms-container">
+  <div class="header-section">
+    <button mat-icon-button class="back-button" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-text">
+      <h1 class="h1">Registrar Síntomas</h1>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner></mat-spinner>
+      <p>Guardando síntomas...</p>
+    </div>
+  }
+
+  <form [formGroup]="symptomForm" (ngSubmit)="onSubmit()" class="symptom-form">
+    <!-- Signos Vitales -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon vital-icon">favorite</mat-icon>
+        <mat-card-title>Signos Vitales</mat-card-title>
+        <mat-card-subtitle>Mediciones objetivas (opcional)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Glucosa (mg/dL)</mat-label>
+            <input matInput type="number" formControlName="glucose" placeholder="Ej: 120">
+            <mat-icon matPrefix>bloodtype</mat-icon>
+            @if (symptomForm.get('glucose')?.hasError('min') || symptomForm.get('glucose')?.hasError('max')) {
+              <mat-error>Valor debe estar entre 0 y 600 mg/dL</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Presión Arterial (mmHg)</mat-label>
+            <input matInput type="text" formControlName="bloodPressure" placeholder="Ej: 120/80">
+            <mat-icon matPrefix>monitor_heart</mat-icon>
+            @if (symptomForm.get('bloodPressure')?.hasError('pattern')) {
+              <mat-error>Formato inválido. Use XXX/XX (ej: 120/80)</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Frecuencia Cardíaca (bpm)</mat-label>
+            <input matInput type="number" formControlName="heartRate" placeholder="Ej: 72">
+            <mat-icon matPrefix>favorite</mat-icon>
+            @if (symptomForm.get('heartRate')?.hasError('min') || symptomForm.get('heartRate')?.hasError('max')) {
+              <mat-error>Valor debe estar entre 30 y 220 bpm</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Temperatura (°C)</mat-label>
+            <input matInput type="number" step="0.1" formControlName="temperature" placeholder="Ej: 36.5">
+            <mat-icon matPrefix>thermostat</mat-icon>
+            @if (symptomForm.get('temperature')?.hasError('min') || symptomForm.get('temperature')?.hasError('max')) {
+              <mat-error>Valor debe estar entre 34 y 42 °C</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Saturación de Oxígeno (%)</mat-label>
+            <input matInput type="number" formControlName="oxygenSaturation" placeholder="Ej: 98">
+            <mat-icon matPrefix>air</mat-icon>
+            @if (symptomForm.get('oxygenSaturation')?.hasError('min') || symptomForm.get('oxygenSaturation')?.hasError('max')) {
+              <mat-error>Valor debe estar entre 0 y 100%</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Síntomas Subjetivos -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon symptom-icon">sentiment_satisfied</mat-icon>
+        <mat-card-title>Síntomas Subjetivos</mat-card-title>
+        <mat-card-subtitle>Cómo te sientes hoy (escala 1-10)</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Fatiga -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <label class="slider-label">
+              <mat-icon class="slider-icon">bedtime</mat-icon>
+              Nivel de Fatiga
+            </label>
+            <span class="slider-value">{{ fatigueValue() }} - {{ formatLabel(fatigueValue()) }}</span>
+          </div>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            [value]="fatigueValue()" 
+            (input)="onFatigueChange($event)"
+            class="custom-slider"
+          >
+          <div class="slider-labels">
+            <span>Ninguna</span>
+            <span>Moderada</span>
+            <span>Extrema</span>
+          </div>
+        </div>
+
+        <!-- Dolor -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <label class="slider-label">
+              <mat-icon class="slider-icon">healing</mat-icon>
+              Nivel de Dolor
+            </label>
+            <span class="slider-value">{{ painValue() }} - {{ formatLabel(painValue()) }}</span>
+          </div>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            [value]="painValue()" 
+            (input)="onPainChange($event)"
+            class="custom-slider"
+          >
+          <div class="slider-labels">
+            <span>Sin dolor</span>
+            <span>Moderado</span>
+            <span>Severo</span>
+          </div>
+        </div>
+
+        <!-- Mareo -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <label class="slider-label">
+              <mat-icon class="slider-icon">rotate_right</mat-icon>
+              Nivel de Mareo
+            </label>
+            <span class="slider-value">{{ dizzinessValue() }} - {{ formatLabel(dizzinessValue()) }}</span>
+          </div>
+          <input 
+            type="range" 
+            min="1" 
+            max="10" 
+            [value]="dizzinessValue()" 
+            (input)="onDizzinessChange($event)"
+            class="custom-slider"
+          >
+          <div class="slider-labels">
+            <span>Ninguno</span>
+            <span>Moderado</span>
+            <span>Severo</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Notas Adicionales -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon notes-icon">note</mat-icon>
+        <mat-card-title>Notas Adicionales</mat-card-title>
+        <mat-card-subtitle>Describe cualquier otro síntoma o detalle importante</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notas</mat-label>
+          <textarea 
+            matInput 
+            formControlName="notes" 
+            rows="4" 
+            placeholder="Ej: Dolor de cabeza desde esta mañana, aumenta con la luz..."
+            maxlength="500"
+          ></textarea>
+          <mat-hint align="end">{{ symptomForm.get('notes')?.value?.length || 0 }}/500</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button 
+        mat-raised-button 
+        type="button" 
+        (click)="onCancel()"
+        class="btn-cancel"
+      >
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        type="submit"
+        [disabled]="symptomForm.invalid || loading()"
+        class="btn-submit"
+      >
+        <mat-icon>check</mat-icon>
+        Guardar Síntomas
+      </button>
+    </div>
+  </form>
+</div>

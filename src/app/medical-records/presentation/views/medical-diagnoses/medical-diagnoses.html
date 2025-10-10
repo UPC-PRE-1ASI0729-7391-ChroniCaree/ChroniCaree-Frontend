@@ -1,0 +1,203 @@
+<div class="medical-diagnoses-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-text">
+      <h1>Mis Diagnósticos Médicos</h1>
+      <p>Gestiona tus diagnósticos y monitorea su evolución</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando diagnósticos...</p>
+    </div>
+  }
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-icon">
+        <mat-icon>medical_information</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().total }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </div>
+
+    <div class="stat-card active">
+      <div class="stat-icon">
+        <mat-icon>error</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().active }}</span>
+        <span class="stat-label">Activos</span>
+      </div>
+    </div>
+
+    <div class="stat-card controlled">
+      <div class="stat-icon">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().controlled }}</span>
+        <span class="stat-label">Controlados</span>
+      </div>
+    </div>
+
+    <div class="stat-card resolved">
+      <div class="stat-icon">
+        <mat-icon>verified</mat-icon>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats().resolved }}</span>
+        <span class="stat-label">Resueltos</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button 
+      class="filter-tab"
+      [class.active]="selectedFilter() === 'all'"
+      (click)="setFilter('all')">
+      <mat-icon>view_list</mat-icon>
+      Todos ({{ stats().total }})
+    </button>
+    <button 
+      class="filter-tab"
+      [class.active]="selectedFilter() === 'active'"
+      (click)="setFilter('active')">
+      <mat-icon>error</mat-icon>
+      Activos ({{ stats().active }})
+    </button>
+    <button 
+      class="filter-tab"
+      [class.active]="selectedFilter() === 'controlled'"
+      (click)="setFilter('controlled')">
+      <mat-icon>check_circle</mat-icon>
+      Controlados ({{ stats().controlled }})
+    </button>
+    <button 
+      class="filter-tab"
+      [class.active]="selectedFilter() === 'resolved'"
+      (click)="setFilter('resolved')">
+      <mat-icon>verified</mat-icon>
+      Resueltos ({{ stats().resolved }})
+    </button>
+  </div>
+
+  <!-- Diagnoses List -->
+  <div class="diagnoses-list">
+    @if (filteredDiagnoses().length === 0 && !loading()) {
+      <div class="empty-state">
+        <mat-icon>medical_services</mat-icon>
+        <h3>No hay diagnósticos en esta categoría</h3>
+        <p>{{ selectedFilter() === 'all' ? 'Aún no se han registrado diagnósticos médicos' : 'No tienes diagnósticos en esta categoría' }}</p>
+      </div>
+    } @else {
+      @for (diagnosis of filteredDiagnoses(); track diagnosis.id) {
+        <mat-card class="diagnosis-card" [class]="getStatusColor(diagnosis.status)">
+          <div class="card-header">
+            <div class="diagnosis-main-info">
+              <div class="icd-code-badge">
+                <mat-icon>qr_code_2</mat-icon>
+                {{ diagnosis.icd10Code }}
+              </div>
+              <h3 class="diagnosis-name">{{ diagnosis.diagnosisName }}</h3>
+            </div>
+            <div class="diagnosis-badges">
+              <mat-chip [class]="getStatusColor(diagnosis.status)" class="status-chip">
+                {{ getStatusLabel(diagnosis.status) }}
+              </mat-chip>
+              <mat-chip [class]="getSeverityColor(diagnosis.severity)" class="severity-chip">
+                <mat-icon>{{ getSeverityIcon(diagnosis.severity) }}</mat-icon>
+                {{ getSeverityLabel(diagnosis.severity) }}
+              </mat-chip>
+            </div>
+          </div>
+
+          <mat-card-content>
+            <div class="diagnosis-details">
+              <!-- Timeline Info -->
+              <div class="detail-row">
+                <mat-icon class="detail-icon">event</mat-icon>
+                <div class="detail-content">
+                  <span class="detail-label">Diagnosticado:</span>
+                  <span class="detail-value">{{ formatDate(diagnosis.diagnosedDate) }}</span>
+                  <span class="detail-extra">(Hace {{ getDaysSinceDiagnosis(diagnosis.diagnosedDate) }} días)</span>
+                </div>
+              </div>
+
+              @if (diagnosis.resolvedDate) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">check_circle</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Resuelto:</span>
+                    <span class="detail-value">{{ formatDate(diagnosis.resolvedDate) }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (diagnosis.lastReviewDate) {
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">update</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Última revisión:</span>
+                    <span class="detail-value">{{ formatDate(diagnosis.lastReviewDate) }}</span>
+                  </div>
+                </div>
+              }
+
+              <!-- Treatment -->
+              @if (diagnosis.treatment) {
+                <div class="detail-row treatment-row">
+                  <mat-icon class="detail-icon">medication</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Tratamiento:</span>
+                    <span class="detail-value">{{ diagnosis.treatment }}</span>
+                  </div>
+                </div>
+              }
+
+              <!-- Notes -->
+              @if (diagnosis.notes) {
+                <div class="detail-row notes-row">
+                  <mat-icon class="detail-icon">description</mat-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Notas:</span>
+                    <p class="detail-notes">{{ diagnosis.notes }}</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Follow-up Required -->
+              @if (diagnosis.followUpRequired) {
+                <div class="follow-up-alert">
+                  <mat-icon>schedule</mat-icon>
+                  <span>Requiere seguimiento médico</span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button (click)="viewDiagnosisDetails(diagnosis)">
+              <mat-icon>visibility</mat-icon>
+              Ver Detalles
+            </button>
+            <button mat-button>
+              <mat-icon>edit</mat-icon>
+              Actualizar
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    }
+  </div>
+</div>

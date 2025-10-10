@@ -1,0 +1,200 @@
+<div class="edit-profile-container">
+  <div class="header-section">
+    <button mat-icon-button class="back-button" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-text">
+      <h1 class="h1">Editar Perfil</h1>
+      <p class="text">US20: Actualiza tu información personal</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner></mat-spinner>
+      <p>Cargando perfil...</p>
+    </div>
+  }
+
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+    <!-- Información Personal -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon personal-icon">person</mat-icon>
+        <mat-card-title>Información Personal</mat-card-title>
+        <mat-card-subtitle>Datos básicos de tu perfil</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="firstName" placeholder="Ej: María">
+            <mat-icon matPrefix>badge</mat-icon>
+            @if (profileForm.get('firstName')?.hasError('required')) {
+              <mat-error>El nombre es requerido</mat-error>
+            }
+            @if (profileForm.get('firstName')?.hasError('minlength')) {
+              <mat-error>Mínimo 2 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="lastName" placeholder="Ej: García">
+            <mat-icon matPrefix>badge</mat-icon>
+            @if (profileForm.get('lastName')?.hasError('required')) {
+              <mat-error>El apellido es requerido</mat-error>
+            }
+            @if (profileForm.get('lastName')?.hasError('minlength')) {
+              <mat-error>Mínimo 2 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="birthDate" placeholder="DD/MM/YYYY">
+            <mat-icon matPrefix>cake</mat-icon>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (profileForm.get('birthDate')?.hasError('required')) {
+              <mat-error>La fecha de nacimiento es requerida</mat-error>
+            }
+            @if (calculatedAge() > 0) {
+              <mat-hint>Edad: {{ calculatedAge() }} años</mat-hint>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Teléfono</mat-label>
+            <input matInput type="tel" formControlName="phone" placeholder="Ej: 987654321">
+            <mat-icon matPrefix>phone</mat-icon>
+            @if (profileForm.get('phone')?.hasError('required')) {
+              <mat-error>El teléfono es requerido</mat-error>
+            }
+            @if (profileForm.get('phone')?.hasError('pattern')) {
+              <mat-error>Debe ser un número de 9 dígitos</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width-2col">
+            <mat-label>Dirección</mat-label>
+            <input matInput formControlName="address" placeholder="Ej: Av. Principal 123, Lima">
+            <mat-icon matPrefix>home</mat-icon>
+            @if (profileForm.get('address')?.hasError('required')) {
+              <mat-error>La dirección es requerida</mat-error>
+            }
+            @if (profileForm.get('address')?.hasError('minlength')) {
+              <mat-error>Mínimo 5 caracteres</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Medidas Corporales -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon health-icon">monitor_weight</mat-icon>
+        <mat-card-title>Medidas Corporales</mat-card-title>
+        <mat-card-subtitle>Peso y altura para cálculo de IMC</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Peso (kg)</mat-label>
+            <input matInput type="number" formControlName="weight" placeholder="Ej: 70">
+            <mat-icon matPrefix>scale</mat-icon>
+            <span matSuffix>kg</span>
+            @if (profileForm.get('weight')?.hasError('required')) {
+              <mat-error>El peso es requerido</mat-error>
+            }
+            @if (profileForm.get('weight')?.hasError('min')) {
+              <mat-error>El peso mínimo es 20 kg</mat-error>
+            }
+            @if (profileForm.get('weight')?.hasError('max')) {
+              <mat-error>El peso máximo es 300 kg</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Altura (cm)</mat-label>
+            <input matInput type="number" formControlName="height" placeholder="Ej: 165">
+            <mat-icon matPrefix>height</mat-icon>
+            <span matSuffix>cm</span>
+            @if (profileForm.get('height')?.hasError('required')) {
+              <mat-error>La altura es requerida</mat-error>
+            }
+            @if (profileForm.get('height')?.hasError('min')) {
+              <mat-error>La altura mínima es 50 cm</mat-error>
+            }
+            @if (profileForm.get('height')?.hasError('max')) {
+              <mat-error>La altura máxima es 250 cm</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- BMI Calculator Display -->
+        @if (calculatedBMI() > 0) {
+          <div class="bmi-display">
+            <div class="bmi-header">
+              <mat-icon class="bmi-icon">calculate</mat-icon>
+              <h3>Índice de Masa Corporal (IMC)</h3>
+            </div>
+            <div class="bmi-result">
+              <div class="bmi-value" [style.color]="bmiColor()">
+                {{ calculatedBMI() }}
+              </div>
+              <div class="bmi-category" [style.color]="bmiColor()">
+                {{ bmiCategory() }}
+              </div>
+            </div>
+            <div class="bmi-scale">
+              <div class="scale-bar">
+                <div class="scale-marker" 
+                     [style.left.%]="((calculatedBMI() - 15) / (35 - 15)) * 100"
+                     [style.background]="bmiColor()">
+                </div>
+              </div>
+              <div class="scale-labels">
+                <span class="scale-label">15</span>
+                <span class="scale-label">18.5</span>
+                <span class="scale-label">25</span>
+                <span class="scale-label">30</span>
+                <span class="scale-label">35+</span>
+              </div>
+              <div class="scale-categories">
+                <span class="category-label">Bajo</span>
+                <span class="category-label">Normal</span>
+                <span class="category-label">Sobrepeso</span>
+                <span class="category-label">Obesidad</span>
+              </div>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button 
+        mat-raised-button 
+        type="button" 
+        (click)="onCancel()"
+        class="btn-cancel"
+      >
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        type="submit"
+        [disabled]="profileForm.invalid || loading()"
+        class="btn-submit"
+      >
+        <mat-icon>save</mat-icon>
+        Guardar Cambios
+      </button>
+    </div>
+  </form>
+</div>

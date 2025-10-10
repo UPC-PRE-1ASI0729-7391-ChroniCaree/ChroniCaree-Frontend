@@ -1,0 +1,98 @@
+@if (isVisible()) {
+  <div class="onboarding-overlay">
+    <div class="onboarding-container">
+      <!-- Progress Bar -->
+      <div class="onboarding-progress">
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="progress()">
+        </mat-progress-bar>
+        <span class="progress-text">Paso {{ currentStep() + 1 }} de {{ steps.length }}</span>
+      </div>
+
+      <!-- Content -->
+      <div class="onboarding-content">
+        <!-- Icon -->
+        <div class="onboarding-icon">
+          {{ currentStepData().icon }}
+        </div>
+
+        <!-- Title -->
+        <h2 class="onboarding-title">{{ currentStepData().title }}</h2>
+
+        <!-- Description -->
+        <p class="onboarding-description">{{ currentStepData().description }}</p>
+
+        <!-- Step Action Button (if exists) -->
+        @if (currentStepData().action) {
+          <button 
+            mat-raised-button 
+            color="primary"
+            class="action-button"
+            (click)="executeStepAction(currentStepData().action?.route)">
+            <mat-icon>{{ currentStepData().action?.route?.includes('symptoms') ? 'edit_note' : 
+                          currentStepData().action?.route?.includes('diagnoses') ? 'medical_information' : 
+                          'person' }}</mat-icon>
+            {{ currentStepData().action?.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Step Indicators -->
+      <div class="step-indicators">
+        @for (step of steps; track $index) {
+          <button 
+            class="step-indicator"
+            [class.active]="$index === currentStep()"
+            [class.completed]="$index < currentStep()"
+            (click)="goToStep($index)"
+            [attr.aria-label]="'Ir al paso ' + ($index + 1)">
+          </button>
+        }
+      </div>
+
+      <!-- Navigation -->
+      <div class="onboarding-navigation">
+        <!-- Skip Button -->
+        @if (!isLastStep()) {
+          <button 
+            mat-button 
+            class="skip-button"
+            (click)="skip()">
+            Omitir Tutorial
+          </button>
+        }
+
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+          @if (!isFirstStep()) {
+            <button 
+              mat-stroked-button
+              (click)="previousStep()">
+              <mat-icon>arrow_back</mat-icon>
+              Anterior
+            </button>
+          }
+
+          @if (!isLastStep()) {
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="nextStep()">
+              Siguiente
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          } @else {
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="complete()">
+              <mat-icon>check_circle</mat-icon>
+              Finalizar
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

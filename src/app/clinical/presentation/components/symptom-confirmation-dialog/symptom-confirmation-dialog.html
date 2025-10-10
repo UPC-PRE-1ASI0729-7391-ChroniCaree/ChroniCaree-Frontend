@@ -1,0 +1,123 @@
+<div class="confirmation-dialog">
+  <div class="dialog-header">
+    <div class="success-icon">
+      <mat-icon class="check-icon">check_circle</mat-icon>
+    </div>
+    <h2 class="dialog-title">¡Síntomas Registrados!</h2>
+    <p class="dialog-subtitle">Tu información ha sido guardada correctamente</p>
+  </div>
+
+  <div class="dialog-content">
+    <!-- Resumen de síntomas registrados -->
+    <div class="summary-section">
+      <h3 class="section-title">
+        <mat-icon>summarize</mat-icon>
+        Resumen de tu registro
+      </h3>
+      
+      <div class="summary-grid">
+        @if (data.glucose) {
+          <div class="summary-item">
+            <span class="item-label">Glucosa:</span>
+            <span class="item-value">{{ data.glucose }} mg/dL</span>
+          </div>
+        }
+        @if (data.bloodPressure) {
+          <div class="summary-item">
+            <span class="item-label">Presión Arterial:</span>
+            <span class="item-value">{{ data.bloodPressure }} mmHg</span>
+          </div>
+        }
+        @if (data.heartRate) {
+          <div class="summary-item">
+            <span class="item-label">Frecuencia Cardíaca:</span>
+            <span class="item-value">{{ data.heartRate }} bpm</span>
+          </div>
+        }
+        @if (data.temperature) {
+          <div class="summary-item">
+            <span class="item-label">Temperatura:</span>
+            <span class="item-value">{{ data.temperature }} °C</span>
+          </div>
+        }
+        @if (data.oxygenSaturation) {
+          <div class="summary-item">
+            <span class="item-label">Saturación O2:</span>
+            <span class="item-value">{{ data.oxygenSaturation }}%</span>
+          </div>
+        }
+        
+        <div class="summary-item">
+          <span class="item-label">Fatiga:</span>
+          <span class="item-value severity-{{ data.fatigue > 7 ? 'high' : data.fatigue > 4 ? 'medium' : 'low' }}">
+            {{ data.fatigue }}/10
+          </span>
+        </div>
+        
+        <div class="summary-item">
+          <span class="item-label">Dolor:</span>
+          <span class="item-value severity-{{ data.pain > 7 ? 'high' : data.pain > 4 ? 'medium' : 'low' }}">
+            {{ data.pain }}/10
+          </span>
+        </div>
+        
+        <div class="summary-item">
+          <span class="item-label">Mareo:</span>
+          <span class="item-value severity-{{ data.dizziness > 7 ? 'high' : data.dizziness > 4 ? 'medium' : 'low' }}">
+            {{ data.dizziness }}/10
+          </span>
+        </div>
+      </div>
+
+      @if (data.notes) {
+        <div class="notes-section">
+          <p class="notes-label">Notas adicionales:</p>
+          <p class="notes-text">{{ data.notes }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Información sobre próximos pasos -->
+    <div class="info-section">
+      @if (data.hasCriticalValues) {
+        <div class="alert-box critical">
+          <mat-icon class="alert-icon">warning</mat-icon>
+          <div class="alert-content">
+            <h4>Valores críticos detectados</h4>
+            <p>Tu doctor será notificado inmediatamente y puede contactarte pronto.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="alert-box normal">
+          <mat-icon class="alert-icon">notifications_active</mat-icon>
+          <div class="alert-content">
+            <h4>Doctor notificado</h4>
+            <p>Tu equipo médico ha recibido tu registro y lo revisará durante tu próxima consulta.</p>
+          </div>
+        </div>
+      }
+
+      <div class="info-cards">
+        <div class="info-card">
+          <mat-icon>trending_up</mat-icon>
+          <p>Podrás ver el seguimiento de tus síntomas en tu historial médico</p>
+        </div>
+        <div class="info-card">
+          <mat-icon>calendar_today</mat-icon>
+          <p>Recuerda registrar tus síntomas diariamente para un mejor seguimiento</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-button class="btn-secondary" (click)="onBackToDashboard()">
+      <mat-icon>home</mat-icon>
+      Volver al Dashboard
+    </button>
+    <button mat-raised-button color="primary" class="btn-primary" (click)="onViewHistory()">
+      <mat-icon>history</mat-icon>
+      Ver mi Historial
+    </button>
+  </div>
+</div>

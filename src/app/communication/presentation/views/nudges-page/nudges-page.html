@@ -1,0 +1,37 @@
+<div class="nudges-page-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button mat-icon-button routerLink="/patient/dashboard" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-text">
+        <h1>Recordatorios</h1>
+        <p>Gestiona tus notificaciones y recordatorios importantes</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card">
+        <mat-icon class="stat-icon">notifications_active</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ activeCount() }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="page-content">
+    @if (loading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando recordatorios...</p>
+      </div>
+    } @else {
+      <div class="nudges-full-panel">
+        <app-nudge-panel />
+      </div>
+    }
+  </div>
+</div>

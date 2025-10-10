@@ -1,20 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { MatBadgeModule } from '@angular/material/badge';
 import { UserStore } from '../../../../iam/application/user.store';
+import { NudgeStore } from '../../../../communication/application/nudge.store';
 
 @Component({
   selector: 'app-toolbar-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatBadgeModule],
   templateUrl: './toolbar-patient.html',
   styleUrls: ['./toolbar-patient.css']
 })
-export class ToolbarPatientComponent {
+export class ToolbarPatientComponent implements OnInit {
+  get activeNudgesCount() {
+    return this.nudgeStore.activeCount;
+  }
+
   constructor(
     private router: Router,
-    public userStore: UserStore
+    public userStore: UserStore,
+    private nudgeStore: NudgeStore
   ) {}
+
+  ngOnInit(): void {
+    // Cargar nudges al iniciar
+    this.nudgeStore.loadAllNudges().subscribe();
+  }
 
   get currentUser() {
     return this.userStore.currentUser$();
