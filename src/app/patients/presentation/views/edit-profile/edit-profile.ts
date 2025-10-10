@@ -23,7 +23,6 @@ import { Patient } from '../../../domain/model/patient.entity';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,

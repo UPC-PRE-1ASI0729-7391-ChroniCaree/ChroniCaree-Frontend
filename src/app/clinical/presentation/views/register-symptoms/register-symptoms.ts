@@ -23,7 +23,6 @@ import { SymptomConfirmationDialogComponent } from '../../components/symptom-con
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,

@@ -21,7 +21,6 @@ import { DoctorStore } from '../../../application/doctor.store';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,

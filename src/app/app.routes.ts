@@ -76,6 +76,19 @@ export const routes: Routes = [
       }
     ]
   },
+
+  // Medical Records routes (Diagnoses)
+  {
+    path: 'medical-records',
+    children: [
+      {
+        path: 'diagnoses',
+        loadComponent: () => import('./medical-records/presentation/views/medical-diagnoses/medical-diagnoses').then(m => m.MedicalDiagnosesComponent),
+        title: `${baseTitle} - Diagnósticos Médicos`,
+        data: { role: 'patient' }
+      }
+    ]
+  },
   
   // Doctor routes
   {
