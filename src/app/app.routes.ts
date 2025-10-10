@@ -71,6 +71,20 @@ export const routes: Routes = [
     ]
   },
   
+  // Coming Soon page (for features under development)
+  {
+    path: 'coming-soon',
+    loadComponent: () => import('./shared/presentation/components/coming-soon/coming-soon').then(m => m.ComingSoonComponent),
+    title: `${baseTitle} - Próximamente`
+  },
+  
+  // 404 Not Found page
+  {
+    path: '404',
+    loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),
+    title: `${baseTitle} - Página no encontrada`
+  },
+  
   // Legacy redirects for backward compatibility
   { 
     path: 'dashboard/doctor', 
@@ -83,9 +97,9 @@ export const routes: Routes = [
     pathMatch: 'full' 
   },
   
-  // Wildcard route (always last)
+  // Wildcard route (always last) - redirect to 404
   { 
     path: '**', 
-    redirectTo: '/iam/login' 
+    redirectTo: '/404'
   }
 ];

@@ -1,0 +1,66 @@
+<div class="not-found-container">
+  <div class="not-found-content">
+    <!-- 404 Number -->
+    <div class="error-code">
+      <span class="number">4</span>
+      <span class="number middle">0</span>
+      <span class="number">4</span>
+    </div>
+
+    <!-- Sad Icon -->
+    <div class="icon-wrapper">
+      <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
+        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+      </svg>
+    </div>
+
+    <!-- Title -->
+    <h1 class="title">¡Oops! Página no encontrada</h1>
+
+    <!-- Description -->
+    <p class="description">
+      La página que buscas no existe o ha sido movida. 
+      Por favor, verifica la URL o regresa al inicio.
+    </p>
+
+    <!-- Suggestions -->
+    <div class="suggestions">
+      <h3>Posibles razones:</h3>
+      <ul>
+        <li>La URL fue escrita incorrectamente</li>
+        <li>La página fue removida o movida</li>
+        <li>El enlace está desactualizado</li>
+      </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button class="btn btn-primary" (click)="goHome()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Ir al inicio
+      </button>
+
+      <button class="btn btn-secondary" (click)="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver atrás
+      </button>
+    </div>
+  </div>
+
+  <!-- Animated Background -->
+  <div class="background-animation">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+  </div>
+</div>
