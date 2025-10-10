@@ -89,7 +89,7 @@
       </div>
     </div>
 
-    <!-- Main Content Grid (3 columns) -->
+    <!-- Main Content Grid (4 items: medications, appointments, alerts, nudges) -->
     <div class="content-grid">
       <!-- Medications -->
       <div class="card medications-card">
@@ -136,6 +136,9 @@
           }
         </div>
       </div>
+
+      <!-- Alertas -->
+      <app-alert-panel [maxItems]="3" />
 
       <!-- Recordatorios/Nudges -->
       <div class="card nudges-card">

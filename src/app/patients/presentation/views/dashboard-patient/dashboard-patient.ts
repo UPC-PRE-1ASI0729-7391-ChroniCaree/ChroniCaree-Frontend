@@ -4,16 +4,18 @@ import { RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
 import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
 import { MedicationLogComponent } from '../../../../medications/presentation/components/medication-log/medication-log';
+import { AlertPanelComponent } from '../../../../alerts/presentation/components/alert-panel/alert-panel';
 import { PatientStore } from '../../../application/patient.store';
 import { UserStore } from '../../../../iam/application/user.store';
 import { SymptomStore } from '../../../../clinical/application/symptom.store';
 import { DiagnosisStore } from '../../../../medical-records/application/diagnosis.store';
 import { MedicationStore } from '../../../../medications/application/medication.store';
+import { AlertStore } from '../../../../alerts/application/alert.store';
 
 @Component({
   selector: 'app-dashboard-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent],
+  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, AlertPanelComponent],
   templateUrl: './dashboard-patient.html',
   styleUrl: './dashboard-patient.css'
 })
@@ -141,7 +143,8 @@ export class DashboardPatient implements OnInit {
     private userStore: UserStore,
     private symptomStore: SymptomStore,
     private diagnosisStore: DiagnosisStore,
-    private medicationStore: MedicationStore
+    private medicationStore: MedicationStore,
+    private alertStore: AlertStore
   ) {}
 
   ngOnInit(): void {
@@ -174,6 +177,9 @@ export class DashboardPatient implements OnInit {
 
     // Cargar medicamentos
     this.medicationStore.loadMedicationsByPatient('1').subscribe();
+
+    // Cargar alertas
+    this.alertStore.loadAlertsByPatient('1').subscribe();
   }
 
   /**

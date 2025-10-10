@@ -72,6 +72,12 @@ export const routes: Routes = [
         loadComponent: () => import('./medications/presentation/views/medication-history/medication-history').then(m => m.MedicationHistoryComponent),
         title: `${baseTitle} - Mis Medicamentos`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'salud',
+        loadComponent: () => import('./alerts/presentation/views/health-alerts/health-alerts').then(m => m.HealthAlertsComponent),
+        title: `${baseTitle} - Mi Salud`,
+        data: { role: 'patient' }
       }
     ]
   },

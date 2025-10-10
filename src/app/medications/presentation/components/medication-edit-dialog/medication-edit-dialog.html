@@ -1,0 +1,83 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Medicación
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="editForm" class="edit-form">
+      <div class="medication-info">
+        <mat-icon class="info-icon">medication</mat-icon>
+        <p class="info-text">
+          Modifica los datos de tu medicación. Recuerda verificar la información antes de guardar.
+        </p>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre de la Medicación</mat-label>
+        <input 
+          matInput 
+          formControlName="name"
+          placeholder="Ej: Metformina 850mg"
+        />
+        <mat-icon matPrefix>local_pharmacy</mat-icon>
+        @if (editForm.get('name')?.hasError('required') && editForm.get('name')?.touched) {
+          <mat-error>El nombre es requerido</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dosis</mat-label>
+        <input 
+          matInput 
+          formControlName="dosage"
+          placeholder="Ej: 1 tableta"
+        />
+        <mat-icon matPrefix>medication_liquid</mat-icon>
+        @if (editForm.get('dosage')?.hasError('required') && editForm.get('dosage')?.touched) {
+          <mat-error>La dosis es requerida</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Instrucciones (opcional)</mat-label>
+        <textarea 
+          matInput 
+          formControlName="instructions"
+          placeholder="Ej: Tomar con alimentos"
+          rows="3"
+        ></textarea>
+        <mat-icon matPrefix>note</mat-icon>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button 
+      mat-button 
+      (click)="onCancel()"
+      [disabled]="loading()"
+    >
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="!editForm.valid || loading()"
+      class="save-button"
+    >
+      @if (loading()) {
+        <mat-icon class="spinner">refresh</mat-icon>
+      } @else {
+        <mat-icon>save</mat-icon>
+      }
+      Guardar Cambios
+    </button>
+  </mat-dialog-actions>
+</div>

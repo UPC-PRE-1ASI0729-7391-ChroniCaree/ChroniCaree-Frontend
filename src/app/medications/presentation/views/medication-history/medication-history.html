@@ -141,9 +141,13 @@
                       <mat-icon>visibility</mat-icon>
                       Ver Detalles
                     </button>
-                    <button mat-button color="primary">
+                    <button mat-button color="primary" (click)="editMedication(medication)">
                       <mat-icon>edit</mat-icon>
                       Editar
+                    </button>
+                    <button mat-button color="warn" (click)="deleteMedication(medication)">
+                      <mat-icon>delete</mat-icon>
+                      Eliminar
                     </button>
                   </mat-card-actions>
                 </mat-card>
@@ -213,8 +217,11 @@
                     <button mat-icon-button [matTooltip]="'Ver detalles'" (click)="viewDetails(med)">
                       <mat-icon>visibility</mat-icon>
                     </button>
-                    <button mat-icon-button [matTooltip]="'Editar'" color="primary">
+                    <button mat-icon-button [matTooltip]="'Editar'" color="primary" (click)="editMedication(med)">
                       <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button [matTooltip]="'Eliminar'" color="warn" (click)="deleteMedication(med)">
+                      <mat-icon>delete</mat-icon>
                     </button>
                   </td>
                 </ng-container>

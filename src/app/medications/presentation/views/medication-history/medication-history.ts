@@ -8,8 +8,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MedicationStore } from '../../../application/medication.store';
 import { Medication, MedicationStatus } from '../../../domain/model/medication.entity';
+import { MedicationEditDialogComponent } from '../../components/medication-edit-dialog/medication-edit-dialog';
+import { MedicationDeleteDialogComponent } from '../../components/medication-delete-dialog/medication-delete-dialog';
 
 @Component({
   selector: 'app-medication-history',
@@ -23,13 +27,17 @@ import { Medication, MedicationStatus } from '../../../domain/model/medication.e
     MatTableModule,
     MatChipsModule,
     MatTooltipModule,
-    MatTabsModule
+    MatTabsModule,
+    MatDialogModule,
+    MatSnackBarModule
   ],
   templateUrl: './medication-history.html',
   styleUrls: ['./medication-history.css']
 })
 export class MedicationHistoryComponent implements OnInit {
   private readonly medicationStore = inject(MedicationStore);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   // Expose store signals
   medications = this.medicationStore.medications;
@@ -130,5 +138,47 @@ export class MedicationHistoryComponent implements OnInit {
   viewDetails(medication: Medication): void {
     console.log('View details for:', medication);
     // TODO: Open dialog with medication details
+  }
+
+  /**
+   * Edit medication
+   */
+  editMedication(medication: Medication): void {
+    const dialogRef = this.dialog.open(MedicationEditDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: { medication },
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((success: boolean) => {
+      if (success) {
+        // Reload medications to show updated data
+        const patientId = localStorage.getItem('currentPatientId') || 'patient_1';
+        this.medicationStore.loadMedicationsByPatient(patientId).subscribe();
+      }
+    });
+  }
+
+  /**
+   * Delete medication
+   */
+  deleteMedication(medication: Medication): void {
+    const dialogRef = this.dialog.open(MedicationDeleteDialogComponent, {
+      width: '550px',
+      maxWidth: '95vw',
+      data: { medication },
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((success: boolean) => {
+      if (success) {
+        // Reload medications to show updated data
+        const patientId = localStorage.getItem('currentPatientId') || 'patient_1';
+        this.medicationStore.loadMedicationsByPatient(patientId).subscribe();
+      }
+    });
   }
 }

@@ -242,12 +242,21 @@
   font-weight: var(--font-weight-medium);
 }
 
-/* Content Grid */
+/* Content Grid - 2x2 responsive layout */
 .content-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
+}
+
+/* Cards con altura consistente */
+.medications-card,
+.appointments-card,
+.nudges-card {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Nudges Preview - Altura limitada */
@@ -608,10 +617,6 @@
 @media (max-width: 1200px) {
   .content-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .nudges-card {
-    grid-column: 1 / -1;
   }
 }
 
