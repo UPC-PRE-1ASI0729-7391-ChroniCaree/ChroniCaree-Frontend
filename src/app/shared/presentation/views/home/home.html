@@ -1,93 +1,93 @@
-<div class="hero-container">
-  <div class="hero-content">
-    @if (loading()) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <p class="paragraph-1">Cargando...</p>
+<div class="home-container">
+  <div class="home-content">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="logo-container">
+        <svg class="logo" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" fill="var(--color-cc-green)" opacity="0.2"/>
+          <path d="M30 10 L30 20 M30 40 L30 50" stroke="var(--color-cc-bold-green)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="30" cy="30" r="10" fill="none" stroke="var(--color-cc-bold-green)" stroke-width="3"/>
+          <path d="M20 30 L26 30" stroke="var(--color-cc-red)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M34 30 L40 30" stroke="var(--color-cc-red)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
       </div>
-    } @else if (error()) {
-      <div class="error-state">
-        <div class="error-icon">⚠️</div>
-        <h2>Error de Conexión</h2>
-        <p class="paragraph-2">{{ error() }}</p>
-        <p class="text">Por favor, asegúrate de que el servidor JSON esté corriendo.</p>
-        <code class="command-hint">npm run api</code>
-      </div>
-    } @else {
-      <div class="welcome-section">
-        <div class="logo-container">
-          <svg class="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="45" fill="var(--color-cc-green)" opacity="0.1"/>
-            <path d="M50 20 L50 35 M50 65 L50 80" stroke="var(--color-cc-bold-green)" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="50" cy="50" r="15" fill="none" stroke="var(--color-cc-bold-green)" stroke-width="4"/>
-            <path d="M35 50 L45 50" stroke="var(--color-cc-red)" stroke-width="3" stroke-linecap="round"/>
-            <path d="M55 50 L65 50" stroke="var(--color-cc-red)" stroke-width="3" stroke-linecap="round"/>
-          </svg>
-        </div>
-        
-        <h1 class="display-1">{{ title() }}</h1>
-        
-        <div class="hospital-info">
-          <div class="hospital-badge">
-            <svg class="badge-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7V12C2 16.4 5.6 20.1 10 21C10 21 10 21 10 21C10.7 21.2 11.3 21.3 12 21.3C12.7 21.3 13.3 21.2 14 21C14 21 14 21 14 21C18.4 20.1 22 16.4 22 12V7L12 2Z" fill="var(--color-cc-green)"/>
-              <path d="M12 8V16M8 12H16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <h1 class="display-1">ChroniCaree</h1>
+      <p class="paragraph-1">Plataforma integral para la gestión de cuidado crónico</p>
+    </div>
+
+    <!-- Selection Section -->
+    <div class="selection-section">
+      <h2 class="h2">Selecciona tu tipo de usuario</h2>
+      <p class="paragraph-2">Elige cómo deseas acceder a la plataforma</p>
+
+      <div class="cards-container">
+        <!-- Patient Card -->
+        <div 
+          class="user-card patient-card"
+          [class.selected]="selectedUserType() === 'patient'"
+          [class.hovered]="hoveredCard() === 'patient'"
+          (click)="selectUserType('patient')"
+          (mouseenter)="setHoveredCard('patient')"
+          (mouseleave)="clearHoveredCard()">
+          <div class="card-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="35" r="15" fill="currentColor"/>
+              <path d="M25 75 Q25 55 50 55 Q75 55 75 75 L75 85 L25 85 Z" fill="currentColor"/>
+              <circle cx="65" cy="65" r="8" fill="var(--color-cc-red)"/>
+              <path d="M65 61 L65 69 M61 65 L69 65" stroke="white" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <div class="hospital-details">
-              <span class="hospital-label">Sistema de Salud</span>
-              <span class="hospital-name">{{ hospitalName() }}</span>
-            </div>
+          </div>
+          <h3 class="h3">Paciente</h3>
+          <p class="text">Accede a tu historial médico, citas, medicamentos y más</p>
+          <ul class="features-list">
+            <li>📊 Seguimiento de signos vitales</li>
+            <li>💊 Gestión de medicamentos</li>
+            <li>📅 Agenda de citas</li>
+            <li>📱 Alertas y recordatorios</li>
+          </ul>
+          <div class="card-footer">
+            <span class="action-text">Continuar como Paciente →</span>
           </div>
         </div>
-        
-        <p class="subtitle paragraph-1">
-          Gestión integral de cuidado crónico
-        </p>
-        
-        <p class="description text">
-          Plataforma diseñada para mejorar la calidad de vida de pacientes con condiciones crónicas,
-          facilitando el seguimiento médico continuo y la comunicación entre pacientes y profesionales de la salud.
-        </p>
-        
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon bg-primary">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 6L9 17L4 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="h4">Monitoreo Continuo</h3>
-            <p class="text">Seguimiento en tiempo real de signos vitales y síntomas</p>
+
+        <!-- Doctor Card -->
+        <div 
+          class="user-card doctor-card"
+          [class.selected]="selectedUserType() === 'doctor'"
+          [class.hovered]="hoveredCard() === 'doctor'"
+          (click)="selectUserType('doctor')"
+          (mouseenter)="setHoveredCard('doctor')"
+          (mouseleave)="clearHoveredCard()">
+          <div class="card-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="35" r="15" fill="currentColor"/>
+              <path d="M25 75 Q25 55 50 55 Q75 55 75 75 L75 85 L25 85 Z" fill="currentColor"/>
+              <rect x="42" y="20" width="16" height="6" rx="3" fill="var(--color-cc-green)"/>
+              <path d="M35 60 L45 70 L65 50" stroke="var(--color-cc-green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
           </div>
-          
-          <div class="feature-card">
-            <div class="feature-icon bg-secondary">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="9" cy="7" r="4" stroke="white" stroke-width="2"/>
-                <path d="M23 21V19C23 17.9391 22.5786 16.9217 21.8284 16.1716C21.0783 15.4214 20.0609 15 19 15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="h4">Comunicación Directa</h3>
-            <p class="text">Conexión inmediata entre pacientes y médicos</p>
+          <h3 class="h3">Doctor</h3>
+          <p class="text">Gestiona pacientes, diagnósticos y tratamientos</p>
+          <ul class="features-list">
+            <li>👥 Gestión de pacientes</li>
+            <li>📋 Historial clínico completo</li>
+            <li>🔔 Alertas críticas</li>
+            <li>📈 Análisis y reportes</li>
+          </ul>
+          <div class="card-footer">
+            <span class="action-text">Continuar como Doctor →</span>
           </div>
-          
-          <div class="feature-card">
-            <div class="feature-icon bg-danger">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 12H18L15 21L9 3L6 12H2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <h3 class="h4">Alertas Inteligentes</h3>
-            <p class="text">Notificaciones automáticas ante valores críticos</p>
-          </div>
-        </div>
-        
-        <div class="status-indicator">
-          <div class="status-dot"></div>
-          <span class="text">Sistema Activo • Servidor Conectado</span>
         </div>
       </div>
-    }
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+      <p class="text">
+        <span class="info-icon">ℹ️</span>
+        Tu selección se guardará para futuras visitas. 
+        Puedes cambiarla desde el menú de usuario.
+      </p>
+    </div>
   </div>
 </div>
