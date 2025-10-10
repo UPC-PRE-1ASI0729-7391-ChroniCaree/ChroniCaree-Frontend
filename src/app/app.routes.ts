@@ -22,6 +22,16 @@ export const routes: Routes = [
     path: 'iam',
     children: [
       {
+        path: 'register',
+        loadComponent: () => import('./iam/presentation/components/register-select/register-select').then(m => m.RegisterSelectComponent),
+        title: `${baseTitle} - Seleccionar Registro`
+      },
+      {
+        path: 'register/patient',
+        loadComponent: () => import('./iam/presentation/components/register-patient/register-patient').then(m => m.RegisterPatientComponent),
+        title: `${baseTitle} - Registro de Paciente`
+      },
+      {
         path: 'register/hospital',
         loadComponent: () => import('./iam/presentation/components/register-hospital/register-hospital').then(m => m.RegisterHospitalComponent),
         title: `${baseTitle} - Registro de Hospital`,

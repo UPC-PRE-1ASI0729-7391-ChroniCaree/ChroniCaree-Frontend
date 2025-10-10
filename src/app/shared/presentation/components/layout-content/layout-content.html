@@ -1,18 +1,26 @@
-<div class="layout">
-  <!-- Sidebar/Toolbar -->
-  <app-toolbar-content />
+<!-- Full Screen Mode (for IAM routes) -->
+@if (isFullScreen()) {
+  <router-outlet />
+}
 
-  <!-- Main Content Area -->
-  <div class="layout-main">
-    <!-- Header -->
-    <app-header-content />
+<!-- Normal Layout (with header/footer/toolbar) -->
+@if (!isFullScreen()) {
+  <div class="layout">
+    <!-- Sidebar/Toolbar -->
+    <app-toolbar-content />
 
-    <!-- Page Content -->
-    <main class="content">
-      <router-outlet />
-    </main>
+    <!-- Main Content Area -->
+    <div class="layout-main">
+      <!-- Header -->
+      <app-header-content />
 
-    <!-- Footer -->
-    <app-footer-content />
+      <!-- Page Content -->
+      <main class="content">
+        <router-outlet />
+      </main>
+
+      <!-- Footer -->
+      <app-footer-content />
+    </div>
   </div>
-</div>
+}
