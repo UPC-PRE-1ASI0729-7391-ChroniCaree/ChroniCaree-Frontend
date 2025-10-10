@@ -10,8 +10,10 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SymptomStore } from '../../../application/symptom.store';
 import { Symptom } from '../../../domain/model/symptom.entity';
+import { SymptomConfirmationDialogComponent } from '../../components/symptom-confirmation-dialog/symptom-confirmation-dialog';
 
 /**
  * Register Symptoms View - Registro de síntomas diarios
@@ -30,7 +32,8 @@ import { Symptom } from '../../../domain/model/symptom.entity';
     MatSliderModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './register-symptoms.html',
   styleUrl: './register-symptoms.css'
@@ -47,7 +50,8 @@ export class RegisterSymptomsComponent implements OnInit {
     private fb: FormBuilder,
     private symptomStore: SymptomStore,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
   
   get loading() {
@@ -114,11 +118,29 @@ export class RegisterSymptomsComponent implements OnInit {
 
       this.symptomStore.createSymptom(newSymptom).subscribe({
         next: () => {
-          this.snackBar.open('✅ Síntomas registrados exitosamente', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
+          // Detectar valores críticos
+          const hasCriticalValues = this.detectCriticalValues(newSymptom);
+          
+          // Abrir diálogo de confirmación
+          this.dialog.open(SymptomConfirmationDialogComponent, {
+            width: '600px',
+            maxWidth: '95vw',
+            disableClose: false,
+            data: {
+              glucose: newSymptom.glucose,
+              bloodPressure: newSymptom.bloodPressure,
+              heartRate: newSymptom.heartRate,
+              temperature: newSymptom.temperature,
+              oxygenSaturation: newSymptom.oxygenSaturation,
+              fatigue: newSymptom.fatigue,
+              pain: newSymptom.pain,
+              dizziness: newSymptom.dizziness,
+              notes: newSymptom.notes,
+              hasCriticalValues
+            }
           });
+
+          // Reset form
           this.symptomForm.reset();
           this.fatigueValue.set(5);
           this.painValue.set(5);
@@ -140,6 +162,52 @@ export class RegisterSymptomsComponent implements OnInit {
         verticalPosition: 'top'
       });
     }
+  }
+
+  /**
+   * Detecta si hay valores críticos en los síntomas
+   */
+  private detectCriticalValues(symptom: Symptom): boolean {
+    // Glucosa crítica: < 70 o > 250
+    if (symptom.glucose && (symptom.glucose < 70 || symptom.glucose > 250)) {
+      return true;
+    }
+    
+    // Presión arterial crítica: sistólica > 180 o diastólica > 120
+    if (symptom.bloodPressure) {
+      const [systolic, diastolic] = symptom.bloodPressure.split('/').map(Number);
+      if (systolic > 180 || diastolic > 120) {
+        return true;
+      }
+    }
+    
+    // Frecuencia cardíaca crítica: < 50 o > 120
+    if (symptom.heartRate && (symptom.heartRate < 50 || symptom.heartRate > 120)) {
+      return true;
+    }
+    
+    // Temperatura crítica: < 35 o > 38.5
+    if (symptom.temperature && (symptom.temperature < 35 || symptom.temperature > 38.5)) {
+      return true;
+    }
+    
+    // Saturación de oxígeno crítica: < 92
+    if (symptom.oxygenSaturation && symptom.oxygenSaturation < 92) {
+      return true;
+    }
+    
+    // Síntomas severos: dolor, fatiga o mareo > 8
+    if (symptom.pain && symptom.pain > 8) {
+      return true;
+    }
+    if (symptom.fatigue && symptom.fatigue > 8) {
+      return true;
+    }
+    if (symptom.dizziness && symptom.dizziness > 8) {
+      return true;
+    }
+    
+    return false;
   }
 
   onCancel(): void {

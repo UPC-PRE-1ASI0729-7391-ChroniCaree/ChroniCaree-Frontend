@@ -1,0 +1,348 @@
+/* Symptom Confirmation Dialog Styles */
+:host {
+  --color-success: #4CAF50;
+  --color-warning: #ff9800;
+  --color-danger: #f44336;
+  --color-primary: #1976d2;
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+  --color-background: #fafafa;
+  --color-border: #e0e0e0;
+}
+
+.confirmation-dialog {
+  max-width: 600px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Header Section */
+.dialog-header {
+  background: linear-gradient(135deg, var(--color-success) 0%, #45a049 100%);
+  color: white;
+  padding: 32px 24px;
+  text-align: center;
+  position: relative;
+}
+
+.success-icon {
+  margin: 0 auto 16px;
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.check-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: white;
+}
+
+.dialog-title {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.dialog-subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 400;
+}
+
+/* Content Section */
+.dialog-content {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Summary Section */
+.summary-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 16px 0;
+}
+
+.section-title mat-icon {
+  color: var(--color-primary);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--color-background);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.item-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.item-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.severity-low {
+  color: var(--color-success);
+}
+
+.severity-medium {
+  color: var(--color-warning);
+}
+
+.severity-high {
+  color: var(--color-danger);
+}
+
+/* Notes Section */
+.notes-section {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.notes-label {
+  margin: 0 0 8px 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.notes-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+/* Info Section */
+.info-section {
+  margin-top: 24px;
+}
+
+.alert-box {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-box.critical {
+  background: #fff3e0;
+  border: 2px solid var(--color-warning);
+}
+
+.alert-box.normal {
+  background: #e8f5e9;
+  border: 2px solid var(--color-success);
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.alert-box.critical .alert-icon {
+  color: var(--color-warning);
+}
+
+.alert-box.normal .alert-icon {
+  color: var(--color-success);
+}
+
+.alert-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.alert-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Info Cards */
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.info-card mat-icon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Actions */
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-secondary,
+.btn-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background: white;
+  border: 2px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-background);
+  border-color: var(--color-text-secondary);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .confirmation-dialog {
+    max-width: 100%;
+  }
+
+  .dialog-header {
+    padding: 24px 16px;
+  }
+
+  .dialog-content {
+    padding: 16px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-actions {
+    flex-direction: column;
+    padding: 12px 16px;
+  }
+
+  .btn-secondary,
+  .btn-primary {
+    width: 100%;
+  }
+}
+
+/* Scrollbar */
+.dialog-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dialog-content::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}

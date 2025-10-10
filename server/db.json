@@ -177,6 +177,21 @@
       "notes": "Tengo mucho mareo ",
       "timestamp": "2025-10-10T17:04:25.972Z",
       "isEdited": false
+    },
+    {
+      "id": 3,
+      "patientId": 1,
+      "glucose": 12,
+      "bloodPressure": "140/60",
+      "heartRate": 100,
+      "temperature": 37.5,
+      "oxygenSaturation": 100,
+      "fatigue": 9,
+      "pain": 9,
+      "dizziness": 9,
+      "notes": "me estoy muriendo ayuda",
+      "timestamp": "2025-10-10T17:10:14.334Z",
+      "isEdited": false
     }
   ],
   "medications": [
