@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
 import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
 import { MedicationLogComponent } from '../../../../medications/presentation/components/medication-log/medication-log';
@@ -53,7 +53,13 @@ export class DashboardPatient implements OnInit {
   });
 
   protected readonly primaryCondition = computed(() => {
-    const diagnoses = this.diagnosisStore.activeDiagnoses();
+    const patient = this.currentPatient();
+    if (!patient) return 'Sin diagnósticos activos';
+
+    // Filtrar solo diagnósticos activos del paciente actual
+    const allDiagnoses = this.diagnosisStore.activeDiagnoses();
+    const diagnoses = allDiagnoses.filter(d => d.patientId === patient.id);
+    
     if (diagnoses.length === 0) return 'Sin diagnósticos activos';
     
     // Retornar el diagnóstico más severo o el primero
@@ -66,8 +72,8 @@ export class DashboardPatient implements OnInit {
 
   // Signos vitales (últimos registrados)
   protected readonly vitalSigns = computed(() => {
-    const symptoms = this.symptomStore.symptoms$();
-    if (symptoms.length === 0) {
+    const patient = this.currentPatient();
+    if (!patient) {
       return {
         heartRate: '--',
         bloodPressure: '--/--',
@@ -77,8 +83,22 @@ export class DashboardPatient implements OnInit {
       };
     }
 
-    // Obtener el síntoma más reciente
-    const latest = symptoms[0];
+    // Filtrar solo síntomas del paciente actual
+    const allSymptoms = this.symptomStore.symptoms$();
+    const patientSymptoms = allSymptoms.filter(s => s.patientId === patient.id);
+    
+    if (patientSymptoms.length === 0) {
+      return {
+        heartRate: '--',
+        bloodPressure: '--/--',
+        temperature: '--',
+        oxygen: '--',
+        lastUpdate: 'Sin datos'
+      };
+    }
+
+    // Obtener el síntoma más reciente del paciente
+    const latest = patientSymptoms[0];
     const updateTime = new Date(latest.timestamp).toLocaleTimeString('es-PE', { 
       hour: '2-digit', 
       minute: '2-digit' 
@@ -93,14 +113,25 @@ export class DashboardPatient implements OnInit {
     };
   });
 
-  // Medicamentos (de MedicationStore)
+  // Medicamentos (filtrados por paciente actual)
   protected readonly medicationCount = computed(() => {
-    return this.medicationStore.medicationCount();
+    const patient = this.currentPatient();
+    if (!patient) return 0;
+
+    // ✅ Filtrar solo medicamentos del paciente actual
+    const allMedications = this.medicationStore.medications();
+    const patientMedications = allMedications.filter(m => m.patientId === patient.id.toString());
+    return patientMedications.length;
   });
 
   protected readonly todayMedications = computed(() => {
+    const patient = this.currentPatient();
+    if (!patient) return [];
+
+    // ✅ Filtrar solo medicamentos del paciente actual
     const schedule = this.medicationStore.todaySchedule();
-    return schedule.slice(0, 3); // Mostrar solo primeros 3 en dashboard
+    const patientSchedule = schedule.filter(s => s.medication.patientId === patient.id.toString());
+    return patientSchedule.slice(0, 3); // Mostrar solo primeros 3 en dashboard
   });
 
   // Próximas citas (mock data - se integrará con el store real)
@@ -123,8 +154,14 @@ export class DashboardPatient implements OnInit {
 
   // Síntomas recientes (de SymptomStore)
   protected readonly recentSymptoms = computed(() => {
-    const symptoms = this.symptomStore.symptoms$();
-    return symptoms.slice(0, 3).map(s => ({
+    const patient = this.currentPatient();
+    if (!patient) return [];
+
+    // Filtrar solo síntomas del paciente actual
+    const allSymptoms = this.symptomStore.symptoms$();
+    const patientSymptoms = allSymptoms.filter(s => s.patientId === patient.id);
+    
+    return patientSymptoms.slice(0, 3).map(s => ({
       id: s.id,
       symptom: this.getSymptomDescription(s),
       severity: this.getSeverityLevel(s),
@@ -135,10 +172,18 @@ export class DashboardPatient implements OnInit {
 
   // Diagnósticos activos
   protected readonly activeDiagnosesCount = computed(() => {
-    return this.diagnosisStore.activeDiagnoses().length;
+    const patient = this.currentPatient();
+    if (!patient) return 0;
+
+    // Filtrar solo diagnósticos del paciente actual
+    const allDiagnoses = this.diagnosisStore.activeDiagnoses();
+    const patientDiagnoses = allDiagnoses.filter(d => d.patientId === patient.id);
+    
+    return patientDiagnoses.length;
   });
 
   constructor(
+    private router: Router,
     private patientStore: PatientStore,
     private userStore: UserStore,
     private symptomStore: SymptomStore,
@@ -149,37 +194,80 @@ export class DashboardPatient implements OnInit {
 
   ngOnInit(): void {
     console.log('Dashboard Patient inicializado');
-    this.loadPatientData();
+    
+    // Verificar autenticación
+    let user = this.currentUser();
+    
+    if (!user) {
+      // Fallback: intentar cargar desde localStorage
+      const currentUserStr = localStorage.getItem('currentUser');
+      const isAuthenticated = localStorage.getItem('isAuthenticated');
+      
+      if (currentUserStr && isAuthenticated === 'true') {
+        try {
+          const parsedUser = JSON.parse(currentUserStr);
+          user = parsedUser;
+          this.userStore.setCurrentUser(parsedUser);
+          console.log('✅ Dashboard-Patient: Usuario cargado desde localStorage:', parsedUser.email);
+        } catch (error) {
+          console.error('❌ Dashboard-Patient: Error parsing currentUser:', error);
+          this.router.navigate(['/iam/login']);
+          return;
+        }
+      } else {
+        console.warn('⚠️ Dashboard-Patient: No hay usuario autenticado');
+        this.router.navigate(['/iam/login']);
+        return;
+      }
+    }
+    
+    // Cargar datos del paciente autenticado
+    if (user) {
+      this.loadPatientData(user.id);
+    }
   }
 
   /**
    * Carga todos los datos del paciente
    */
-  private loadPatientData(): void {
-    const user = this.currentUser();
-    if (!user) return;
+  private loadPatientData(userId: number): void {
 
     // Cargar datos del paciente
     this.patientStore.loadAllPatients().subscribe({
       next: (patients) => {
-        const patient = patients.find(p => p.userId === user.id);
+        const patient = patients.find(p => p.userId === userId);
         if (patient) {
+          console.log('✅ Dashboard-Patient: Paciente encontrado:', patient.firstName, patient.lastName, 'ID:', patient.id);
           this.patientStore.loadPatientById(patient.id).subscribe();
+          
+          // ✅ Cargar medicamentos del paciente actual (con force reload para limpiar cache)
+          this.medicationStore.forceReload(patient.id.toString()).subscribe();
+
+          // Cargar alertas del paciente actual
+          this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe();
+          
+          // Cargar síntomas del paciente actual (filtrados)
+          this.symptomStore.loadAllSymptoms().subscribe({
+            next: (allSymptoms) => {
+              // Filtrar solo los síntomas de este paciente
+              const patientSymptoms = allSymptoms.filter(s => s.patientId === patient.id);
+              console.log(`✅ Dashboard-Patient: ${patientSymptoms.length} síntomas encontrados para paciente ${patient.id}`);
+            }
+          });
+
+          // Cargar diagnósticos del paciente actual (filtrados)
+          this.diagnosisStore.loadAllDiagnoses().subscribe({
+            next: (allDiagnoses) => {
+              // Filtrar solo los diagnósticos de este paciente
+              const patientDiagnoses = allDiagnoses.filter(d => d.patientId === patient.id);
+              console.log(`✅ Dashboard-Patient: ${patientDiagnoses.length} diagnósticos encontrados para paciente ${patient.id}`);
+            }
+          });
+        } else {
+          console.warn('⚠️ Dashboard-Patient: No se encontró paciente para userId:', userId);
         }
       }
     });
-
-    // Cargar síntomas
-    this.symptomStore.loadAllSymptoms().subscribe();
-
-    // Cargar diagnósticos
-    this.diagnosisStore.loadAllDiagnoses().subscribe();
-
-    // Cargar medicamentos
-    this.medicationStore.loadMedicationsByPatient('1').subscribe();
-
-    // Cargar alertas
-    this.alertStore.loadAlertsByPatient('1').subscribe();
   }
 
   /**

@@ -21,13 +21,8 @@ export class ToolbarDoctorComponent {
   }
 
   logout(): void {
-    // Clear localStorage
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole');
-    
-    // Clear user store
-    this.userStore.setCurrentUser(null);
+    // Clear user store and localStorage
+    this.userStore.clearCurrentUser();
     
     // Navigate to login
     this.router.navigate(['/iam/login']);

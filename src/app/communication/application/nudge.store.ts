@@ -88,6 +88,48 @@ export class NudgeStore {
   }
 
   /**
+   * Carga nudges filtrados por paciente
+   * Similar a loadAllNudges() pero filtra por patientId
+   */
+  loadNudgesByPatient(patientId: string): Observable<Nudge[]> {
+    // 🛡️ Si ya hay una petición en curso, retornar la misma Observable
+    if (this.currentRequest) {
+      return this.currentRequest;
+    }
+
+    // 🚀 Iniciar nueva carga
+    this.loading.set(true);
+    this.error.set(null);
+    
+    const patientIdNumber = parseInt(patientId, 10);
+    
+    // shareReplay(1) asegura que múltiples suscripciones usen la misma petición HTTP
+    this.currentRequest = this.nudgeApi.getAll().pipe(
+      tap({
+        next: (allNudges) => {
+          // ✅ Filtrar solo los nudges del paciente actual
+          const patientNudges = allNudges.filter(n => n.patientId === patientIdNumber);
+          console.log(`✅ NudgeStore: ${patientNudges.length} nudges encontrados para paciente ${patientId}`);
+          this.nudges.set(patientNudges);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error.set('Error al cargar nudges');
+          this.loading.set(false);
+          console.error('Error loading nudges by patient:', err);
+        }
+      }),
+      finalize(() => {
+        // Limpiar la referencia cuando termine (éxito o error)
+        this.currentRequest = null;
+      }),
+      shareReplay(1) // Cache la respuesta para múltiples suscriptores
+    );
+
+    return this.currentRequest;
+  }
+
+  /**
    * Crea un nuevo nudge
    */
   createNudge(nudge: Nudge): Observable<Nudge> {

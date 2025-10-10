@@ -1,5 +1,6 @@
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { AlertStore } from '../../../application/alert.store';
 import { Alert, AlertSeverity, AlertStatus } from '../../../domain/model/alert.entity';
+import { PatientStore } from '../../../../patients/application/patient.store';
 
 @Component({
   selector: 'app-health-alerts',
@@ -25,7 +27,9 @@ import { Alert, AlertSeverity, AlertStatus } from '../../../domain/model/alert.e
   styleUrl: './health-alerts.css'
 })
 export class HealthAlertsComponent implements OnInit {
-  constructor(private alertStore: AlertStore) {}
+  private readonly alertStore = inject(AlertStore);
+  private readonly patientStore = inject(PatientStore);
+  private readonly router = inject(Router);
 
   readonly alerts = computed(() => this.alertStore.alerts());
   readonly activeAlerts = computed(() => this.alertStore.activeAlerts());
@@ -47,9 +51,41 @@ export class HealthAlertsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.alertStore.loadAlertsByPatient('1').subscribe({
-      next: () => console.log('Alertas cargadas'),
-      error: (err) => console.error('Error al cargar alertas:', err)
+    // Verificar autenticación
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.error('❌ Health-Alerts: Usuario no autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+
+    console.log(`🔍 Health-Alerts: Usuario actual ID: ${userId}`);
+
+    // Buscar el paciente asociado al usuario actual
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+
+        if (patient) {
+          console.log(`✅ Health-Alerts: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
+          
+          // ✅ Cargar alertas usando el ID del paciente actual
+          this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe({
+            next: () => console.log('✅ Alertas cargadas para paciente', patient.id),
+            error: (err) => console.error('❌ Error al cargar alertas:', err)
+          });
+        } else {
+          console.error(`❌ Health-Alerts: No se encontró paciente para userId ${userId}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Health-Alerts: Error cargando pacientes:', err);
+      }
     });
   }
 

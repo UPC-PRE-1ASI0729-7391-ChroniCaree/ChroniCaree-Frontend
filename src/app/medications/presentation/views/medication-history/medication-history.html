@@ -19,8 +19,8 @@
               <mat-icon>trending_up</mat-icon>
               <div class="stat-details">
                 <span class="stat-label">Adherencia</span>
-                <span class="stat-value" [class]="getAdherenceColorClass(stats.average)">
-                  {{stats.average}}%
+                <span class="stat-value" [class]="getAdherenceColorClass(stats.rate)">
+                  {{stats.rate}}%
                 </span>
               </div>
             </div>
@@ -32,10 +32,10 @@
               </div>
             </div>
             <div class="stat-item">
-              <mat-icon>schedule</mat-icon>
+              <mat-icon>cancel</mat-icon>
               <div class="stat-details">
-                <span class="stat-label">Total Registros</span>
-                <span class="stat-value">{{stats.total}}</span>
+                <span class="stat-label">Omitidos</span>
+                <span class="stat-value">{{stats.missed}}</span>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MedicationStore } from '../../../application/medication.store';
+import { PatientStore } from '../../../../patients/application/patient.store';
 import { Medication, MedicationStatus } from '../../../domain/model/medication.entity';
 import { MedicationEditDialogComponent } from '../../components/medication-edit-dialog/medication-edit-dialog';
 import { MedicationDeleteDialogComponent } from '../../components/medication-delete-dialog/medication-delete-dialog';
@@ -36,24 +37,90 @@ import { MedicationDeleteDialogComponent } from '../../components/medication-del
 })
 export class MedicationHistoryComponent implements OnInit {
   private readonly medicationStore = inject(MedicationStore);
+  private readonly patientStore = inject(PatientStore);
+  private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
-  // Expose store signals
-  medications = this.medicationStore.medications;
-  activeMedications = this.medicationStore.activeMedications;
+  // ✅ Signal para almacenar el patientId actual (string porque así está en db.json)
+  private readonly currentPatientId = signal<string | null>(null);
+
+  // ✅ Computed signals que filtran por paciente actual
+  medications = computed(() => {
+    const patientId = this.currentPatientId();
+    if (!patientId) return [];
+    return this.medicationStore.medications().filter(m => m.patientId === patientId);
+  });
+
+  activeMedications = computed(() => {
+    const patientId = this.currentPatientId();
+    if (!patientId) return [];
+    return this.medicationStore.activeMedications().filter(m => m.patientId === patientId);
+  });
+
   loading = this.medicationStore.loading;
-  adherenceStats = this.medicationStore.adherenceStats;
+  
+  // ✅ Adherence stats filtrado por paciente
+  adherenceStats = computed(() => {
+    const patientId = this.currentPatientId();
+    if (!patientId) return { taken: 0, missed: 0, rate: 0 };
+    
+    const allMeds = this.medicationStore.medications().filter(m => m.patientId === patientId);
+    const taken = allMeds.filter(m => m.status === MedicationStatus.TAKEN).length;
+    const missed = allMeds.filter(m => m.status === MedicationStatus.MISSED).length;
+    const total = taken + missed;
+    
+    return {
+      taken,
+      missed,
+      rate: total > 0 ? Math.round((taken / total) * 100) : 0
+    };
+  });
 
   // Local state
   selectedTab = signal(0);
 
   ngOnInit(): void {
-    // Load medications if not already loaded
-    const patientId = localStorage.getItem('currentPatientId') || 'patient_1';
-    if (this.medications().length === 0) {
-      this.medicationStore.loadMedicationsByPatient(patientId).subscribe();
+    // ✅ Verificar autenticación y cargar medicamentos del paciente actual
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.error('❌ Medication-History: Usuario no autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
     }
+
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+
+    console.log(`🔍 Medication-History: Usuario actual ID: ${userId}`);
+
+    // ✅ Buscar el paciente asociado al usuario actual
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+
+        if (patient) {
+          console.log(`✅ Medication-History: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
+          const patientIdStr = patient.id.toString();
+          this.currentPatientId.set(patientIdStr);
+          
+          // ✅ Cargar medicamentos del paciente actual (con force reload)
+          this.medicationStore.forceReload(patientIdStr).subscribe({
+            next: (medications) => {
+              console.log(`✅ Medication-History: ${medications.length} medicamentos cargados para paciente ${patient.id}`);
+            },
+            error: (err) => console.error('❌ Error cargando medicamentos:', err)
+          });
+        } else {
+          console.error(`❌ Medication-History: No se encontró paciente para userId ${userId}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Medication-History: Error cargando pacientes:', err);
+      }
+    });
   }
 
   /**
@@ -154,9 +221,11 @@ export class MedicationHistoryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) {
-        // Reload medications to show updated data
-        const patientId = localStorage.getItem('currentPatientId') || 'patient_1';
-        this.medicationStore.loadMedicationsByPatient(patientId).subscribe();
+        // ✅ Reload medications usando el patientId actual
+        const patientId = this.currentPatientId();
+        if (patientId) {
+          this.medicationStore.forceReload(patientId).subscribe();
+        }
       }
     });
   }
@@ -175,9 +244,11 @@ export class MedicationHistoryComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) {
-        // Reload medications to show updated data
-        const patientId = localStorage.getItem('currentPatientId') || 'patient_1';
-        this.medicationStore.loadMedicationsByPatient(patientId).subscribe();
+        // ✅ Reload medications usando el patientId actual
+        const patientId = this.currentPatientId();
+        if (patientId) {
+          this.medicationStore.forceReload(patientId).subscribe();
+        }
       }
     });
   }

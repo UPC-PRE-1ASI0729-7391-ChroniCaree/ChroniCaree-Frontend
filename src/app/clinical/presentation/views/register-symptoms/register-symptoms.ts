@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SymptomStore } from '../../../application/symptom.store';
 import { Symptom } from '../../../domain/model/symptom.entity';
 import { SymptomConfirmationDialogComponent } from '../../components/symptom-confirmation-dialog/symptom-confirmation-dialog';
+import { PatientStore } from '../../../../patients/application/patient.store';
 
 /**
  * Register Symptoms View - Registro de síntomas diarios
@@ -38,6 +39,13 @@ import { SymptomConfirmationDialogComponent } from '../../components/symptom-con
   styleUrl: './register-symptoms.css'
 })
 export class RegisterSymptomsComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly symptomStore = inject(SymptomStore);
+  private readonly patientStore = inject(PatientStore);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+
   symptomForm!: FormGroup;
   
   // Valores de escalas (1-10)
@@ -45,13 +53,8 @@ export class RegisterSymptomsComponent implements OnInit {
   painValue = signal(5);
   dizzinessValue = signal(5);
 
-  constructor(
-    private fb: FormBuilder,
-    private symptomStore: SymptomStore,
-    private snackBar: MatSnackBar,
-    private router: Router,
-    private dialog: MatDialog
-  ) {}
+  // Signal para almacenar el patientId actual
+  private readonly currentPatientId = signal<number | null>(null);
   
   get loading() {
     return this.symptomStore.loading$;
@@ -59,6 +62,48 @@ export class RegisterSymptomsComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadCurrentPatient();
+  }
+
+  /**
+   * Carga el paciente actual desde localStorage
+   */
+  private loadCurrentPatient(): void {
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.error('❌ Register-Symptoms: Usuario no autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+
+    console.log(`🔍 Register-Symptoms: Usuario actual ID: ${userId}`);
+
+    // Buscar el paciente asociado al usuario actual
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+
+        if (patient) {
+          console.log(`✅ Register-Symptoms: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
+          this.currentPatientId.set(patient.id);
+        } else {
+          console.error(`❌ Register-Symptoms: No se encontró paciente para userId ${userId}`);
+          this.snackBar.open('❌ Error: No se encontró el perfil del paciente', 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top'
+          });
+        }
+      },
+      error: (err) => {
+        console.error('❌ Register-Symptoms: Error cargando pacientes:', err);
+      }
+    });
   }
 
   private initializeForm(): void {
@@ -97,11 +142,22 @@ export class RegisterSymptomsComponent implements OnInit {
 
   onSubmit(): void {
     if (this.symptomForm.valid) {
+      // ✅ Verificar que tenemos el patientId del usuario actual
+      const patientId = this.currentPatientId();
+      if (!patientId) {
+        this.snackBar.open('❌ Error: No se pudo identificar al paciente', 'Cerrar', {
+          duration: 4000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        return;
+      }
+
       const formValue = this.symptomForm.value;
       
       const newSymptom: Symptom = {
         id: 0, // Will be assigned by backend
-        patientId: 1, // TODO: Get from auth service
+        patientId: patientId, // ✅ Usando el ID del paciente actual
         glucose: formValue.glucose || undefined,
         bloodPressure: formValue.bloodPressure || undefined,
         heartRate: formValue.heartRate || undefined,
@@ -114,6 +170,8 @@ export class RegisterSymptomsComponent implements OnInit {
         timestamp: new Date().toISOString(),
         isEdited: false
       };
+
+      console.log(`✅ Register-Symptoms: Registrando síntoma para paciente ${patientId}`);
 
       this.symptomStore.createSymptom(newSymptom).subscribe({
         next: () => {
