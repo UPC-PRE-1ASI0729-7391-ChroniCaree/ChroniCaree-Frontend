@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PdfExportResponse } from '../../../../shared/infrastructure/pdf-export.response';
 
 @Component({
@@ -36,10 +36,33 @@ export class DashboardDoctor implements OnInit {
     { id: 2, patientName: 'Carmen Silva', condition: 'Glucosa fuera de rango', severity: 'medium', time: '08:30' }
   ]);
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     console.log('Dashboard Doctor inicializado');
+    
+    // Verificar autenticación
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.warn('⚠️ Dashboard-Doctor: No hay usuario autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+    
+    try {
+      const currentUser = JSON.parse(currentUserStr);
+      console.log('✅ Dashboard-Doctor: Usuario autenticado:', currentUser.email);
+      
+      // Aquí podrías cargar datos específicos del doctor si es necesario
+      // Por ejemplo: cargar estadísticas reales del doctor actual
+      
+    } catch (error) {
+      console.error('❌ Dashboard-Doctor: Error parsing currentUser:', error);
+      this.router.navigate(['/iam/login']);
+      return;
+    }
   }
 
   // --- Acción: exportar PDF del dashboard ---

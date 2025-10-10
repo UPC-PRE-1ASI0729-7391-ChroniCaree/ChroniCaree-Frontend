@@ -44,6 +44,24 @@
       "password": "123456789",
       "isVerified": false,
       "twoFactorEnabled": false
+    },
+    {
+      "id": 1760136165111,
+      "email": "jose@jose.com",
+      "role": "hospital_admin",
+      "name": "josee",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false
+    },
+    {
+      "id": 1760137119779,
+      "email": "123@123.com",
+      "role": "patient",
+      "name": "juan perez",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false
     }
   ],
   "tenants": [
@@ -55,6 +73,10 @@
       "plan": "enterprise",
       "status": "active",
       "registrationDate": "2024-01-15"
+    },
+    {
+      "id": 1760136165157,
+      "name": "hospital san lorenzo"
     }
   ],
   "subscriptions": [
@@ -113,6 +135,23 @@
       "weight": 75,
       "height": 1.75,
       "bmi": 24.5
+    },
+    {
+      "id": 1760137119834,
+      "userId": 1760137119779,
+      "assignedDoctorId": null,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "juan",
+      "lastName": "perez",
+      "dni": "123456789",
+      "birthDate": "2004-06-16",
+      "gender": "male",
+      "phone": "123456789",
+      "address": "123 av",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0
     }
   ],
   "doctors": [
