@@ -1,21 +1,95 @@
-<section class="card" *ngIf="vm() as data">
+<section class="card empty" *ngIf="!vm()?.thread">
   <header>
     <h2>Conversación</h2>
-    <small>Estado: {{ data.status }}</small>
+  </header>
+  <div class="empty-state">
+    <p>Selecciona una conversación para verla aquí.</p>
+  </div>
+</section>
+
+
+<section class="card" *ngIf="vm()?.thread as data">
+  <header class="card-header">
+    <div class="title">
+      <h2>Conversación</h2>
+      <span class="status" [class.closed]="data.status === 'CLOSED'">
+        {{ data.status === 'CLOSED' ? 'Cerrada' : 'Abierta' }}
+      </span>
+    </div>
+    <div class="participants">
+      <span class="chip">Paciente: {{ data.patientId }}</span>
+      <span class="chip">Médico: {{ data.doctorId }}</span>
+    </div>
   </header>
 
+
   <ul class="msgs">
-    <li *ngFor="let m of data.messages">
+    <li *ngFor="let m of data.messages; trackBy: trackByMsgId"
+        class="msg"
+        [class.from-patient]="m.senderRole === 'PATIENT'"
+        [class.from-doctor]="m.senderRole === 'DOCTOR'">
       <div class="meta">
-        <b>{{ m.senderRole === 'PATIENT' ? 'Paciente' : 'Médico' }}</b>
-        <span>· {{ m.createdAt | date:'short' }}</span>
+        <span class="role"
+              [class.patient]="m.senderRole === 'PATIENT'"
+              [class.doctor]="m.senderRole === 'DOCTOR'">
+          {{ m.senderRole === 'PATIENT' ? 'Paciente' : 'Médico' }}
+        </span>
+        <span class="dot">•</span>
+        <time>{{ m.createdAt | date: 'short' }}</time>
       </div>
+
       <div class="body">{{ m.body }}</div>
+
       <div class="files" *ngIf="m.attachments?.length">
-        <a *ngFor="let a of m.attachments" [href]="a.url" target="_blank" rel="noopener">
+        <a *ngFor="let a of m.attachments"
+           class="file"
+           [href]="a.url"
+           target="_blank"
+           rel="noopener">
           {{ a.fileName }}
         </a>
       </div>
     </li>
   </ul>
+
+
+  <footer class="actions" *ngIf="vm() as vmx">
+    <!-- responder -->
+    <div class="reply" *ngIf="vmx.canReply">
+      <label for="replyBox" class="reply-label">Responder</label>
+      <textarea
+        id="replyBox"
+        class="reply-input"
+        rows="4"
+        [ngModel]="replyText()"
+        (ngModelChange)="replyText.set($event)"
+        placeholder="Escribe tu respuesta para el paciente..."></textarea>
+
+      <div class="reply-buttons">
+        <button class="btn btn-primary"
+                (click)="sendReply()"
+                [disabled]="vmx.sending || !replyText().trim()">
+          {{ vmx.sending ? 'Enviando…' : 'Enviar respuesta' }}
+        </button>
+        <button class="btn btn-ghost"
+                type="button"
+                (click)="replyText.set('')"
+                [disabled]="vmx.sending">
+          Limpiar
+        </button>
+      </div>
+    </div>
+
+
+    <div class="close-thread" *ngIf="vmx.canClose">
+      <button class="btn btn-danger"
+              (click)="closeThread()"
+              [disabled]="vmx.closing">
+        {{ vmx.closing ? 'Cerrando…' : 'Marcar conversación como resuelta' }}
+      </button>
+      <small class="hint">
+        Al cerrar, la conversación se archiva pero seguirá disponible para consulta.
+      </small>
+    </div>
+  </footer>
 </section>

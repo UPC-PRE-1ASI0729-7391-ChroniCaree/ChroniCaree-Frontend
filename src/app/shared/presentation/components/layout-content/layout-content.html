@@ -1,28 +1,28 @@
-<!-- Full Screen Mode (for IAM routes) -->
 @if (isFullScreen()) {
   <router-outlet />
-}
+} @else {
+  <div
+    class="layout"
+    [class.role-doctor]="userRole() === 'doctor' || userRole() === 'hospital_admin'"
+    [class.role-patient]="userRole() === 'patient'"
+    [attr.data-role]="userRole() || 'guest'">
 
-<!-- Normal Layout (with header/footer/toolbar) -->
-@if (!isFullScreen()) {
-  <div class="layout">
-    <!-- Sidebar/Toolbar - Different for each role -->
+    <!-- Sidebar / Toolbar by role -->
     @if (userRole() === 'doctor' || userRole() === 'hospital_admin') {
       <app-toolbar-doctor />
     } @else if (userRole() === 'patient') {
       <app-toolbar-patient />
     } @else {
-      <!-- No toolbar if no role (user not logged in) -->
-      <div class="no-sidebar-placeholder"></div>
+      <div class="no-sidebar-placeholder" aria-hidden="true"></div>
     }
 
-    <!-- Main Content Area -->
+    <!-- Main column -->
     <div class="layout-main">
       <!-- Header -->
       <app-header-content />
 
-      <!-- Page Content -->
-      <main class="content">
+      <!-- Routed page content -->
+      <main class="content" role="main">
         <router-outlet />
       </main>
 
