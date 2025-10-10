@@ -4,21 +4,24 @@
  * 
  * Vista de lista de pacientes asignados al doctor
  */
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AssignedPatientsStore } from '../../../application/assigned-patients.store';
 import { PatientHealthStatus } from '../../../domain/model/patient-health-summary.entity';
+import { DoctorApiEndpoint } from '../../../infrastructure/doctor-api.endpoint';
+import { RequestPatientModalComponent } from '../../components/request-patient-modal/request-patient-modal';
 
 @Component({
   selector: 'app-patients-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RequestPatientModalComponent],
   templateUrl: './patients-list.html',
   styleUrl: './patients-list.css'
 })
 export class PatientsListComponent implements OnInit {
   private readonly patientsStore = inject(AssignedPatientsStore);
+  private readonly doctorApi = inject(DoctorApiEndpoint);
   
   // Exponer el enum para el template
   readonly PatientHealthStatus = PatientHealthStatus;
@@ -34,24 +37,63 @@ export class PatientsListComponent implements OnInit {
   readonly atRiskCount = this.patientsStore.atRiskCount;
   readonly totalCriticalAlerts = this.patientsStore.totalCriticalAlerts;
   
-  // Doctor ID from localStorage
-  private getDoctorId(): number | null {
-    const doctorStr = localStorage.getItem('doctor');
-    if (doctorStr) {
-      const doctor = JSON.parse(doctorStr);
-      return doctor.id || null;
-    }
-    return null;
-  }
+  // Doctor ID signal (lo obtenemos del API)
+  private readonly doctorId = signal<number | null>(null);
+  
+  // Modal state
+  readonly showModal = signal(false);
   
   ngOnInit(): void {
-    const doctorId = this.getDoctorId();
-    if (doctorId) {
-      console.log(`🔄 Loading patients for doctor ${doctorId}`);
-      this.patientsStore.loadPatientsByDoctor(doctorId);
-    } else {
-      console.error('❌ No doctor ID found');
+    // Obtener el usuario actual del localStorage
+    const currentUserStr = localStorage.getItem('currentUser');
+    
+    if (!currentUserStr) {
+      console.error('❌ No user found in localStorage');
+      return;
     }
+    
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+    
+    console.log(`🔍 Current user ID: ${userId}, looking for associated doctor...`);
+    
+    // Buscar el doctor asociado a este userId
+    this.doctorApi.getAll().subscribe({
+      next: (doctors) => {
+        const doctor = doctors.find(d => d.userId === userId);
+        
+        if (doctor) {
+          console.log(`✅ Doctor found: ID ${doctor.id}, Name: ${doctor.firstName} ${doctor.lastName}`);
+          this.doctorId.set(doctor.id);
+          this.patientsStore.loadPatientsByDoctor(doctor.id);
+        } else {
+          console.error(`❌ No doctor found for userId ${userId}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error fetching doctors:', err);
+      }
+    });
+    
+    // Listen for patient assignment events
+    window.addEventListener('patient-assigned', () => {
+      const currentDoctorId = this.doctorId();
+      if (currentDoctorId) {
+        this.patientsStore.refresh(currentDoctorId);
+      }
+    });
+    
+    // Listen for modal close events
+    window.addEventListener('close-modal', () => {
+      this.showModal.set(false);
+    });
+  }
+  
+  /**
+   * Abre el modal de solicitud de paciente
+   */
+  openRequestModal(): void {
+    this.showModal.set(true);
   }
   
   /**
@@ -122,9 +164,9 @@ export class PatientsListComponent implements OnInit {
    * Refresca la lista de pacientes
    */
   refresh(): void {
-    const doctorId = this.getDoctorId();
-    if (doctorId) {
-      this.patientsStore.refresh(doctorId);
+    const currentDoctorId = this.doctorId();
+    if (currentDoctorId) {
+      this.patientsStore.refresh(currentDoctorId);
     }
   }
 }

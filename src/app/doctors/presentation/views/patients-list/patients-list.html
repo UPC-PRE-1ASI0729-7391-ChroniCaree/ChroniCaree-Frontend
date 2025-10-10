@@ -8,6 +8,11 @@
     </div>
     
     <div class="header-actions">
+      <button class="btn btn-primary" (click)="openRequestModal()">
+        <span class="icon">➕</span>
+        <span>Solicitar Paciente</span>
+      </button>
+      
       <button class="btn btn-secondary" (click)="refresh()" [disabled]="loading()">
         <span class="icon">🔄</span>
         <span>Actualizar</span>
@@ -198,5 +203,10 @@
         </div>
       }
     </div>
+  }
+  
+  <!-- Request Patient Modal -->
+  @if (showModal()) {
+    <app-request-patient-modal />
   }
 </div>

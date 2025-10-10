@@ -35,6 +35,15 @@
       "password": "password123",
       "isVerified": true,
       "twoFactorEnabled": false
+    },
+    {
+      "id": 1760134180969,
+      "email": "andreo@123.com",
+      "role": "patient",
+      "name": "Andreow Santiago",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false
     }
   ],
   "tenants": [
@@ -74,7 +83,7 @@
     {
       "id": 1,
       "userId": 1,
-      "assignedDoctorId": 3,
+      "assignedDoctorId": 2,
       "tenantId": null,
       "subscriptionId": 1,
       "firstName": "Ana",
@@ -87,6 +96,23 @@
       "weight": 68,
       "height": 1.65,
       "bmi": 24.9
+    },
+    {
+      "id": 1760134181081,
+      "userId": 1760134180969,
+      "assignedDoctorId": null,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "Andreow",
+      "lastName": "Santiago",
+      "dni": "12345678",
+      "birthDate": "2005-10-05",
+      "gender": "male",
+      "phone": "123456789",
+      "address": "Av 123",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0
     }
   ],
   "doctors": [
