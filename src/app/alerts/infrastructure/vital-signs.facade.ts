@@ -1,6 +1,16 @@
+/**
+ * Facade para coordinar alertas con signos vitales
+ * Detecta valores fuera de rango y genera alertas automáticamente
+ */
 import { Injectable, inject, computed, signal } from '@angular/core';
-import { Alert, AlertType, AlertSeverity, VITAL_SIGN_RANGES } from '../domain/model/alert.entity';
 import { AlertStore } from '../application/alert.store';
+import { 
+  Alert, 
+  AlertType, 
+  AlertSeverity, 
+  AlertStatus, 
+  VITAL_SIGN_RANGES 
+} from '../domain/model/alert.entity';
 
 interface VitalSignMeasurement {
   vitalSign: string;
@@ -10,16 +20,12 @@ interface VitalSignMeasurement {
   recordId: string;
 }
 
-/**
- * Facade para coordinar alertas con otros bounded contexts (clinical, medications)
- * Detecta valores fuera de rango y genera alertas automáticamente
- */
 @Injectable({
   providedIn: 'root'
 })
 export class VitalSignsFacade {
-  readonly alertStore = inject(AlertStore);
-
+  private readonly alertStore = inject(AlertStore);
+  
   // Señal para tracking de procesamiento
   private processing = signal(false);
 
@@ -131,7 +137,7 @@ export class VitalSignsFacade {
       severity,
       title: `${vitalSign} ${direction} ${emoji}`,
       message: `Tu ${vitalSign.toLowerCase()} está en ${value} ${unit}, fuera del rango normal (${minValue}-${maxValue} ${unit})`,
-      status: 'active' as any,
+      status: AlertStatus.ACTIVE,
       metadata: {
         vitalSign,
         value,
@@ -140,6 +146,6 @@ export class VitalSignsFacade {
         measurement: recordId
       },
       createdAt: new Date().toISOString()
-    } as any;
+    } as Omit<Alert, 'id'>;
   }
 }

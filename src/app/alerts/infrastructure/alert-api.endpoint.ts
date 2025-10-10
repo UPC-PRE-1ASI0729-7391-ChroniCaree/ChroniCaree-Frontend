@@ -3,45 +3,46 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AlertResource } from './alert.resource';
 import { AlertStatus } from '../domain/model/alert.entity';
+import { BaseApi } from '../../shared/infrastructure/base-api';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AlertApiEndpoint {
+export class AlertApiEndpoint extends BaseApi {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:3000/alerts';
+  private readonly resourcePath = '/alerts';
 
   getByPatientId(patientId: string): Observable<AlertResource[]> {
-    return this.http.get<AlertResource[]>(`${this.baseUrl}?patientId=${patientId}`);
+    return this.http.get<AlertResource[]>(`${this.baseUrl}${this.resourcePath}?patientId=${patientId}`);
   }
 
   getActiveAlerts(patientId: string): Observable<AlertResource[]> {
     return this.http.get<AlertResource[]>(
-      `${this.baseUrl}?patientId=${patientId}&status=${AlertStatus.ACTIVE}`
+      `${this.baseUrl}${this.resourcePath}?patientId=${patientId}&status=${AlertStatus.ACTIVE}`
     );
   }
 
   getById(id: string): Observable<AlertResource> {
-    return this.http.get<AlertResource>(`${this.baseUrl}/${id}`);
+    return this.http.get<AlertResource>(`${this.baseUrl}${this.resourcePath}/${id}`);
   }
 
   create(alert: Omit<AlertResource, 'id'>): Observable<AlertResource> {
-    return this.http.post<AlertResource>(this.baseUrl, {
+    return this.http.post<AlertResource>(`${this.baseUrl}${this.resourcePath}`, {
       ...alert,
       id: crypto.randomUUID()
     });
   }
 
   update(id: string, alert: Partial<AlertResource>): Observable<AlertResource> {
-    return this.http.patch<AlertResource>(`${this.baseUrl}/${id}`, alert);
+    return this.http.patch<AlertResource>(`${this.baseUrl}${this.resourcePath}/${id}`, alert);
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${this.baseUrl}${this.resourcePath}/${id}`);
   }
 
   acknowledge(id: string, userId: string, notes?: string): Observable<AlertResource> {
-    return this.http.patch<AlertResource>(`${this.baseUrl}/${id}`, {
+    return this.http.patch<AlertResource>(`${this.baseUrl}${this.resourcePath}/${id}`, {
       status: AlertStatus.ACKNOWLEDGED,
       acknowledgedAt: new Date().toISOString(),
       acknowledgedBy: userId,
@@ -50,7 +51,7 @@ export class AlertApiEndpoint {
   }
 
   resolve(id: string, notes?: string): Observable<AlertResource> {
-    return this.http.patch<AlertResource>(`${this.baseUrl}/${id}`, {
+    return this.http.patch<AlertResource>(`${this.baseUrl}${this.resourcePath}/${id}`, {
       status: AlertStatus.RESOLVED,
       resolvedAt: new Date().toISOString(),
       notes
@@ -58,7 +59,7 @@ export class AlertApiEndpoint {
   }
 
   dismiss(id: string, notes?: string): Observable<AlertResource> {
-    return this.http.patch<AlertResource>(`${this.baseUrl}/${id}`, {
+    return this.http.patch<AlertResource>(`${this.baseUrl}${this.resourcePath}/${id}`, {
       status: AlertStatus.DISMISSED,
       dismissedAt: new Date().toISOString(),
       notes

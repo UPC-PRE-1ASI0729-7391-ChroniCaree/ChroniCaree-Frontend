@@ -10,13 +10,13 @@ import { map } from 'rxjs/operators';
 import { MedicationResource, MedicationLogResource } from './medication.resource';
 import { Medication, MedicationLog } from '../domain/model/medication.entity';
 import { MedicationAssembler } from './medication.assembler';
+import { BaseApi } from '../../shared/infrastructure/base-api';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MedicationApiEndpoint {
+export class MedicationApiEndpoint extends BaseApi {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000';
   private readonly resourcePath = '/medications';
 
   /**
