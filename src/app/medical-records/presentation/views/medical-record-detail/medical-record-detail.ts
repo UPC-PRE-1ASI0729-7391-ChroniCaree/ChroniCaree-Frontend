@@ -9,7 +9,7 @@ import { MedicalRecordsStore } from '../../../../doctors/application/medical-rec
   templateUrl: './medical-record-detail.html',
   styleUrls: ['./medical-record-detail.css'],
 })
-export default class MedicalRecordDetailComponent {
+export class MedicalRecordDetailComponent {
   private route = inject(ActivatedRoute);
   private recordsStore = inject(MedicalRecordsStore);
   private location = inject(Location);

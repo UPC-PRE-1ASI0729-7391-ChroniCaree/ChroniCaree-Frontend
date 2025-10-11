@@ -18,7 +18,7 @@ import { RequestPatientModalComponent } from '../../components/request-patient-m
   standalone: true,
   imports: [CommonModule, RouterLink, RequestPatientModalComponent],
   templateUrl: './patients-list.html',
-  styleUrl: './patients-list.css'
+  styleUrls: ['./patients-list.css']
 })
 export class PatientsListComponent implements OnInit {
   private readonly patientsStore = inject(AssignedPatientsStore);

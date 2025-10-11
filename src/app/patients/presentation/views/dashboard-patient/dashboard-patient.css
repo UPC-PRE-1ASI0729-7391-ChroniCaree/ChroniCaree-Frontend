@@ -166,22 +166,22 @@
 
 .vital-card.heart-rate {
   border-color: var(--color-cc-red);
-  background: rgba(230, 57, 70, 0.05);
+    background: rgba(230,57,70,0.05);
 }
 
 .vital-card.blood-pressure {
   border-color: var(--color-cc-green);
-  background: rgba(38, 181, 166, 0.05);
+    background: rgba(38,181,166,0.05);
 }
 
 .vital-card.temperature {
   border-color: var(--color-warning);
-  background: rgba(255, 193, 7, 0.05);
+    background: rgba(255,193,7,0.05);
 }
 
 .vital-card.oxygen {
   border-color: var(--color-info);
-  background: rgba(23, 162, 184, 0.05);
+    background: rgba(23,162,184,0.05);
 }
 
 .vital-icon {
@@ -195,22 +195,22 @@
 
 .heart-rate .vital-icon {
   color: var(--color-cc-red);
-  background: rgba(230, 57, 70, 0.1);
+    background: rgba(230,57,70,0.1);
 }
 
 .blood-pressure .vital-icon {
   color: var(--color-cc-green);
-  background: rgba(38, 181, 166, 0.1);
+    background: rgba(38,181,166,0.1);
 }
 
 .temperature .vital-icon {
   color: var(--color-warning);
-  background: rgba(255, 193, 7, 0.1);
+    background: rgba(255,193,7,0.1);
 }
 
 .oxygen .vital-icon {
   color: var(--color-info);
-  background: rgba(23, 162, 184, 0.1);
+    background: rgba(23,162,184,0.1);
 }
 
 .vital-content {
@@ -451,7 +451,7 @@
 }
 .medication-item.taken {
   background: rgba(40, 167, 69, 0.05);
-  border-color: var(--color-success);
+    border-color: var(--color-success);
 }
 
 .medication-info {
@@ -518,7 +518,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(38, 181, 166, 0.1);
+    background: rgba(38,181,166,0.1);
   border-radius: var(--radius-md);
 }
 .appointment-details { flex: 1; }

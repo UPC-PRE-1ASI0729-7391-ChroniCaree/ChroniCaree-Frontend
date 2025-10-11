@@ -134,7 +134,7 @@ export const routes: Routes = [
       {
         path: ':id',
         loadComponent: () =>
-          import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.default),
+          import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.MedicalRecordDetailComponent),
         title: `${baseTitle} - Registro Médico`,
       },
     ],
