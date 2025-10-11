@@ -1,10 +1,14 @@
 import { Alert } from '../domain/model/alert.entity';
 import { AlertResource } from './alert.resource';
 
-// Clase encargada de transformar datos entre el dominio (Alert) y el recurso (AlertResource)
+/**
+ * AlertAssembler - Convierte entre entidades Alert y recursos AlertResource
+ */
 export class AlertAssembler {
   
-  // Convierte un recurso proveniente del backend en una entidad de dominio
+  /**
+   * Convierte un recurso AlertResource en una entidad Alert
+   */
   static toEntity(resource: AlertResource): Alert {
     return new Alert(
       resource.id,
@@ -24,7 +28,9 @@ export class AlertAssembler {
     );
   }
 
-  // Convierte una entidad del dominio en un recurso para enviar o mostrar en la interfaz
+  /**
+   * Convierte una entidad Alert en un recurso AlertResource
+   */
   static toResource(entity: Alert): AlertResource {
     return {
       id: entity.id,
@@ -44,12 +50,16 @@ export class AlertAssembler {
     };
   }
 
-  // Transforma un arreglo de recursos en un arreglo de entidades
+  /**
+   * Convierte un arreglo de recursos AlertResource en un arreglo de entidades Alert
+   */
   static toEntityArray(resources: AlertResource[]): Alert[] {
     return resources.map(resource => this.toEntity(resource));
   }
 
-  // Transforma un arreglo de entidades en un arreglo de recursos
+  /**
+   * Convierte un arreglo de entidades Alert en un arreglo de recursos AlertResource
+   */
   static toResourceArray(entities: Alert[]): AlertResource[] {
     return entities.map(entity => this.toResource(entity));
   }
