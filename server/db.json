@@ -62,6 +62,15 @@
       "password": "123456789",
       "isVerified": false,
       "twoFactorEnabled": false
+    },
+    {
+      "id": 1760208835322,
+      "email": "a@a.com",
+      "role": "patient",
+      "name": "and ow",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false
     }
   ],
   "tenants": [
@@ -139,7 +148,7 @@
     {
       "id": 1760137119834,
       "userId": 1760137119779,
-      "assignedDoctorId": null,
+      "assignedDoctorId": 2,
       "tenantId": null,
       "subscriptionId": null,
       "firstName": "juan",
@@ -149,6 +158,23 @@
       "gender": "male",
       "phone": "123456789",
       "address": "123 av",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0
+    },
+    {
+      "id": 1760208835420,
+      "userId": 1760208835322,
+      "assignedDoctorId": null,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "and",
+      "lastName": "ow",
+      "dni": "12345",
+      "birthDate": "2007-06-14",
+      "gender": "female",
+      "phone": "12345679",
+      "address": "123",
       "weight": 0,
       "height": 0,
       "bmi": 0
@@ -239,6 +265,38 @@
       "diagnosis": "Evaluación inicial",
       "treatment": "Recomendaciones de estilo de vida saludable",
       "notes": "Paciente joven, sin antecedentes relevantes"
+    },
+    {
+      "patientId": 1,
+      "type": "symptoms",
+      "date": "2025-10-11T19:06:14.321Z",
+      "glucose": 123,
+      "bloodPressure": "90/40",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 9,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "estoy cansadoooooXDD",
+      "reviewStatus": "pending_review",
+      "doctorId": 2,
+      "id": 6
+    },
+    {
+      "patientId": 1,
+      "type": "symptoms",
+      "date": "2025-10-11T19:38:16.956Z",
+      "glucose": 123,
+      "bloodPressure": "123/60",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "no puedo dormir me siento con mareos y temblores ",
+      "reviewStatus": "pending_review",
+      "doctorId": 2,
+      "id": 7
     }
   ],
   "symptoms": [
@@ -310,12 +368,72 @@
       "notes": "me desamyoooo",
       "timestamp": "2025-10-11T00:20:19.799Z",
       "isEdited": false
+    },
+    {
+      "id": 6,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "12/60",
+      "heartRate": 80,
+      "temperature": 36,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "me siento mal",
+      "timestamp": "2025-10-11T02:30:44.421Z",
+      "isEdited": false
+    },
+    {
+      "id": 7,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "20/60",
+      "heartRate": 80,
+      "temperature": 36,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 5,
+      "notes": "me duele todo ",
+      "timestamp": "2025-10-11T02:32:47.554Z",
+      "isEdited": false
+    },
+    {
+      "id": 8,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "90/40",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 100,
+      "fatigue": 9,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "estoy cansadoooooXDD",
+      "timestamp": "2025-10-11T19:06:14.258Z",
+      "isEdited": false
+    },
+    {
+      "id": 9,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "123/60",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "no puedo dormir me siento con mareos y temblores ",
+      "timestamp": "2025-10-11T19:38:16.898Z",
+      "isEdited": false
     }
   ],
   "medications": [
     {
       "id": "med_1",
-      "patientId": "1",
+      "patientId": 1,
       "name": "Metformina",
       "type": "pill",
       "dosage": "500mg - 2 tabletas",
@@ -374,10 +492,10 @@
     },
     {
       "id": "med_2",
-      "patientId": "1",
+      "patientId": 1,
       "name": "Enalapril",
       "type": "pill",
-      "dosage": "10mg - 2 tableta",
+      "dosage": "10mg - 5 tableta",
       "schedule": {
         "frequency": "once_daily",
         "times": [
@@ -419,11 +537,11 @@
         }
       ],
       "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-10-10T20:31:06.260Z"
+      "updatedAt": "2025-10-11T02:28:11.780Z"
     },
     {
       "id": "med_3",
-      "patientId": "1",
+      "patientId": 1,
       "name": "Atorvastatina",
       "type": "pill",
       "dosage": "20mg - 1 tableta",
@@ -472,7 +590,7 @@
     },
     {
       "id": "med_4",
-      "patientId": "1",
+      "patientId": 1,
       "name": "Vitamina D3",
       "type": "capsule",
       "dosage": "2000 IU - 1 cápsula",
@@ -505,12 +623,34 @@
       ],
       "createdAt": "2025-03-01T00:00:00Z",
       "updatedAt": "2025-04-05T12:00:00Z"
+    },
+    {
+      "id": "med_1760211886656",
+      "patientId": "1",
+      "name": "amoxicilina",
+      "type": "pill",
+      "dosage": "2",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "09:00"
+        ],
+        "startDate": "2025-10-11T19:44:46.656Z"
+      },
+      "prescribedBy": "Doctor",
+      "prescribedDate": "2025-10-11T19:44:46.656Z",
+      "status": "active",
+      "sideEffects": [],
+      "contraindications": [],
+      "logs": [],
+      "createdAt": "2025-10-11T19:44:46.656Z",
+      "updatedAt": "2025-10-11T19:44:46.656Z"
     }
   ],
   "alerts": [
     {
       "id": "alert_1",
-      "patientId": "1",
+      "patientId": 1,
       "type": "vital_sign_high",
       "severity": "high",
       "title": "Presión Arterial Sistólica alta ⬆️",
@@ -527,7 +667,7 @@
     },
     {
       "id": "alert_2",
-      "patientId": "1",
+      "patientId": 1,
       "type": "vital_sign_high",
       "severity": "critical",
       "title": "Glucosa alta ⬆️",
@@ -544,7 +684,7 @@
     },
     {
       "id": "alert_3",
-      "patientId": "1",
+      "patientId": 1,
       "type": "vital_sign_low",
       "severity": "medium",
       "title": "Saturación de Oxígeno baja ⬇️",
@@ -561,7 +701,7 @@
     },
     {
       "id": "alert_4",
-      "patientId": "1",
+      "patientId": 1,
       "type": "vital_sign_high",
       "severity": "high",
       "title": "Frecuencia Cardíaca alta ⬆️",
@@ -581,7 +721,7 @@
     },
     {
       "id": "alert_5",
-      "patientId": "1",
+      "patientId": 1,
       "type": "medication_overdue",
       "severity": "medium",
       "title": "Medicación atrasada",
@@ -598,7 +738,7 @@
   "adherence": [
     {
       "id": 1,
-      "medicationId": 1,
+      "medicationId": "med_1",
       "patientId": 1,
       "scheduledTime": "2025-04-05T08:00:00Z",
       "takenAt": "2025-04-05T08:05:00Z",
@@ -607,7 +747,7 @@
     },
     {
       "id": 2,
-      "medicationId": 1,
+      "medicationId": "med_1",
       "patientId": 1,
       "scheduledTime": "2025-04-05T20:00:00Z",
       "takenAt": null,
@@ -672,6 +812,19 @@
       "isUrgent": false,
       "attachments": [],
       "id": 3
+    },
+    {
+      "senderId": "1",
+      "receiverId": "2",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "holaa me siento mal",
+      "content": "me siento mal",
+      "timestamp": "2025-10-11T02:28:40.809Z",
+      "read": false,
+      "isUrgent": true,
+      "attachments": [],
+      "id": 4
     }
   ],
   "diagnoses": [
@@ -837,7 +990,7 @@
       "date": "2025-10-24",
       "time": "09:00",
       "type": "Emergencia",
-      "status": "in_progress",
+      "status": "completed",
       "notes": "prueba",
       "id": 8
     },
@@ -847,9 +1000,19 @@
       "date": "2025-11-07",
       "time": "15:00",
       "type": "Seguimiento",
-      "status": "confirmed",
+      "status": "in_progress",
       "notes": "xd",
       "id": 9
+    },
+    {
+      "patientId": 1,
+      "doctorId": 2,
+      "date": "2025-10-17",
+      "time": "12:30",
+      "type": "Emergencia",
+      "status": "scheduled",
+      "notes": "estoy mal ",
+      "id": 10
     }
   ],
   "staff": [
@@ -875,11 +1038,11 @@
       "actionLabel": "Registrar toma",
       "actionRoute": "/medications",
       "icon": "medication",
-      "isDismissed": false,
+      "isDismissed": true,
       "isSnoozed": true,
       "snoozeUntil": "2025-10-10T21:06:02.881Z",
       "createdAt": "2025-04-05T08:00:00Z",
-      "dismissedAt": null
+      "dismissedAt": "2025-10-11T02:33:05.275Z"
     },
     {
       "id": 2,
@@ -891,11 +1054,11 @@
       "actionLabel": "Registrar síntomas",
       "actionRoute": "/clinical/symptoms/register",
       "icon": "healing",
-      "isDismissed": false,
+      "isDismissed": true,
       "isSnoozed": false,
       "snoozeUntil": null,
       "createdAt": "2025-04-05T09:00:00Z",
-      "dismissedAt": null
+      "dismissedAt": "2025-10-11T19:07:07.960Z"
     },
     {
       "id": 3,

@@ -36,19 +36,16 @@ export class ToolbarPatientComponent implements OnInit {
 
   ngOnInit(): void {
     // ✅ Cargar nudges y mensajes filtrados por paciente actual
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (!currentUserStr) {
+    const currentUser = this.userStore.currentUser$();
+    if (!currentUser || !currentUser.id) {
       console.error('❌ Toolbar-Patient: Usuario no autenticado');
       return;
     }
 
-    const currentUser = JSON.parse(currentUserStr);
-    const userId = currentUser.id;
-
     // Buscar el paciente asociado al usuario actual
     this.patientStore.loadAllPatients().subscribe({
       next: (patients) => {
-        const patient = patients.find(p => p.userId === userId);
+        const patient = patients.find(p => p.userId === currentUser.id);
 
         if (patient) {
           console.log(`✅ Toolbar-Patient: Cargando datos para paciente ${patient.id}`);
@@ -63,13 +60,34 @@ export class ToolbarPatientComponent implements OnInit {
           console.log(`✅ Toolbar-Patient: Cargando mensajes para paciente ID: ${patient.id}`);
           this.messagesStore.loadInbox('PATIENT', patient.id.toString());
         } else {
-          console.error(`❌ Toolbar-Patient: No se encontró paciente para userId ${userId}`);
+          console.error(`❌ Toolbar-Patient: No se encontró paciente para userId ${currentUser.id}`);
         }
       },
       error: (err) => {
         console.error('❌ Toolbar-Patient: Error cargando pacientes:', err);
       }
     });
+
+    // Listen for user changes so toolbar reloads patient-specific data without page refresh
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const current = detailUser || this.userStore.currentUser$();
+        if (!current || !current.id) return;
+
+        this.patientStore.loadAllPatients().subscribe({
+          next: (patients) => {
+            const patient = patients.find(p => p.userId === current.id);
+            if (patient) {
+              this.nudgeStore.loadNudgesByPatient(patient.id.toString()).subscribe({ next: () => {}, error: () => {} });
+              this.messagesStore.loadInbox('PATIENT', patient.id.toString());
+            }
+          }
+        });
+      });
+    } catch (e) {
+      // ignore if window not available
+    }
   }
 
   get currentUser() {

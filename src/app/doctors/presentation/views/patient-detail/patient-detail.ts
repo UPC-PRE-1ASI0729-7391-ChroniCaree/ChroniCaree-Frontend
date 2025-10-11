@@ -1,0 +1,243 @@
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { CommonModule, NgIf, NgFor, Location } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+// Angular Material modules
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PatientStore } from '../../../../patients/application/patient.store';
+import { MedicalRecordsStore } from '../../../application/medical-records.store';
+import { MedicationStore } from '../../../../medications/application/medication.store';
+import { Medication, MedicationFrequency, MedicationType, MedicationStatus } from '../../../../medications/domain/model/medication.entity';
+import { MedicalRecord, RecordType } from '../../../domain/model/medical-record.entity';
+
+@Component({
+  selector: 'app-patient-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    NgIf,
+    NgFor,
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule
+  ],
+  templateUrl: './patient-detail.html',
+  styleUrls: ['./patient-detail.css']
+})
+export class DoctorsPatientDetailComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly patientStore = inject(PatientStore);
+  private readonly recordsStore = inject(MedicalRecordsStore);
+  private readonly location = inject(Location);
+  private readonly router = inject(Router);
+
+  readonly patient = signal<any | null>(null);
+  readonly records = this.recordsStore.records;
+  readonly loading = this.recordsStore.loading;
+  readonly RecordType = RecordType;
+  // UI state: expanded records map and showAll flag
+  readonly expanded = signal<Record<string, boolean>>({});
+  // Medication expanded state (for medication detail toggles)
+  readonly medicationExpanded = signal<Record<string, boolean>>({});
+  readonly showAll = signal(false);
+  // Medications (from medication bounded context)
+  private readonly medicationStore = inject(MedicationStore);
+  readonly medicationsForPatient = computed(() => {
+    const p = this.patient();
+    if (!p) return [] as any[];
+    const all = (this.medicationStore.medications && this.medicationStore.medications()) || [];
+    return all.filter(m => String(m.patientId) === String(p.id));
+  });
+  // Expose all medications signal for debugging/template
+  readonly allMeds = this.medicationStore.medications;
+  // Editing state for medications
+  readonly editingMedicationId = signal<string | null>(null);
+  readonly editName = signal<string>('');
+  readonly editDosage = signal<string>('');
+  readonly editFrequency = signal<string>('');
+  // Prescription UI
+  readonly prescribing = signal(false);
+  readonly medName = signal('');
+  readonly medDosage = signal('');
+  readonly medFrequency = signal<MedicationFrequency | string>(MedicationFrequency.ONCE_DAILY);
+  readonly medType = signal<MedicationType | string>(MedicationType.PILL);
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) return;
+    const patientId = Number(idParam);
+
+    // Load patient
+    this.patientStore.loadPatientById(patientId).subscribe({
+      next: (p) => this.patient.set(p),
+      error: (err) => console.error('Error loading patient', err)
+    });
+
+    // Load medical records for this patient
+    this.recordsStore.loadRecordsByPatient(patientId);
+    // Load medications for this patient from the medication bounded context
+    try {
+      this.medicationStore.loadMedicationsByPatient(String(patientId)).subscribe({
+        next: (meds) => { console.debug('MedicationStore loaded meds:', meds); },
+        error: (err) => console.error('Error loading medications for patient', err)
+      });
+    } catch (e) {
+      // defensive: if the method isn't available, ignore (store may have different API)
+      console.warn('medicationStore.loadMedicationsByPatient not available', e);
+    }
+  }
+
+  togglePrescribe(): void {
+    this.prescribing.set(!this.prescribing());
+  }
+
+  prescribe(name: string, dosage: string, frequency: string, notes?: string): void {
+    if (!this.patient()) return;
+    const patientId = String(this.patient().id);
+
+    const med: Medication = new Medication({
+      id: `med_${Date.now()}`,
+      patientId,
+      name: name || 'Medicamento',
+      dosage: dosage || '1 unidad',
+      type: this.medType() as MedicationType,
+      schedule: {
+        frequency: (frequency as MedicationFrequency) || MedicationFrequency.ONCE_DAILY,
+        times: ['09:00'],
+        startDate: new Date()
+      },
+      prescribedBy: this.patient().assignedDoctorName || 'Doctor',
+      prescribedDate: new Date(),
+      status: MedicationStatus.ACTIVE,
+      instructions: notes || undefined,
+    });
+
+    this.medicationStore.createMedication(med).subscribe({
+      next: () => {
+        this.prescribing.set(false);
+      },
+      error: (err) => {
+        console.error('Error prescribing medication', err);
+      }
+    });
+  }
+
+  // Medication edit helpers
+  startEditMedication(med: Medication): void {
+    this.editingMedicationId.set(med.id);
+    this.editName.set(med.name || '');
+    this.editDosage.set(med.dosage || '');
+    this.editFrequency.set((med.schedule?.frequency as string) || 'once_daily');
+  }
+
+  cancelEditMedication(): void {
+    this.editingMedicationId.set(null);
+    this.editName.set('');
+    this.editDosage.set('');
+    this.editFrequency.set('');
+  }
+
+  saveMedicationEdit(med: Medication): void {
+    const id = med.id;
+    const updated: Medication = new Medication({
+      ...med,
+      name: this.editName() || med.name,
+      dosage: this.editDosage() || med.dosage,
+      schedule: {
+        ...(med.schedule || {}),
+        frequency: this.editFrequency() as MedicationFrequency
+      }
+    });
+
+    this.medicationStore.updateMedication(id, updated).subscribe({
+      next: () => {
+        this.cancelEditMedication();
+      },
+      error: (err) => console.error('Error updating medication', err)
+    });
+  }
+
+  /** Toggle medication details card */
+  toggleMedicationDetails(medicationId: string): void {
+    this.medicationExpanded.update(m => ({ ...m, [medicationId]: !m[medicationId] }));
+  }
+
+  isMedicationExpanded(medicationId: string): boolean {
+    return !!this.medicationExpanded()[medicationId];
+  }
+
+  toggleRecord(recordId: number): void {
+    this.expanded.update(m => ({ ...m, [recordId]: !m[recordId] }));
+  }
+
+  isExpanded(recordId: number): boolean {
+    return !!this.expanded()[recordId];
+  }
+
+  toggleShowAll(): void {
+    this.showAll.set(!this.showAll());
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleString('es-ES');
+  }
+
+  trackById(index: number, item: MedicalRecord) {
+    return item?.id;
+  }
+
+  calculateAge(birthDate?: string): string {
+    if (!birthDate) return 'N/A';
+    try {
+      const today = new Date();
+      const birth = new Date(birthDate);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return String(age);
+    } catch (e) {
+      return 'N/A';
+    }
+  }
+
+  /** Go back to previous page */
+  goBack(): void {
+    try { this.location.back(); } catch (e) { this.router.navigate(['/doctor/patients']); }
+  }
+
+  /**
+   * Friendly label for record types
+   */
+  recordTypeLabel(type: RecordType | string | undefined): string {
+    if (!type) return 'Desconocido';
+    switch (String(type)) {
+      case RecordType.SYMPTOMS:
+      case 'SYMPTOMS':
+        return 'Síntomas';
+      case RecordType.VITAL_SIGNS:
+      case 'VITAL_SIGNS':
+        return 'Signos vitales';
+      case RecordType.CONSULTATION:
+      case 'CONSULTATION':
+        return 'Consulta / Diagnóstico';
+      default:
+        // Title case fallback
+        const s = String(type).toLowerCase().replace(/_/g, ' ');
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+  }
+}

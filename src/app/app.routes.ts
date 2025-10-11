@@ -131,6 +131,12 @@ export const routes: Routes = [
         title: `${baseTitle} - Diagnósticos Médicos`,
         data: { role: 'patient' },
       },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.default),
+        title: `${baseTitle} - Registro Médico`,
+      },
     ],
   },
 
@@ -159,6 +165,12 @@ export const routes: Routes = [
         path: 'patients',
         loadComponent: () => import('./doctors/presentation/views/patients-list/patients-list').then(m => m.PatientsListComponent),
         title: `${baseTitle} - Mis Pacientes`,
+        data: { role: 'doctor' }
+      },
+      {
+        path: 'patients/:id',
+        loadComponent: () => import('./doctors/presentation/views/patient-detail/patient-detail').then(m => m.DoctorsPatientDetailComponent),
+        title: `${baseTitle} - Detalle Paciente`,
         data: { role: 'doctor' }
       },
       {

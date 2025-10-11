@@ -202,14 +202,11 @@ export class DashboardPatient implements OnInit {
   ngOnInit(): void {
     console.log('Dashboard Patient inicializado');
     
-    // Verificar autenticación
+    // Verificar autenticación usando UserStore (preferred) con fallback a localStorage
     let user = this.currentUser();
-    
     if (!user) {
-      // Fallback: intentar cargar desde localStorage
       const currentUserStr = localStorage.getItem('currentUser');
       const isAuthenticated = localStorage.getItem('isAuthenticated');
-      
       if (currentUserStr && isAuthenticated === 'true') {
         try {
           const parsedUser = JSON.parse(currentUserStr);
@@ -231,6 +228,20 @@ export class DashboardPatient implements OnInit {
     // Cargar datos del paciente autenticado
     if (user) {
       this.loadPatientData(user.id);
+    }
+
+    // React to user changes (login/logout/switch) to reload patient data without full page refresh
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const userId = detailUser?.id || (this.userStore.currentUser$()?.id);
+        if (userId) {
+          console.log('Dashboard-Patient: detected user change, reloading patient data for userId', userId);
+          this.loadPatientData(userId);
+        }
+      });
+    } catch (e) {
+      // ignore in non-browser environments
     }
   }
 

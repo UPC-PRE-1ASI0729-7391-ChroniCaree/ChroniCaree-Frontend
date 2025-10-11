@@ -1,0 +1,44 @@
+<div class="medical-record-detail">
+  <button class="btn btn-ghost back-btn" (click)="goBack()">← Volver</button>
+
+  <ng-container *ngIf="record$() as r; else loadingTpl">
+    <h2>Registro médico — {{ r?.type }}</h2>
+    <p class="muted">Fecha: {{ r?.date | date:'short' }}</p>
+
+    <section class="detail-block">
+      <div *ngIf="r?.type === 'vital_signs'">
+        <h4>Signos vitales</h4>
+        <p><strong>Glucosa:</strong> {{ r?.glucose ?? '—' }} mg/dL</p>
+        <p><strong>Presión:</strong> {{ r?.bloodPressure || '—' }}</p>
+        <p><strong>Pulso:</strong> {{ r?.heartRate ?? '—' }} bpm</p>
+        <p><strong>Temperatura:</strong> {{ r?.temperature ?? '—' }} °C</p>
+        <p><strong>Peso:</strong> {{ r?.weight ?? '—' }} kg</p>
+      </div>
+
+      <div *ngIf="r?.type === 'symptoms'">
+        <h4>Síntomas reportados</h4>
+        <p><strong>Fatiga:</strong> {{ r?.fatigue ?? '—' }}</p>
+        <p><strong>Dolor:</strong> {{ r?.pain ?? '—' }}</p>
+        <p><strong>Mareo:</strong> {{ r?.dizziness ?? '—' }}</p>
+        <p><strong>Notas:</strong> {{ r?.notes || '—' }}</p>
+      </div>
+
+      <div *ngIf="r?.type === 'consultation'">
+        <h4>Consulta / Diagnóstico</h4>
+        <p><strong>Diagnóstico:</strong> {{ r?.diagnosis || '—' }}</p>
+        <p><strong>Tratamiento:</strong> {{ r?.treatment || '—' }}</p>
+        <p><strong>Notas:</strong> {{ r?.notes || '—' }}</p>
+      </div>
+    </section>
+
+    <section class="meta">
+      <p><strong>Revisión:</strong> {{ r?.reviewStatus || '—' }}</p>
+      <p *ngIf="r?.reviewedBy"><strong>Revisado por:</strong> {{ r.reviewedBy }}</p>
+      <p *ngIf="r?.reviewedAt"><strong>Revisado en:</strong> {{ r.reviewedAt | date:'short' }}</p>
+    </section>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <p class="muted">Cargando registro...</p>
+  </ng-template>
+</div>
