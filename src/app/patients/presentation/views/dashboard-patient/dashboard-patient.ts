@@ -232,6 +232,20 @@ export class DashboardPatient implements OnInit {
     if (user) {
       this.loadPatientData(user.id);
     }
+
+    // React to user changes (login/logout/switch) to reload patient data without full page refresh
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const userId = detailUser?.id || (this.userStore.currentUser$()?.id);
+        if (userId) {
+          console.log('Dashboard-Patient: detected user change, reloading patient data for userId', userId);
+          this.loadPatientData(userId);
+        }
+      });
+    } catch (e) {
+      // ignore in non-browser environments
+    }
   }
 
   /**

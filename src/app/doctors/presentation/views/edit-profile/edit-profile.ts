@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { DoctorStore } from '../../../application/doctor.store';
+import { UserStore } from '../../../../iam/application/user.store';
 
 /**
  * Edit Profile View - Doctor Profile Management
@@ -72,7 +73,8 @@ export class EditProfileDoctorComponent implements OnInit {
     private fb: FormBuilder,
     private doctorStore: DoctorStore,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private userStore: UserStore
   ) {
     this.initializeForm();
   }
@@ -171,12 +173,16 @@ export class EditProfileDoctorComponent implements OnInit {
       next: () => {
         this.showNotification('✅ Perfil actualizado correctamente', 'success');
         
-        // Actualizar localStorage
-        const userStr = localStorage.getItem('currentUser');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          user.name = `Dr. ${formValue.firstName} ${formValue.lastName}`;
-          localStorage.setItem('currentUser', JSON.stringify(user));
+        // Update current user via UserStore so other components react
+        try {
+          const userStr = localStorage.getItem('currentUser');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            user.name = `Dr. ${formValue.firstName} ${formValue.lastName}`;
+            this.userStore.setCurrentUser(user);
+          }
+        } catch (e) {
+          console.error('Error updating currentUser after profile update:', e);
         }
       },
       error: (error) => {

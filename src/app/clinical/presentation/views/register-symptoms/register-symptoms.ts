@@ -63,6 +63,20 @@ export class RegisterSymptomsComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadCurrentPatient();
+
+    // React to user changes to reload patient context automatically
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const userId = detailUser?.id || JSON.parse(localStorage.getItem('currentUser') || '{}').id;
+        if (userId) {
+          console.log('Register-Symptoms: userChanged detected, reloading patient for userId', userId);
+          this.loadCurrentPatient();
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

@@ -91,15 +91,10 @@ export class LoginComponent implements OnInit {
         const user = users.find(u => u.email === email && u.password === password);
 
         if (user) {
-          // Store user in UserStore
+          // Store user in UserStore (this will persist + emit userChanged)
           this.userStore.setCurrentUser(user);
 
-          // Save to localStorage for persistence
-          localStorage.setItem('currentUser', JSON.stringify(user));
-          localStorage.setItem('isAuthenticated', 'true');
-          localStorage.setItem('userRole', user.role);
-
-          // Remember me functionality
+          // Remember me functionality (only rememberedEmail remains in localStorage)
           if (rememberMe) {
             localStorage.setItem('rememberedEmail', email);
           } else {

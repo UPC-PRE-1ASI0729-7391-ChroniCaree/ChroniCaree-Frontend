@@ -146,6 +146,23 @@ export class UserStore {
 
   setCurrentUser(user: User | null): void {
     this.currentUser.set(user);
+    // Persist to localStorage when setting current user
+    if (user) {
+      try {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userRole', user.role);
+      } catch (e) {
+        console.warn('Could not persist currentUser to localStorage', e);
+      }
+    }
+
+    // Notify other parts of the app that the current user changed.
+    try {
+      window.dispatchEvent(new CustomEvent('userChanged', { detail: user }));
+    } catch (e) {
+      // In environments without window or CustomEvent, ignore
+    }
   }
 
   /**
@@ -157,6 +174,12 @@ export class UserStore {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
     console.log('✅ UserStore cleared');
+    try {
+      // Notify interested components that user is now null/logged out
+      window.dispatchEvent(new CustomEvent('userChanged', { detail: null }));
+    } catch (e) {
+      // ignore
+    }
   }
 
   clearError(): void {

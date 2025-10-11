@@ -121,6 +121,29 @@ export class MedicationHistoryComponent implements OnInit {
         console.error('❌ Medication-History: Error cargando pacientes:', err);
       }
     });
+
+    // React to user changes (login/logout/switch)
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const userId = detailUser?.id || JSON.parse(localStorage.getItem('currentUser') || '{}').id;
+        if (userId) {
+          console.log('Medication-History: userChanged detected, reloading patient data for userId', userId);
+          this.patientStore.loadAllPatients().subscribe({
+            next: (patients) => {
+              const patient = patients.find(p => p.userId === userId);
+              if (patient) {
+                const patientIdStr = patient.id.toString();
+                this.currentPatientId.set(patientIdStr);
+                this.medicationStore.forceReload(patientIdStr).subscribe();
+              }
+            }
+          });
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

@@ -87,6 +87,27 @@ export class HealthAlertsComponent implements OnInit {
         console.error('❌ Health-Alerts: Error cargando pacientes:', err);
       }
     });
+
+    
+    // React to user changes so alerts reload automatically
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const userId = detailUser?.id || JSON.parse(localStorage.getItem('currentUser') || '{}').id;
+        if (userId) {
+          this.patientStore.loadAllPatients().subscribe({
+            next: (patients) => {
+              const patient = patients.find(p => p.userId === userId);
+              if (patient) {
+                this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe();
+              }
+            }
+          });
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

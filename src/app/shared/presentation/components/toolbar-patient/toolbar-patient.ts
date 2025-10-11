@@ -70,6 +70,26 @@ export class ToolbarPatientComponent implements OnInit {
         console.error('❌ Toolbar-Patient: Error cargando pacientes:', err);
       }
     });
+
+    // Listen for user changes so toolbar reloads patient-specific data without page refresh
+    try {
+      window.addEventListener('userChanged', () => {
+        const currentUserStr2 = localStorage.getItem('currentUser');
+        if (!currentUserStr2) return;
+        const cu = JSON.parse(currentUserStr2);
+        this.patientStore.loadAllPatients().subscribe({
+          next: (patients) => {
+            const patient = patients.find(p => p.userId === cu.id);
+            if (patient) {
+              this.nudgeStore.loadNudgesByPatient(patient.id.toString()).subscribe();
+              this.messagesStore.loadInbox('PATIENT', patient.id.toString());
+            }
+          }
+        });
+      });
+    } catch (e) {
+      // ignore if window not available
+    }
   }
 
   get currentUser() {

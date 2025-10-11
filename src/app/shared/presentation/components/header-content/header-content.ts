@@ -122,14 +122,8 @@ export class HeaderContentComponent implements OnInit {
   }
 
   logout(): void {
-    // Clear localStorage
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole');
-    
-    // Clear user store
-    this.userStore.setCurrentUser(null);
-    
+    // Use UserStore to clear session (this will clear localStorage and emit userChanged)
+    this.userStore.clearCurrentUser();
     // Navigate to login
     this.router.navigate(['/iam/login']);
   }
