@@ -1,3 +1,4 @@
+
 import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -6,11 +7,12 @@ import { PdfExportResponse } from '../../../../shared/infrastructure/pdf-export.
 @Component({
   selector: 'app-dashboard-doctor',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonToggleModule],
   templateUrl: './dashboard-doctor.html',
   styleUrl: './dashboard-doctor.css'
 })
 export class DashboardDoctor implements OnInit {
+
   // --- Referencia al área que se exportará ---
   @ViewChild('printArea', { static: false }) printArea!: ElementRef<HTMLElement>;
 
@@ -35,6 +37,7 @@ export class DashboardDoctor implements OnInit {
     { id: 1, patientName: 'Luis Torres', condition: 'Presión arterial elevada', severity: 'high', time: '08:45' },
     { id: 2, patientName: 'Carmen Silva', condition: 'Glucosa fuera de rango', severity: 'medium', time: '08:30' }
   ]);
+
 
   constructor(private router: Router) {}
 
