@@ -12,6 +12,7 @@ import { DiagnosisStore } from '../../../../medical-records/application/diagnosi
 import { MedicationStore } from '../../../../medications/application/medication.store';
 import { AlertStore } from '../../../../alerts/application/alert.store';
 import { AppointmentsStore } from '../../../../doctors/application/appointments.store';
+import { Appointment } from '../../../../doctors/domain/model/appointment.entity';
 
 @Component({
   selector: 'app-dashboard-patient',
@@ -143,10 +144,10 @@ export class DashboardPatient implements OnInit {
     // ✅ Filtrar solo citas del paciente actual
     const allAppointments = this.appointmentsStore.upcomingAppointments();
     const patientAppointments = allAppointments
-      .filter(apt => apt.patientId === patient.id)
+      .filter((apt: Appointment) => apt.patientId === patient.id)
       .slice(0, 2); // Mostrar solo las 2 próximas en dashboard
 
-    return patientAppointments.map(apt => ({
+    return patientAppointments.map((apt: Appointment) => ({
       id: apt.id,
       doctorName: 'Dr. Asignado', // TODO: obtener nombre del doctor
       specialty: 'Especialidad', // TODO: obtener especialidad

@@ -143,7 +143,7 @@ export class AppointmentsStore {
     
     return this.apiEndpoint.getAppointmentsByPatient(patientId).pipe(
       tap({
-        next: (appointments) => {
+        next: (appointments: Appointment[]) => {
           console.log(`✅ [AppointmentsStore] ${appointments.length} citas cargadas para paciente ${patientId}`);
           this.state.update(s => ({
             ...s,
@@ -152,7 +152,7 @@ export class AppointmentsStore {
             error: null
           }));
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error(`❌ [AppointmentsStore] Error cargando citas del paciente:`, err);
           this.state.update(s => ({
             ...s,
