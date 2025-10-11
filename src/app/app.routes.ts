@@ -131,6 +131,12 @@ export const routes: Routes = [
         title: `${baseTitle} - Diagnósticos Médicos`,
         data: { role: 'patient' },
       },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.default),
+        title: `${baseTitle} - Registro Médico`,
+      },
     ],
   },
 

@@ -281,6 +281,22 @@
       "reviewStatus": "pending_review",
       "doctorId": 2,
       "id": 6
+    },
+    {
+      "patientId": 1,
+      "type": "symptoms",
+      "date": "2025-10-11T19:38:16.956Z",
+      "glucose": 123,
+      "bloodPressure": "123/60",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "no puedo dormir me siento con mareos y temblores ",
+      "reviewStatus": "pending_review",
+      "doctorId": 2,
+      "id": 7
     }
   ],
   "symptoms": [
@@ -396,6 +412,21 @@
       "dizziness": 2,
       "notes": "estoy cansadoooooXDD",
       "timestamp": "2025-10-11T19:06:14.258Z",
+      "isEdited": false
+    },
+    {
+      "id": 9,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "123/60",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "no puedo dormir me siento con mareos y temblores ",
+      "timestamp": "2025-10-11T19:38:16.898Z",
       "isEdited": false
     }
   ],
@@ -592,6 +623,28 @@
       ],
       "createdAt": "2025-03-01T00:00:00Z",
       "updatedAt": "2025-04-05T12:00:00Z"
+    },
+    {
+      "id": "med_1760211886656",
+      "patientId": "1",
+      "name": "amoxicilina",
+      "type": "pill",
+      "dosage": "2",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "09:00"
+        ],
+        "startDate": "2025-10-11T19:44:46.656Z"
+      },
+      "prescribedBy": "Doctor",
+      "prescribedDate": "2025-10-11T19:44:46.656Z",
+      "status": "active",
+      "sideEffects": [],
+      "contraindications": [],
+      "logs": [],
+      "createdAt": "2025-10-11T19:44:46.656Z",
+      "updatedAt": "2025-10-11T19:44:46.656Z"
     }
   ],
   "alerts": [
