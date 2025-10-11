@@ -9,14 +9,14 @@ export const routes: Routes = [
     redirectTo: '/iam/login',
     pathMatch: 'full'
   },
-  
+
   // Home route
   {
     path: 'home',
     loadComponent: () => import('./shared/presentation/views/home/home').then(m => m.Home),
     title: `${baseTitle} - Inicio`
   },
-  
+
   // IAM routes (Authentication & Identity)
   {
     path: 'iam',
@@ -44,7 +44,7 @@ export const routes: Routes = [
       }
     ]
   },
-  
+
   // Patient routes
   {
     path: 'patient',
@@ -81,7 +81,7 @@ export const routes: Routes = [
       }
     ]
   },
-  
+
   // Clinical routes (Symptoms & Medical Records)
   {
     path: 'clinical',
@@ -107,7 +107,7 @@ export const routes: Routes = [
       }
     ]
   },
-  
+
   // Doctor routes
   {
     path: 'doctor',
@@ -144,36 +144,43 @@ export const routes: Routes = [
       }
     ]
   },
-  
+
   // Coming Soon page (for features under development)
   {
     path: 'coming-soon',
     loadComponent: () => import('./shared/presentation/components/coming-soon/coming-soon').then(m => m.ComingSoonComponent),
     title: `${baseTitle} - Próximamente`
   },
-  
+
   // 404 Not Found page
   {
     path: '404',
     loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),
     title: `${baseTitle} - Página no encontrada`
   },
-  
+
   // Legacy redirects for backward compatibility
-  { 
-    path: 'dashboard/doctor', 
-    redirectTo: 'doctor/dashboard', 
-    pathMatch: 'full' 
+  {
+    path: 'dashboard/doctor',
+    redirectTo: 'doctor/dashboard',
+    pathMatch: 'full'
   },
-  { 
-    path: 'dashboard/patient', 
-    redirectTo: 'patient/dashboard', 
-    pathMatch: 'full' 
+  {
+    path: 'dashboard/patient',
+    redirectTo: 'patient/dashboard',
+    pathMatch: 'full'
   },
-  
+  {
+    path: 'tutorial',
+    loadComponent: () =>
+      import('./shared/presentation/components/tutorial-reset/tutorial-reset')
+        .then(m => m.TutorialResetComponent),
+    title: `${baseTitle} - Tutorial`
+  },
+
   // Wildcard route (always last) - redirect to 404
-  { 
-    path: '**', 
+  {
+    path: '**',
     redirectTo: '/404'
   }
 ];
