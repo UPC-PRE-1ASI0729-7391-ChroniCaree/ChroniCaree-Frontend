@@ -3,10 +3,14 @@ import { BaseResponse } from '../../shared/infrastructure/base-response';
 import { Doctor } from '../domain/model/doctor.entity';
 import { DoctorResource } from './doctor.resource';
 
-// Clase encargada de convertir datos entre la entidad Doctor y su recurso correspondiente
+/**
+ * DoctorAssembler - Convierte entre entidades Doctor y recursos DoctorResource
+ */
 export class DoctorAssembler implements BaseAssembler<Doctor, DoctorResource, BaseResponse> {
   
-  // Convierte un recurso (generalmente recibido del backend) en una entidad Doctor del dominio
+  /**
+   * Convierte un recurso DoctorResource en una entidad Doctor
+   */
   toEntityFromResource(resource: DoctorResource): Doctor {
     return {
       id: resource.id,
@@ -23,7 +27,9 @@ export class DoctorAssembler implements BaseAssembler<Doctor, DoctorResource, Ba
     };
   }
 
-  // Convierte una entidad Doctor en un recurso (por ejemplo, para enviar al backend o mostrar en la vista)
+  /**
+   * Convierte una entidad Doctor en un recurso DoctorResource
+   */
   toResourceFromEntity(entity: Doctor): DoctorResource {
     return {
       id: entity.id,
@@ -40,7 +46,9 @@ export class DoctorAssembler implements BaseAssembler<Doctor, DoctorResource, Ba
     };
   }
 
-  // Método preparado para transformar respuestas base en una lista de entidades Doctor (actualmente sin implementación)
+  /**
+   * Convierte una respuesta BaseResponse en una lista de entidades Doctor (sin implementación actual)
+   */
   toEntitiesFromResponse(response: BaseResponse): Doctor[] {
     return [];
   }
