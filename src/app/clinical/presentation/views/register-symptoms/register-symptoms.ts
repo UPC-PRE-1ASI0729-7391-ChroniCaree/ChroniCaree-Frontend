@@ -13,9 +13,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SymptomStore } from '../../../application/symptom.store';
 import { Symptom } from '../../../domain/model/symptom.entity';
+import { MedicalRecord } from '../../../../doctors/domain/model/medical-record.entity';
 import { SymptomConfirmationDialogComponent } from '../../components/symptom-confirmation-dialog/symptom-confirmation-dialog';
 import { PatientStore } from '../../../../patients/application/patient.store';
 import { UserStore } from '../../../../iam/application/user.store';
+import { MedicalRecordsStore } from '../../../../doctors/application/medical-records.store';
+import { RecordType, ReviewStatus } from '../../../../doctors/domain/model/medical-record.entity';
 
 /**
  * Register Symptoms View - Registro de síntomas diarios
@@ -46,6 +49,7 @@ export class RegisterSymptomsComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly medicalRecordsStore = inject(MedicalRecordsStore);
   symptomForm!: FormGroup;
 
   // Valores de escalas (1-10)
@@ -203,6 +207,43 @@ export class RegisterSymptomsComponent implements OnInit {
           this.fatigueValue.set(5);
           this.painValue.set(5);
           this.dizzinessValue.set(5);
+
+          // Also create a medical record entry so it appears in the patient's history
+          try {
+            const mr: Partial<MedicalRecord> = {
+              patientId: patientId,
+              // doctorId will be set if patient has assignedDoctorId
+              type: RecordType.SYMPTOMS,
+              date: new Date().toISOString(),
+              glucose: newSymptom.glucose,
+              bloodPressure: newSymptom.bloodPressure,
+              heartRate: newSymptom.heartRate,
+              temperature: newSymptom.temperature,
+              fatigue: newSymptom.fatigue,
+              pain: newSymptom.pain,
+              dizziness: newSymptom.dizziness,
+              notes: newSymptom.notes,
+              reviewStatus: ReviewStatus.PENDING_REVIEW
+            };
+
+            // If patient record includes assignedDoctorId, use it
+            this.patientStore.loadAllPatients().subscribe({
+              next: (patients) => {
+                const patientObj = patients.find(p => p.id === patientId);
+                if (patientObj && (patientObj as any).assignedDoctorId) {
+                  // use bracket notation to satisfy index signature rules
+                  (mr as any)['doctorId'] = (patientObj as any).assignedDoctorId;
+                }
+                this.medicalRecordsStore.createRecord(mr);
+              },
+              error: () => {
+                // still create record without doctor
+                this.medicalRecordsStore.createRecord(mr);
+              }
+            });
+          } catch (e) {
+            console.warn('Could not create medical record automatically', e);
+          }
         },
         error: (error) => {
           this.snackBar.open('❌ Error al registrar síntomas', 'Cerrar', {

@@ -88,6 +88,22 @@ export class MedicalRecordsStore {
   clear(): void {
     this.state.set({ records: [], selectedRecord: null, loading: false, error: null });
   }
+
+  /**
+   * Crea un nuevo registro médico (por ejemplo al registrar síntomas)
+   */
+  createRecord(record: Partial<MedicalRecord>): void {
+    this.setLoading(true);
+    this.apiEndpoint.createRecord(record).subscribe({
+      next: (created) => {
+        this.state.update(s => ({ ...s, records: [created, ...s.records], loading: false, error: null }));
+      },
+      error: (err) => {
+        console.error('[MedicalRecordsStore] Error creating record', err);
+        this.state.update(s => ({ ...s, loading: false, error: 'Error al crear registro médico' }));
+      }
+    });
+  }
   
   private setLoading(loading: boolean): void {
     this.state.update(s => ({ ...s, loading }));

@@ -1,0 +1,45 @@
+.patient-detail-container {
+	padding: 16px;
+	max-width: 900px;
+	margin: 0 auto;
+}
+.header {
+	display:flex;
+	align-items:center;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+.avatar {
+	width:56px;
+	height:56px;
+	border-radius:50%;
+	background:#1976d2;
+	color:white;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:700;
+	font-size:20px;
+}
+.title h2 { margin:0; }
+.meta { margin:0; color:#666; font-size:0.95em }
+.patient-summary { display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; }
+.patient-summary .left, .patient-summary .right { flex:1 }
+.patient-summary p { margin:4px 0 }
+.records { margin-top: 12px }
+.records-list { list-style: none; padding: 0; margin: 0 }
+.record-item { display:flex; gap:12px; padding: 10px; border-radius:6px; border:1px solid #f0f0f0; margin-bottom:8px; background:#fff }
+.record-left { width:160px; flex-shrink:0 }
+.record-type { font-weight:700 }
+.record-date { color:#888; font-size:0.9em }
+.record-right { flex:1; display:flex; justify-content:space-between; align-items:center }
+.record-summary { color:#333 }
+.record-actions { display:flex; gap:8px; align-items:center }
+.btn-link { color:#1976d2; text-decoration:none }
+.status { font-size:0.85em; color:#555; padding:4px 8px; border-radius:12px; background:#f5f5f5 }
+.muted { color:#666 }
+
+@media (max-width: 600px) {
+	.patient-summary { flex-direction:column }
+	.record-left { width:120px }
+}

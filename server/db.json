@@ -265,6 +265,22 @@
       "diagnosis": "Evaluación inicial",
       "treatment": "Recomendaciones de estilo de vida saludable",
       "notes": "Paciente joven, sin antecedentes relevantes"
+    },
+    {
+      "patientId": 1,
+      "type": "symptoms",
+      "date": "2025-10-11T19:06:14.321Z",
+      "glucose": 123,
+      "bloodPressure": "90/40",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 9,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "estoy cansadoooooXDD",
+      "reviewStatus": "pending_review",
+      "doctorId": 2,
+      "id": 6
     }
   ],
   "symptoms": [
@@ -365,6 +381,21 @@
       "dizziness": 5,
       "notes": "me duele todo ",
       "timestamp": "2025-10-11T02:32:47.554Z",
+      "isEdited": false
+    },
+    {
+      "id": 8,
+      "patientId": 1,
+      "glucose": 123,
+      "bloodPressure": "90/40",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 100,
+      "fatigue": 9,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "estoy cansadoooooXDD",
+      "timestamp": "2025-10-11T19:06:14.258Z",
       "isEdited": false
     }
   ],
@@ -970,11 +1001,11 @@
       "actionLabel": "Registrar síntomas",
       "actionRoute": "/clinical/symptoms/register",
       "icon": "healing",
-      "isDismissed": false,
+      "isDismissed": true,
       "isSnoozed": false,
       "snoozeUntil": null,
       "createdAt": "2025-04-05T09:00:00Z",
-      "dismissedAt": null
+      "dismissedAt": "2025-10-11T19:07:07.960Z"
     },
     {
       "id": 3,

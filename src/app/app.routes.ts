@@ -162,6 +162,12 @@ export const routes: Routes = [
         data: { role: 'doctor' }
       },
       {
+        path: 'patients/:id',
+        loadComponent: () => import('./doctors/presentation/views/patient-detail/patient-detail').then(m => m.DoctorsPatientDetailComponent),
+        title: `${baseTitle} - Detalle Paciente`,
+        data: { role: 'doctor' }
+      },
+      {
         path: 'appointments',
         loadComponent: () => import('./doctors/presentation/views/appointments-list/appointments-list').then(m => m.AppointmentsListComponent),
         title: `${baseTitle} - Mis Citas`,

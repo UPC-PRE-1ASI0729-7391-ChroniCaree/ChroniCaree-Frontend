@@ -195,4 +195,11 @@ export class PatientsListComponent implements OnInit {
       this.patientsStore.refresh(currentDoctorId);
     }
   }
+
+  /**
+   * trackBy function for patients list to improve rendering
+   */
+  trackByPatient(index: number, patient: any) {
+    return patient?.id;
+  }
 }

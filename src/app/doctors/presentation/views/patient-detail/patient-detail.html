@@ -1,0 +1,62 @@
+<div class="patient-detail-container">
+  <ng-container *ngIf="patient(); else loadingTpl">
+    <div class="header">
+      <div class="avatar">{{ patient().firstName.charAt(0) }}{{ patient().lastName.charAt(0) }}</div>
+      <div class="title">
+        <h2>{{ patient().firstName }} {{ patient().lastName }}</h2>
+        <p class="meta">DNI: {{ patient().dni }} • Edad: {{ calculateAge(patient().birthDate) }} años</p>
+      </div>
+    </div>
+
+    <div class="patient-summary">
+      <div class="left">
+        <p><strong>Sexo:</strong> {{ patient().gender || 'N/D' }}</p>
+        <p><strong>Teléfono:</strong> {{ patient().phone || '—' }}</p>
+        <p><strong>Dirección:</strong> {{ patient().address || '—' }}</p>
+      </div>
+      <div class="right">
+        <p><strong>Asignado desde:</strong> {{ formatDate(patient().assignedSince) }}</p>
+        <p *ngIf="patient().assignedDoctorId"><strong>Médico asignado:</strong> {{ patient().assignedDoctorName || patient().assignedDoctorId }}</p>
+      </div>
+    </div>
+
+    <section class="records">
+      <h3>Historial Médico</h3>
+
+      <div *ngIf="loading(); else recordsTpl">
+        <p class="muted">Cargando historial...</p>
+      </div>
+
+      <ng-template #recordsTpl>
+        <div *ngIf="records().length === 0">
+          <p class="muted">No hay registros médicos para este paciente.</p>
+        </div>
+
+        <ul class="records-list" *ngIf="records().length > 0">
+          <li class="record-item" *ngFor="let r of records(); trackBy: trackById">
+            <div class="record-left">
+              <div class="record-type">{{ r.type }}</div>
+              <div class="record-date">{{ formatDate(r.date) }}</div>
+            </div>
+            <div class="record-right">
+              <div class="record-summary">
+                <div *ngIf="r.type === RecordType.SYMPTOMS">Síntomas: {{ r.notes || '—' }}</div>
+                <div *ngIf="r.type === RecordType.VITAL_SIGNS">Signos vitales registrados</div>
+                <div *ngIf="r.type !== RecordType.SYMPTOMS && r.type !== RecordType.VITAL_SIGNS">Consulta/diagnóstico</div>
+              </div>
+              <div class="record-actions">
+                <a [routerLink]="['/medical-records', r.id]" class="btn btn-link">Ver detalle</a>
+                <span class="status" *ngIf="r.reviewStatus">{{ r.reviewStatus }}</span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </ng-template>
+    </section>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <p class="muted">Cargando paciente...</p>
+  </ng-template>
+</div>
+
