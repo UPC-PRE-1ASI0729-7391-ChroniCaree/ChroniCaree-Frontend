@@ -4,11 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+  "build": "ng build",
+  "postbuild": "node -e \"const fs=require('fs'); const dir='dist/ChroniCaree-Frontend'; const candidates=[dir+'/index.html', dir+'/browser/index.html', dir+'/index.htm']; let found=false; for(const inFile of candidates){ if(fs.existsSync(inFile)){ fs.copyFileSync(inFile, dir+'/200.html'); console.log('200.html created from', inFile); found=true; break; } } if(!found){ console.warn('index.html not found at', JSON.stringify(candidates)); }\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-  "api": "bash server/start.sh",
-  "dev": "concurrently \"npm run api\" \"npm start\""
+    "api": "bash server/start.sh",
+    "dev": "concurrently \"npm run api\" \"npm start\""
   },
   "prettier": {
     "printWidth": 100,
