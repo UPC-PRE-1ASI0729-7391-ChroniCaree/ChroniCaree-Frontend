@@ -8,24 +8,20 @@
     <span class="chevron">▼</span>
   </button>
 
-  @if (showDropdown()) {
+  <ng-container *ngIf="showDropdown()">
     <div class="dropdown">
       <ul class="language-list">
-        @for (language of languages; track language.code) {
-          <li>
-            <button 
-              class="language-option"
-              [class.active]="language.code === currentLanguage().code"
-              (click)="selectLanguage(language)">
-              <span class="flag">{{ language.flag }}</span>
-              <span class="language-name">{{ language.name }}</span>
-              @if (language.code === currentLanguage().code) {
-                <span class="checkmark">✓</span>
-              }
-            </button>
-          </li>
-        }
+        <li *ngFor="let language of languages">
+          <button 
+            class="language-option"
+            [class.active]="language.code === currentLanguage().code"
+            (click)="selectLanguage(language)">
+            <span class="flag">{{ language.flag }}</span>
+            <span class="language-name">{{ language.name }}</span>
+            <span class="checkmark" *ngIf="language.code === currentLanguage().code">✓</span>
+          </button>
+        </li>
       </ul>
     </div>
-  }
+  </ng-container>
 </div>

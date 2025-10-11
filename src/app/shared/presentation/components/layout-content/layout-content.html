@@ -1,6 +1,8 @@
-@if (isFullScreen()) {
+<ng-container *ngIf="isFullScreen(); else withLayout">
   <router-outlet />
-} @else {
+</ng-container>
+
+<ng-template #withLayout>
   <div
     class="layout"
     [class.role-doctor]="userRole() === 'doctor' || userRole() === 'hospital_admin'"
@@ -8,13 +10,17 @@
     [attr.data-role]="userRole() || 'guest'">
 
     <!-- Sidebar / Toolbar by role -->
-    @if (userRole() === 'doctor' || userRole() === 'hospital_admin') {
+    <ng-container *ngIf="userRole() === 'doctor' || userRole() === 'hospital_admin'; else patientOrGuest">
       <app-toolbar-doctor />
-    } @else if (userRole() === 'patient') {
-      <app-toolbar-patient />
-    } @else {
-      <div class="no-sidebar-placeholder" aria-hidden="true"></div>
-    }
+    </ng-container>
+    <ng-template #patientOrGuest>
+      <ng-container *ngIf="userRole() === 'patient'; else guestToolbar">
+        <app-toolbar-patient />
+      </ng-container>
+      <ng-template #guestToolbar>
+        <div class="no-sidebar-placeholder" aria-hidden="true"></div>
+      </ng-template>
+    </ng-template>
 
     <!-- Main column -->
     <div class="layout-main">
@@ -30,4 +36,4 @@
       <app-footer-content />
     </div>
   </div>
-}
+</ng-template>

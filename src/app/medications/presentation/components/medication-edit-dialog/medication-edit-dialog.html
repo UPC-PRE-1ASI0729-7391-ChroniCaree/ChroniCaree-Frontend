@@ -26,9 +26,7 @@
           placeholder="Ej: Metformina 850mg"
         />
         <mat-icon matPrefix>local_pharmacy</mat-icon>
-        @if (editForm.get('name')?.hasError('required') && editForm.get('name')?.touched) {
-          <mat-error>El nombre es requerido</mat-error>
-        }
+        <mat-error *ngIf="editForm.get('name')?.hasError('required') && editForm.get('name')?.touched">El nombre es requerido</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -39,9 +37,7 @@
           placeholder="Ej: 1 tableta"
         />
         <mat-icon matPrefix>medication_liquid</mat-icon>
-        @if (editForm.get('dosage')?.hasError('required') && editForm.get('dosage')?.touched) {
-          <mat-error>La dosis es requerida</mat-error>
-        }
+        <mat-error *ngIf="editForm.get('dosage')?.hasError('required') && editForm.get('dosage')?.touched">La dosis es requerida</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
@@ -72,11 +68,8 @@
       [disabled]="!editForm.valid || loading()"
       class="save-button"
     >
-      @if (loading()) {
-        <mat-icon class="spinner">refresh</mat-icon>
-      } @else {
-        <mat-icon>save</mat-icon>
-      }
+      <mat-icon *ngIf="loading()" class="spinner">refresh</mat-icon>
+      <mat-icon *ngIf="!loading()">save</mat-icon>
       Guardar Cambios
     </button>
   </mat-dialog-actions>
