@@ -1,9 +1,10 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { Observable, shareReplay, tap, catchError, of, map } from 'rxjs';
 import { Alert, AlertStatus, AlertSeverity } from '../domain/model/alert.entity';
 import { AlertApiEndpoint } from '../infrastructure/alert-api.endpoint';
 import { AlertAssembler } from '../infrastructure/alert.assembler';
 import { AlertResource } from '../infrastructure/alert.resource';
+import { UserStore } from '../../iam/application/user.store';
 
 interface StoreState {
   alerts: Alert[];
@@ -17,6 +18,14 @@ interface StoreState {
 export class AlertStore {
   private apiEndpoint = inject(AlertApiEndpoint);
 
+  // Track which patient's alerts are currently loaded to avoid returning stale data
+  private lastPatientId: string | null = null;
+  // Track last user id to clear alerts when session changes
+  private lastUserIdForSession: number | null = null;
+
+  // Inject UserStore to react to user/session changes
+  private userStore = inject(UserStore);
+
   // Estado principal
   private state = signal<StoreState>({
     alerts: [],
@@ -26,6 +35,26 @@ export class AlertStore {
 
   // Cache para prevenir duplicación
   private currentRequest: Observable<AlertResource[]> | null = null;
+  // Track which patient the currentRequest belongs to (prevents returning results for wrong patient)
+  private currentRequestPatientId: string | null = null;
+
+  // Effect: when the current user changes, clear alerts to avoid showing data from previous account
+  // (components will call loadAlertsByPatient after this clears)
+  constructor() {
+    try {
+      effect(() => {
+        const user = this.userStore.currentUser$();
+        const userId = user?.id ?? null;
+        // If user changed (including logout), reset cached alerts
+        if (this.lastUserIdForSession !== userId) {
+          this.clear();
+          this.lastUserIdForSession = userId;
+        }
+      });
+    } catch (e) {
+      // effect may not run in non-Angular environments; ignore
+    }
+  }
 
   // Selectores readonly
   readonly alerts = computed(() => this.state().alerts);
@@ -64,19 +93,34 @@ export class AlertStore {
    * Carga alertas por paciente
    */
   loadAlertsByPatient(patientId: string): Observable<Alert[]> {
-    // Si ya hay una petición en curso, retornarla
-    if (this.currentRequest) {
-      return this.currentRequest.pipe(
-        map(resources => {
-          const alerts = AlertAssembler.toEntityArray(resources);
-          this.state.update(state => ({ ...state, alerts }));
-          return alerts;
-        })
-      );
+    // If there's a different patient's data cached, clear it
+    if (this.lastPatientId && this.lastPatientId !== patientId) {
+      this.state.update(s => ({ ...s, alerts: [] }));
+      this.currentRequest = null;
+      this.currentRequestPatientId = null;
+      this.lastPatientId = null;
     }
 
-    // Si ya hay datos cargados para este paciente, retornarlos
-    if (this.state().alerts.length > 0) {
+    // Si ya hay una petición en curso, retornarla
+    if (this.currentRequest) {
+      // If the in-flight request is for the same patient, reuse it
+      if (this.currentRequestPatientId && this.currentRequestPatientId === patientId) {
+        return this.currentRequest.pipe(
+          map(resources => {
+            const alerts = AlertAssembler.toEntityArray(resources);
+            this.state.update(state => ({ ...state, alerts }));
+            return alerts;
+          })
+        );
+      }
+
+      // Otherwise, drop the stale in-flight request and continue to create a new one
+      this.currentRequest = null;
+      this.currentRequestPatientId = null;
+    }
+
+    // Si ya hay datos cargados para este mismo paciente, retornarlos
+    if (this.state().alerts.length > 0 && this.lastPatientId === patientId) {
       return of(this.state().alerts);
     }
 
@@ -85,6 +129,7 @@ export class AlertStore {
     this.currentRequest = this.apiEndpoint.getByPatientId(patientId).pipe(
       shareReplay(1)
     );
+    this.currentRequestPatientId = patientId;
 
     return this.currentRequest.pipe(
       map(resources => {
@@ -95,6 +140,8 @@ export class AlertStore {
           loading: false
         }));
         this.currentRequest = null;
+        this.lastPatientId = patientId;
+        this.currentRequestPatientId = null;
         return alerts;
       }),
       catchError(error => {
@@ -107,6 +154,27 @@ export class AlertStore {
         return of([]);
       })
     );
+  }
+
+  /**
+   * Force reload alerts for a patient (clears cache and fetches)
+   */
+  forceReload(patientId: string): Observable<Alert[]> {
+    this.state.update(s => ({ ...s, alerts: [] }));
+    this.currentRequest = null;
+    this.currentRequestPatientId = null;
+    this.lastPatientId = null;
+    return this.loadAlertsByPatient(patientId);
+  }
+
+  /**
+   * Clear all alerts cached in the store
+   */
+  clear(): void {
+    this.state.update(s => ({ ...s, alerts: [], loading: false, error: null }));
+    this.currentRequest = null;
+    this.currentRequestPatientId = null;
+    this.lastPatientId = null;
   }
 
   /**

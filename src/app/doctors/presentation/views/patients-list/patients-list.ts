@@ -5,6 +5,7 @@
  * Vista de lista de pacientes asignados al doctor
  */
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { UserStore } from '../../../../iam/application/user.store';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AssignedPatientsStore } from '../../../application/assigned-patients.store';
@@ -22,6 +23,7 @@ import { RequestPatientModalComponent } from '../../components/request-patient-m
 export class PatientsListComponent implements OnInit {
   private readonly patientsStore = inject(AssignedPatientsStore);
   private readonly doctorApi = inject(DoctorApiEndpoint);
+  private readonly userStore = inject(UserStore);
   
   // Exponer el enum para el template
   readonly PatientHealthStatus = PatientHealthStatus;
@@ -44,17 +46,18 @@ export class PatientsListComponent implements OnInit {
   readonly showModal = signal(false);
   
   ngOnInit(): void {
-    // Obtener el usuario actual del localStorage
-    const currentUserStr = localStorage.getItem('currentUser');
-    
-    if (!currentUserStr) {
-      console.error('❌ No user found in localStorage');
+    // Obtener el usuario actual desde UserStore o fallback a localStorage
+    const cur = (this.userStore && this.userStore.currentUser$ && this.userStore.currentUser$()) || (() => {
+      const s = localStorage.getItem('currentUser');
+      return s ? JSON.parse(s) : null;
+    })();
+
+    if (!cur) {
+      console.error('❌ No user found in localStorage or UserStore');
       return;
     }
-    
-    const currentUser = JSON.parse(currentUserStr);
-    const userId = currentUser.id;
-    
+
+    const userId = cur.id;
     console.log(`🔍 Current user ID: ${userId}, looking for associated doctor...`);
     
     // Buscar el doctor asociado a este userId
@@ -82,6 +85,29 @@ export class PatientsListComponent implements OnInit {
         this.patientsStore.refresh(currentDoctorId);
       }
     });
+    
+    // React to user changes
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const storeUser = this.userStore?.currentUser$ && this.userStore.currentUser$();
+        const resolvedUser = detailUser?.id || storeUser?.id;
+        if (resolvedUser) {
+          // reload assigned patients for the new doctor if applicable
+          this.doctorApi.getAll().subscribe({
+            next: (doctors) => {
+              const doctor = doctors.find(d => d.userId === resolvedUser);
+              if (doctor) {
+                this.doctorId.set(doctor.id);
+                this.patientsStore.loadPatientsByDoctor(doctor.id);
+              }
+            }
+          });
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
     
     // Listen for modal close events
     window.addEventListener('close-modal', () => {

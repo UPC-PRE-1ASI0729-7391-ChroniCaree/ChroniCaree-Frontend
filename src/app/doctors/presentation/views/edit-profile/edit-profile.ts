@@ -105,14 +105,18 @@ export class EditProfileDoctorComponent implements OnInit {
   }
 
   private loadDoctorData(): void {
-    // Obtener el doctor actual del localStorage
-    const userStr = localStorage.getItem('currentUser');
-    if (userStr) {
+    // Obtener el doctor actual desde UserStore o fallback a localStorage
+    const user = this.userStore.currentUser$() || (() => {
       try {
-        const user = JSON.parse(userStr);
-        const doctorId = user.doctorId || 1; // Default to 1 for demo
-        
-        this.doctorStore.loadDoctorById(doctorId).subscribe({
+        const s = localStorage.getItem('currentUser');
+        return s ? JSON.parse(s) : null;
+      } catch { return null; }
+    })();
+
+    if (user) {
+      const doctorId = user.doctorId || 1; // Default to 1 for demo
+
+      this.doctorStore.loadDoctorById(doctorId).subscribe({
           next: () => {
             const doctor = this.currentDoctor();
             if (doctor) {
@@ -136,9 +140,6 @@ export class EditProfileDoctorComponent implements OnInit {
             this.showNotification('Error al cargar los datos del perfil', 'error');
           }
         });
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-      }
     }
   }
 

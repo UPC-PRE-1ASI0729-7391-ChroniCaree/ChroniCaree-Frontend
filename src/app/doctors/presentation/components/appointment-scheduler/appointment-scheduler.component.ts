@@ -73,9 +73,27 @@ export class AppointmentSchedulerComponent implements OnInit {
     this.selectedDate.set(tomorrow.toISOString().split('T')[0]);
 
     // Load current patient data to get assigned doctor
+    // Note: users and patients are separate resources. We must find the patient
+    // record whose `userId` matches the logged in user's id, then load that
+    // patient by its `id`. Previously the code requested /patients/:userId
+    // which produced 404 when patient.id !== user.id.
     const currentUser = this.userStore.currentUser$();
     if (currentUser && currentUser.id) {
-      this.patientStore.loadPatientById(currentUser.id).subscribe();
+      // Try to locate a patient that references this user
+      this.patientStore.loadAllPatients().subscribe({
+        next: (patients) => {
+          const patient = patients.find(p => p.userId === currentUser.id);
+          if (patient) {
+            // Now load the patient by the patient.id so the API path is correct
+            this.patientStore.loadPatientById(patient.id).subscribe();
+          } else {
+            console.warn('AppointmentScheduler: no patient entry found for current user', currentUser.id);
+          }
+        },
+        error: (err) => {
+          console.error('AppointmentScheduler: error loading patients', err);
+        }
+      });
     }
   }
 

@@ -22,10 +22,23 @@ export class HeaderContentComponent implements OnInit {
   showUserMenu = signal(false);
 
   // Get user from localStorage
+  // Compute header user info from UserStore, fallback to localStorage for initial load
   currentUser = computed(() => {
+    const userFromStore = this.userStore.currentUser$();
+    const roleFromStore = localStorage.getItem('userRole') || undefined;
+    if (userFromStore && userFromStore.id) {
+      const role = roleFromStore || userFromStore.role;
+      return {
+        name: userFromStore.name || 'Usuario',
+        role: this.getRoleLabel(role),
+        avatar: this.getRoleAvatar(role),
+        email: userFromStore.email
+      };
+    }
+
+    // Fallback to localStorage if UserStore empty
     const userStr = localStorage.getItem('currentUser');
     const role = localStorage.getItem('userRole');
-    
     if (userStr && role) {
       const user = JSON.parse(userStr);
       return {
@@ -35,7 +48,7 @@ export class HeaderContentComponent implements OnInit {
         email: user.email
       };
     }
-    
+
     return {
       name: 'Usuario',
       role: 'Invitado',
@@ -102,7 +115,7 @@ export class HeaderContentComponent implements OnInit {
    * Obtiene la ruta del perfil según el rol del usuario
    */
   getProfileRoute(): string {
-    const role = localStorage.getItem('userRole');
+    const role = localStorage.getItem('userRole') || this.userStore.currentUser$()?.role;
     
     switch (role) {
       case 'patient':

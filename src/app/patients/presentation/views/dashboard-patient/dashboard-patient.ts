@@ -202,14 +202,11 @@ export class DashboardPatient implements OnInit {
   ngOnInit(): void {
     console.log('Dashboard Patient inicializado');
     
-    // Verificar autenticación
+    // Verificar autenticación usando UserStore (preferred) con fallback a localStorage
     let user = this.currentUser();
-    
     if (!user) {
-      // Fallback: intentar cargar desde localStorage
       const currentUserStr = localStorage.getItem('currentUser');
       const isAuthenticated = localStorage.getItem('isAuthenticated');
-      
       if (currentUserStr && isAuthenticated === 'true') {
         try {
           const parsedUser = JSON.parse(currentUserStr);
