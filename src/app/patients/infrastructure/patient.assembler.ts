@@ -3,7 +3,14 @@ import { BaseResponse } from '../../shared/infrastructure/base-response';
 import { Patient } from '../domain/model/patient.entity';
 import { PatientResource } from './patient.resource';
 
+/**
+ * Patient Assembler - Convierte entre entidades de dominio y recursos de API para pacientes
+ */
 export class PatientAssembler implements BaseAssembler<Patient, PatientResource, BaseResponse> {
+  
+  /**
+   * Convierte un recurso (generalmente recibido del backend) en una entidad Patient del dominio
+   */
   toEntityFromResource(resource: PatientResource): Patient {
     return {
       id: resource.id,
@@ -24,6 +31,9 @@ export class PatientAssembler implements BaseAssembler<Patient, PatientResource,
     };
   }
 
+  /**
+   * Convierte una entidad Patient del dominio en un recurso (para envío o visualización en la API)
+   */
   toResourceFromEntity(entity: Patient): PatientResource {
     return {
       id: entity.id,
@@ -44,6 +54,9 @@ export class PatientAssembler implements BaseAssembler<Patient, PatientResource,
     };
   }
 
+  /**
+   * Transforma una respuesta base en una lista de entidades Patient (actualmente sin implementación)
+   */
   toEntitiesFromResponse(response: BaseResponse): Patient[] {
     return [];
   }
