@@ -1,0 +1,11 @@
+{
+  "name": "chronicaree-fake-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "bash start.sh"
+  },
+  "dependencies": {
+    "json-server": "^0.17.3"
+  }
+}
