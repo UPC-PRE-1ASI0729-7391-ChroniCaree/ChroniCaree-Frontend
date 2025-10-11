@@ -2,12 +2,13 @@
   <!-- Onboarding Component -->
   <app-onboarding />
 
-  @if (loading()) {
+  <ng-container *ngIf="loading(); else mainContent">
     <div class="loading-overlay">
       <div class="spinner"></div>
       <p>Cargando tu información...</p>
     </div>
-  } @else {
+  </ng-container>
+  <ng-template #mainContent>
     <!-- Header Section -->
     <div class="dashboard-header">
       <div class="welcome-section">
@@ -116,7 +117,7 @@
           <a routerLink="/appointments" class="link-primary">Ver todas</a>
         </div>
         <div class="appointments-list">
-          @if (upcomingAppointments().length === 0) {
+          <ng-container *ngIf="upcomingAppointments().length === 0; else hasAppointments">
             <div class="empty-state">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
@@ -124,28 +125,27 @@
               </svg>
               <p>No tienes citas programadas</p>
             </div>
-          } @else {
-            @for (appointment of upcomingAppointments(); track appointment.id) {
-              <div class="appointment-item">
-                <div class="appointment-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="var(--color-cc-green)" stroke-width="2"/>
-                    <path d="M16 2V6M8 2V6M3 10H21" stroke="var(--color-cc-green)" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                </div>
-                <div class="appointment-details">
-                  <p class="appointment-doctor">{{ appointment.doctorName }}</p>
-                  <p class="appointment-specialty">{{ appointment.specialty }}</p>
-                  <p class="appointment-datetime">{{ appointment.date }} • {{ appointment.time }}</p>
-                </div>
-                <button class="btn-icon" title="Ver detalles">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </button>
+          </ng-container>
+          <ng-template #hasAppointments>
+            <div *ngFor="let appointment of upcomingAppointments(); trackBy: trackById" class="appointment-item">
+              <div class="appointment-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="4" width="18" height="18" rx="2" stroke="var(--color-cc-green)" stroke-width="2"/>
+                  <path d="M16 2V6M8 2V6M3 10H21" stroke="var(--color-cc-green)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
               </div>
-            }
-          }
+              <div class="appointment-details">
+                <p class="appointment-doctor">{{ appointment.doctorName }}</p>
+                <p class="appointment-specialty">{{ appointment.specialty }}</p>
+                <p class="appointment-datetime">{{ appointment.date }} • {{ appointment.time }}</p>
+              </div>
+              <button class="btn-icon" title="Ver detalles">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </ng-template>
         </div>
       </div>
 
@@ -179,7 +179,7 @@
         <a routerLink="/medical-records/diagnoses" class="link-primary">Ver historial médico</a>
       </div>
       <div class="symptoms-list">
-        @if (recentSymptoms().length === 0) {
+        <ng-container *ngIf="recentSymptoms().length === 0; else hasSymptoms">
           <div class="empty-state">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20.84 4.61C19.9 3.67 17.5 3 12 3s-7.9.67-8.84 1.61C2.22 5.55 2 7.13 2 12s.22 6.45 1.16 7.39C4.1 20.33 6.5 21 12 21s7.9-.67 8.84-1.61C21.78 18.45 22 16.87 22 12s-.22-6.45-1.16-7.39z" stroke="currentColor" stroke-width="2"/>
@@ -188,43 +188,40 @@
             <p>No hay síntomas registrados recientemente</p>
             <button class="btn btn-primary btn-sm" routerLink="/clinical/symptoms/register">Registrar síntoma</button>
           </div>
-        } @else {
-          @for (symptom of recentSymptoms(); track symptom.id) {
-            <div class="symptom-item"
-                 [class.severity-low]="symptom.severity === 'low'"
-                 [class.severity-medium]="symptom.severity === 'medium'"
-                 [class.severity-high]="symptom.severity === 'high'">
-              <div class="symptom-icon">
-                @if (symptom.severity === 'low') {
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="var(--color-info)" stroke-width="2"/>
-                    <path d="M12 8V12M12 16H12.01" stroke="var(--color-info)" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                } @else if (symptom.severity === 'medium') {
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="var(--color-warning)" stroke-width="2"/>
-                    <line x1="12" y1="9" x2="12" y2="13" stroke="var(--color-warning)" stroke-width="2"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17" stroke="var(--color-warning)" stroke-width="2"/>
-                  </svg>
-                } @else {
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="var(--color-cc-red)" stroke-width="2"/>
-                    <line x1="15" y1="9" x2="9" y2="15" stroke="var(--color-cc-red)" stroke-width="2"/>
-                    <line x1="9" y1="9" x2="15" y2="15" stroke="var(--color-cc-red)" stroke-width="2"/>
-                  </svg>
-                }
-              </div>
-              <div class="symptom-details">
-                <p class="symptom-name">{{ symptom.symptom }}</p>
-                <p class="symptom-time">{{ symptom.date }} • {{ symptom.time }}</p>
-              </div>
-              <span class="severity-badge" [class]="'severity-' + symptom.severity">
-                {{ symptom.severity === 'low' ? 'Leve' : symptom.severity === 'medium' ? 'Moderado' : 'Severo' }}
-              </span>
+        </ng-container>
+        <ng-template #hasSymptoms>
+          <div *ngFor="let symptom of recentSymptoms(); trackBy: trackById" class="symptom-item"
+               [class.severity-low]="symptom.severity === 'low'"
+               [class.severity-medium]="symptom.severity === 'medium'"
+               [class.severity-high]="symptom.severity === 'high'">
+            <div class="symptom-icon">
+              <ng-container [ngSwitch]="symptom.severity">
+                <svg *ngSwitchCase="'low'" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--color-info)" stroke-width="2"/>
+                  <path d="M12 8V12M12 16H12.01" stroke="var(--color-info)" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg *ngSwitchCase="'medium'" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="var(--color-warning)" stroke-width="2"/>
+                  <line x1="12" y1="9" x2="12" y2="13" stroke="var(--color-warning)" stroke-width="2"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17" stroke="var(--color-warning)" stroke-width="2"/>
+                </svg>
+                <svg *ngSwitchDefault width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="var(--color-cc-red)" stroke-width="2"/>
+                  <line x1="15" y1="9" x2="9" y2="15" stroke="var(--color-cc-red)" stroke-width="2"/>
+                  <line x1="9" y1="9" x2="15" y2="15" stroke="var(--color-cc-red)" stroke-width="2"/>
+                </svg>
+              </ng-container>
             </div>
-          }
-        }
+            <div class="symptom-details">
+              <p class="symptom-name">{{ symptom.symptom }}</p>
+              <p class="symptom-time">{{ symptom.date }} • {{ symptom.time }}</p>
+            </div>
+            <span class="severity-badge" [class]="'severity-' + symptom.severity">
+              {{ symptom.severity === 'low' ? 'Leve' : symptom.severity === 'medium' ? 'Moderado' : 'Severo' }}
+            </span>
+          </div>
+        </ng-template>
       </div>
     </div>
-  }
+    </ng-template>
 </div>

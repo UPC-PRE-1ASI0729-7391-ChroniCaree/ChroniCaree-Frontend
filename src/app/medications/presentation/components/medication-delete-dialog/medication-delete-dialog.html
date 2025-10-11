@@ -48,15 +48,13 @@
         </div>
       </div>
 
-      @if (data.medication.instructions) {
-        <div class="detail-row">
-          <mat-icon class="detail-icon">note</mat-icon>
-          <div class="detail-content">
-            <span class="detail-label">Instrucciones</span>
-            <span class="detail-value">{{ data.medication.instructions }}</span>
-          </div>
+      <div class="detail-row" *ngIf="data.medication.instructions">
+        <mat-icon class="detail-icon">note</mat-icon>
+        <div class="detail-content">
+          <span class="detail-label">Instrucciones</span>
+          <span class="detail-value">{{ data.medication.instructions }}</span>
         </div>
-      }
+      </div>
     </div>
   </mat-dialog-content>
 
@@ -75,11 +73,8 @@
       [disabled]="loading()"
       class="delete-button"
     >
-      @if (loading()) {
-        <mat-icon class="spinner">refresh</mat-icon>
-      } @else {
-        <mat-icon>delete</mat-icon>
-      }
+      <mat-icon *ngIf="loading()" class="spinner">refresh</mat-icon>
+      <mat-icon *ngIf="!loading()">delete</mat-icon>
       Eliminar
     </button>
   </mat-dialog-actions>

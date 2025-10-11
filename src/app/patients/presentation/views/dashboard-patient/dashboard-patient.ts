@@ -358,4 +358,11 @@ export class DashboardPatient implements OnInit {
     const date = new Date(dateStr);
     return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'long' });
   }
+
+  /**
+   * trackBy function for ngFor to avoid re-rendering
+   */
+  protected trackById(index: number, item: { id?: any }) {
+    return item?.id ?? index;
+  }
 }

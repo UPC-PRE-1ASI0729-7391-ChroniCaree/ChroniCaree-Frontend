@@ -1,4 +1,4 @@
-@if (isVisible()) {
+<ng-container *ngIf="isVisible()">
   <div class="onboarding-overlay">
     <div class="onboarding-container">
       <!-- Progress Bar -->
@@ -24,8 +24,7 @@
         <p class="onboarding-description">{{ currentStepData().description }}</p>
 
         <!-- Step Action Button (if exists) -->
-        @if (currentStepData().action) {
-          <button 
+        <button *ngIf="currentStepData().action" 
             mat-raised-button 
             color="primary"
             class="action-button"
@@ -34,65 +33,53 @@
                           currentStepData().action?.route?.includes('diagnoses') ? 'medical_information' : 
                           'person' }}</mat-icon>
             {{ currentStepData().action?.label }}
-          </button>
-        }
+        </button>
       </div>
 
       <!-- Step Indicators -->
       <div class="step-indicators">
-        @for (step of steps; track $index) {
-          <button 
+        <button *ngFor="let step of steps; let i = index" 
             class="step-indicator"
-            [class.active]="$index === currentStep()"
-            [class.completed]="$index < currentStep()"
-            (click)="goToStep($index)"
-            [attr.aria-label]="'Ir al paso ' + ($index + 1)">
-          </button>
-        }
+            [class.active]="i === currentStep()"
+            [class.completed]="i < currentStep()"
+            (click)="goToStep(i)"
+            [attr.aria-label]="'Ir al paso ' + (i + 1)">
+        </button>
       </div>
 
       <!-- Navigation -->
       <div class="onboarding-navigation">
         <!-- Skip Button -->
-        @if (!isLastStep()) {
-          <button 
+        <button *ngIf="!isLastStep()" 
             mat-button 
             class="skip-button"
             (click)="skip()">
             Omitir Tutorial
-          </button>
-        }
+        </button>
 
         <!-- Navigation Buttons -->
         <div class="nav-buttons">
-          @if (!isFirstStep()) {
-            <button 
-              mat-stroked-button
-              (click)="previousStep()">
-              <mat-icon>arrow_back</mat-icon>
-              Anterior
-            </button>
-          }
+          <button *ngIf="!isFirstStep()" 
+            mat-stroked-button
+            (click)="previousStep()">
+            <mat-icon>arrow_back</mat-icon>
+            Anterior
+          </button>
 
-          @if (!isLastStep()) {
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="nextStep()">
+          <ng-container *ngIf="!isLastStep(); else finishBtn">
+            <button mat-raised-button color="primary" (click)="nextStep()">
               Siguiente
               <mat-icon>arrow_forward</mat-icon>
             </button>
-          } @else {
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="complete()">
+          </ng-container>
+          <ng-template #finishBtn>
+            <button mat-raised-button color="primary" (click)="complete()">
               <mat-icon>check_circle</mat-icon>
               Finalizar
             </button>
-          }
+          </ng-template>
         </div>
       </div>
     </div>
   </div>
-}
+</ng-container>

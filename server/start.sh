@@ -18,5 +18,6 @@ else
 	exit 1
 fi
 
-echo "🚀 Starting json-server with DB=${DB_PATH} ROUTES=${ROUTES_PATH} PORT=${PORT}"
-npx json-server --watch "$DB_PATH" --routes "$ROUTES_PATH" --port "$PORT"
+echo "🚀 Starting json-server with DB=${DB_PATH} ROUTES=${ROUTES_PATH} PORT=${PORT} HOST=0.0.0.0"
+# Bind to 0.0.0.0 so platform like Render can detect the open port
+npx json-server --watch "$DB_PATH" --routes "$ROUTES_PATH" --port "$PORT" --host 0.0.0.0
