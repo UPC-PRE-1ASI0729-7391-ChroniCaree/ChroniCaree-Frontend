@@ -77,7 +77,10 @@
             </div>
             <ul class="menu-list">
               <li><a [routerLink]="getProfileRoute()" (click)="closeMenus()" class="menu-link">👤 Mi Perfil</a></li>
-              <li><a href="#" class="menu-link">❓ Ayuda</a></li>
+              <li>
+                <a [routerLink]="'/tutorial'" (click)="closeMenus()" class="menu-link">❓ Ayuda</a>
+              </li>
+
               <li class="divider"></li>
               <li><button (click)="logout()" class="menu-link logout">🚪 Cerrar Sesión</button></li>
             </ul>
