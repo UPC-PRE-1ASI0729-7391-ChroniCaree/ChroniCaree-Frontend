@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { MessagesStore } from '../../../application/messages.store';
-import { Message } from '../../../domain/model/message';
-import { Thread } from '../../../domain/model/thread';
+import { Message } from '../../../domain/model/message.entity';
+import { Thread } from '../../../domain/model/thread.entity';
 
 type ThreadVM = (Thread & { messages: Message[] }) | null;
 

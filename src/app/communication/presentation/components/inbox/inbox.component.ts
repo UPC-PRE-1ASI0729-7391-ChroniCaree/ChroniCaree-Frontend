@@ -1,9 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { ActivatedRoute, RouterLink, RouterOutlet } from '@angular/router';
 
 import { MessagesStore } from '../../../application/messages.store';
-import { Thread } from '../../../domain/model/thread';
+import { Thread } from '../../../domain/model/thread.entity';
+import { UserStore } from '../../../../iam/application/user.store';
 
 type ThreadVM = {
   id: string;
@@ -11,41 +12,48 @@ type ThreadVM = {
   participantsCount: number;
   lastSnippet: string;
   lastMessageAt: Date | string | null;
-  status?: string; // 'OPEN' | 'CLOSED' | etc.
+  status?: string;
+  hasUrgentMessages?: boolean;
+  unreadCount?: number;
 };
 
 @Component({
   standalone: true,
   selector: 'cc-inbox',
-  imports: [CommonModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, NgIf, NgFor, RouterOutlet, RouterLink],
   templateUrl: './inbox.component.html',
   styleUrls: ['./inbox.component.css'],
 })
 export class InboxComponent implements OnInit {
   private readonly store = inject(MessagesStore);
   private readonly route = inject(ActivatedRoute);
+  private readonly userStore = inject(UserStore);
 
   role: 'PATIENT' | 'DOCTOR' = 'PATIENT';
   userId = '';
 
   ngOnInit(): void {
-    const routeRole =
-      (this.route.snapshot.data['role'] as 'patient' | 'doctor' | undefined) ??
-      (this.route.parent?.snapshot.data['role'] as 'patient' | 'doctor' | undefined) ??
-      'patient';
+    const currentUser = this.userStore.currentUser$();
+    if (currentUser) {
+      this.role = currentUser.role === 'doctor' ? 'DOCTOR' : 'PATIENT';
+      this.userId = currentUser.id.toString();
+    } else {
+      const routeRole =
+        (this.route.snapshot.data['role'] as 'patient' | 'doctor' | undefined) ??
+        (this.route.parent?.snapshot.data['role'] as 'patient' | 'doctor' | undefined) ??
+        'patient';
 
-    this.role = routeRole === 'doctor' ? 'DOCTOR' : 'PATIENT';
-    this.userId = this.resolveUserId(this.role);
+      this.role = routeRole === 'doctor' ? 'DOCTOR' : 'PATIENT';
+      this.userId = this.resolveUserId(this.role);
+    }
 
     this.store.loadInbox(this.role, this.userId);
   }
 
-  // Threads originales (por si los necesitas en otro sitio)
   get threads(): Thread[] {
     return this.store.inbox();
   }
 
-  // ViewModel seguro para la plantilla
   get threadsVM(): ThreadVM[] {
     const raw = (this.store.inbox() as unknown[]) ?? [];
     return raw.map((t: any): ThreadVM => {
@@ -62,13 +70,16 @@ export class InboxComponent implements OnInit {
         t.participants ?? t.members ?? t.recipients ?? [];
       const participantsCount = Array.isArray(participantsArray)
         ? participantsArray.length
-        : 2; // fallback razonable
+        : 2;
 
       const status: string | undefined =
         t.status ?? (t.closed ? 'CLOSED' : 'OPEN');
 
       const id: string =
         t.id ?? t.threadId ?? cryptoRandomId();
+
+      const hasUrgentMessages: boolean = t.hasUrgentMessages ?? false;
+      const unreadCount: number = t.unreadCount ?? 0;
 
       return {
         id,
@@ -77,6 +88,8 @@ export class InboxComponent implements OnInit {
         lastSnippet,
         lastMessageAt,
         status,
+        hasUrgentMessages,
+        unreadCount,
       };
     });
   }
@@ -88,13 +101,10 @@ export class InboxComponent implements OnInit {
   }
 }
 
-// Pequeño helper para IDs si el backend no envía uno
 function cryptoRandomId(): string {
   try {
-    // navegador moderno
     return crypto.randomUUID();
   } catch {
-    // fallback
     return 'tmp-' + Math.random().toString(36).slice(2, 10);
   }
 }

@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Message } from '../domain/model/message';
-import { Thread } from '../domain/model/thread';
+import { Message } from '../domain/model/message.entity';
+import { Thread } from '../domain/model/thread.entity';
 
 @Injectable({ providedIn: 'root' })
 export class MessagesApi {

@@ -6,6 +6,7 @@ import { UserStore } from '../../../../iam/application/user.store';
 import { NudgeStore } from '../../../../communication/application/nudge.store';
 import { MedicationReminderFacade } from '../../../../medications/infrastructure/medication-reminder.facade';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { MessagesStore } from '../../../../communication/application/messages.store';
 
 @Component({
   selector: 'app-toolbar-patient',
@@ -20,6 +21,7 @@ export class ToolbarPatientComponent implements OnInit {
   private readonly nudgeStore = inject(NudgeStore);
   private readonly medicationFacade = inject(MedicationReminderFacade);
   private readonly patientStore = inject(PatientStore);
+  readonly messagesStore = inject(MessagesStore);
 
   // Total nudges count (from NudgeStore + MedicationFacade)
   readonly totalNotifications = computed(() => {
@@ -33,7 +35,7 @@ export class ToolbarPatientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // ✅ Cargar nudges filtrados por paciente actual
+    // ✅ Cargar nudges y mensajes filtrados por paciente actual
     const currentUserStr = localStorage.getItem('currentUser');
     if (!currentUserStr) {
       console.error('❌ Toolbar-Patient: Usuario no autenticado');
@@ -49,13 +51,17 @@ export class ToolbarPatientComponent implements OnInit {
         const patient = patients.find(p => p.userId === userId);
 
         if (patient) {
-          console.log(`✅ Toolbar-Patient: Cargando nudges para paciente ${patient.id}`);
+          console.log(`✅ Toolbar-Patient: Cargando datos para paciente ${patient.id}`);
           
           // ✅ Cargar nudges usando el patientId
           this.nudgeStore.loadNudgesByPatient(patient.id.toString()).subscribe({
             next: () => console.log('✅ Nudges cargados para toolbar'),
             error: (err) => console.error('❌ Error cargando nudges:', err)
           });
+
+          // ⭐ Cargar mensajes del paciente
+          console.log(`✅ Toolbar-Patient: Cargando mensajes para paciente ID: ${patient.id}`);
+          this.messagesStore.loadInbox('PATIENT', patient.id.toString());
         } else {
           console.error(`❌ Toolbar-Patient: No se encontró paciente para userId ${userId}`);
         }

@@ -17,12 +17,21 @@
     </div>
 
     <div class="card-body">
+      <!-- Alerta de doctor no asignado -->
+      <div class="alert alert-warning" *ngIf="!doctorId()">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          <strong>No tienes un médico asignado</strong>
+          <p>Debes tener un médico asignado para poder enviar mensajes. Contacta con el administrador.</p>
+        </div>
+      </div>
+
       <!-- Para -->
       <div class="row">
         <label class="label">Para</label>
         <div class="pill">
           <div class="avatar" aria-hidden="true">👨‍⚕️</div>
-          <span>Tu médico</span>
+          <span>{{ doctorId() ? 'Tu médico' : 'Sin médico asignado' }}</span>
         </div>
       </div>
 
@@ -32,7 +41,8 @@
         <input
           id="subject"
           type="text"
-          [(ngModel)]="subject"
+          [ngModel]="subject()"
+          (ngModelChange)="subject.set($event)"
           placeholder="Ej. Consulta por dolor de cabeza"
           class="input"
         />
@@ -44,11 +54,31 @@
         <textarea
           id="body"
           rows="8"
-          [(ngModel)]="body"
+          [ngModel]="body()"
+          (ngModelChange)="body.set($event)"
           class="textarea"
           placeholder="Describe tu consulta clínica con el mayor detalle posible…"
         ></textarea>
         <div class="hint">Evita compartir datos sensibles innecesarios.</div>
+      </div>
+
+      <!-- ⭐ Checkbox de Urgencia -->
+      <div class="row">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="isUrgent()" 
+            (change)="isUrgent.set($any($event.target).checked)"
+            class="checkbox-input"
+          />
+          <span class="checkbox-text">
+            <span class="urgent-icon" [class.active]="isUrgent()">🚨</span>
+            Marcar como urgente
+          </span>
+        </label>
+        <div class="hint" *ngIf="isUrgent()" style="color: #d32f2f; font-weight: 500;">
+          Este mensaje será marcado como prioritario para tu médico.
+        </div>
       </div>
 
       <!-- Adjuntos -->

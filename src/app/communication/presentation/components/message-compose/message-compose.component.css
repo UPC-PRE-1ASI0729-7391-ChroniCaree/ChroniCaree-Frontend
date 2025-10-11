@@ -79,6 +79,35 @@
     radial-gradient(1200px 140px at 50% -30px, rgba(79,70,229,.05), transparent);
 }
 
+/* Alerta */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid;
+}
+.alert-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #856404;
+}
+.alert-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.alert strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #856404;
+}
+.alert p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #856404;
+}
+
 .row { display: grid; gap: .5rem; }
 
 .label {
@@ -190,6 +219,50 @@
   border-radius: 999px;
 }
 .chip-remove:hover { background: rgba(0,0,0,.06); }
+
+/* ⭐ Checkbox de urgencia */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid rgba(211, 47, 47, 0.2);
+  background: linear-gradient(135deg, rgba(211, 47, 47, 0.05), transparent);
+  transition: all 0.2s ease;
+}
+.checkbox-label:hover {
+  border-color: rgba(211, 47, 47, 0.4);
+  background: rgba(211, 47, 47, 0.08);
+}
+.checkbox-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #d32f2f;
+}
+.checkbox-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: var(--color-cc-dark-blue);
+}
+.urgent-icon {
+  font-size: 1.2rem;
+  opacity: 0.4;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.urgent-icon.active {
+  opacity: 1;
+  transform: scale(1.2);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1.2); }
+  50% { transform: scale(1.35); }
+}
 
 /* ===== Footer/acciones ===== */
 .card-actions {
