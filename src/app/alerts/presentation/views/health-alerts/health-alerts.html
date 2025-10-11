@@ -1,0 +1,228 @@
+<div class="health-alerts-container">
+  <div class="header">
+    <div class="title-section">
+      <h1>Mi Salud - Alertas 🏥</h1>
+      <p class="subtitle">Monitorea tus signos vitales y alertas de salud</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card critical">
+        <mat-icon>emergency</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats().critical }}</span>
+          <span class="stat-label">Críticas</span>
+        </div>
+      </div>
+      <div class="stat-card high">
+        <mat-icon>error</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats().high }}</span>
+          <span class="stat-label">Altas</span>
+        </div>
+      </div>
+      <div class="stat-card medium">
+        <mat-icon>warning</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats().medium }}</span>
+          <span class="stat-label">Medias</span>
+        </div>
+      </div>
+      <div class="stat-card low">
+        <mat-icon>info</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats().low }}</span>
+          <span class="stat-label">Bajas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Cargando alertas...</p>
+    </div>
+  } @else {
+    <mat-tab-group class="alerts-tabs">
+      <!-- Tab: Activas -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>notifications_active</mat-icon>
+          Activas
+          @if (activeAlerts().length > 0) {
+            <span class="tab-badge">{{ activeAlerts().length }}</span>
+          }
+        </ng-template>
+
+        @if (activeAlerts().length === 0) {
+          <div class="empty-state">
+            <mat-icon>check_circle</mat-icon>
+            <h3>Sin alertas activas</h3>
+            <p>Todo está bajo control 🎉</p>
+          </div>
+        } @else {
+          <div class="alerts-list">
+            @for (alert of activeAlerts(); track alert.id) {
+              <div class="alert-card" [class]="getSeverityClass(alert.severity)">
+                <div class="alert-icon">
+                  <mat-icon [class.pulse]="alert.severity === 'critical'">
+                    {{ alert.typeIcon }}
+                  </mat-icon>
+                </div>
+
+                <div class="alert-body">
+                  <div class="alert-header">
+                    <h3>{{ alert.title }}</h3>
+                    <mat-chip [class]="getSeverityClass(alert.severity)">
+                      {{ getSeverityLabel(alert.severity) }}
+                    </mat-chip>
+                  </div>
+
+                  <p class="alert-message">{{ alert.message }}</p>
+
+                  <div class="alert-meta">
+                    <span class="time">
+                      <mat-icon>schedule</mat-icon>
+                      {{ getTimeAgo(alert) }}
+                    </span>
+                    @if (alert.metadata.vitalSign) {
+                      <span class="vital-sign">
+                        <mat-icon>favorite</mat-icon>
+                        {{ alert.metadata.vitalSign }}: {{ alert.metadata.value }} {{ alert.metadata.unit }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="alert-actions">
+                    <button mat-raised-button color="primary" (click)="acknowledgeAlert(alert)">
+                      <mat-icon>done</mat-icon>
+                      Reconocer
+                    </button>
+                    <button mat-raised-button color="accent" (click)="resolveAlert(alert)">
+                      <mat-icon>check_circle</mat-icon>
+                      Resolver
+                    </button>
+                    <button mat-button (click)="dismissAlert(alert)">
+                      <mat-icon>close</mat-icon>
+                      Descartar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </mat-tab>
+
+      <!-- Tab: Reconocidas -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>done</mat-icon>
+          Reconocidas
+          @if (acknowledgedAlerts().length > 0) {
+            <span class="tab-badge">{{ acknowledgedAlerts().length }}</span>
+          }
+        </ng-template>
+
+        @if (acknowledgedAlerts().length === 0) {
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <h3>Sin alertas reconocidas</h3>
+            <p>Las alertas que reconozcas aparecerán aquí</p>
+          </div>
+        } @else {
+          <div class="alerts-list">
+            @for (alert of acknowledgedAlerts(); track alert.id) {
+              <div class="alert-card acknowledged">
+                <div class="alert-icon">
+                  <mat-icon>{{ alert.typeIcon }}</mat-icon>
+                </div>
+
+                <div class="alert-body">
+                  <div class="alert-header">
+                    <h3>{{ alert.title }}</h3>
+                    <mat-chip class="acknowledged-chip">Reconocida</mat-chip>
+                  </div>
+
+                  <p class="alert-message">{{ alert.message }}</p>
+
+                  <div class="alert-meta">
+                    <span class="time">
+                      <mat-icon>schedule</mat-icon>
+                      {{ getTimeAgo(alert) }}
+                    </span>
+                    @if (alert.acknowledgedAt) {
+                      <span class="acknowledged-time">
+                        <mat-icon>done</mat-icon>
+                        Reconocida {{ getTimeAgo(alert) }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="alert-actions">
+                    <button mat-raised-button color="accent" (click)="resolveAlert(alert)">
+                      <mat-icon>check_circle</mat-icon>
+                      Resolver
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </mat-tab>
+
+      <!-- Tab: Resueltas -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>check_circle</mat-icon>
+          Resueltas
+          @if (resolvedAlerts().length > 0) {
+            <span class="tab-badge">{{ resolvedAlerts().length }}</span>
+          }
+        </ng-template>
+
+        @if (resolvedAlerts().length === 0) {
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <h3>Sin alertas resueltas</h3>
+            <p>Las alertas resueltas aparecerán aquí</p>
+          </div>
+        } @else {
+          <div class="alerts-list">
+            @for (alert of resolvedAlerts(); track alert.id) {
+              <div class="alert-card resolved">
+                <div class="alert-icon">
+                  <mat-icon>{{ alert.typeIcon }}</mat-icon>
+                </div>
+
+                <div class="alert-body">
+                  <div class="alert-header">
+                    <h3>{{ alert.title }}</h3>
+                    <mat-chip class="resolved-chip">Resuelta</mat-chip>
+                  </div>
+
+                  <p class="alert-message">{{ alert.message }}</p>
+
+                  <div class="alert-meta">
+                    <span class="time">
+                      <mat-icon>schedule</mat-icon>
+                      Creada {{ getTimeAgo(alert) }}
+                    </span>
+                    @if (alert.resolvedAt) {
+                      <span class="resolved-time">
+                        <mat-icon>check_circle</mat-icon>
+                        Resuelta
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

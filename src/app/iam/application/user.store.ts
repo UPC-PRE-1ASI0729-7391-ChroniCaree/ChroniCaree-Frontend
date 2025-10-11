@@ -19,7 +19,29 @@ export class UserStore {
   readonly loading$ = this.loading.asReadonly();
   readonly error$ = this.error.asReadonly();
 
-  constructor(private userApi: UserApiEndpoint) {}
+  constructor(private userApi: UserApiEndpoint) {
+    // Inicializar currentUser desde localStorage si existe
+    this.initializeFromLocalStorage();
+  }
+
+  /**
+   * Inicializa el currentUser desde localStorage si existe
+   */
+  private initializeFromLocalStorage(): void {
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    
+    if (currentUserStr && isAuthenticated === 'true') {
+      try {
+        const user = JSON.parse(currentUserStr);
+        this.currentUser.set(user);
+        console.log('✅ UserStore initialized with user:', user.email);
+      } catch (error) {
+        console.error('❌ Error parsing currentUser from localStorage:', error);
+        this.clearCurrentUser();
+      }
+    }
+  }
 
   loadAllUsers(): Observable<User[]> {
     this.loading.set(true);
@@ -124,6 +146,17 @@ export class UserStore {
 
   setCurrentUser(user: User | null): void {
     this.currentUser.set(user);
+  }
+
+  /**
+   * Limpia el currentUser y localStorage
+   */
+  clearCurrentUser(): void {
+    this.currentUser.set(null);
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
+    console.log('✅ UserStore cleared');
   }
 
   clearError(): void {

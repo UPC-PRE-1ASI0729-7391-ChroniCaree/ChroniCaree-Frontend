@@ -1,0 +1,86 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="warning-icon-container">
+      <mat-icon class="warning-icon">warning</mat-icon>
+    </div>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <h2>¿Eliminar este registro?</h2>
+    
+    <p class="warning-message">
+      Esta acción no se puede deshacer. El registro de medicación será eliminado permanentemente.
+    </p>
+
+    <div class="medication-details">
+      <div class="detail-row">
+        <mat-icon class="detail-icon">medication</mat-icon>
+        <div class="detail-content">
+          <span class="detail-label">Medicación</span>
+          <span class="detail-value">{{ data.medication.name }}</span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <mat-icon class="detail-icon">medication_liquid</mat-icon>
+        <div class="detail-content">
+          <span class="detail-label">Dosis</span>
+          <span class="detail-value">{{ data.medication.dosage }}</span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <mat-icon class="detail-icon">schedule</mat-icon>
+        <div class="detail-content">
+          <span class="detail-label">Horarios</span>
+          <span class="detail-value">{{ data.medication.schedule.times.join(', ') }}</span>
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <mat-icon class="detail-icon">calendar_today</mat-icon>
+        <div class="detail-content">
+          <span class="detail-label">Fecha de prescripción</span>
+          <span class="detail-value">{{ formatDate(data.medication.prescribedDate.toString()) }}</span>
+        </div>
+      </div>
+
+      @if (data.medication.instructions) {
+        <div class="detail-row">
+          <mat-icon class="detail-icon">note</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Instrucciones</span>
+            <span class="detail-value">{{ data.medication.instructions }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button 
+      mat-button 
+      (click)="onCancel()"
+      [disabled]="loading()"
+    >
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="warn"
+      (click)="onConfirm()"
+      [disabled]="loading()"
+      class="delete-button"
+    >
+      @if (loading()) {
+        <mat-icon class="spinner">refresh</mat-icon>
+      } @else {
+        <mat-icon>delete</mat-icon>
+      }
+      Eliminar
+    </button>
+  </mat-dialog-actions>
+</div>

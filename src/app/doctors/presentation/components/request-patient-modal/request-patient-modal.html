@@ -1,0 +1,114 @@
+<!-- Request Patient Modal -->
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2>Solicitar Paciente</h2>
+      <button class="close-btn" (click)="close()">✕</button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando pacientes disponibles...</p>
+        </div>
+      }
+      
+      <!-- Error State -->
+      @else if (error()) {
+        <div class="error-state">
+          <span class="error-icon">⚠️</span>
+          <p>{{ error() }}</p>
+          <button class="btn btn-secondary" (click)="loadAvailablePatients()">
+            Reintentar
+          </button>
+        </div>
+      }
+      
+      <!-- Empty State -->
+      @else if (availablePatients().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">👥</span>
+          <h3>No hay pacientes disponibles</h3>
+          <p>Todos los pacientes ya tienen doctor asignado</p>
+        </div>
+      }
+      
+      <!-- Patients List -->
+      @else {
+        <div class="patients-list">
+          <p class="info-text">
+            <span class="icon">ℹ️</span>
+            Selecciona un paciente para solicitar su asignación
+          </p>
+          
+          @for (patient of availablePatients(); track patient.id) {
+            <div 
+              class="patient-item" 
+              [class.selected]="selectedPatientId() === patient.id"
+              (click)="selectPatient(patient.id)">
+              
+              <div class="patient-avatar">
+                {{ patient.firstName.charAt(0) }}{{ patient.lastName.charAt(0) }}
+              </div>
+              
+              <div class="patient-info">
+                <h4>{{ patient.firstName }} {{ patient.lastName }}</h4>
+                <div class="patient-meta">
+                  <span class="meta-item">
+                    <span class="icon">🎂</span>
+                    {{ calculateAge(patient.birthDate) }} años
+                  </span>
+                  <span class="meta-item">
+                    <span class="icon">🆔</span>
+                    DNI: {{ patient.dni }}
+                  </span>
+                  <span class="meta-item">
+                    <span class="icon">📞</span>
+                    {{ patient.phone }}
+                  </span>
+                </div>
+                
+                @if (patient.hasActiveSubscription) {
+                  <span class="badge badge-success">
+                    ✓ Suscripción Activa
+                  </span>
+                } @else {
+                  <span class="badge badge-warning">
+                    ⚠️ Sin Suscripción
+                  </span>
+                }
+              </div>
+              
+              @if (selectedPatientId() === patient.id) {
+                <div class="checkmark">✓</div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()" [disabled]="requesting()">
+        Cancelar
+      </button>
+      
+      <button 
+        class="btn btn-primary" 
+        (click)="requestPatient()"
+        [disabled]="!selectedPatientId() || requesting()">
+        @if (requesting()) {
+          <span class="spinner-small"></span>
+          <span>Asignando...</span>
+        } @else {
+          <span>Solicitar Asignación</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

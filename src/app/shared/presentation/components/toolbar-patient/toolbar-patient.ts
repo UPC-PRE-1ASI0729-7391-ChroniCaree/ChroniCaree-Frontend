@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatBadgeModule } from '@angular/material/badge';
 import { UserStore } from '../../../../iam/application/user.store';
 import { NudgeStore } from '../../../../communication/application/nudge.store';
+import { MedicationReminderFacade } from '../../../../medications/infrastructure/medication-reminder.facade';
+import { PatientStore } from '../../../../patients/application/patient.store';
 
 @Component({
   selector: 'app-toolbar-patient',
@@ -13,19 +15,55 @@ import { NudgeStore } from '../../../../communication/application/nudge.store';
   styleUrls: ['./toolbar-patient.css']
 })
 export class ToolbarPatientComponent implements OnInit {
+  private readonly router = inject(Router);
+  public readonly userStore = inject(UserStore);
+  private readonly nudgeStore = inject(NudgeStore);
+  private readonly medicationFacade = inject(MedicationReminderFacade);
+  private readonly patientStore = inject(PatientStore);
+
+  // Total nudges count (from NudgeStore + MedicationFacade)
+  readonly totalNotifications = computed(() => {
+    const nudgesCount = this.nudgeStore.activeCount();
+    const medicationReminders = this.medicationFacade.overdueCount();
+    return nudgesCount + medicationReminders;
+  });
+
   get activeNudgesCount() {
     return this.nudgeStore.activeCount;
   }
 
-  constructor(
-    private router: Router,
-    public userStore: UserStore,
-    private nudgeStore: NudgeStore
-  ) {}
-
   ngOnInit(): void {
-    // Cargar nudges al iniciar
-    this.nudgeStore.loadAllNudges().subscribe();
+    // ✅ Cargar nudges filtrados por paciente actual
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) {
+      console.error('❌ Toolbar-Patient: Usuario no autenticado');
+      return;
+    }
+
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+
+    // Buscar el paciente asociado al usuario actual
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+
+        if (patient) {
+          console.log(`✅ Toolbar-Patient: Cargando nudges para paciente ${patient.id}`);
+          
+          // ✅ Cargar nudges usando el patientId
+          this.nudgeStore.loadNudgesByPatient(patient.id.toString()).subscribe({
+            next: () => console.log('✅ Nudges cargados para toolbar'),
+            error: (err) => console.error('❌ Error cargando nudges:', err)
+          });
+        } else {
+          console.error(`❌ Toolbar-Patient: No se encontró paciente para userId ${userId}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Toolbar-Patient: Error cargando pacientes:', err);
+      }
+    });
   }
 
   get currentUser() {
@@ -33,13 +71,8 @@ export class ToolbarPatientComponent implements OnInit {
   }
 
   logout(): void {
-    // Clear localStorage
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole');
-    
-    // Clear user store
-    this.userStore.setCurrentUser(null);
+    // Clear user store and localStorage
+    this.userStore.clearCurrentUser();
     
     // Navigate to login
     this.router.navigate(['/iam/login']);

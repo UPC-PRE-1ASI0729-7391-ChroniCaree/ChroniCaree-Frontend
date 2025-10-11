@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DiagnosisStore } from '../../../application/diagnosis.store';
 import { Diagnosis, DiagnosisStatus, DiagnosisSeverity } from '../../../domain/model/diagnosis.entity';
+import { PatientStore } from '../../../../patients/application/patient.store';
 
 /**
  * Medical Diagnoses View - US21: Gestión de diagnósticos médicos
@@ -29,6 +30,10 @@ import { Diagnosis, DiagnosisStatus, DiagnosisSeverity } from '../../../domain/m
   styleUrl: './medical-diagnoses.css'
 })
 export class MedicalDiagnosesComponent implements OnInit {
+  private readonly diagnosisStore = inject(DiagnosisStore);
+  private readonly patientStore = inject(PatientStore);
+  private readonly router = inject(Router);
+
   // Getters para signals del store
   get loading() { return this.diagnosisStore.loading$; }
   get diagnoses() { return this.diagnosisStore.diagnoses$; }
@@ -39,41 +44,91 @@ export class MedicalDiagnosesComponent implements OnInit {
   // Filtro activo
   selectedFilter = signal<'all' | 'active' | 'controlled' | 'resolved'>('all');
 
-  // Diagnósticos filtrados
+  // Diagnósticos filtrados (ahora por paciente actual)
   filteredDiagnoses = computed(() => {
-    switch (this.selectedFilter()) {
-      case 'active':
-        return this.activeDiagnoses();
-      case 'controlled':
-        return this.controlledDiagnoses();
-      case 'resolved':
-        return this.resolvedDiagnoses();
-      default:
-        return this.diagnoses();
-    }
+    const diagnoses = (() => {
+      switch (this.selectedFilter()) {
+        case 'active':
+          return this.activeDiagnoses();
+        case 'controlled':
+          return this.controlledDiagnoses();
+        case 'resolved':
+          return this.resolvedDiagnoses();
+        default:
+          return this.diagnoses();
+      }
+    })();
+
+    // ✅ Filtrar solo diagnósticos del paciente actual
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) return [];
+
+    const currentUser = JSON.parse(currentUserStr);
+    const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
+    
+    if (!currentPatient) return [];
+
+    return diagnoses.filter(d => d.patientId === currentPatient.id);
   });
 
-  // Estadísticas
-  stats = computed(() => ({
-    total: this.diagnoses().length,
-    active: this.activeDiagnoses().length,
-    controlled: this.controlledDiagnoses().length,
-    resolved: this.resolvedDiagnoses().length
-  }));
+  // Estadísticas (ahora filtradas por paciente actual)
+  stats = computed(() => {
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) return { total: 0, active: 0, controlled: 0, resolved: 0 };
 
-  constructor(
-    private diagnosisStore: DiagnosisStore,
-    private router: Router
-  ) {}
+    const currentUser = JSON.parse(currentUserStr);
+    const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
+    
+    if (!currentPatient) return { total: 0, active: 0, controlled: 0, resolved: 0 };
+
+    const patientDiagnoses = this.diagnoses().filter(d => d.patientId === currentPatient.id);
+    const active = this.activeDiagnoses().filter(d => d.patientId === currentPatient.id);
+    const controlled = this.controlledDiagnoses().filter(d => d.patientId === currentPatient.id);
+    const resolved = this.resolvedDiagnoses().filter(d => d.patientId === currentPatient.id);
+
+    return {
+      total: patientDiagnoses.length,
+      active: active.length,
+      controlled: controlled.length,
+      resolved: resolved.length
+    };
+  });
 
   ngOnInit(): void {
-    this.loadDiagnoses();
-  }
+    // Verificar autenticación
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
 
-  private loadDiagnoses(): void {
-    this.diagnosisStore.loadAllDiagnoses().subscribe({
-      error: (error) => {
-        console.error('Error loading diagnoses:', error);
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.error('❌ Medical-Diagnoses: Usuario no autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+
+    const currentUser = JSON.parse(currentUserStr);
+    const userId = currentUser.id;
+
+    console.log(`🔍 Medical-Diagnoses: Usuario actual ID: ${userId}`);
+
+    // Primero cargar pacientes para obtener el patientId
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+
+        if (patient) {
+          console.log(`✅ Medical-Diagnoses: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
+          
+          // Cargar diagnósticos (se filtrarán en el computed)
+          this.diagnosisStore.loadAllDiagnoses().subscribe({
+            next: () => console.log('✅ Diagnósticos cargados (se filtrarán por paciente)'),
+            error: (error) => console.error('❌ Error loading diagnoses:', error)
+          });
+        } else {
+          console.error(`❌ Medical-Diagnoses: No se encontró paciente para userId ${userId}`);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Medical-Diagnoses: Error cargando pacientes:', err);
       }
     });
   }

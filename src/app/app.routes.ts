@@ -80,9 +80,22 @@ export const routes: Routes = [
           import('./communication/presentation/views/nudges-page/nudges-page')
             .then((m) => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
-        data: { role: 'patient' },
+
+        data: { role: 'patient' }
       },
-    ],
+      {
+        path: 'medicamentos',
+        loadComponent: () => import('./medications/presentation/views/medication-history/medication-history').then(m => m.MedicationHistoryComponent),
+        title: `${baseTitle} - Mis Medicamentos`,
+        data: { role: 'patient' }
+      },
+      {
+        path: 'salud',
+        loadComponent: () => import('./alerts/presentation/views/health-alerts/health-alerts').then(m => m.HealthAlertsComponent),
+        title: `${baseTitle} - Mi Salud`,
+        data: { role: 'patient' }
+      }
+    ]
   },
 
   // Clinical
@@ -133,64 +146,28 @@ export const routes: Routes = [
           import('./doctors/presentation/views/edit-profile/edit-profile')
             .then((m) => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
-        data: { role: 'doctor' },
-      },
 
-      // Bandeja del doctor
-      {
-        path: 'messages',
-        loadComponent: () =>
-          import('./communication/messages/presentation/components/inbox/inbox.component')
-            .then((m) => m.InboxComponent),
-        title: `${baseTitle} - Mensajes (Doctor)`,
-        data: { role: 'doctor' },
+        data: { role: 'doctor' }
       },
-
-      // Conversación del doctor
       {
-        path: 'messages/thread/:id',
-        loadComponent: () =>
-          import('./communication/messages/presentation/components/message-thread/message-thread.component')
-            .then((m) => m.MessageThreadComponent),
-        title: `${baseTitle} - Conversación (Doctor)`,
-        data: { role: 'doctor' },
+        path: 'patients',
+        loadComponent: () => import('./doctors/presentation/views/patients-list/patients-list').then(m => m.PatientsListComponent),
+        title: `${baseTitle} - Mis Pacientes`,
+        data: { role: 'doctor' }
       },
-    ],
-  },
-
-  // Communication → mensajes del paciente
-  {
-    path: 'communication',
-    children: [
       {
-        path: 'messages',
-        loadComponent: () =>
-          import('./communication/messages/presentation/components/inbox/inbox.component')
-            .then((m) => m.InboxComponent),
-        title: `${baseTitle} - Mensajes`,
-        data: { role: 'patient' },
-        children: [
-          {
-            path: 'compose',
-            loadComponent: () =>
-              import('./communication/messages/presentation/components/message-compose/message-compose.component')
-                .then((m) => m.MessageComposeComponent),
-            title: `${baseTitle} - Nuevo Mensaje`,
-            data: { role: 'patient' },
-          },
-          {
-            path: 'thread/:id',
-            loadComponent: () =>
-              import('./communication/messages/presentation/components/message-thread/message-thread.component')
-                .then((m) => m.MessageThreadComponent),
-            title: `${baseTitle} - Conversación`,
-            data: { role: 'patient' },
-          },
-          // Solo aplica al flujo del paciente
-          { path: '', pathMatch: 'full', redirectTo: 'compose' },
-        ],
+        path: 'appointments',
+        loadComponent: () => import('./doctors/presentation/views/appointments-list/appointments-list').then(m => m.AppointmentsListComponent),
+        title: `${baseTitle} - Mis Citas`,
+        data: { role: 'doctor' }
       },
-    ],
+      {
+        path: 'records',
+        loadComponent: () => import('./doctors/presentation/views/medical-records-list/medical-records-list').then(m => m.MedicalRecordsListComponent),
+        title: `${baseTitle} - Historiales Médicos`,
+        data: { role: 'doctor' }
+      }
+    ]
   },
 
   // Coming Soon (restaurado, sin redirección a mensajes)

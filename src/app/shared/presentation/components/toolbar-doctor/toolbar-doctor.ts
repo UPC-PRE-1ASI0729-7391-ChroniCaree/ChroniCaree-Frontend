@@ -15,8 +15,13 @@ export class ToolbarDoctorComponent {
   constructor(private router: Router) {}
 
   logout(): void {
-
     console.log('Doctor logout');
+
+    // Clear user store and localStorage
+    this.userStore.clearCurrentUser();
+    
+    // Navigate to login
+    this.router.navigate(['/iam/login']);
 
   }
 }
