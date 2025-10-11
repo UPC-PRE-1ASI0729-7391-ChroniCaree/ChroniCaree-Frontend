@@ -94,6 +94,12 @@ export const routes: Routes = [
         loadComponent: () => import('./alerts/presentation/views/health-alerts/health-alerts').then(m => m.HealthAlertsComponent),
         title: `${baseTitle} - Mi Salud`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'agendar-cita',
+        loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
+        title: `${baseTitle} - Agendar Cita`,
+        data: { role: 'patient' }
       }
     ]
   },
@@ -170,6 +176,34 @@ export const routes: Routes = [
     ]
   },
 
+  // Communication - Messages (shared by patient and doctor)
+  {
+    path: 'communication/messages',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./communication/presentation/components/inbox/inbox.component')
+            .then((m) => m.InboxComponent),
+        title: `${baseTitle} - Mensajes`,
+      },
+      {
+        path: 'compose',
+        loadComponent: () =>
+          import('./communication/presentation/components/message-compose/message-compose.component')
+            .then((m) => m.MessageComposeComponent),
+        title: `${baseTitle} - Nuevo Mensaje`,
+      },
+      {
+        path: 'thread/:id',
+        loadComponent: () =>
+          import('./communication/presentation/components/message-thread/message-thread.component')
+            .then((m) => m.MessageThreadComponent),
+        title: `${baseTitle} - Conversación`,
+      },
+    ],
+  },
+
   // Coming Soon (restaurado, sin redirección a mensajes)
   {
     path: 'coming-soon',
@@ -182,6 +216,7 @@ export const routes: Routes = [
   // Atajos legados
   { path: 'messages', redirectTo: '/communication/messages', pathMatch: 'full' },
   { path: 'patient/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+  { path: 'doctor/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
 
   // 404
   {

@@ -11,6 +11,12 @@ export enum RecordType {
   CONSULTATION = 'consultation'
 }
 
+export enum ReviewStatus {
+  PENDING_REVIEW = 'pending_review',  // ⭐ Pendiente de revisión médica
+  REVIEWED = 'reviewed',              // ⭐ Revisado por el doctor
+  ARCHIVED = 'archived'               // ⭐ Archivado
+}
+
 export interface MedicalRecord {
   id: number;
   patientId: number;
@@ -34,4 +40,8 @@ export interface MedicalRecord {
   notes?: string;
   // Enriched data
   patientName?: string;
+  // ⭐ Review Status
+  reviewStatus?: ReviewStatus;
+  reviewedAt?: string;  // Fecha de revisión
+  reviewedBy?: number;  // ID del doctor que revisó
 }

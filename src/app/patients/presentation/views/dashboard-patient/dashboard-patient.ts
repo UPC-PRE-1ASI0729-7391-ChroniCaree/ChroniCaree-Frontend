@@ -11,6 +11,8 @@ import { SymptomStore } from '../../../../clinical/application/symptom.store';
 import { DiagnosisStore } from '../../../../medical-records/application/diagnosis.store';
 import { MedicationStore } from '../../../../medications/application/medication.store';
 import { AlertStore } from '../../../../alerts/application/alert.store';
+import { AppointmentsStore } from '../../../../doctors/application/appointments.store';
+import { Appointment } from '../../../../doctors/domain/model/appointment.entity';
 
 @Component({
   selector: 'app-dashboard-patient',
@@ -134,23 +136,27 @@ export class DashboardPatient implements OnInit {
     return patientSchedule.slice(0, 3); // Mostrar solo primeros 3 en dashboard
   });
 
-  // Próximas citas (mock data - se integrará con el store real)
-  protected readonly upcomingAppointments = signal([
-    { 
-      id: 1, 
-      doctorName: 'Dr. Juan Torres', 
-      specialty: 'Cardiología', 
-      date: '15 Abril', 
-      time: '10:00 AM' 
-    },
-    { 
-      id: 2, 
-      doctorName: 'Dra. María López', 
-      specialty: 'Endocrinología', 
-      date: '18 Abril', 
-      time: '15:30 PM' 
-    }
-  ]);
+  // Próximas citas (desde AppointmentsStore)
+  protected readonly upcomingAppointments = computed(() => {
+    const patient = this.currentPatient();
+    if (!patient) return [];
+
+    // ✅ Filtrar solo citas del paciente actual
+    const allAppointments = this.appointmentsStore.upcomingAppointments();
+    const patientAppointments = allAppointments
+      .filter((apt: Appointment) => apt.patientId === patient.id)
+      .slice(0, 2); // Mostrar solo las 2 próximas en dashboard
+
+    return patientAppointments.map((apt: Appointment) => ({
+      id: apt.id,
+      doctorName: 'Dr. Asignado', // TODO: obtener nombre del doctor
+      specialty: 'Especialidad', // TODO: obtener especialidad
+      date: this.formatAppointmentDate(apt.date),
+      time: apt.time,
+      type: apt.type,
+      status: apt.status
+    }));
+  });
 
   // Síntomas recientes (de SymptomStore)
   protected readonly recentSymptoms = computed(() => {
@@ -189,7 +195,8 @@ export class DashboardPatient implements OnInit {
     private symptomStore: SymptomStore,
     private diagnosisStore: DiagnosisStore,
     private medicationStore: MedicationStore,
-    private alertStore: AlertStore
+    private alertStore: AlertStore,
+    private appointmentsStore: AppointmentsStore
   ) {}
 
   ngOnInit(): void {
@@ -263,6 +270,9 @@ export class DashboardPatient implements OnInit {
               console.log(`✅ Dashboard-Patient: ${patientDiagnoses.length} diagnósticos encontrados para paciente ${patient.id}`);
             }
           });
+
+          // ✅ Cargar citas del paciente actual
+          this.appointmentsStore.loadAppointmentsByPatient(patient.id).subscribe();
         } else {
           console.warn('⚠️ Dashboard-Patient: No se encontró paciente para userId:', userId);
         }
@@ -328,5 +338,13 @@ export class DashboardPatient implements OnInit {
       hour: '2-digit', 
       minute: '2-digit' 
     });
+  }
+
+  /**
+   * Formatea fecha de cita (formato corto: "15 Abril")
+   */
+  private formatAppointmentDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'long' });
   }
 }

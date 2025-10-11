@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { MessagesApi } from './messages-api';
-import { Message } from '../domain/model/message';
-import { Thread } from '../domain/model/thread';
+import { Message } from '../domain/model/message.entity';
+import { Thread } from '../domain/model/thread.entity';
 
 describe('MessagesApi', () => {
   let api: MessagesApi;

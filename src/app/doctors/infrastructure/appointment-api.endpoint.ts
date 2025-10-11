@@ -105,6 +105,30 @@ export class AppointmentApiEndpoint {
   }
 
   /**
+   * ⭐ Obtiene todas las citas de un paciente
+   */
+  getAppointmentsByPatient(patientId: number): Observable<Appointment[]> {
+    return this.http.get<AppointmentResource[]>(`${this.baseUrl}/appointments`).pipe(
+      map(appointments => appointments.filter(apt => apt.patientId === patientId)),
+      map(appointments => appointments.map(resource => AppointmentAssembler.toDomain(resource))),
+      catchError(error => {
+        console.error('Error fetching patient appointments:', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * ⭐ Crea una nueva cita
+   */
+  create(appointmentData: Omit<Appointment, 'id'>): Observable<Appointment> {
+    const resource = AppointmentAssembler.toResource(appointmentData as Appointment);
+    return this.http.post<AppointmentResource>(`${this.baseUrl}/appointments`, resource).pipe(
+      map(resource => AppointmentAssembler.toDomain(resource))
+    );
+  }
+
+  /**
    * Actualiza el estado de una cita
    */
   updateAppointmentStatus(appointmentId: number, status: string): Observable<Appointment> {

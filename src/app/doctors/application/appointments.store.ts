@@ -5,6 +5,7 @@
  * Store signal-based para gestionar citas del doctor
  */
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { tap } from 'rxjs';
 import { Appointment, AppointmentStatus } from '../domain/model/appointment.entity';
 import { AppointmentApiEndpoint } from '../infrastructure/appointment-api.endpoint';
 
@@ -75,6 +76,39 @@ export class AppointmentsStore {
   readonly upcomingCount = computed(() => this.upcomingAppointments().length);
   
   /**
+   * ⭐ Crea una nueva cita
+   */
+  async createAppointment(appointmentData: Omit<Appointment, 'id'>): Promise<Appointment> {
+    this.setLoading(true);
+    
+    try {
+      const created = await this.apiEndpoint.create(appointmentData).toPromise();
+      
+      if (created) {
+        console.log(`✅ [AppointmentsStore] Nueva cita creada: ${created.id}`);
+        this.state.update(s => ({
+          ...s,
+          appointments: [...s.appointments, created],
+          loading: false,
+          error: null
+        }));
+        
+        return created;
+      }
+      
+      throw new Error('No se pudo crear la cita');
+    } catch (err) {
+      console.error(`❌ [AppointmentsStore] Error creando cita:`, err);
+      this.state.update(s => ({
+        ...s,
+        loading: false,
+        error: 'Error al crear cita'
+      }));
+      throw err;
+    }
+  }
+
+  /**
    * Carga citas de un doctor
    */
   loadAppointmentsByDoctor(doctorId: number): void {
@@ -99,6 +133,35 @@ export class AppointmentsStore {
         }));
       }
     });
+  }
+
+  /**
+   * ⭐ Carga citas de un paciente
+   */
+  loadAppointmentsByPatient(patientId: number) {
+    this.setLoading(true);
+    
+    return this.apiEndpoint.getAppointmentsByPatient(patientId).pipe(
+      tap({
+        next: (appointments: Appointment[]) => {
+          console.log(`✅ [AppointmentsStore] ${appointments.length} citas cargadas para paciente ${patientId}`);
+          this.state.update(s => ({
+            ...s,
+            appointments,
+            loading: false,
+            error: null
+          }));
+        },
+        error: (err: any) => {
+          console.error(`❌ [AppointmentsStore] Error cargando citas del paciente:`, err);
+          this.state.update(s => ({
+            ...s,
+            loading: false,
+            error: 'Error al cargar citas'
+          }));
+        }
+      })
+    );
   }
   
   /**

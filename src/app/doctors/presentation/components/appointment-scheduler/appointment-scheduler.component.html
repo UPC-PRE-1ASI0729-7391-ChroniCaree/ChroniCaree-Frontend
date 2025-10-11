@@ -1,0 +1,120 @@
+<div class="scheduler-page">
+  <div class="scheduler-header">
+    <h1 class="h2">📅 Agendar Nueva Cita</h1>
+    <p class="subtitle">Programa una cita con tu médico asignado</p>
+  </div>
+
+  <div class="scheduler-card">
+    <div class="card-body">
+      <!-- Fecha -->
+      <div class="form-group">
+        <label for="date" class="form-label">
+          <span class="label-icon">📆</span>
+          Fecha de la cita
+        </label>
+        <input
+          id="date"
+          type="date"
+          class="form-input"
+          [min]="minDate"
+          [max]="maxDate()"
+          [value]="selectedDate()"
+          (input)="selectedDate.set($any($event.target).value)"
+          required
+        />
+        <small class="form-hint">Selecciona una fecha entre hoy y los próximos 3 meses</small>
+      </div>
+
+      <!-- Hora -->
+      <div class="form-group">
+        <label for="time" class="form-label">
+          <span class="label-icon">🕐</span>
+          Hora de la cita
+        </label>
+        <select
+          id="time"
+          class="form-select"
+          [value]="selectedTime()"
+          (change)="selectedTime.set($any($event.target).value)"
+          required
+        >
+          <option value="">Selecciona una hora</option>
+          <option *ngFor="let slot of timeSlots" [value]="slot">
+            {{ slot }}
+          </option>
+        </select>
+        <small class="form-hint">Horario de atención: 8:00 AM - 6:00 PM</small>
+      </div>
+
+      <!-- Tipo de cita -->
+      <div class="form-group">
+        <label for="type" class="form-label">
+          <span class="label-icon">🏥</span>
+          Tipo de cita
+        </label>
+        <select
+          id="type"
+          class="form-select"
+          [value]="appointmentType()"
+          (change)="appointmentType.set($any($event.target).value)"
+          required
+        >
+          <option *ngFor="let type of appointmentTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Notas adicionales -->
+      <div class="form-group">
+        <label for="notes" class="form-label">
+          <span class="label-icon">📝</span>
+          Notas adicionales (opcional)
+        </label>
+        <textarea
+          id="notes"
+          rows="4"
+          class="form-textarea"
+          placeholder="Describe el motivo de tu cita o cualquier información relevante para tu médico..."
+          [value]="notes()"
+          (input)="notes.set($any($event.target).value)"
+        ></textarea>
+        <small class="form-hint">Máximo 500 caracteres</small>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <div class="info-icon">ℹ️</div>
+        <div class="info-content">
+          <strong>Información importante:</strong>
+          <ul>
+            <li>Tu médico recibirá una notificación inmediata</li>
+            <li>La cita quedará como "Programada" hasta que el médico la confirme</li>
+            <li>Recibirás un recordatorio 24 horas antes de la cita</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cancel()"
+        [disabled]="submitting()"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="submit()"
+        [disabled]="!canSubmit()"
+      >
+        <span *ngIf="!submitting()">✓ Agendar Cita</span>
+        <span *ngIf="submitting()">Agendando...</span>
+      </button>
+    </div>
+  </div>
+</div>

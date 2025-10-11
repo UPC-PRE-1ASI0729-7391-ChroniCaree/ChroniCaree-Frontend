@@ -1,4 +1,4 @@
-import { Attachment } from './attachment';
+import { Attachment } from './attachment.entity';
 
 export interface Message {
   id?: string;
@@ -11,4 +11,6 @@ export interface Message {
   attachments?: Attachment[];
   createdAt?: string;
   archivedToMedicalRecord?: boolean;
+  isUrgent?: boolean;     // ⭐ Marca si el mensaje es urgente
+  isRead?: boolean;       // ⭐ Indica si el mensaje fue leído
 }

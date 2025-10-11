@@ -17,12 +17,23 @@
           [routerLink]="role === 'DOCTOR'
             ? ['/doctor/messages/thread', t.id]
             : ['thread', t.id]"
+          [class.urgent]="t.hasUrgentMessages"
         >
           <div class="thread-title">
-            <strong>{{ t.subject }}</strong>
-            <span class="badge" [class.closed]="t.status === 'CLOSED'">
-              {{ t.status === 'CLOSED' ? 'Cerrado' : 'Abierto' }}
-            </span>
+            <strong>
+              <!-- ⭐ Icono de urgencia -->
+              <span *ngIf="t.hasUrgentMessages" class="urgent-badge" title="Mensaje urgente">🚨</span>
+              {{ t.subject }}
+            </strong>
+            <div class="badges">
+              <!-- ⭐ Badge de mensajes sin leer -->
+              <span *ngIf="t.unreadCount && t.unreadCount > 0" class="badge unread-badge">
+                {{ t.unreadCount }}
+              </span>
+              <span class="badge" [class.closed]="t.status === 'CLOSED'">
+                {{ t.status === 'CLOSED' ? 'Cerrado' : 'Abierto' }}
+              </span>
+            </div>
           </div>
 
           <div class="thread-meta">
