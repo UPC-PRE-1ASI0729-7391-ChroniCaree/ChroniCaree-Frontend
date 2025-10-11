@@ -1,0 +1,87 @@
+<div class="compose-page">
+  <!-- Migas -->
+  <nav class="breadcrumbs">
+    <a routerLink="/communication/messages" class="crumb">Mensajes</a>
+    <span class="sep">/</span>
+    <span class="crumb current">Nuevo</span>
+  </nav>
+
+  <!-- Card -->
+  <div class="card compose-card">
+    <div class="card-header">
+      <h2 class="h3">
+        <span class="icon-mail" aria-hidden="true">✉️</span>
+        Nuevo mensaje al médico
+      </h2>
+      <a class="link-primary" routerLink="/communication/messages">Volver a la bandeja</a>
+    </div>
+
+    <div class="card-body">
+      <!-- Para -->
+      <div class="row">
+        <label class="label">Para</label>
+        <div class="pill">
+          <div class="avatar" aria-hidden="true">👨‍⚕️</div>
+          <span>Tu médico</span>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div class="row">
+        <label class="label" for="subject">Título</label>
+        <input
+          id="subject"
+          type="text"
+          [(ngModel)]="subject"
+          placeholder="Ej. Consulta por dolor de cabeza"
+          class="input"
+        />
+      </div>
+
+      <!-- Mensaje -->
+      <div class="row">
+        <label class="label" for="body">Mensaje</label>
+        <textarea
+          id="body"
+          rows="8"
+          [(ngModel)]="body"
+          class="textarea"
+          placeholder="Describe tu consulta clínica con el mayor detalle posible…"
+        ></textarea>
+        <div class="hint">Evita compartir datos sensibles innecesarios.</div>
+      </div>
+
+      <!-- Adjuntos -->
+      <div class="row">
+        <label class="label">Adjuntos</label>
+        <div class="uploader">
+          <input type="file" multiple (change)="onFiles($event)" id="file-input" hidden />
+          <label for="file-input" class="btn btn-secondary">Seleccionar archivos</label>
+          <div class="dropzone" title="Selecciona archivos">
+            <div class="dz-icon" aria-hidden="true">📎</div>
+            <div>
+              <div class="dz-title">Arrastra y suelta aquí</div>
+              <div class="dz-sub">o haz clic en “Seleccionar archivos”</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de adjuntos -->
+        <div class="files" *ngIf="files().length">
+          <div class="file-chip" *ngFor="let f of files(); let i = index">
+            <span class="file-name">{{ f.name }}</span>
+            <button type="button" class="chip-remove" (click)="removeFile(i)" aria-label="Quitar archivo">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="card-actions">
+      <a routerLink="/communication/messages" class="btn btn-secondary">Cancelar</a>
+      <button class="btn btn-primary" [disabled]="!canSend()" (click)="send()">
+        {{ sending() ? 'Enviando…' : 'Enviar mensaje' }}
+      </button>
+    </div>
+  </div>
+</div>

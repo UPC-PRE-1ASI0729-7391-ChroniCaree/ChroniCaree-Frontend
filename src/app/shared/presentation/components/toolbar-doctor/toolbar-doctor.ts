@@ -1,35 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../../iam/application/user.store';
+import { Router } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
-  selector: 'app-toolbar-doctor',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  selector: 'app-toolbar-doctor',
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './toolbar-doctor.html',
-  styleUrls: ['./toolbar-doctor.css']
+  styleUrls: ['./toolbar-doctor.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToolbarDoctorComponent {
-  constructor(
-    private router: Router,
-    public userStore: UserStore
-  ) {}
-
-  get currentUser() {
-    return this.userStore.currentUser$();
-  }
+  constructor(private router: Router) {}
 
   logout(): void {
-    // Clear localStorage
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userRole');
-    
-    // Clear user store
-    this.userStore.setCurrentUser(null);
+    console.log('Doctor logout');
+
+    // Clear user store and localStorage
+    this.userStore.clearCurrentUser();
     
     // Navigate to login
     this.router.navigate(['/iam/login']);
+
   }
 }

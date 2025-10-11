@@ -1,0 +1,122 @@
+<div class="medication-log-container">
+  <!-- Header with stats -->
+  <div class="log-header">
+    <h3>💊 Medicamentos de Hoy</h3>
+    <a routerLink="/patient/medicamentos" class="view-all-link">Ver todos →</a>
+  </div>
+  
+  @if (adherenceStats(); as stats) {
+    <div class="adherence-summary">
+      <mat-chip [highlighted]="true" [color]="getAdherenceColor(stats.average)">
+        <mat-icon>trending_up</mat-icon>
+        Adherencia: {{stats.average}}%
+      </mat-chip>
+    </div>
+  }
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Cargando medicamentos...</p>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @else if (todaySchedule().length === 0) {
+    <div class="empty-state">
+      <mat-icon>medication</mat-icon>
+      <p>No tienes medicamentos programados para hoy</p>
+    </div>
+  }
+
+  <!-- Medication schedule list -->
+  @else {
+    <div class="medication-list">
+      @for (item of todaySchedule(); track item.medication.id + item.time) {
+        <mat-card class="medication-card" [class.taken]="item.taken" [class.past]="isTimePast(item.time)">
+          <mat-card-content>
+            <div class="medication-info">
+              <!-- Icon and time -->
+              <div class="med-icon-time">
+                <mat-icon [class.taken-icon]="item.taken">
+                  {{ getMedicationIcon(item.medication) }}
+                </mat-icon>
+                <div class="time-info">
+                  <span class="time">{{ item.time }}</span>
+                  @if (item.taken) {
+                    <mat-icon class="check-icon" [matTooltip]="'Tomado'">check_circle</mat-icon>
+                  }
+                  @else if (isTimePast(item.time)) {
+                    <mat-icon class="warning-icon" [matTooltip]="'Hora pasada'">schedule</mat-icon>
+                  }
+                </div>
+              </div>
+
+              <!-- Medication details -->
+              <div class="med-details">
+                <h4>{{ item.medication.name }}</h4>
+                <p class="dosage">{{ item.medication.dosage }}</p>
+                @if (item.medication.instructions) {
+                  <p class="instructions">
+                    <mat-icon>info</mat-icon>
+                    {{ item.medication.instructions }}
+                  </p>
+                }
+              </div>
+
+              <!-- Actions -->
+              <div class="med-actions">
+                @if (!item.taken) {
+                  <button 
+                    mat-raised-button 
+                    color="primary"
+                    [disabled]="processingMedId() === item.medication.id"
+                    (click)="markAsTaken(item.medication, item.time)"
+                    matTooltip="Marcar como tomado">
+                    <mat-icon>check</mat-icon>
+                    Tomado
+                  </button>
+                  <button 
+                    mat-stroked-button
+                    [disabled]="processingMedId() === item.medication.id"
+                    (click)="markAsMissed(item.medication, item.time)"
+                    matTooltip="Omitir medicamento">
+                    <mat-icon>close</mat-icon>
+                    Omitir
+                  </button>
+                } @else {
+                  <div class="taken-badge">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Completado</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Adherence indicator -->
+            <div class="adherence-bar">
+              <div class="adherence-progress" [style.width.%]="item.medication.adherenceRate"></div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- Summary footer -->
+  @if (medicationCount(); as count) {
+    <div class="log-footer">
+      <div class="stat">
+        <mat-icon>medication</mat-icon>
+        <span>{{ count.active }} activos</span>
+      </div>
+      @if (count.needRefill > 0) {
+        <div class="stat warning">
+          <mat-icon>warning</mat-icon>
+          <span>{{ count.needRefill }} necesitan reabastecimiento</span>
+        </div>
+      }
+    </div>
+  }
+</div>

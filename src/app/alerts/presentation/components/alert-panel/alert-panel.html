@@ -1,0 +1,87 @@
+<mat-card class="alerts-card">
+  <mat-card-header>
+    <div class="header-content">
+      <div class="header-title">
+        <mat-icon class="header-icon">notifications_active</mat-icon>
+        <h3>Alertas</h3>
+        @if (criticalCount() > 0) {
+          <span class="critical-badge" [matBadge]="criticalCount()" matBadgeColor="warn" matBadgeSize="small"></span>
+        }
+      </div>
+      <a routerLink="/patient/salud" class="view-all-link">
+        Ver todas
+        <mat-icon>arrow_forward</mat-icon>
+      </a>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando alertas...</p>
+      </div>
+    } @else if (topAlerts().length === 0) {
+      <div class="empty-state">
+        <mat-icon>check_circle</mat-icon>
+        <p>Sin alertas activas</p>
+        <span class="subtitle">Todo está bajo control 🎉</span>
+      </div>
+    } @else {
+      <div class="alerts-list">
+        @for (alert of topAlerts(); track alert.id) {
+          <div class="alert-item" [class]="getSeverityClass(alert.severity)">
+            <div class="alert-icon">
+              <mat-icon [class.critical]="alert.severity === 'critical'">
+                {{ alert.typeIcon }}
+              </mat-icon>
+            </div>
+
+            <div class="alert-content">
+              <div class="alert-header">
+                <h4 class="alert-title">{{ alert.title }}</h4>
+                <mat-chip class="severity-chip" [class]="getSeverityClass(alert.severity)">
+                  {{ getSeverityLabel(alert.severity) }}
+                </mat-chip>
+              </div>
+
+              <p class="alert-message">{{ alert.message }}</p>
+
+              <div class="alert-footer">
+                <span class="alert-time">
+                  <mat-icon>schedule</mat-icon>
+                  {{ getTimeAgo(alert) }}
+                </span>
+
+                <div class="alert-actions">
+                  <button 
+                    mat-button 
+                    color="primary" 
+                    (click)="acknowledgeAlert(alert)"
+                    class="action-btn">
+                    <mat-icon>done</mat-icon>
+                    Reconocer
+                  </button>
+                  <button 
+                    mat-icon-button 
+                    (click)="dismissAlert(alert)"
+                    class="dismiss-btn">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (hasMoreAlerts()) {
+        <div class="more-alerts">
+          <a routerLink="/patient/salud" class="more-link">
+            Ver todas las alertas →
+          </a>
+        </div>
+      }
+    }
+  </mat-card-content>
+</mat-card>

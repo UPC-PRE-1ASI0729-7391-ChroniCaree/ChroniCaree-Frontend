@@ -1,12 +1,8 @@
-// src/app/doctors/presentation/views/dashboard-doctor/dashboard-doctor.ts
-import { Component, OnInit, ViewChild, ElementRef, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { PdfExportService } from '../../../../shared/infrastructure/pdf-export.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
-type TimePoint = { date: string; value: number };
+import { Component, OnInit, ViewChild, ElementRef, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { PdfExportResponse } from '../../../../shared/infrastructure/pdf-export.response';
 
 @Component({
   selector: 'app-dashboard-doctor',
@@ -16,13 +12,14 @@ type TimePoint = { date: string; value: number };
   styleUrl: './dashboard-doctor.css'
 })
 export class DashboardDoctor implements OnInit {
-  // Área a exportar
+
+  // --- Referencia al área que se exportará ---
   @ViewChild('printArea', { static: false }) printArea!: ElementRef<HTMLElement>;
 
-  // Estado
+  // --- Estado de exportación ---
   protected readonly exporting = signal(false);
 
-  // Datos básicos (demo)
+  // --- Datos de ejemplo (signals) ---
   protected readonly doctorName = signal('Dr. Juan Pérez');
   protected readonly specialty = signal('Cardiología');
   protected readonly todayAppointments = signal(8);
@@ -41,120 +38,49 @@ export class DashboardDoctor implements OnInit {
     { id: 2, patientName: 'Carmen Silva', condition: 'Glucosa fuera de rango', severity: 'medium', time: '08:30' }
   ]);
 
-  // ------- Gráficos de evolución (solo frontend) -------
-  protected readonly rangeDays = signal<7 | 14 | 30 | 60>(30);
 
-  // Series completas (60 días simulados)
-  protected readonly allGlucose  = signal<TimePoint[]>(this.genSeries(60, 110, 25)); // mg/dL
-  protected readonly allSystolic = signal<TimePoint[]>(this.genSeries(60, 120, 15)); // mmHg
-  protected readonly allDiastolic= signal<TimePoint[]>(this.genSeries(60, 78, 10));  // mmHg
-  protected readonly allSpO2     = signal<TimePoint[]>(this.genSeries(60, 97, 2));   // %
+  constructor(private router: Router) {}
 
-  // Filtrado por periodo seleccionado
-  protected readonly glucose  = computed(() => this.filterLastDays(this.allGlucose(),  this.rangeDays()));
-  protected readonly systolic = computed(() => this.filterLastDays(this.allSystolic(), this.rangeDays()));
-  protected readonly diastolic= computed(() => this.filterLastDays(this.allDiastolic(),this.rangeDays()));
-  protected readonly spo2     = computed(() => this.filterLastDays(this.allSpO2(),     this.rangeDays()));
+  ngOnInit(): void {
+    console.log('Dashboard Doctor inicializado');
+    
+    // Verificar autenticación
+    const currentUserStr = localStorage.getItem('currentUser');
+    const isAuthenticated = localStorage.getItem('isAuthenticated');
+    
+    if (!currentUserStr || isAuthenticated !== 'true') {
+      console.warn('⚠️ Dashboard-Doctor: No hay usuario autenticado');
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+    
+    try {
+      const currentUser = JSON.parse(currentUserStr);
+      console.log('✅ Dashboard-Doctor: Usuario autenticado:', currentUser.email);
+      
+      // Aquí podrías cargar datos específicos del doctor si es necesario
+      // Por ejemplo: cargar estadísticas reales del doctor actual
+      
+    } catch (error) {
+      console.error('❌ Dashboard-Doctor: Error parsing currentUser:', error);
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+  }
 
-  // Dimensiones para el cálculo de paths
-  private readonly W = 600;
-  private readonly H = 220;
-  private readonly padL = 24;
-  private readonly padR = 8;
-  private readonly padT = 12;
-  private readonly padB = 20;
-
-  // Límites Y por métrica (para escalar)
-  private readonly Y_GLU = { min: 50, max: 220 };
-  private readonly Y_BP  = { min: 40, max: 160 };
-  private readonly Y_SPO = { min: 92, max: 100 };
-
-  // Paths de líneas
-  protected readonly glucosePath  = computed(() => this.buildPath(this.glucose(),  this.Y_GLU.min, this.Y_GLU.max));
-  protected readonly systolicPath = computed(() => this.buildPath(this.systolic(), this.Y_BP.min,  this.Y_BP.max));
-  protected readonly diastolicPath= computed(() => this.buildPath(this.diastolic(),this.Y_BP.min,  this.Y_BP.max));
-  protected readonly spo2Path     = computed(() => this.buildPath(this.spo2(),     this.Y_SPO.min, this.Y_SPO.max));
-
-  // Líneas de grilla (0–100 => 5 líneas)
-  protected readonly gridLines = [0, 25, 50, 75, 100];
-
-  constructor(private pdf: PdfExportService) {}
-
-  ngOnInit(): void {}
-
-  // Exportar PDF
+  // --- Acción: exportar PDF del dashboard ---
   async onExportPdf(): Promise<void> {
-    if (!this.printArea?.nativeElement) return;
+    if (!this.printArea) return;
     this.exporting.set(true);
     try {
       const today = new Date().toISOString().slice(0, 10);
-      await this.pdf.exportElementToPdf(this.printArea.nativeElement, {
+      await PdfExportResponse.exportElementToPdf(this.printArea.nativeElement, {
         filename: `dashboard-doctor-${today}.pdf`,
-        margin: 12,
-        // si tu servicio ya soporta 'mode', déjalo; si no, elimina esta línea:
-        mode: 'report',
-        organization: 'ChroniCaree'
-      } as any);
+        margin: 8,
+        scale: 2
+      });
     } finally {
       this.exporting.set(false);
     }
-  }
-
-  // --------- Helpers de gráficos ----------
-  protected setRange(days: 7 | 14 | 30 | 60) {
-    this.rangeDays.set(days);
-  }
-
-  private genSeries(days: number, base: number, spread: number): TimePoint[] {
-    const out: TimePoint[] = [];
-    const now = new Date();
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(now.getDate() - i);
-      const noise = (Math.random() - 0.5) * spread * 2;
-      const value = Math.max(0, Math.round((base + noise) * 10) / 10);
-      out.push({ date: d.toISOString().slice(0, 10), value });
-    }
-    return out;
-  }
-
-  private filterLastDays(series: TimePoint[], days: number): TimePoint[] {
-    return series.slice(-days);
-  }
-
-  private x(i: number, n: number): number {
-    if (n <= 1) return this.padL;
-    const usableW = this.W - this.padL - this.padR;
-    return this.padL + (usableW * i) / (n - 1);
-  }
-
-  private y(v: number, minY: number, maxY: number): number {
-    const usableH = this.H - this.padT - this.padB;
-    const t = (v - minY) / (maxY - minY);
-    const clamped = Math.min(1, Math.max(0, t));
-    // y crece hacia abajo
-    return this.padT + (1 - clamped) * usableH;
-  }
-
-  private buildPath(points: TimePoint[], minY: number, maxY: number): string {
-    if (!points.length) return '';
-    const n = points.length;
-    const start = `M ${this.x(0, n)} ${this.y(points[0].value, minY, maxY)}`;
-    const segs = points
-      .slice(1)
-      .map((p, i) => `L ${this.x(i + 1, n)} ${this.y(p.value, minY, maxY)}`)
-      .join(' ');
-    return `${start} ${segs}`;
-  }
-
-  protected pointCx(i: number, total: number) {
-    return this.x(i, total);
-  }
-  protected pointCy(v: number, minY: number, maxY: number) {
-    return this.y(v, minY, maxY);
-  }
-
-  protected labelMinMax(min: number, max: number) {
-    return `${min} — ${max}`;
   }
 }

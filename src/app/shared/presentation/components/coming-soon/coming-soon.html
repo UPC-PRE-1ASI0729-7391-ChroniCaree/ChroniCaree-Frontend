@@ -1,7 +1,7 @@
 <div class="coming-soon-container">
   <div class="coming-soon-content">
     <!-- Icon -->
-    <div class="icon-wrapper">
+    <div class="icon-wrapper" aria-hidden="true">
       <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
@@ -17,39 +17,51 @@
     </p>
 
     <!-- Features List -->
-    <div class="features">
-      <div class="feature-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="features" role="list">
+      <div class="feature-item" role="listitem">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
         <span>En desarrollo activo</span>
       </div>
-      <div class="feature-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="feature-item" role="listitem">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
         <span>Próximo lanzamiento</span>
       </div>
-      <div class="feature-item">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="feature-item" role="listitem">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
         <span>Nuevas funcionalidades</span>
       </div>
     </div>
 
-    <!-- Back Button -->
-    <button class="back-btn" (click)="goBack()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-      </svg>
-      Volver al dashboard
-    </button>
+    <!-- Actions -->
+    <div class="actions">
+      <!-- Ir a Mensajes -->
+      <a class="btn btn-primary" routerLink="/communication/messages" aria-label="Ir a Mensajes">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M4 4h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z"></path>
+          <path d="M22 6l-10 7L2 6"></path>
+        </svg>
+        Ir a Mensajes
+      </a>
+
+      <!-- Volver al dashboard -->
+      <a class="back-btn" routerLink="/patient/dashboard" aria-label="Volver al dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver al dashboard
+      </a>
+    </div>
   </div>
 
   <!-- Animated Background -->
-  <div class="animated-bg">
+  <div class="animated-bg" aria-hidden="true">
     <div class="circle circle-1"></div>
     <div class="circle circle-2"></div>
     <div class="circle circle-3"></div>

@@ -1,0 +1,54 @@
+<!-- messages/presentation/components/inbox/inbox.component.html -->
+<div class="messages-shell">
+  <!-- Panel izquierdo: lista / bandeja -->
+  <aside class="threads-pane">
+    <header class="pane-header">
+      <h1 class="pane-title">Mensajes</h1>
+
+      <!-- CTA “Nuevo” visible para el paciente -->
+      <a *ngIf="role === 'PATIENT'" class="link-primary" routerLink="compose">+ Nuevo</a>
+    </header>
+
+    <!-- Lista de hilos -->
+    <ul *ngIf="threadsVM.length > 0; else empty" class="thread-list">
+      <li *ngFor="let t of threadsVM; trackBy: trackByVmId" class="thread-item">
+        <a
+          class="thread-link"
+          [routerLink]="role === 'DOCTOR'
+            ? ['/doctor/messages/thread', t.id]
+            : ['thread', t.id]"
+        >
+          <div class="thread-title">
+            <strong>{{ t.subject }}</strong>
+            <span class="badge" [class.closed]="t.status === 'CLOSED'">
+              {{ t.status === 'CLOSED' ? 'Cerrado' : 'Abierto' }}
+            </span>
+          </div>
+
+          <div class="thread-meta">
+            <span>{{ t.lastMessageAt | date:'short' }}</span>
+            <span class="muted">• {{ t.participantsCount }} participantes</span>
+          </div>
+
+          <div class="thread-snippet muted">
+            {{ t.lastSnippet || '—' }}
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <p>No hay conversaciones todavía.</p>
+        <a *ngIf="role === 'PATIENT'" class="btn btn-primary btn-sm" routerLink="compose">
+          Nuevo mensaje
+        </a>
+      </div>
+    </ng-template>
+  </aside>
+
+  <!-- Panel derecho: aquí se monta compose/thread -->
+  <section class="detail-pane">
+    <router-outlet></router-outlet>
+  </section>
+</div>

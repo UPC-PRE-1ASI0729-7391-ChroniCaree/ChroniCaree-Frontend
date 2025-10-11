@@ -21,12 +21,22 @@
           </svg>
           Registrar Síntoma
         </button>
+
         <button class="btn btn-secondary" routerLink="/medical-records/diagnoses">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
             <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2"/>
           </svg>
           Ver Diagnósticos ({{ activeDiagnosesCount() }})
+        </button>
+
+        <!-- NUEVO: Acción rápida a Mensajes -->
+        <button class="btn btn-secondary" routerLink="/communication/messages/compose">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 4h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Mensajes
         </button>
       </div>
     </div>
@@ -89,42 +99,14 @@
       </div>
     </div>
 
-    <!-- Main Content Grid (3 columns) -->
-    <div class="content-grid">
+
+    <!-- Main Content Grid (4 items: medications, appointments, alerts, nudges) -->
+
+  <div class="content-grid">
       <!-- Medications -->
       <div class="card medications-card">
-        <div class="card-header">
-          <h2 class="h3">Medicamentos del Día 💊</h2>
-          <a routerLink="/medications" class="link-primary">Ver todos</a>
-        </div>
-        <div class="medications-list">
-          @for (med of medications(); track med.id) {
-            <div class="medication-item" [class.taken]="med.taken">
-              <div class="medication-info">
-                <div class="medication-icon">
-                  @if (med.taken) {
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20 6L9 17L4 12" stroke="var(--color-success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  } @else {
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="12" r="10" stroke="var(--color-text-secondary)" stroke-width="2"/>
-                    </svg>
-                  }
-                </div>
-                <div class="medication-details">
-                  <p class="medication-name">{{ med.name }}</p>
-                  <p class="medication-dose">{{ med.dose }} • {{ med.schedule }}</p>
-                </div>
-              </div>
-              @if (!med.taken) {
-                <button class="btn btn-sm btn-primary" (click)="takeMedication(med.id)">Marcar tomado</button>
-              } @else {
-                <span class="status-badge success">✓ Tomado</span>
-              }
-            </div>
-          }
-        </div>
+        <!-- Use the MedicationLogComponent with limit of 4 items -->
+        <app-medication-log [maxItems]="4" />
       </div>
 
       <!-- Appointments -->
@@ -167,6 +149,9 @@
         </div>
       </div>
 
+      <!-- Alertas -->
+      <app-alert-panel [maxItems]="3" />
+
       <!-- Recordatorios/Nudges -->
       <div class="card nudges-card">
         <div class="card-header">
@@ -175,6 +160,14 @@
         </div>
         <div class="nudges-preview">
           <app-nudge-panel />
+          <!-- (Opcional) CTA pequeño -->
+          <!--
+          <div style="margin-top:.75rem;">
+            <button class="btn btn-secondary btn-sm" routerLink="/communication/messages/compose">
+              Escribir al médico
+            </button>
+          </div>
+          -->
         </div>
       </div>
     </div>
@@ -197,8 +190,8 @@
           </div>
         } @else {
           @for (symptom of recentSymptoms(); track symptom.id) {
-            <div class="symptom-item" 
-                 [class.severity-low]="symptom.severity === 'low'" 
+            <div class="symptom-item"
+                 [class.severity-low]="symptom.severity === 'low'"
                  [class.severity-medium]="symptom.severity === 'medium'"
                  [class.severity-high]="symptom.severity === 'high'">
               <div class="symptom-icon">
