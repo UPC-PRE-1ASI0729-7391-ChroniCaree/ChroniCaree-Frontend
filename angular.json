@@ -43,6 +43,13 @@
                   "maximumError": "16kB"
                 }
               ],
+              "allowedCommonJsDependencies": [
+                "canvg",
+                "html2canvas",
+                "raf",
+                "rgbcolor",
+                "core-js"
+              ],
               "outputHashing": "all"
             },
             "development": {
