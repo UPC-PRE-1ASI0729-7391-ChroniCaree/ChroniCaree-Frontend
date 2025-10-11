@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
   "build": "ng build",
-  "postbuild": "node -e \"const fs=require('fs'); const dir='dist/ChroniCaree-Frontend'; const candidates=[dir+'/index.html', dir+'/browser/index.html', dir+'/index.htm']; let found=false; for(const inFile of candidates){ if(fs.existsSync(inFile)){ try{ fs.copyFileSync(inFile, dir+'/200.html'); console.log('200.html created at', dir+'/200.html'); }catch(e){} try{ const browserOut = dir + '/browser/200.html'; if(fs.existsSync(dir + '/browser') || inFile.includes('/browser/')){ fs.copyFileSync(inFile, browserOut); console.log('200.html also created at', browserOut); } }catch(e){} found=true; break; } } if(!found){ console.warn('index.html not found at', JSON.stringify(candidates)); }\"",
+  "postbuild": "node ./scripts/postbuild-copy.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "api": "bash server/start.sh",
