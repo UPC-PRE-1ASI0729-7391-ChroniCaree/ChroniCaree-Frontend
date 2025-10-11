@@ -156,7 +156,7 @@
           <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de glucosa" shape-rendering="geometricPrecision">
             <!-- grid -->
             <g>
-              <line *ngFor="let g of gridLines; let i = index"
+              <line *ngFor="let g of gridLines(); let i = index"
                     [attr.x1]="0" [attr.x2]="600"
                     [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
                     stroke="#e9edf3" stroke-width="1"></line>
@@ -197,7 +197,7 @@
           <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de presión arterial" shape-rendering="geometricPrecision">
             <!-- grid -->
             <g>
-              <line *ngFor="let g of gridLines; let i = index"
+              <line *ngFor="let g of gridLines(); let i = index"
                     [attr.x1]="0" [attr.x2]="600"
                     [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
                     stroke="#e9edf3" stroke-width="1"></line>
@@ -255,7 +255,7 @@
           <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de saturación de oxígeno" shape-rendering="geometricPrecision">
             <!-- grid -->
             <g>
-              <line *ngFor="let g of gridLines; let i = index"
+              <line *ngFor="let g of gridLines(); let i = index"
                     [attr.x1]="0" [attr.x2]="600"
                     [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
                     stroke="#e9edf3" stroke-width="1"></line>

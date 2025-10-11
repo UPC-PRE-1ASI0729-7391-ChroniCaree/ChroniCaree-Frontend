@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   standalone: true,
@@ -12,11 +12,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToolbarDoctorComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private userStore: UserStore
+  ) {}
 
   logout(): void {
-    console.log('Doctor logout');
-
     // Clear user store and localStorage
     this.userStore.clearCurrentUser();
     
