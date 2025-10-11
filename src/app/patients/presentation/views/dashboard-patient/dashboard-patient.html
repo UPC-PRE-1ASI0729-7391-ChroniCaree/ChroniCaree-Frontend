@@ -21,12 +21,22 @@
           </svg>
           Registrar Síntoma
         </button>
+
         <button class="btn btn-secondary" routerLink="/medical-records/diagnoses">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
             <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2"/>
           </svg>
           Ver Diagnósticos ({{ activeDiagnosesCount() }})
+        </button>
+
+        <!-- NUEVO: Acción rápida a Mensajes -->
+        <button class="btn btn-secondary" routerLink="/communication/messages/compose">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 4h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Mensajes
         </button>
       </div>
     </div>
@@ -89,8 +99,10 @@
       </div>
     </div>
 
+
     <!-- Main Content Grid (4 items: medications, appointments, alerts, nudges) -->
-    <div class="content-grid">
+
+  <div class="content-grid">
       <!-- Medications -->
       <div class="card medications-card">
         <!-- Use the MedicationLogComponent with limit of 4 items -->
@@ -148,6 +160,14 @@
         </div>
         <div class="nudges-preview">
           <app-nudge-panel />
+          <!-- (Opcional) CTA pequeño -->
+          <!--
+          <div style="margin-top:.75rem;">
+            <button class="btn btn-secondary btn-sm" routerLink="/communication/messages/compose">
+              Escribir al médico
+            </button>
+          </div>
+          -->
         </div>
       </div>
     </div>
@@ -170,8 +190,8 @@
           </div>
         } @else {
           @for (symptom of recentSymptoms(); track symptom.id) {
-            <div class="symptom-item" 
-                 [class.severity-low]="symptom.severity === 'low'" 
+            <div class="symptom-item"
+                 [class.severity-low]="symptom.severity === 'low'"
                  [class.severity-medium]="symptom.severity === 'medium'"
                  [class.severity-high]="symptom.severity === 'high'">
               <div class="symptom-icon">
