@@ -25,7 +25,7 @@ export class HeaderContentComponent implements OnInit {
   currentUser = computed(() => {
     const userStr = localStorage.getItem('currentUser');
     const role = localStorage.getItem('userRole');
-    
+
     if (userStr && role) {
       const user = JSON.parse(userStr);
       return {
@@ -35,7 +35,7 @@ export class HeaderContentComponent implements OnInit {
         email: user.email
       };
     }
-    
+
     return {
       name: 'Usuario',
       role: 'Invitado',
@@ -80,6 +80,11 @@ export class HeaderContentComponent implements OnInit {
     return roleAvatars[role] || '👤';
   }
 
+  getHelpRoute(): string {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    return role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
+  }
+
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
     if (this.showNotifications()) {
@@ -103,7 +108,7 @@ export class HeaderContentComponent implements OnInit {
    */
   getProfileRoute(): string {
     const role = localStorage.getItem('userRole');
-    
+
     switch (role) {
       case 'patient':
         return '/patient/edit-profile';
@@ -126,10 +131,10 @@ export class HeaderContentComponent implements OnInit {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
-    
+
     // Clear user store
     this.userStore.setCurrentUser(null);
-    
+
     // Navigate to login
     this.router.navigate(['/iam/login']);
   }
