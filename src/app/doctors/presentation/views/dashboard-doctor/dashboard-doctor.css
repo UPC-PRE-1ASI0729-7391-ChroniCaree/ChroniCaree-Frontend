@@ -381,6 +381,156 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* ====================================
+   Pending Reviews Section
+   ==================================== */
+
+.pending-reviews-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-header h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--color-cc-dark-blue);
+}
+
+.section-header h2 svg {
+  color: var(--color-cc-green);
+}
+
+.link-primary {
+  color: var(--color-cc-green);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+}
+
+.link-primary:hover {
+  color: var(--color-cc-bold-green);
+  text-decoration: underline;
+}
+
+.pending-records-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.pending-record-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.pending-record-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-cc-green);
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.record-badge {
+  background: var(--color-warning);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.record-date {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.record-body {
+  margin-bottom: var(--spacing-md);
+}
+
+.record-patient {
+  font-size: 18px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-cc-dark-blue);
+  margin-bottom: var(--spacing-xs);
+}
+
+.record-type {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.record-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Empty States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.empty-state svg {
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.empty-state-large {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+  text-align: center;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(33, 150, 243, 0.05));
+  border-radius: var(--radius-lg);
+}
+
+.empty-state-large svg {
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-cc-green);
+}
+
+.empty-state-large h3 {
+  color: var(--color-cc-dark-blue);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state-large p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-container {
@@ -403,5 +553,9 @@
 
   .quick-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pending-records-grid {
+    grid-template-columns: 1fr;
   }
 }
