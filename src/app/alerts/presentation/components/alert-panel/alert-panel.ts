@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { AlertStore } from '../../../application/alert.store';
 import { Alert, AlertSeverity } from '../../../domain/model/alert.entity';
 import { RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-alert-panel',
@@ -19,6 +20,7 @@ import { RouterLink } from '@angular/router';
     MatButtonModule,
     MatBadgeModule,
     MatChipsModule,
+    TranslateModule,
     RouterLink
   ],
   templateUrl: './alert-panel.html',

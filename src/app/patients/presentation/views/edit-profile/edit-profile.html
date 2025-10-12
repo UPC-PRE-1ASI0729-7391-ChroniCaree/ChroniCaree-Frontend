@@ -4,15 +4,15 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="header-text">
-      <h1 class="h1">Editar Perfil</h1>
-      <p class="text">US20: Actualiza tu información personal</p>
+      <h1 class="h1">{{ 'patients.editProfile.title' | translate }}</h1>
+      <p class="text">{{ 'patients.editProfile.subtitle' | translate }}</p>
     </div>
   </div>
 
-  <ng-container *ngIf="loading()">
+    <ng-container *ngIf="loading()">
     <div class="loading-overlay">
       <mat-spinner></mat-spinner>
-      <p>Cargando perfil...</p>
+      <p>{{ 'patients.editProfile.loading' | translate }}</p>
     </div>
   </ng-container>
 
@@ -21,51 +21,51 @@
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon personal-icon">person</mat-icon>
-        <mat-card-title>Información Personal</mat-card-title>
-        <mat-card-subtitle>Datos básicos de tu perfil</mat-card-subtitle>
+  <mat-card-title>{{ 'patients.editProfile.personal.title' | translate }}</mat-card-title>
+  <mat-card-subtitle>{{ 'patients.editProfile.personal.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
+            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
             <input matInput formControlName="firstName" placeholder="Ej: María">
             <mat-icon matPrefix>badge</mat-icon>
-            <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">El nombre es requerido</mat-error>
-            <mat-error *ngIf="profileForm.get('firstName')?.hasError('minlength')">Mínimo 2 caracteres</mat-error>
+            <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">{{ 'patients.editProfile.errors.firstName.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('firstName')?.hasError('minlength')">{{ 'patients.editProfile.errors.firstName.minlength' | translate }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Apellido</mat-label>
+            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
             <input matInput formControlName="lastName" placeholder="Ej: García">
             <mat-icon matPrefix>badge</mat-icon>
-            <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">El apellido es requerido</mat-error>
-            <mat-error *ngIf="profileForm.get('lastName')?.hasError('minlength')">Mínimo 2 caracteres</mat-error>
+            <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">{{ 'patients.editProfile.errors.lastName.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('lastName')?.hasError('minlength')">{{ 'patients.editProfile.errors.lastName.minlength' | translate }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha de Nacimiento</mat-label>
+            <mat-label>{{ 'common.birthDate' | translate }}</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="birthDate" placeholder="DD/MM/YYYY">
             <mat-icon matPrefix>cake</mat-icon>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="profileForm.get('birthDate')?.hasError('required')">La fecha de nacimiento es requerida</mat-error>
-            <mat-hint *ngIf="calculatedAge() > 0">Edad: {{ calculatedAge() }} años</mat-hint>
+            <mat-error *ngIf="profileForm.get('birthDate')?.hasError('required')">{{ 'patients.editProfile.errors.birthDate.required' | translate }}</mat-error>
+            <mat-hint *ngIf="calculatedAge() > 0">{{ 'patients.editProfile.ageLabel' | translate:{ age: calculatedAge() } }}</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Teléfono</mat-label>
+            <mat-label>{{ 'common.phone' | translate }}</mat-label>
             <input matInput type="tel" formControlName="phone" placeholder="Ej: 987654321">
             <mat-icon matPrefix>phone</mat-icon>
-            <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">El teléfono es requerido</mat-error>
-            <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">Debe ser un número de 9 dígitos</mat-error>
+            <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">{{ 'patients.editProfile.errors.phone.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">{{ 'patients.editProfile.errors.phone.pattern' | translate }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width-2col">
-            <mat-label>Dirección</mat-label>
+            <mat-label>{{ 'common.address' | translate }}</mat-label>
             <input matInput formControlName="address" placeholder="Ej: Av. Principal 123, Lima">
             <mat-icon matPrefix>home</mat-icon>
-            <mat-error *ngIf="profileForm.get('address')?.hasError('required')">La dirección es requerida</mat-error>
-            <mat-error *ngIf="profileForm.get('address')?.hasError('minlength')">Mínimo 5 caracteres</mat-error>
+            <mat-error *ngIf="profileForm.get('address')?.hasError('required')">{{ 'patients.editProfile.errors.address.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('address')?.hasError('minlength')">{{ 'patients.editProfile.errors.address.minlength' | translate }}</mat-error>
           </mat-form-field>
         </div>
       </mat-card-content>
@@ -75,29 +75,29 @@
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon health-icon">monitor_weight</mat-icon>
-        <mat-card-title>Medidas Corporales</mat-card-title>
-        <mat-card-subtitle>Peso y altura para cálculo de IMC</mat-card-subtitle>
+  <mat-card-title>{{ 'patients.editProfile.measurements.title' | translate }}</mat-card-title>
+  <mat-card-subtitle>{{ 'patients.editProfile.measurements.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Peso (kg)</mat-label>
+            <mat-label>{{ 'patients.editProfile.weight' | translate }}</mat-label>
             <input matInput type="number" formControlName="weight" placeholder="Ej: 70">
             <mat-icon matPrefix>scale</mat-icon>
             <span matSuffix>kg</span>
-            <mat-error *ngIf="profileForm.get('weight')?.hasError('required')">El peso es requerido</mat-error>
-            <mat-error *ngIf="profileForm.get('weight')?.hasError('min')">El peso mínimo es 20 kg</mat-error>
-            <mat-error *ngIf="profileForm.get('weight')?.hasError('max')">El peso máximo es 300 kg</mat-error>
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('required')">{{ 'patients.editProfile.errors.weight.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('min')">{{ 'patients.editProfile.errors.weight.min' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('max')">{{ 'patients.editProfile.errors.weight.max' | translate }}</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Altura (cm)</mat-label>
+            <mat-label>{{ 'patients.editProfile.height' | translate }}</mat-label>
             <input matInput type="number" formControlName="height" placeholder="Ej: 165">
             <mat-icon matPrefix>height</mat-icon>
             <span matSuffix>cm</span>
-            <mat-error *ngIf="profileForm.get('height')?.hasError('required')">La altura es requerida</mat-error>
-            <mat-error *ngIf="profileForm.get('height')?.hasError('min')">La altura mínima es 50 cm</mat-error>
-            <mat-error *ngIf="profileForm.get('height')?.hasError('max')">La altura máxima es 250 cm</mat-error>
+            <mat-error *ngIf="profileForm.get('height')?.hasError('required')">{{ 'patients.editProfile.errors.height.required' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('height')?.hasError('min')">{{ 'patients.editProfile.errors.height.min' | translate }}</mat-error>
+            <mat-error *ngIf="profileForm.get('height')?.hasError('max')">{{ 'patients.editProfile.errors.height.max' | translate }}</mat-error>
           </mat-form-field>
         </div>
 
@@ -105,7 +105,7 @@
         <div class="bmi-display" *ngIf="calculatedBMI() > 0">
             <div class="bmi-header">
               <mat-icon class="bmi-icon">calculate</mat-icon>
-              <h3>Índice de Masa Corporal (IMC)</h3>
+              <h3>{{ 'patients.editProfile.bmi.title' | translate }}</h3>
             </div>
             <div class="bmi-result">
               <div class="bmi-value" [style.color]="bmiColor()">
@@ -130,10 +130,10 @@
                 <span class="scale-label">35+</span>
               </div>
               <div class="scale-categories">
-                <span class="category-label">Bajo</span>
-                <span class="category-label">Normal</span>
-                <span class="category-label">Sobrepeso</span>
-                <span class="category-label">Obesidad</span>
+                <span class="category-label">{{ 'patients.editProfile.bmi.labels.underweight' | translate }}</span>
+                <span class="category-label">{{ 'patients.editProfile.bmi.labels.normal' | translate }}</span>
+                <span class="category-label">{{ 'patients.editProfile.bmi.labels.overweight' | translate }}</span>
+                <span class="category-label">{{ 'patients.editProfile.bmi.labels.obesity' | translate }}</span>
               </div>
             </div>
           </div>
@@ -142,14 +142,14 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button 
+        <button 
         mat-raised-button 
         type="button" 
         (click)="onCancel()"
         class="btn-cancel"
       >
         <mat-icon>close</mat-icon>
-        Cancelar
+        {{ 'common.cancel' | translate }}
       </button>
       <button 
         mat-raised-button 
@@ -159,7 +159,7 @@
         class="btn-submit"
       >
         <mat-icon>save</mat-icon>
-        Guardar Cambios
+        {{ 'common.saveChanges' | translate }}
       </button>
     </div>
   </form>

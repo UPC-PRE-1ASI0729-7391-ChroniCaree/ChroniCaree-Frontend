@@ -3,16 +3,16 @@
     <div class="success-icon">
       <mat-icon class="check-icon">check_circle</mat-icon>
     </div>
-    <h2 class="dialog-title">¡Síntomas Registrados!</h2>
-    <p class="dialog-subtitle">Tu información ha sido guardada correctamente</p>
+  <h2 class="dialog-title">{{ 'clinical.confirmation.title' | translate }}</h2>
+  <p class="dialog-subtitle">{{ 'clinical.confirmation.subtitle' | translate }}</p>
   </div>
 
   <div class="dialog-content">
     <!-- Resumen de síntomas registrados -->
     <div class="summary-section">
-      <h3 class="section-title">
+        <h3 class="section-title">
         <mat-icon>summarize</mat-icon>
-        Resumen de tu registro
+        {{ 'clinical.confirmation.summary' | translate }}
       </h3>
       
       <div class="summary-grid">
@@ -48,21 +48,21 @@
         }
         
         <div class="summary-item">
-          <span class="item-label">Fatiga:</span>
+          <span class="item-label">{{ 'clinical.fatigue' | translate }}:</span>
           <span class="item-value severity-{{ data.fatigue > 7 ? 'high' : data.fatigue > 4 ? 'medium' : 'low' }}">
             {{ data.fatigue }}/10
           </span>
         </div>
         
         <div class="summary-item">
-          <span class="item-label">Dolor:</span>
+          <span class="item-label">{{ 'clinical.pain' | translate }}:</span>
           <span class="item-value severity-{{ data.pain > 7 ? 'high' : data.pain > 4 ? 'medium' : 'low' }}">
             {{ data.pain }}/10
           </span>
         </div>
         
         <div class="summary-item">
-          <span class="item-label">Mareo:</span>
+          <span class="item-label">{{ 'clinical.dizziness' | translate }}:</span>
           <span class="item-value severity-{{ data.dizziness > 7 ? 'high' : data.dizziness > 4 ? 'medium' : 'low' }}">
             {{ data.dizziness }}/10
           </span>
@@ -71,7 +71,7 @@
 
       @if (data.notes) {
         <div class="notes-section">
-          <p class="notes-label">Notas adicionales:</p>
+          <p class="notes-label">{{ 'clinical.notes' | translate }}:</p>
           <p class="notes-text">{{ data.notes }}</p>
         </div>
       }
@@ -83,16 +83,16 @@
         <div class="alert-box critical">
           <mat-icon class="alert-icon">warning</mat-icon>
           <div class="alert-content">
-            <h4>Valores críticos detectados</h4>
-            <p>Tu doctor será notificado inmediatamente y puede contactarte pronto.</p>
+            <h4>{{ 'clinical.confirmation.criticalValues' | translate }}</h4>
+            <p>{{ 'clinical.confirmation.doctorNotified' | translate }}</p>
           </div>
         </div>
       } @else {
         <div class="alert-box normal">
           <mat-icon class="alert-icon">notifications_active</mat-icon>
           <div class="alert-content">
-            <h4>Doctor notificado</h4>
-            <p>Tu equipo médico ha recibido tu registro y lo revisará durante tu próxima consulta.</p>
+            <h4>{{ 'clinical.confirmation.doctorNotified' | translate }}</h4>
+              <p>{{ 'clinical.confirmation.subtitle' | translate }}</p>
           </div>
         </div>
       }
@@ -100,7 +100,7 @@
       <div class="info-cards">
         <div class="info-card">
           <mat-icon>trending_up</mat-icon>
-          <p>Podrás ver el seguimiento de tus síntomas en tu historial médico</p>
+          <p>{{ 'clinical.confirmation.viewHistory' | translate }}</p>
         </div>
         <div class="info-card">
           <mat-icon>calendar_today</mat-icon>
@@ -112,12 +112,12 @@
 
   <div class="dialog-actions">
     <button mat-button class="btn-secondary" (click)="onBackToDashboard()">
-      <mat-icon>home</mat-icon>
-      Volver al Dashboard
+  <mat-icon>home</mat-icon>
+  {{ 'clinical.confirmation.backToDashboard' | translate }}
     </button>
     <button mat-raised-button color="primary" class="btn-primary" (click)="onViewHistory()">
-      <mat-icon>history</mat-icon>
-      Ver mi Historial
+  <mat-icon>history</mat-icon>
+  {{ 'clinical.confirmation.viewHistory' | translate }}
     </button>
   </div>
 </div>

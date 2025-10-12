@@ -1,0 +1,449 @@
+{
+	"alerts": {
+		"title": "Alertas",
+		"viewAll": "Ver todas",
+		"loading": "Cargando alertas...",
+		"empty": {
+			"title": "Sin alertas activas",
+			"subtitle": "No tienes alertas pendientes en este momento."
+		},
+		"actions": {
+			"acknowledge": "Reconocer",
+			"resolve": "Resolver",
+			"dismiss": "Descartar",
+			"seeAll": "Ver todas las alertas →"
+		},
+		"stats": {
+			"critical": "Críticas",
+			"high": "Altas",
+			"medium": "Medias",
+			"low": "Bajas"
+		},
+		"subtitle": "Monitorea tus signos vitales y alertas de salud",
+		"tab": {
+			"active": "Activas",
+			"acknowledged": "Reconocidas",
+			"resolved": "Resueltas"
+		},
+		"acknowledged": {
+			"empty": {
+				"title": "Sin alertas reconocidas",
+				"subtitle": "Las alertas que reconozcas aparecerán aquí"
+			}
+		},
+		"resolved": {
+			"empty": {
+				"title": "Sin alertas resueltas",
+				"subtitle": "Las alertas resueltas aparecerán aquí"
+			}
+		}
+	},
+	"clinical": {
+		"registerSymptoms": "Registrar Síntomas",
+		"saving": "Guardando síntomas...",
+		"vitalSigns": "Signos Vitales",
+		"vitalSubtitle": "Mediciones objetivas (opcional)",
+		"notes": "Notas",
+		"submit": "Guardar Síntomas",
+		"cancel": "Cancelar",
+		"fatigue": "Fatiga",
+		"pain": "Dolor",
+		"dizziness": "Mareo",
+		"none": "Ninguna",
+		"moderate": "Moderada",
+		"severe": "Severa",
+		"confirmation": {
+			"title": "¡Síntomas Registrados!",
+			"subtitle": "Tu información ha sido guardada correctamente",
+			"summary": "Resumen de tu registro",
+			"doctorNotified": "Doctor notificado",
+			"criticalValues": "Valores críticos detectados",
+			"viewHistory": "Ver mi Historial",
+			"backToDashboard": "Volver al Dashboard"
+		}
+	},
+	"patients": {
+		"loading": "Cargando tu información...",
+		"greeting": "¡Hola, {{name}}!",
+		"years": "años",
+		"registerSymptom": "Registrar Síntoma",
+		"viewDiagnoses": "Ver Diagnósticos ({{count}})",
+		"messages": "Mensajes",
+		"vitalSigns": "Signos Vitales",
+		"lastUpdate": "Última actualización",
+		"heartRate": "Frecuencia Cardíaca",
+		"bloodPressure": "Presión Arterial",
+		"temperature": "Temperatura",
+		"oxygenSaturation": "Saturación O2",
+		"upcomingAppointments": "Próximas Citas",
+		"viewAll": "Ver todas",
+		"noAppointments": "No tienes citas programadas",
+		"viewDetails": "Ver detalles",
+		"reminders": "Recordatorios",
+		"recentSymptoms": "Síntomas Recientes",
+		"viewHistory": "Ver historial",
+		"noRecentSymptoms": "No hay síntomas registrados recientemente",
+		"severity": {
+			"low": "Leve",
+			"medium": "Moderado",
+			"high": "Severo"
+		},
+		"editProfile": {
+			"title": "Editar Perfil",
+			"subtitle": "US20: Actualiza tu información personal",
+			"loading": "Cargando perfil...",
+			"personal": {
+				"title": "Información Personal",
+				"subtitle": "Datos básicos de tu perfil"
+			},
+			"errors": {
+				"firstName": {
+					"required": "El nombre es requerido",
+					"minlength": "Mínimo 2 caracteres"
+				},
+				"lastName": {
+					"required": "El apellido es requerido",
+					"minlength": "Mínimo 2 caracteres"
+				},
+				"birthDate": {
+					"required": "La fecha de nacimiento es requerida"
+				},
+				"phone": {
+					"required": "El teléfono es requerido",
+					"pattern": "Debe ser un número de 9 dígitos"
+				},
+				"address": {
+					"required": "La dirección es requerida",
+					"minlength": "Mínimo 5 caracteres"
+				},
+				"weight": {
+					"required": "El peso es requerido",
+					"min": "El peso mínimo es 20 kg",
+					"max": "El peso máximo es 300 kg"
+				},
+				"height": {
+					"required": "La altura es requerida",
+					"min": "La altura mínima es 50 cm",
+					"max": "La altura máxima es 250 cm"
+				}
+			},
+			"ageLabel": "Edad: {{age}} años",
+			"measurements": {
+				"title": "Medidas Corporales",
+				"subtitle": "Peso y altura para cálculo de IMC"
+			},
+			"weight": "Peso (kg)",
+			"height": "Altura (cm)",
+			"bmi": {
+				"title": "Índice de Masa Corporal (IMC)",
+				"labels": {
+					"underweight": "Bajo",
+					"normal": "Normal",
+					"overweight": "Sobrepeso",
+					"obesity": "Obesidad"
+				}
+			}
+		}
+	},
+	"doctors": {
+		"welcome": "Bienvenido, {{name}}",
+		"exportPdf": "Exportar PDF",
+		"exporting": "Exportando...",
+		"newAppointment": "Nueva Cita",
+		"appointmentsToday": "Citas de Hoy",
+		"viewAll": "Ver todas",
+		"noAppointmentsToday": "No hay citas programadas para hoy",
+		"review": "Revisar",
+		"allCaughtUp": "¡Todo al día!",
+		"noPendingRecords": "No hay historiales pendientes de revisión",
+		"pending": "Pendiente",
+		"reviewRecord": "Revisar historial",
+		"weeklySummary": "Resumen Semanal",
+		"consultations": "Consultas realizadas",
+		"pendingReviews": "Revisiones pendientes",
+		"activePatients": "Pacientes activos",
+		"avgDuration": "Tiempo promedio",
+		"appointments": {
+			"title": "Mis Citas",
+			"subtitle": "Gestiona tus citas con pacientes",
+			"today": "Citas de Hoy",
+			"upcoming": "Próximas Citas",
+			"loading": "Cargando citas...",
+			"empty": {
+				"title": "No hay citas",
+				"subtitle": "No se encontraron citas para el filtro seleccionado"
+			},
+			"status": {
+				"scheduled": "📅 Programada",
+				"confirmed": "✅ Confirmada",
+				"inProgress": "⏳ En Progreso",
+				"completed": "✔️ Completada",
+				"cancelled": "❌ Cancelada",
+				"noShow": "🚫 No Asistió"
+			},
+			"actions": {
+				"confirm": "Confirmar",
+				"start": "Iniciar",
+				"complete": "Completar",
+				"cancel": "Cancelar",
+				"refresh": "Actualizar",
+				"todayBadge": "HOY",
+				"scheduled": "Programadas",
+				"completed": "Completadas"
+			}
+		}
+	},
+	"common": {
+		"firstName": "Nombre",
+		"lastName": "Apellido",
+		"birthDate": "Fecha de Nacimiento",
+		"phone": "Teléfono",
+		"address": "Dirección",
+		"cancel": "Cancelar",
+		"saveChanges": "Guardar Cambios",
+		"patient": "Paciente"
+	}
+}
+		"viewAll": "Ver todas",
+		"loading": "Cargando alertas...",
+		"empty": {
+			"title": "Sin alertas activas",
+			"subtitle": "No tienes alertas pendientes en este momento."
+		},
+		"actions": {
+			"acknowledge": "Reconocer",
+			"resolve": "Resolver",
+			"dismiss": "Descartar",
+			"seeAll": "Ver todas las alertas →"
+		},
+		"stats": {
+			"critical": "Críticas",
+			"high": "Altas",
+			"medium": "Medias",
+			"low": "Bajas"
+		},
+		"subtitle": "Monitorea tus signos vitales y alertas de salud",
+		"tab": {
+			"active": "Activas",
+			"acknowledged": "Reconocidas",
+			"resolved": "Resueltas"
+		},
+		"acknowledged": {
+			"empty": {
+				"title": "Sin alertas reconocidas",
+				"subtitle": "Las alertas que reconozcas aparecerán aquí"
+			}
+		},
+		"resolved": {
+			"empty": {
+				"title": "Sin alertas resueltas",
+				"subtitle": "Las alertas resueltas aparecerán aquí"
+			}
+
+		{
+			"alerts": {
+				"title": "Alertas",
+				"viewAll": "Ver todas",
+				"loading": "Cargando alertas...",
+				"empty": {
+					"title": "Sin alertas activas",
+					"subtitle": "No tienes alertas pendientes en este momento."
+				},
+				"actions": {
+					"acknowledge": "Reconocer",
+					"resolve": "Resolver",
+					"dismiss": "Descartar",
+					"seeAll": "Ver todas las alertas →"
+				},
+				"stats": {
+					"critical": "Críticas",
+					"high": "Altas",
+					"medium": "Medias",
+					"low": "Bajas"
+				},
+				"subtitle": "Monitorea tus signos vitales y alertas de salud",
+				"tab": {
+					"active": "Activas",
+					"acknowledged": "Reconocidas",
+					"resolved": "Resueltas"
+				},
+				"acknowledged": {
+					"empty": {
+						"title": "Sin alertas reconocidas",
+						"subtitle": "Las alertas que reconozcas aparecerán aquí"
+					}
+				},
+				"resolved": {
+					"empty": {
+						"title": "Sin alertas resueltas",
+						"subtitle": "Las alertas resueltas aparecerán aquí"
+					}
+				}
+			},
+			"clinical": {
+				"registerSymptoms": "Registrar Síntomas",
+				"saving": "Guardando síntomas...",
+				"vitalSigns": "Signos Vitales",
+				"vitalSubtitle": "Mediciones objetivas (opcional)",
+				"notes": "Notas",
+				"submit": "Guardar Síntomas",
+				"cancel": "Cancelar",
+				"fatigue": "Fatiga",
+				"pain": "Dolor",
+				"dizziness": "Mareo",
+				"none": "Ninguna",
+				"moderate": "Moderada",
+				"severe": "Severa",
+				"confirmation": {
+					"title": "¡Síntomas Registrados!",
+					"subtitle": "Tu información ha sido guardada correctamente",
+					"summary": "Resumen de tu registro",
+					"doctorNotified": "Doctor notificado",
+					"criticalValues": "Valores críticos detectados",
+					"viewHistory": "Ver mi Historial",
+					"backToDashboard": "Volver al Dashboard"
+				}
+			},
+			"patients": {
+				"loading": "Cargando tu información...",
+				"greeting": "¡Hola, {{name}}!",
+				"years": "años",
+				"registerSymptom": "Registrar Síntoma",
+				"viewDiagnoses": "Ver Diagnósticos ({{count}})",
+				"messages": "Mensajes",
+				"vitalSigns": "Signos Vitales",
+				"lastUpdate": "Última actualización",
+				"heartRate": "Frecuencia Cardíaca",
+				"bloodPressure": "Presión Arterial",
+				"temperature": "Temperatura",
+				"oxygenSaturation": "Saturación O2",
+				"upcomingAppointments": "Próximas Citas",
+				"viewAll": "Ver todas",
+				"noAppointments": "No tienes citas programadas",
+				"viewDetails": "Ver detalles",
+				"reminders": "Recordatorios",
+				"recentSymptoms": "Síntomas Recientes",
+				"viewHistory": "Ver historial",
+				"noRecentSymptoms": "No hay síntomas registrados recientemente",
+				"severity": {
+					"low": "Leve",
+					"medium": "Moderado",
+					"high": "Severo"
+				},
+				"editProfile": {
+					"title": "Editar Perfil",
+					"subtitle": "US20: Actualiza tu información personal",
+					"loading": "Cargando perfil...",
+					"personal": {
+						"title": "Información Personal",
+						"subtitle": "Datos básicos de tu perfil"
+					},
+					"errors": {
+						"firstName": {
+							"required": "El nombre es requerido",
+							"minlength": "Mínimo 2 caracteres"
+						},
+						"lastName": {
+							"required": "El apellido es requerido",
+							"minlength": "Mínimo 2 caracteres"
+						},
+						"birthDate": {
+							"required": "La fecha de nacimiento es requerida"
+						},
+						"phone": {
+							"required": "El teléfono es requerido",
+							"pattern": "Debe ser un número de 9 dígitos"
+						},
+						"address": {
+							"required": "La dirección es requerida",
+							"minlength": "Mínimo 5 caracteres"
+						},
+						"weight": {
+							"required": "El peso es requerido",
+							"min": "El peso mínimo es 20 kg",
+							"max": "El peso máximo es 300 kg"
+						},
+						"height": {
+							"required": "La altura es requerida",
+							"min": "La altura mínima es 50 cm",
+							"max": "La altura máxima es 250 cm"
+						}
+					},
+					"ageLabel": "Edad: {{age}} años",
+					"measurements": {
+						"title": "Medidas Corporales",
+						"subtitle": "Peso y altura para cálculo de IMC"
+					},
+					"weight": "Peso (kg)",
+					"height": "Altura (cm)",
+					"bmi": {
+						"title": "Índice de Masa Corporal (IMC)",
+						"labels": {
+							"underweight": "Bajo",
+							"normal": "Normal",
+							"overweight": "Sobrepeso",
+							"obesity": "Obesidad"
+						}
+					}
+				}
+			},
+			"doctors": {
+				"welcome": "Bienvenido, {{name}}",
+				"exportPdf": "Exportar PDF",
+				"exporting": "Exportando...",
+				"newAppointment": "Nueva Cita",
+				"appointmentsToday": "Citas de Hoy",
+				"viewAll": "Ver todas",
+				"noAppointmentsToday": "No hay citas programadas para hoy",
+				"review": "Revisar",
+				"allCaughtUp": "¡Todo al día!",
+				"noPendingRecords": "No hay historiales pendientes de revisión",
+				"pending": "Pendiente",
+				"reviewRecord": "Revisar historial",
+				"weeklySummary": "Resumen Semanal",
+				"consultations": "Consultas realizadas",
+				"pendingReviews": "Revisiones pendientes",
+				"activePatients": "Pacientes activos",
+				"avgDuration": "Tiempo promedio",
+				"appointments": {
+					"title": "Mis Citas",
+					"subtitle": "Gestiona tus citas con pacientes",
+					"today": "Citas de Hoy",
+					"upcoming": "Próximas Citas",
+					"loading": "Cargando citas...",
+					"empty": {
+						"title": "No hay citas",
+						"subtitle": "No se encontraron citas para el filtro seleccionado"
+					},
+					"status": {
+						"scheduled": "📅 Programada",
+						"confirmed": "✅ Confirmada",
+						"inProgress": "⏳ En Progreso",
+						"completed": "✔️ Completada",
+						"cancelled": "❌ Cancelada",
+						"noShow": "🚫 No Asistió"
+					},
+					"actions": {
+						"confirm": "Confirmar",
+						"start": "Iniciar",
+						"complete": "Completar",
+						"cancel": "Cancelar",
+						"refresh": "Actualizar",
+						"todayBadge": "HOY",
+						"scheduled": "Programadas",
+						"completed": "Completadas"
+					}
+				}
+			},
+			"common": {
+				"firstName": "Nombre",
+				"lastName": "Apellido",
+				"birthDate": "Fecha de Nacimiento",
+				"phone": "Teléfono",
+				"address": "Dirección",
+				"cancel": "Cancelar",
+				"saveChanges": "Guardar Cambios",
+				"patient": "Paciente"
+			}
+		}
+

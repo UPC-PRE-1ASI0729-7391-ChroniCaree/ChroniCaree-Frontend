@@ -3,8 +3,8 @@
   <!-- Header Section -->
   <div class="dashboard-header">
     <div class="welcome-section">
-      <h1 class="h1">Bienvenido, {{ doctorName() }}</h1>
-      <p class="text">{{ specialty() }}</p>
+  <h1 class="h1">{{ 'doctors.welcome' | translate:{name: doctorName()} }}</h1>
+  <p class="text">{{ specialty() }}</p>
     </div>
 
 
@@ -16,14 +16,14 @@
           <path d="M15 2v5h5" stroke="currentColor" stroke-width="2"/>
           <path d="M7.5 16h1.5a2 2 0 0 0 0-4H7.5v4zM12 12v4m0 0h1.2a1.8 1.8 0 1 0 0-3.6H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        {{ exporting() ? 'Exportando…' : 'Exportar PDF' }}
+  {{ exporting() ? ('doctors.exporting' | translate) : ('doctors.exportPdf' | translate) }}
       </button>
 
       <a routerLink="/appointments/schedule" class="btn btn-primary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        Nueva Cita
+  {{ 'doctors.newAppointment' | translate }}
       </a>
     </div>
   </div>
@@ -38,7 +38,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <p class="stat-label">Citas Hoy</p>
+  <p class="stat-label">{{ 'doctors.appointmentsToday' | translate }}</p>
         <p class="stat-value">{{ todayAppointments() }}</p>
       </div>
     </div>
@@ -50,7 +50,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <p class="stat-label">Revisiones Pendientes</p>
+  <p class="stat-label">{{ 'doctors.pendingReviews' | translate }}</p>
         <p class="stat-value">{{ pendingReviews() }}</p>
       </div>
     </div>
@@ -65,7 +65,7 @@
         </svg>
       </div>
       <div class="stat-content">
-        <p class="stat-label">Pacientes Activos</p>
+  <p class="stat-label">{{ 'doctors.activePatients' | translate }}</p>
         <p class="stat-value">{{ activePatients() }}</p>
       </div>
     </div>
@@ -76,8 +76,8 @@
     <!-- Upcoming Appointments -->
     <div class="card">
       <div class="card-header">
-        <h2 class="h3">Citas de Hoy</h2>
-        <a routerLink="/appointments" class="link-primary">Ver todas</a>
+  <h2 class="h3">{{ 'doctors.todaysAppointments' | translate }}</h2>
+  <a routerLink="/appointments" class="link-primary">{{ 'doctors.viewAll' | translate }}</a>
       </div>
       <div class="appointments-list">
         @if (upcomingAppointments().length === 0) {
@@ -86,7 +86,7 @@
               <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
               <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <p>No hay citas programadas para hoy</p>
+            <p>{{ 'doctors.noAppointmentsToday' | translate }}</p>
           </div>
         }
         @for (appointment of upcomingAppointments(); track appointment.id) {
@@ -140,7 +140,7 @@
               <p class="alert-condition">{{ alert.condition }}</p>
               <p class="alert-time">{{ alert.time }}</p>
             </div>
-            <button class="btn btn-sm btn-primary" routerLink="/health-alerts">Revisar</button>
+            <button class="btn btn-sm btn-primary" routerLink="/health-alerts">{{ 'doctors.review' | translate }}</button>
           </div>
         }
       </div>
@@ -167,14 +167,14 @@
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
             <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <h3>¡Todo al día!</h3>
-          <p>No hay historiales pendientes de revisión</p>
+          <h3>{{ 'doctors.allCaughtUp' | translate }}</h3>
+          <p>{{ 'doctors.noPendingRecords' | translate }}</p>
         </div>
       }
       @for (record of pendingRecords(); track record.id) {
         <div class="pending-record-card">
           <div class="record-header">
-            <div class="record-badge">Pendiente</div>
+            <div class="record-badge">{{ 'doctors.pending' | translate }}</div>
             <span class="record-date">{{ record.date }}</span>
           </div>
           <div class="record-body">
@@ -183,7 +183,7 @@
           </div>
           <div class="record-actions">
             <button class="btn btn-primary btn-sm" routerLink="/medical-records/{{ record.id }}">
-              Revisar historial
+              {{ 'doctors.reviewRecord' | translate }}
             </button>
           </div>
         </div>
@@ -194,24 +194,24 @@
   <!-- Quick Stats Section -->
   <div class="quick-stats-section">
     <div class="section-header">
-      <h2 class="h2">Resumen Semanal</h2>
+  <h2 class="h2">{{ 'doctors.weeklySummary' | translate }}</h2>
     </div>
     <div class="quick-stats-grid">
       <div class="quick-stat">
         <div class="stat-number">{{ weeklyStats().consultations }}</div>
-        <div class="stat-description">Consultas realizadas</div>
+  <div class="stat-description">{{ 'doctors.consultations' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ pendingReviews() }}</div>
-        <div class="stat-description">Revisiones pendientes</div>
+  <div class="stat-description">{{ 'doctors.pendingReviews' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ activePatients() }}</div>
-        <div class="stat-description">Pacientes activos</div>
+  <div class="stat-description">{{ 'doctors.activePatients' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ weeklyStats().avgDuration }}</div>
-        <div class="stat-description">Tiempo promedio</div>
+  <div class="stat-description">{{ 'doctors.avgDuration' | translate }}</div>
       </div>
     </div>
   </div>

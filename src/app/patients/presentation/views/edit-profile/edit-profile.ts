@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -34,6 +35,7 @@ import { Patient } from '../../../domain/model/patient.entity';
     MatDialogModule,
     MatDatepickerModule,
     MatNativeDateModule
+    ,TranslateModule
   ],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css'
@@ -96,7 +98,8 @@ export class EditProfileComponent implements OnInit {
     private patientStore: PatientStore,
     private snackBar: MatSnackBar,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private translate: TranslateService
   ) {}
   
   get loading() {

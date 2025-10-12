@@ -825,6 +825,32 @@
       "isUrgent": true,
       "attachments": [],
       "id": 4
+    },
+    {
+      "senderId": "1",
+      "receiverId": "2",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "hola",
+      "content": "holaaa",
+      "timestamp": "2025-10-11T23:36:16.860Z",
+      "read": false,
+      "isUrgent": true,
+      "attachments": [],
+      "id": 5
+    },
+    {
+      "senderId": "1",
+      "receiverId": "2",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "xddd",
+      "content": "xdddddd no se",
+      "timestamp": "2025-10-11T23:36:37.782Z",
+      "read": false,
+      "isUrgent": true,
+      "attachments": [],
+      "id": 6
     }
   ],
   "diagnoses": [
