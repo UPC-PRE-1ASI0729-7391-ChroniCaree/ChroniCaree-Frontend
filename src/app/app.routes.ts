@@ -10,7 +10,7 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
 
-  // Home
+  // Home route
   {
     path: 'home',
     loadComponent: () =>
@@ -18,7 +18,7 @@ export const routes: Routes = [
     title: `${baseTitle} - Inicio`,
   },
 
-  // IAM
+  // IAM routes (Authentication & Identity)
   {
     path: 'iam',
     children: [
@@ -54,7 +54,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Patient
+  // Patient routes
   {
     path: 'patient',
     children: [
@@ -104,7 +104,7 @@ export const routes: Routes = [
     ]
   },
 
-  // Clinical
+  // Clinical routes (Symptoms & Medical Records)
   {
     path: 'clinical',
     children: [
@@ -140,7 +140,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Doctor
+  // Doctor routes
   {
     path: 'doctor',
     children: [
@@ -188,6 +188,7 @@ export const routes: Routes = [
     ]
   },
 
+
   // Communication - Messages (shared by patient and doctor)
   {
     path: 'communication/messages',
@@ -225,6 +226,7 @@ export const routes: Routes = [
     title: `${baseTitle} - Próximamente`,
   },
 
+
   // Atajos legados
   { path: 'messages', redirectTo: '/communication/messages', pathMatch: 'full' },
   { path: 'patient/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
@@ -233,16 +235,32 @@ export const routes: Routes = [
   // 404
   {
     path: '404',
-    loadComponent: () =>
-      import('./shared/presentation/components/not-found/not-found')
-        .then((m) => m.NotFoundComponent),
-    title: `${baseTitle} - Página no encontrada`,
+    loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),
+    title: `${baseTitle} - Página no encontrada`
   },
 
-  // Legacy redirects
-  { path: 'dashboard/doctor', redirectTo: 'doctor/dashboard', pathMatch: 'full' },
-  { path: 'dashboard/patient', redirectTo: 'patient/dashboard', pathMatch: 'full' },
+  // Legacy redirects for backward compatibility
+  {
+    path: 'dashboard/doctor',
+    redirectTo: 'doctor/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'dashboard/patient',
+    redirectTo: 'patient/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'tutorial',
+    loadComponent: () =>
+      import('./shared/presentation/components/tutorial-reset/tutorial-reset')
+        .then(m => m.TutorialResetComponent),
+    title: `${baseTitle} - Tutorial`
+  },
 
-  // Wildcard
-  { path: '**', redirectTo: '/404' },
+  // Wildcard route (always last) - redirect to 404
+  {
+    path: '**',
+    redirectTo: '/404'
+  }
 ];

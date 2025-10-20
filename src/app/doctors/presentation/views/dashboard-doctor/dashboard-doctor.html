@@ -1,12 +1,15 @@
+<div class="dashboard-container">
+  <!-- Onboarding Component -->
+  <app-onboarding />
 <!-- dashboard-doctor.html -->
 <div class="dashboard-container" #printArea id="print-area">
   <!-- Header Section -->
+
   <div class="dashboard-header">
     <div class="welcome-section">
   <h1 class="h1">{{ 'doctors.welcome' | translate:{name: doctorName()} }}</h1>
   <p class="text">{{ specialty() }}</p>
     </div>
-
 
     <div class="quick-actions" data-html2canvas-ignore="true">
       <button class="btn btn-secondary" (click)="onExportPdf()" [disabled]="exporting()">
@@ -116,6 +119,7 @@
     <div class="card">
       <div class="card-header">
         <h2 class="h3">Alertas Críticas</h2>
+
         <a routerLink="/health-alerts" class="link-danger">Ver todas</a>
       </div>
       <div class="alerts-list">
@@ -215,4 +219,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

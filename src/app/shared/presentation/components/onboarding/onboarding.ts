@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -94,27 +94,26 @@ export class OnboardingComponent implements OnInit {
   // Paso actual
   currentStepData = computed(() => this.steps[this.currentStep()]);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.checkIfFirstVisit();
   }
 
-  /**
-   * Verifica si es la primera visita del usuario
-   */
   private checkIfFirstVisit(): void {
-    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-    const userRole = localStorage.getItem('userRole');
+    const force = this.route.snapshot.queryParamMap.get('forceOnboarding') === 'true';
+    const hasSeen = localStorage.getItem('hasSeenOnboarding');
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
 
-    // Solo mostrar onboarding para pacientes en su primera visita
-    if (!hasSeenOnboarding && userRole === 'patient') {
-      // Pequeño delay para que cargue el dashboard primero
-      setTimeout(() => {
-        this.isVisible.set(true);
-      }, 500);
+    if (force) {
+      this.isVisible.set(true);
+      return;
+    }
+    if (!hasSeen && (role === 'patient' || role === 'doctor')) {
+      setTimeout(() => this.isVisible.set(true), 500);
     }
   }
+
 
   /**
    * Avanza al siguiente paso
@@ -159,7 +158,7 @@ export class OnboardingComponent implements OnInit {
   complete(): void {
     this.markAsCompleted();
     this.isVisible.set(false);
-    
+
     // Mostrar mensaje de bienvenida
     this.showWelcomeMessage();
   }
