@@ -3,7 +3,14 @@ import { BaseResponse } from '../../shared/infrastructure/base-response';
 import { User } from '../domain/model/user.entity';
 import { UserResource } from './user.resource';
 
+/**
+ * UserAssembler - Convierte entre entidades User y recursos UserResource
+ */
 export class UserAssembler implements BaseAssembler<User, UserResource, BaseResponse> {
+  
+  /**
+   * Convierte un recurso UserResource en una entidad User
+   */
   toEntityFromResource(resource: UserResource): User {
     return {
       id: resource.id,
@@ -16,6 +23,9 @@ export class UserAssembler implements BaseAssembler<User, UserResource, BaseResp
     };
   }
 
+  /**
+   * Convierte una entidad User en un recurso UserResource
+   */
   toResourceFromEntity(entity: User): UserResource {
     return {
       id: entity.id,
@@ -28,6 +38,9 @@ export class UserAssembler implements BaseAssembler<User, UserResource, BaseResp
     };
   }
 
+  /**
+   * Convierte una respuesta BaseResponse en una lista de entidades User (sin implementación actual)
+   */
   toEntitiesFromResponse(response: BaseResponse): User[] {
     return [];
   }

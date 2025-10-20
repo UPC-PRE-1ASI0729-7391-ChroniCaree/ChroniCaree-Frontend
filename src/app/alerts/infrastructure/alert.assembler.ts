@@ -1,7 +1,14 @@
 import { Alert } from '../domain/model/alert.entity';
 import { AlertResource } from './alert.resource';
 
+/**
+ * AlertAssembler - Convierte entre entidades Alert y recursos AlertResource
+ */
 export class AlertAssembler {
+  
+  /**
+   * Convierte un recurso AlertResource en una entidad Alert
+   */
   static toEntity(resource: AlertResource): Alert {
     return new Alert(
       resource.id,
@@ -21,6 +28,9 @@ export class AlertAssembler {
     );
   }
 
+  /**
+   * Convierte una entidad Alert en un recurso AlertResource
+   */
   static toResource(entity: Alert): AlertResource {
     return {
       id: entity.id,
@@ -40,10 +50,16 @@ export class AlertAssembler {
     };
   }
 
+  /**
+   * Convierte un arreglo de recursos AlertResource en un arreglo de entidades Alert
+   */
   static toEntityArray(resources: AlertResource[]): Alert[] {
     return resources.map(resource => this.toEntity(resource));
   }
 
+  /**
+   * Convierte un arreglo de entidades Alert en un arreglo de recursos AlertResource
+   */
   static toResourceArray(entities: Alert[]): AlertResource[] {
     return entities.map(entity => this.toResource(entity));
   }
