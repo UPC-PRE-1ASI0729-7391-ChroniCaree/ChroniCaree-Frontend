@@ -203,8 +203,6 @@
     "saveChanges": "Save Changes"
   }
 }
-    "firstName": "First Name",
-    "lastName": "Last Name",
     "birthDate": "Birth Date",
     "phone": "Phone",
     "address": "Address",
