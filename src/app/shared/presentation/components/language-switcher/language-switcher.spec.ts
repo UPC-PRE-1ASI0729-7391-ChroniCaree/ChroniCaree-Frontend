@@ -25,15 +25,15 @@ describe('LanguageSwitcherComponent', () => {
   });
 
   it('should toggle dropdown', () => {
-    expect(component.showDropdown()).toBeFalse();
+    expect(component.showDropdown).toBeFalse();
     component.toggleDropdown();
-    expect(component.showDropdown()).toBeTrue();
+    expect(component.showDropdown).toBeTrue();
   });
 
   it('should select language', () => {
     const newLanguage = component.languages[1];
     component.selectLanguage(newLanguage);
-    expect(component.currentLanguage().code).toBe(newLanguage.code);
-    expect(component.showDropdown()).toBeFalse();
+    expect(component.currentLanguage.code).toBe(newLanguage.code);
+    expect(component.showDropdown).toBeFalse();
   });
 });

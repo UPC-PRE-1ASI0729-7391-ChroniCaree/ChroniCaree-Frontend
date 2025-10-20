@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 interface Language {
   code: string;
@@ -19,18 +20,26 @@ export class LanguageSwitcherComponent {
     { code: 'es', name: 'Español', flag: '🇪🇸' },
     { code: 'en', name: 'English', flag: '🇺🇸' }
   ];
+  // track both currently selected language code and the Language object for template
+  public currentLanguage: Language = this.languages[0];
+  public showDropdown = false;
 
-  readonly currentLanguage = signal<Language>(this.languages[0]);
-  readonly showDropdown = signal(false);
+  private translate = inject(TranslateService);
+
+  constructor() {
+    const code = (this.translate.currentLang as string) || this.translate.getBrowserLang() || this.languages[0].code;
+    const found = this.languages.find(l => l.code === code);
+    if (found) this.currentLanguage = found;
+  }
 
   toggleDropdown(): void {
-    this.showDropdown.update(v => !v);
+    this.showDropdown = !this.showDropdown;
   }
 
   selectLanguage(language: Language): void {
-    this.currentLanguage.set(language);
-    this.showDropdown.set(false);
-    // Aquí puedes implementar la lógica para cambiar el idioma de la aplicación
-    console.log('Idioma cambiado a:', language.code);
+    this.translate.use(language.code);
+    this.currentLanguage = language;
+    this.showDropdown = false;
+    try { localStorage.setItem('locale', language.code); } catch { /* ignore */ }
   }
 }

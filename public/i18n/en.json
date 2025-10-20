@@ -1,0 +1,236 @@
+
+{
+  "alerts": {
+    "title": "Alerts",
+    "viewAll": "View all",
+    "loading": "Loading alerts...",
+    "empty": {
+      "title": "No active alerts",
+      "subtitle": "You're all caught up. No alerts at the moment."
+    },
+    "actions": {
+      "acknowledge": "Acknowledge",
+      "resolve": "Resolve",
+      "dismiss": "Dismiss",
+      "seeAll": "See all alerts →"
+    },
+    "stats": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "subtitle": "Monitor your vital signs and health alerts",
+    "tab": {
+      "active": "Active",
+      "acknowledged": "Acknowledged",
+      "resolved": "Resolved"
+    },
+    "acknowledged": {
+      "empty": {
+        "title": "No acknowledged alerts",
+        "subtitle": "Alerts you acknowledge will appear here"
+      }
+    },
+    "resolved": {
+      "empty": {
+        "title": "No resolved alerts",
+        "subtitle": "Resolved alerts will appear here"
+      }
+    }
+  },
+  "clinical": {
+    "registerSymptoms": "Register Symptoms",
+    "saving": "Saving symptoms...",
+    "vitalSigns": "Vital Signs",
+    "vitalSubtitle": "Objective measurements (optional)",
+    "notes": "Notes",
+    "submit": "Save Symptoms",
+    "cancel": "Cancel",
+    "fatigue": "Fatigue",
+    "pain": "Pain",
+    "dizziness": "Dizziness",
+    "none": "None",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "confirmation": {
+      "title": "Symptoms Recorded!",
+      "subtitle": "Your information has been saved successfully",
+      "summary": "Summary of your entry",
+      "doctorNotified": "Doctor notified",
+      "criticalValues": "Critical values detected",
+      "viewHistory": "View my History",
+      "backToDashboard": "Back to Dashboard"
+    }
+  },
+  "patients": {
+    "loading": "Loading your information...",
+    "greeting": "Hello, {{name}}!",
+    "years": "years",
+    "registerSymptom": "Register Symptom",
+    "viewDiagnoses": "View Diagnoses ({{count}})",
+    "messages": "Messages",
+    "vitalSigns": "Vital Signs",
+    "lastUpdate": "Last update",
+    "heartRate": "Heart Rate",
+    "bloodPressure": "Blood Pressure",
+    "temperature": "Temperature",
+    "oxygenSaturation": "Oxygen Saturation",
+    "upcomingAppointments": "Upcoming Appointments",
+    "viewAll": "View all",
+    "noAppointments": "You have no scheduled appointments",
+    "viewDetails": "View details",
+    "reminders": "Reminders",
+    "recentSymptoms": "Recent Symptoms",
+    "viewHistory": "View History",
+    "noRecentSymptoms": "No recent symptoms recorded",
+    "severity": {
+      "low": "Mild",
+      "medium": "Moderate",
+      "high": "Severe"
+    },
+    "editProfile": {
+      "title": "Edit Profile",
+      "subtitle": "US20: Update your personal information",
+      "loading": "Loading profile...",
+      "personal": {
+        "title": "Personal Information",
+        "subtitle": "Basic details of your profile"
+      },
+      "errors": {
+        "firstName": {
+          "required": "First name is required",
+          "minlength": "Minimum 2 characters"
+        },
+        "lastName": {
+          "required": "Last name is required",
+          "minlength": "Minimum 2 characters"
+        },
+        "birthDate": {
+          "required": "Birth date is required"
+        },
+        "phone": {
+          "required": "Phone is required",
+          "pattern": "Must be a 9-digit number"
+        },
+        "address": {
+          "required": "Address is required",
+          "minlength": "Minimum 5 characters"
+        },
+        "weight": {
+          "required": "Weight is required",
+          "min": "Minimum weight is 20 kg",
+          "max": "Maximum weight is 300 kg"
+        },
+        "height": {
+          "required": "Height is required",
+          "min": "Minimum height is 50 cm",
+          "max": "Maximum height is 250 cm"
+        }
+      },
+      "ageLabel": "Age: {{age}} years",
+      "measurements": {
+        "title": "Body Measurements",
+        "subtitle": "Weight and height for BMI calculation"
+      },
+      "weight": "Weight (kg)",
+      "height": "Height (cm)",
+      "bmi": {
+        "title": "Body Mass Index (BMI)",
+        "labels": {
+          "underweight": "Underweight",
+          "normal": "Normal",
+          "overweight": "Overweight",
+          "obesity": "Obesity"
+        }
+      }
+    }
+  },
+  "doctors": {
+    "welcome": "Welcome, {{name}}",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting...",
+    "newAppointment": "New Appointment",
+    "appointmentsToday": "Today's Appointments",
+    "viewAll": "View all",
+    "noAppointmentsToday": "No appointments scheduled for today",
+    "review": "Review",
+    "allCaughtUp": "All caught up!",
+    "noPendingRecords": "No pending records to review",
+    "pending": "Pending",
+    "reviewRecord": "Review record",
+    "weeklySummary": "Weekly Summary",
+    "consultations": "Consultations",
+    "pendingReviews": "Pending reviews",
+    "activePatients": "Active patients",
+    "avgDuration": "Average duration",
+    "appointments": {
+      "title": "My Appointments",
+      "subtitle": "Manage your appointments with patients",
+      "today": "Today's Appointments",
+      "upcoming": "Upcoming Appointments",
+      "loading": "Loading appointments...",
+      "empty": {
+        "title": "No appointments",
+        "subtitle": "No appointments found for the selected filter"
+      },
+      "status": {
+        "scheduled": "📅 Scheduled",
+        "confirmed": "✅ Confirmed",
+        "inProgress": "⏳ In Progress",
+        "completed": "✔️ Completed",
+        "cancelled": "❌ Cancelled",
+        "noShow": "🚫 No-show"
+      },
+      "actions": {
+        "confirm": "Confirm",
+        "start": "Start",
+        "complete": "Complete",
+        "cancel": "Cancel",
+        "todayBadge": "TODAY",
+        "scheduled": "Scheduled",
+        "completed": "Completed"
+      }
+    }
+  },
+  "common": {
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "birthDate": "Birth Date",
+    "phone": "Phone",
+    "address": "Address",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes"
+  }
+}
+    "birthDate": "Birth Date",
+    "phone": "Phone",
+    "address": "Address",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes"
+  }
+}
+  "doctors": {
+    "appointments": {
+      "title": "My Appointments",
+      "subtitle": "Manage your appointments with patients",
+      "today": "Today's Appointments",
+      "upcoming": "Upcoming Appointments",
+      "loading": "Loading appointments...",
+      "empty": {
+        "title": "No appointments",
+        "subtitle": "No appointments found for the selected filter"
+      },
+      "status": {
+        "scheduled": "📅 Scheduled",
+        "confirmed": "✅ Confirmed",
+        "inProgress": "⏳ In Progress",
+        "completed": "✔️ Completed",
+        "cancelled": "❌ Cancelled",
+        "noShow": "🚫 No-show"
+      }
+    }
+  }
+}
+
+

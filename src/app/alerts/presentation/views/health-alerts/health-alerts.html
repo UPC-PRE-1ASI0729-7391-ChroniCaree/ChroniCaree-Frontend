@@ -1,8 +1,8 @@
 <div class="health-alerts-container">
   <div class="header">
     <div class="title-section">
-      <h1>Mi Salud - Alertas 🏥</h1>
-      <p class="subtitle">Monitorea tus signos vitales y alertas de salud</p>
+  <h1>{{ 'alerts.title' | translate }} 🏥</h1>
+  <p class="subtitle">{{ 'alerts.subtitle' | translate }}</p>
     </div>
 
     <!-- Stats Cards -->
@@ -11,28 +11,28 @@
         <mat-icon>emergency</mat-icon>
         <div class="stat-content">
           <span class="stat-value">{{ stats().critical }}</span>
-          <span class="stat-label">Críticas</span>
+          <span class="stat-label">{{ 'alerts.stats.critical' | translate }}</span>
         </div>
       </div>
       <div class="stat-card high">
         <mat-icon>error</mat-icon>
         <div class="stat-content">
           <span class="stat-value">{{ stats().high }}</span>
-          <span class="stat-label">Altas</span>
+          <span class="stat-label">{{ 'alerts.stats.high' | translate }}</span>
         </div>
       </div>
       <div class="stat-card medium">
         <mat-icon>warning</mat-icon>
         <div class="stat-content">
           <span class="stat-value">{{ stats().medium }}</span>
-          <span class="stat-label">Medias</span>
+          <span class="stat-label">{{ 'alerts.stats.medium' | translate }}</span>
         </div>
       </div>
       <div class="stat-card low">
         <mat-icon>info</mat-icon>
         <div class="stat-content">
           <span class="stat-value">{{ stats().low }}</span>
-          <span class="stat-label">Bajas</span>
+          <span class="stat-label">{{ 'alerts.stats.low' | translate }}</span>
         </div>
       </div>
     </div>
@@ -41,7 +41,7 @@
   @if (loading()) {
     <div class="loading-state">
       <mat-icon>hourglass_empty</mat-icon>
-      <p>Cargando alertas...</p>
+      <p>{{ 'alerts.loading' | translate }}</p>
     </div>
   } @else {
     <mat-tab-group class="alerts-tabs">
@@ -49,7 +49,7 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon>notifications_active</mat-icon>
-          Activas
+          {{ 'alerts.tab.active' | translate }}
           @if (activeAlerts().length > 0) {
             <span class="tab-badge">{{ activeAlerts().length }}</span>
           }
@@ -58,8 +58,8 @@
         @if (activeAlerts().length === 0) {
           <div class="empty-state">
             <mat-icon>check_circle</mat-icon>
-            <h3>Sin alertas activas</h3>
-            <p>Todo está bajo control 🎉</p>
+            <h3>{{ 'alerts.empty.title' | translate }}</h3>
+            <p>{{ 'alerts.empty.subtitle' | translate }}</p>
           </div>
         } @else {
           <div class="alerts-list">
@@ -97,15 +97,15 @@
                   <div class="alert-actions">
                     <button mat-raised-button color="primary" (click)="acknowledgeAlert(alert)">
                       <mat-icon>done</mat-icon>
-                      Reconocer
+                      {{ 'alerts.actions.acknowledge' | translate }}
                     </button>
                     <button mat-raised-button color="accent" (click)="resolveAlert(alert)">
                       <mat-icon>check_circle</mat-icon>
-                      Resolver
+                      {{ 'alerts.actions.resolve' | translate }}
                     </button>
                     <button mat-button (click)="dismissAlert(alert)">
                       <mat-icon>close</mat-icon>
-                      Descartar
+                      {{ 'alerts.actions.dismiss' | translate }}
                     </button>
                   </div>
                 </div>
@@ -119,7 +119,7 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon>done</mat-icon>
-          Reconocidas
+          {{ 'alerts.tab.acknowledged' | translate }}
           @if (acknowledgedAlerts().length > 0) {
             <span class="tab-badge">{{ acknowledgedAlerts().length }}</span>
           }
@@ -128,8 +128,8 @@
         @if (acknowledgedAlerts().length === 0) {
           <div class="empty-state">
             <mat-icon>inbox</mat-icon>
-            <h3>Sin alertas reconocidas</h3>
-            <p>Las alertas que reconozcas aparecerán aquí</p>
+            <h3>{{ 'alerts.acknowledged.empty.title' | translate }}</h3>
+            <p>{{ 'alerts.acknowledged.empty.subtitle' | translate }}</p>
           </div>
         } @else {
           <div class="alerts-list">
@@ -177,7 +177,7 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon>check_circle</mat-icon>
-          Resueltas
+          {{ 'alerts.tab.resolved' | translate }}
           @if (resolvedAlerts().length > 0) {
             <span class="tab-badge">{{ resolvedAlerts().length }}</span>
           }
@@ -186,8 +186,8 @@
         @if (resolvedAlerts().length === 0) {
           <div class="empty-state">
             <mat-icon>inbox</mat-icon>
-            <h3>Sin alertas resueltas</h3>
-            <p>Las alertas resueltas aparecerán aquí</p>
+            <h3>{{ 'alerts.resolved.empty.title' | translate }}</h3>
+            <p>{{ 'alerts.resolved.empty.subtitle' | translate }}</p>
           </div>
         } @else {
           <div class="alerts-list">

@@ -3,13 +3,13 @@
     <div class="header-content">
       <div class="header-title">
         <mat-icon class="header-icon">notifications_active</mat-icon>
-        <h3>Alertas</h3>
+  <h3>{{ 'alerts.title' | translate }}</h3>
         @if (criticalCount() > 0) {
           <span class="critical-badge" [matBadge]="criticalCount()" matBadgeColor="warn" matBadgeSize="small"></span>
         }
       </div>
       <a routerLink="/patient/salud" class="view-all-link">
-        Ver todas
+        {{ 'alerts.viewAll' | translate }}
         <mat-icon>arrow_forward</mat-icon>
       </a>
     </div>
@@ -19,13 +19,13 @@
     @if (loading()) {
       <div class="loading-state">
         <mat-icon>hourglass_empty</mat-icon>
-        <p>Cargando alertas...</p>
+        <p>{{ 'alerts.loading' | translate }}</p>
       </div>
     } @else if (topAlerts().length === 0) {
       <div class="empty-state">
         <mat-icon>check_circle</mat-icon>
-        <p>Sin alertas activas</p>
-        <span class="subtitle">Todo está bajo control 🎉</span>
+        <p>{{ 'alerts.empty.title' | translate }}</p>
+        <span class="subtitle">{{ 'alerts.empty.subtitle' | translate }}</span>
       </div>
     } @else {
       <div class="alerts-list">
@@ -60,7 +60,7 @@
                     (click)="acknowledgeAlert(alert)"
                     class="action-btn">
                     <mat-icon>done</mat-icon>
-                    Reconocer
+                    {{ 'alerts.actions.acknowledge' | translate }}
                   </button>
                   <button 
                     mat-icon-button 
@@ -78,7 +78,7 @@
       @if (hasMoreAlerts()) {
         <div class="more-alerts">
           <a routerLink="/patient/salud" class="more-link">
-            Ver todas las alertas →
+            {{ 'alerts.actions.seeAll' | translate }}
           </a>
         </div>
       }

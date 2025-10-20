@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
+import { TranslateModule } from '@ngx-translate/core';
 import { AlertStore } from '../../../application/alert.store';
 import { Alert, AlertSeverity, AlertStatus } from '../../../domain/model/alert.entity';
 import { PatientStore } from '../../../../patients/application/patient.store';
@@ -21,8 +22,9 @@ import { UserStore } from '../../../../iam/application/user.store';
     MatCardModule,
     MatIconModule,
     MatButtonModule,
-    MatChipsModule,
-    MatBadgeModule
+  MatChipsModule,
+    MatBadgeModule,
+    TranslateModule
   ],
   templateUrl: './health-alerts.html',
   styleUrl: './health-alerts.css'

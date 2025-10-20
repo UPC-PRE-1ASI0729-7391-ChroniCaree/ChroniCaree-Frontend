@@ -6,6 +6,7 @@
  */
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppointmentsStore } from '../../../application/appointments.store';
 import { AppointmentStatus } from '../../../domain/model/appointment.entity';
 import { DoctorApiEndpoint } from '../../../infrastructure/doctor-api.endpoint';
@@ -13,7 +14,7 @@ import { DoctorApiEndpoint } from '../../../infrastructure/doctor-api.endpoint';
 @Component({
   selector: 'app-appointments-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './appointments-list.html',
   styleUrl: './appointments-list.css'
 })
@@ -156,17 +157,17 @@ export class AppointmentsListComponent implements OnInit {
   getStatusText(status: AppointmentStatus): string {
     switch (status) {
       case AppointmentStatus.SCHEDULED:
-        return '📅 Programada';
+        return 'doctors.appointments.status.scheduled';
       case AppointmentStatus.CONFIRMED:
-        return '✅ Confirmada';
+        return 'doctors.appointments.status.confirmed';
       case AppointmentStatus.IN_PROGRESS:
-        return '⏳ En Progreso';
+        return 'doctors.appointments.status.inProgress';
       case AppointmentStatus.COMPLETED:
-        return '✔️ Completada';
+        return 'doctors.appointments.status.completed';
       case AppointmentStatus.CANCELLED:
-        return '❌ Cancelada';
+        return 'doctors.appointments.status.cancelled';
       case AppointmentStatus.NO_SHOW:
-        return '🚫 No Asistió';
+        return 'doctors.appointments.status.noShow';
       default:
         return status;
     }

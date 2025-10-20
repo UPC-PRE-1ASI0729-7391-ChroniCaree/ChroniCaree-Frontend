@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
 import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
@@ -17,7 +18,7 @@ import { Appointment } from '../../../../doctors/domain/model/appointment.entity
 @Component({
   selector: 'app-dashboard-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, AlertPanelComponent],
+  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, AlertPanelComponent, TranslateModule],
   templateUrl: './dashboard-patient.html',
   styleUrl: './dashboard-patient.css'
 })

@@ -5,22 +5,22 @@
   <ng-container *ngIf="loading(); else mainContent">
     <div class="loading-overlay">
       <div class="spinner"></div>
-      <p>Cargando tu información...</p>
+      <p>{{ 'patients.loading' | translate }}</p>
     </div>
   </ng-container>
   <ng-template #mainContent>
     <!-- Header Section -->
     <div class="dashboard-header">
       <div class="welcome-section">
-        <h1 class="h1">¡Hola, {{ patientName() }}! 👋</h1>
-        <p class="text">{{ age() }} años • IMC: {{ bmi() }} • {{ primaryCondition() }}</p>
+  <h1 class="h1">{{ 'patients.greeting' | translate:{name: patientName()} }} 👋</h1>
+  <p class="text">{{ age() }} {{ 'patients.years' | translate }} • IMC: {{ bmi() }} • {{ primaryCondition() }}</p>
       </div>
       <div class="quick-actions">
         <button class="btn btn-primary" routerLink="/clinical/symptoms/register">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Registrar Síntoma
+          {{ 'patients.registerSymptom' | translate }}
         </button>
 
         <button class="btn btn-secondary" routerLink="/medical-records/diagnoses">
@@ -28,7 +28,7 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
             <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2"/>
           </svg>
-          Ver Diagnósticos ({{ activeDiagnosesCount() }})
+          {{ 'patients.viewDiagnoses' | translate:{count: activeDiagnosesCount()} }}
         </button>
 
         <!-- NUEVO: Acción rápida a Mensajes -->
@@ -37,7 +37,7 @@
             <path d="M4 4h16v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4Z" stroke="currentColor" stroke-width="2"/>
             <path d="M22 6l-10 7L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Mensajes
+          {{ 'patients.messages' | translate }}
         </button>
       </div>
     </div>
@@ -45,8 +45,8 @@
     <!-- Vital Signs Card -->
     <div class="vital-signs-section">
       <div class="section-header">
-        <h2 class="h2">Signos Vitales</h2>
-        <span class="last-update">Última actualización: {{ vitalSigns().lastUpdate }}</span>
+  <h2 class="h2">{{ 'patients.vitalSigns' | translate }}</h2>
+  <span class="last-update">{{ 'patients.lastUpdate' | translate }}: {{ vitalSigns().lastUpdate }}</span>
       </div>
       <div class="vital-signs-grid">
         <div class="vital-card heart-rate">
@@ -56,7 +56,7 @@
             </svg>
           </div>
           <div class="vital-content">
-            <p class="vital-label">Frecuencia Cardíaca</p>
+            <p class="vital-label">{{ 'patients.heartRate' | translate }}</p>
             <p class="vital-value">{{ vitalSigns().heartRate }} <span class="unit">bpm</span></p>
           </div>
         </div>
@@ -68,7 +68,7 @@
             </svg>
           </div>
           <div class="vital-content">
-            <p class="vital-label">Presión Arterial</p>
+            <p class="vital-label">{{ 'patients.bloodPressure' | translate }}</p>
             <p class="vital-value">{{ vitalSigns().bloodPressure }} <span class="unit">mmHg</span></p>
           </div>
         </div>
@@ -80,7 +80,7 @@
             </svg>
           </div>
           <div class="vital-content">
-            <p class="vital-label">Temperatura</p>
+            <p class="vital-label">{{ 'patients.temperature' | translate }}</p>
             <p class="vital-value">{{ vitalSigns().temperature }} <span class="unit">°C</span></p>
           </div>
         </div>
@@ -93,7 +93,7 @@
             </svg>
           </div>
           <div class="vital-content">
-            <p class="vital-label">Saturación O2</p>
+            <p class="vital-label">{{ 'patients.oxygenSaturation' | translate }}</p>
             <p class="vital-value">{{ vitalSigns().oxygen }} <span class="unit">%</span></p>
           </div>
         </div>
@@ -113,8 +113,8 @@
       <!-- Appointments -->
       <div class="card appointments-card">
         <div class="card-header">
-          <h2 class="h3">Próximas Citas 📅</h2>
-          <a routerLink="/appointments" class="link-primary">Ver todas</a>
+          <h2 class="h3">{{ 'patients.upcomingAppointments' | translate }} 📅</h2>
+          <a routerLink="/appointments" class="link-primary">{{ 'patients.viewAll' | translate }}</a>
         </div>
         <div class="appointments-list">
           <ng-container *ngIf="upcomingAppointments().length === 0; else hasAppointments">
@@ -123,7 +123,7 @@
                 <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
                 <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
-              <p>No tienes citas programadas</p>
+              <p>{{ 'patients.noAppointments' | translate }}</p>
             </div>
           </ng-container>
           <ng-template #hasAppointments>
@@ -139,7 +139,7 @@
                 <p class="appointment-specialty">{{ appointment.specialty }}</p>
                 <p class="appointment-datetime">{{ appointment.date }} • {{ appointment.time }}</p>
               </div>
-              <button class="btn-icon" title="Ver detalles">
+                <button class="btn-icon" title="{{ 'patients.viewDetails' | translate }}">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -155,8 +155,8 @@
       <!-- Recordatorios/Nudges -->
       <div class="card nudges-card">
         <div class="card-header">
-          <h2 class="h3">Recordatorios 🔔</h2>
-          <a routerLink="/patient/recordatorios" class="link-primary">Ver todos</a>
+          <h2 class="h3">{{ 'patients.reminders' | translate }} 🔔</h2>
+          <a routerLink="/patient/recordatorios" class="link-primary">{{ 'patients.viewAll' | translate }}</a>
         </div>
         <div class="nudges-preview">
           <app-nudge-panel />
@@ -175,8 +175,8 @@
     <!-- Recent Symptoms (Full Width) -->
     <div class="card symptoms-card">
       <div class="card-header">
-        <h2 class="h3">Síntomas Recientes 🩺</h2>
-        <a routerLink="/medical-records/diagnoses" class="link-primary">Ver historial médico</a>
+  <h2 class="h3">{{ 'patients.recentSymptoms' | translate }} 🩺</h2>
+  <a routerLink="/medical-records/diagnoses" class="link-primary">{{ 'patients.viewHistory' | translate }}</a>
       </div>
       <div class="symptoms-list">
         <ng-container *ngIf="recentSymptoms().length === 0; else hasSymptoms">
@@ -185,8 +185,8 @@
               <path d="M20.84 4.61C19.9 3.67 17.5 3 12 3s-7.9.67-8.84 1.61C2.22 5.55 2 7.13 2 12s.22 6.45 1.16 7.39C4.1 20.33 6.5 21 12 21s7.9-.67 8.84-1.61C21.78 18.45 22 16.87 22 12s-.22-6.45-1.16-7.39z" stroke="currentColor" stroke-width="2"/>
               <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <p>No hay síntomas registrados recientemente</p>
-            <button class="btn btn-primary btn-sm" routerLink="/clinical/symptoms/register">Registrar síntoma</button>
+            <p>{{ 'patients.noRecentSymptoms' | translate }}</p>
+            <button class="btn btn-primary btn-sm" routerLink="/clinical/symptoms/register">{{ 'patients.registerSymptom' | translate }}</button>
           </div>
         </ng-container>
         <ng-template #hasSymptoms>
@@ -216,8 +216,8 @@
               <p class="symptom-name">{{ symptom.symptom }}</p>
               <p class="symptom-time">{{ symptom.date }} • {{ symptom.time }}</p>
             </div>
-            <span class="severity-badge" [class]="'severity-' + symptom.severity">
-              {{ symptom.severity === 'low' ? 'Leve' : symptom.severity === 'medium' ? 'Moderado' : 'Severo' }}
+              <span class="severity-badge" [class]="'severity-' + symptom.severity">
+              {{ symptom.severity === 'low' ? ('patients.severity.low' | translate) : symptom.severity === 'medium' ? ('patients.severity.medium' | translate) : ('patients.severity.high' | translate) }}
             </span>
           </div>
         </ng-template>

@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material/slider';
+import { TranslateModule } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -27,8 +28,8 @@ import { RecordType, ReviewStatus } from '../../../../doctors/domain/model/medic
   selector: 'app-register-symptoms',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
+  CommonModule,
+  ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -37,7 +38,8 @@ import { RecordType, ReviewStatus } from '../../../../doctors/domain/model/medic
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatDialogModule
+    MatDialogModule,
+    TranslateModule
   ],
   templateUrl: './register-symptoms.html',
   styleUrl: './register-symptoms.css'

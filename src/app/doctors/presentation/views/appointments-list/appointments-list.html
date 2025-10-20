@@ -2,12 +2,12 @@
   <!-- Header -->
   <header class="appointments-header">
     <div class="header-content">
-      <h1>📅 Mis Citas Médicas</h1>
-      <p class="subtitle">Gestiona tus citas con pacientes</p>
+  <h1>📅 {{ 'doctors.appointments.title' | translate }}</h1>
+  <p class="subtitle">{{ 'doctors.appointments.subtitle' | translate }}</p>
     </div>
     <button class="btn-refresh" (click)="refresh()" [disabled]="loading()">
       <span class="material-icons">refresh</span>
-      Actualizar
+      {{ 'doctors.appointments.actions.refresh' | translate }}
     </button>
   </header>
 
@@ -17,7 +17,7 @@
       <div class="stat-icon">📍</div>
       <div class="stat-info">
         <h3>{{ todayCount() }}</h3>
-        <p>Citas Hoy</p>
+  <p>{{ 'doctors.appointments.today' | translate }}</p>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
       <div class="stat-icon">🗓️</div>
       <div class="stat-info">
         <h3>{{ upcomingCount() }}</h3>
-        <p>Próximas Citas</p>
+  <p>{{ 'doctors.appointments.upcoming' | translate }}</p>
       </div>
     </div>
 
@@ -33,7 +33,7 @@
       <div class="stat-icon">📅</div>
       <div class="stat-info">
         <h3>{{ scheduledAppointments().length }}</h3>
-        <p>Programadas</p>
+  <p>{{ 'doctors.appointments.actions.scheduled' | translate }}</p>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
       <div class="stat-icon">✅</div>
       <div class="stat-info">
         <h3>{{ completedAppointments().length }}</h3>
-        <p>Completadas</p>
+  <p>{{ 'doctors.appointments.actions.completed' | translate }}</p>
       </div>
     </div>
   </div>
@@ -52,25 +52,25 @@
       class="tab"
       [class.active]="selectedTab() === 'upcoming'"
       (click)="setTab('upcoming')">
-      Próximas ({{ upcomingCount() }})
+      {{ 'doctors.appointments.upcoming' | translate }} ({{ upcomingCount() }})
     </button>
     <button
       class="tab"
       [class.active]="selectedTab() === 'today'"
       (click)="setTab('today')">
-      Hoy ({{ todayCount() }})
+      {{ 'doctors.appointments.today' | translate }} ({{ todayCount() }})
     </button>
     <button
       class="tab"
       [class.active]="selectedTab() === 'all'"
       (click)="setTab('all')">
-      Todas ({{ totalAppointments() }})
+      {{ 'doctors.appointments.all' | translate }} ({{ totalAppointments() }})
     </button>
     <button
       class="tab"
       [class.active]="selectedTab() === 'completed'"
       (click)="setTab('completed')">
-      Completadas ({{ completedAppointments().length }})
+      {{ 'doctors.appointments.completed' | translate }} ({{ completedAppointments().length }})
     </button>
   </div>
 
@@ -78,7 +78,7 @@
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Cargando citas...</p>
+  <p>{{ 'doctors.appointments.loading' | translate }}</p>
     </div>
   }
 
@@ -97,8 +97,8 @@
       @if (getFilteredAppointments().length === 0) {
         <div class="empty-state">
           <span class="material-icons">event_busy</span>
-          <h3>No hay citas</h3>
-          <p>No se encontraron citas para el filtro seleccionado</p>
+          <h3>{{ 'doctors.appointments.empty.title' | translate }}</h3>
+          <p>{{ 'doctors.appointments.empty.subtitle' | translate }}</p>
         </div>
       } @else {
         @for (appointment of getFilteredAppointments(); track appointment.id) {
@@ -110,7 +110,7 @@
                   <span class="material-icons">calendar_today</span>
                   {{ formatDate(appointment.date) }}
                   @if (isToday(appointment.date)) {
-                    <span class="today-badge">HOY</span>
+                    <span class="today-badge">{{ 'doctors.appointments.actions.todayBadge' | translate }}</span>
                   }
                 </div>
                 <div class="time">
@@ -119,7 +119,7 @@
                 </div>
               </div>
               <div class="appointment-status" [ngClass]="getStatusClass(appointment.status)">
-                {{ getStatusText(appointment.status) }}
+                {{ (getStatusText(appointment.status) | translate) || getStatusText(appointment.status) }}
               </div>
             </div>
 
@@ -129,7 +129,7 @@
                 <span class="material-icons">person</span>
               </div>
               <div class="patient-info">
-                <h4>{{ appointment.patientName || 'Paciente' }}</h4>
+                <h4>{{ appointment.patientName || ('common.patient' | translate) }}</h4>
                 <div class="patient-contact">
                   @if (appointment.patientPhone) {
                     <span>📱 {{ appointment.patientPhone }}</span>
@@ -159,28 +159,28 @@
               @if (appointment.status === AppointmentStatus.SCHEDULED) {
                 <button class="btn-action btn-confirm" (click)="updateStatus(appointment.id, 'confirmed')">
                   <span class="material-icons">check_circle</span>
-                  Confirmar
+                  {{ 'doctors.appointments.actions.confirm' | translate }}
                 </button>
               }
               
               @if (appointment.status === AppointmentStatus.CONFIRMED || appointment.status === AppointmentStatus.SCHEDULED) {
                 <button class="btn-action btn-start" (click)="updateStatus(appointment.id, 'in_progress')">
                   <span class="material-icons">play_circle</span>
-                  Iniciar
+                  {{ 'doctors.appointments.actions.start' | translate }}
                 </button>
               }
               
               @if (appointment.status === AppointmentStatus.IN_PROGRESS) {
                 <button class="btn-action btn-complete" (click)="updateStatus(appointment.id, 'completed')">
                   <span class="material-icons">done_all</span>
-                  Completar
+                  {{ 'doctors.appointments.actions.complete' | translate }}
                 </button>
               }
               
               @if (appointment.status !== AppointmentStatus.CANCELLED && appointment.status !== AppointmentStatus.COMPLETED) {
                 <button class="btn-action btn-cancel" (click)="updateStatus(appointment.id, 'cancelled')">
                   <span class="material-icons">cancel</span>
-                  Cancelar
+                  {{ 'doctors.appointments.actions.cancel' | translate }}
                 </button>
               }
             </div>

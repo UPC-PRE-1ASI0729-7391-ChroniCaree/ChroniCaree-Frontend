@@ -4,14 +4,14 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="header-text">
-      <h1 class="h1">Registrar Síntomas</h1>
+      <h1 class="h1">{{ 'clinical.registerSymptoms' | translate }}</h1>
     </div>
   </div>
 
   @if (loading()) {
     <div class="loading-overlay">
-      <mat-spinner></mat-spinner>
-      <p>Guardando síntomas...</p>
+  <mat-spinner></mat-spinner>
+  <p>{{ 'clinical.saving' | translate }}</p>
     </div>
   }
 
@@ -20,8 +20,8 @@
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon vital-icon">favorite</mat-icon>
-        <mat-card-title>Signos Vitales</mat-card-title>
-        <mat-card-subtitle>Mediciones objetivas (opcional)</mat-card-subtitle>
+  <mat-card-title>{{ 'clinical.vitalSigns' | translate }}</mat-card-title>
+  <mat-card-subtitle>{{ 'clinical.vitalSubtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <div class="form-grid">
@@ -86,7 +86,7 @@
           <div class="slider-header">
             <label class="slider-label">
               <mat-icon class="slider-icon">bedtime</mat-icon>
-              Nivel de Fatiga
+              {{ 'clinical.fatigue' | translate }}
             </label>
             <span class="slider-value">{{ fatigueValue() }} - {{ formatLabel(fatigueValue()) }}</span>
           </div>
@@ -98,10 +98,10 @@
             (input)="onFatigueChange($event)"
             class="custom-slider"
           >
-          <div class="slider-labels">
-            <span>Ninguna</span>
-            <span>Moderada</span>
-            <span>Extrema</span>
+            <div class="slider-labels">
+            <span>{{ 'clinical.none' | translate }}</span>
+            <span>{{ 'clinical.moderate' | translate }}</span>
+            <span>{{ 'clinical.severe' | translate }}</span>
           </div>
         </div>
 
@@ -110,7 +110,7 @@
           <div class="slider-header">
             <label class="slider-label">
               <mat-icon class="slider-icon">healing</mat-icon>
-              Nivel de Dolor
+              {{ 'clinical.pain' | translate }}
             </label>
             <span class="slider-value">{{ painValue() }} - {{ formatLabel(painValue()) }}</span>
           </div>
@@ -123,9 +123,9 @@
             class="custom-slider"
           >
           <div class="slider-labels">
-            <span>Sin dolor</span>
-            <span>Moderado</span>
-            <span>Severo</span>
+            <span>{{ 'clinical.none' | translate }}</span>
+            <span>{{ 'clinical.moderate' | translate }}</span>
+            <span>{{ 'clinical.severe' | translate }}</span>
           </div>
         </div>
 
@@ -134,7 +134,7 @@
           <div class="slider-header">
             <label class="slider-label">
               <mat-icon class="slider-icon">rotate_right</mat-icon>
-              Nivel de Mareo
+              {{ 'clinical.dizziness' | translate }}
             </label>
             <span class="slider-value">{{ dizzinessValue() }} - {{ formatLabel(dizzinessValue()) }}</span>
           </div>
@@ -147,9 +147,9 @@
             class="custom-slider"
           >
           <div class="slider-labels">
-            <span>Ninguno</span>
-            <span>Moderado</span>
-            <span>Severo</span>
+            <span>{{ 'clinical.none' | translate }}</span>
+            <span>{{ 'clinical.moderate' | translate }}</span>
+            <span>{{ 'clinical.severe' | translate }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -159,12 +159,12 @@
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon notes-icon">note</mat-icon>
-        <mat-card-title>Notas Adicionales</mat-card-title>
-        <mat-card-subtitle>Describe cualquier otro síntoma o detalle importante</mat-card-subtitle>
+  <mat-card-title>{{ 'clinical.notes' | translate }}</mat-card-title>
+  <mat-card-subtitle>Describe cualquier otro síntoma o detalle importante</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Notas</mat-label>
+          <mat-label>{{ 'clinical.notes' | translate }}</mat-label>
           <textarea 
             matInput 
             formControlName="notes" 
@@ -186,7 +186,7 @@
         class="btn-cancel"
       >
         <mat-icon>close</mat-icon>
-        Cancelar
+        {{ 'clinical.cancel' | translate }}
       </button>
       <button 
         mat-raised-button 
@@ -196,7 +196,7 @@
         class="btn-submit"
       >
         <mat-icon>check</mat-icon>
-        Guardar Síntomas
+        {{ 'clinical.submit' | translate }}
       </button>
     </div>
   </form>
