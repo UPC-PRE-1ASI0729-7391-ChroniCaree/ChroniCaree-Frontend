@@ -39,6 +39,7 @@ export class HeaderContentComponent implements OnInit {
     // Fallback to localStorage if UserStore empty
     const userStr = localStorage.getItem('currentUser');
     const role = localStorage.getItem('userRole');
+
     if (userStr && role) {
       const user = JSON.parse(userStr);
       return {
@@ -93,6 +94,11 @@ export class HeaderContentComponent implements OnInit {
     return roleAvatars[role] || '👤';
   }
 
+  getHelpRoute(): string {
+    const role = (localStorage.getItem('userRole') || '').toLowerCase();
+    return role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
+  }
+
   toggleNotifications(): void {
     this.showNotifications.update(v => !v);
     if (this.showNotifications()) {
@@ -115,6 +121,7 @@ export class HeaderContentComponent implements OnInit {
    * Obtiene la ruta del perfil según el rol del usuario
    */
   getProfileRoute(): string {
+
     const role = localStorage.getItem('userRole') || this.userStore.currentUser$()?.role;
     
     switch (role) {
@@ -135,6 +142,11 @@ export class HeaderContentComponent implements OnInit {
   }
 
   logout(): void {
+    // Clear localStorage
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userRole');
+
     // Use UserStore to clear session (this will clear localStorage and emit userChanged)
     this.userStore.clearCurrentUser();
     // Navigate to login

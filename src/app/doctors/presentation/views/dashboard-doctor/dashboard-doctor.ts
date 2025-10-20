@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { PdfExportResponse } from '../../../../shared/infrastructure/pdf-export.response';
+import {OnboardingComponent} from '../../../../shared/presentation/components/onboarding/onboarding';
 import { UserStore } from '../../../../iam/application/user.store';
 import { DoctorStore } from '../../../application/doctor.store';
 import { AppointmentsStore } from '../../../application/appointments.store';
@@ -16,7 +17,7 @@ import { ReviewStatus } from '../../../domain/model/medical-record.entity';
 @Component({
   selector: 'app-dashboard-doctor',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatCardModule, MatButtonToggleModule],
+  imports: [CommonModule, RouterLink, OnboardingComponent],
   templateUrl: './dashboard-doctor.html',
   styleUrl: './dashboard-doctor.css'
 })
@@ -186,8 +187,9 @@ export class DashboardDoctor implements OnInit {
 
   ngOnInit(): void {
     console.log('Dashboard Doctor inicializado');
-    
+
     // Verificar autenticación
+
     let user = this.currentUser();
     
     if (!user) {
