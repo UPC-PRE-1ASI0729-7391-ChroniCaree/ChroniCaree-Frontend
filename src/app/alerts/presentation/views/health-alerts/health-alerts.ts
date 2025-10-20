@@ -10,6 +10,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { AlertStore } from '../../../application/alert.store';
 import { Alert, AlertSeverity, AlertStatus } from '../../../domain/model/alert.entity';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   selector: 'app-health-alerts',
@@ -29,6 +30,7 @@ import { PatientStore } from '../../../../patients/application/patient.store';
 export class HealthAlertsComponent implements OnInit {
   private readonly alertStore = inject(AlertStore);
   private readonly patientStore = inject(PatientStore);
+  private readonly userStore = inject(UserStore);
   private readonly router = inject(Router);
 
   readonly alerts = computed(() => this.alertStore.alerts());
@@ -51,19 +53,15 @@ export class HealthAlertsComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Verificar autenticación
-    const currentUserStr = localStorage.getItem('currentUser');
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-
-    if (!currentUserStr || isAuthenticated !== 'true') {
+    // Determine current user via UserStore (preferred) or fallback to localStorage
+    const currentUser = this.userStore.currentUser$() || (JSON.parse(localStorage.getItem('currentUser') || 'null'));
+    if (!currentUser || !currentUser.id) {
       console.error('❌ Health-Alerts: Usuario no autenticado');
       this.router.navigate(['/iam/login']);
       return;
     }
 
-    const currentUser = JSON.parse(currentUserStr);
     const userId = currentUser.id;
-
     console.log(`🔍 Health-Alerts: Usuario actual ID: ${userId}`);
 
     // Buscar el paciente asociado al usuario actual
@@ -87,6 +85,28 @@ export class HealthAlertsComponent implements OnInit {
         console.error('❌ Health-Alerts: Error cargando pacientes:', err);
       }
     });
+
+
+    // React to user changes so alerts reload automatically
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const cur = detailUser || this.userStore.currentUser$();
+        const userId = cur?.id;
+        if (userId) {
+          this.patientStore.loadAllPatients().subscribe({
+            next: (patients) => {
+              const patient = patients.find(p => p.userId === userId);
+              if (patient) {
+                this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe();
+              }
+            }
+          });
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

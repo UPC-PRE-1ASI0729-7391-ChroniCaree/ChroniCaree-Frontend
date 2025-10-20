@@ -15,6 +15,7 @@ import { PatientStore } from '../../../../patients/application/patient.store';
 import { Medication, MedicationStatus } from '../../../domain/model/medication.entity';
 import { MedicationEditDialogComponent } from '../../components/medication-edit-dialog/medication-edit-dialog';
 import { MedicationDeleteDialogComponent } from '../../components/medication-delete-dialog/medication-delete-dialog';
+import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   selector: 'app-medication-history',
@@ -41,24 +42,21 @@ export class MedicationHistoryComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly userStore = inject(UserStore);
 
   // ✅ Signal para almacenar el patientId actual (string porque así está en db.json)
   private readonly currentPatientId = signal<string | null>(null);
 
   // ✅ Computed signals que filtran por paciente actual
-  medications = computed(() => {
+  medications = computed((): Medication[] => {
     const patientId = this.currentPatientId();
     if (!patientId) return [];
     return this.medicationStore.medications().filter(m => m.patientId === patientId);
   });
-
-  activeMedications = computed(() => {
-    const patientId = this.currentPatientId();
-    if (!patientId) return [];
-    return this.medicationStore.activeMedications().filter(m => m.patientId === patientId);
-  });
-
+  
+  // Expose loading and activeMedications for template bindings
   loading = this.medicationStore.loading;
+  activeMedications = this.medicationStore.activeMedications;
   
   // ✅ Adherence stats filtrado por paciente
   adherenceStats = computed(() => {
@@ -81,31 +79,26 @@ export class MedicationHistoryComponent implements OnInit {
   selectedTab = signal(0);
 
   ngOnInit(): void {
-    // ✅ Verificar autenticación y cargar medicamentos del paciente actual
-    const currentUserStr = localStorage.getItem('currentUser');
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-
-    if (!currentUserStr || isAuthenticated !== 'true') {
+    // Determine current user via UserStore or fallback to localStorage
+    const currentUser = this.userStore.currentUser$() || (JSON.parse(localStorage.getItem('currentUser') || 'null'));
+    if (!currentUser || !currentUser.id) {
       console.error('❌ Medication-History: Usuario no autenticado');
       this.router.navigate(['/iam/login']);
       return;
     }
 
-    const currentUser = JSON.parse(currentUserStr);
     const userId = currentUser.id;
-
     console.log(`🔍 Medication-History: Usuario actual ID: ${userId}`);
 
-    // ✅ Buscar el paciente asociado al usuario actual
+    // Buscar el paciente asociado al usuario actual
     this.patientStore.loadAllPatients().subscribe({
       next: (patients) => {
         const patient = patients.find(p => p.userId === userId);
-
         if (patient) {
           console.log(`✅ Medication-History: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
           const patientIdStr = patient.id.toString();
           this.currentPatientId.set(patientIdStr);
-          
+
           // ✅ Cargar medicamentos del paciente actual (con force reload)
           this.medicationStore.forceReload(patientIdStr).subscribe({
             next: (medications) => {
@@ -121,6 +114,30 @@ export class MedicationHistoryComponent implements OnInit {
         console.error('❌ Medication-History: Error cargando pacientes:', err);
       }
     });
+
+    // React to user changes (login/logout/switch)
+    try {
+      window.addEventListener('userChanged', (ev: any) => {
+        const detailUser = ev?.detail;
+        const cur = detailUser || this.userStore.currentUser$();
+        const userId = cur?.id;
+        if (userId) {
+          console.log('Medication-History: userChanged detected, reloading patient data for userId', userId);
+          this.patientStore.loadAllPatients().subscribe({
+            next: (patients) => {
+              const patient = patients.find(p => p.userId === userId);
+              if (patient) {
+                const patientIdStr = patient.id.toString();
+                this.currentPatientId.set(patientIdStr);
+                this.medicationStore.forceReload(patientIdStr).subscribe();
+              }
+            }
+          });
+        }
+      });
+    } catch (e) {
+      // ignore
+    }
   }
 
   /**

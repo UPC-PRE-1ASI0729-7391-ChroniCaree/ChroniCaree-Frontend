@@ -13,8 +13,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SymptomStore } from '../../../application/symptom.store';
 import { Symptom } from '../../../domain/model/symptom.entity';
+import { MedicalRecord } from '../../../../doctors/domain/model/medical-record.entity';
 import { SymptomConfirmationDialogComponent } from '../../components/symptom-confirmation-dialog/symptom-confirmation-dialog';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { UserStore } from '../../../../iam/application/user.store';
+import { MedicalRecordsStore } from '../../../../doctors/application/medical-records.store';
+import { RecordType, ReviewStatus } from '../../../../doctors/domain/model/medical-record.entity';
 
 /**
  * Register Symptoms View - Registro de síntomas diarios
@@ -45,9 +49,9 @@ export class RegisterSymptomsComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
-
+  private readonly medicalRecordsStore = inject(MedicalRecordsStore);
   symptomForm!: FormGroup;
-  
+
   // Valores de escalas (1-10)
   fatigueValue = signal(5);
   painValue = signal(5);
@@ -55,39 +59,40 @@ export class RegisterSymptomsComponent implements OnInit {
 
   // Signal para almacenar el patientId actual
   private readonly currentPatientId = signal<number | null>(null);
-  
-  get loading() {
-    return this.symptomStore.loading$;
-  }
 
+  // Expose loading from SymptomStore for template bindings
+  readonly loading = this.symptomStore.loading$;
+
+  private readonly userStore = inject(UserStore);
   ngOnInit(): void {
     this.initializeForm();
     this.loadCurrentPatient();
+
+    // React to user changes (login/logout/switch)
+    try {
+      window.addEventListener('userChanged', (_ev: any) => {
+        // reload patient for the new user
+        this.loadCurrentPatient();
+      });
+    } catch (e) {
+      // ignore environment without window
+    }
   }
-
-  /**
-   * Carga el paciente actual desde localStorage
-   */
   private loadCurrentPatient(): void {
-    const currentUserStr = localStorage.getItem('currentUser');
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-
-    if (!currentUserStr || isAuthenticated !== 'true') {
+    // Prefer UserStore, fallback to localStorage
+    const currentUser = this.userStore.currentUser$() || (JSON.parse(localStorage.getItem('currentUser') || 'null'));
+    if (!currentUser || !currentUser.id) {
       console.error('❌ Register-Symptoms: Usuario no autenticado');
       this.router.navigate(['/iam/login']);
       return;
     }
 
-    const currentUser = JSON.parse(currentUserStr);
     const userId = currentUser.id;
-
     console.log(`🔍 Register-Symptoms: Usuario actual ID: ${userId}`);
 
-    // Buscar el paciente asociado al usuario actual
     this.patientStore.loadAllPatients().subscribe({
       next: (patients) => {
         const patient = patients.find(p => p.userId === userId);
-
         if (patient) {
           console.log(`✅ Register-Symptoms: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
           this.currentPatientId.set(patient.id);
@@ -202,6 +207,43 @@ export class RegisterSymptomsComponent implements OnInit {
           this.fatigueValue.set(5);
           this.painValue.set(5);
           this.dizzinessValue.set(5);
+
+          // Also create a medical record entry so it appears in the patient's history
+          try {
+            const mr: Partial<MedicalRecord> = {
+              patientId: patientId,
+              // doctorId will be set if patient has assignedDoctorId
+              type: RecordType.SYMPTOMS,
+              date: new Date().toISOString(),
+              glucose: newSymptom.glucose,
+              bloodPressure: newSymptom.bloodPressure,
+              heartRate: newSymptom.heartRate,
+              temperature: newSymptom.temperature,
+              fatigue: newSymptom.fatigue,
+              pain: newSymptom.pain,
+              dizziness: newSymptom.dizziness,
+              notes: newSymptom.notes,
+              reviewStatus: ReviewStatus.PENDING_REVIEW
+            };
+
+            // If patient record includes assignedDoctorId, use it
+            this.patientStore.loadAllPatients().subscribe({
+              next: (patients) => {
+                const patientObj = patients.find(p => p.id === patientId);
+                if (patientObj && (patientObj as any).assignedDoctorId) {
+                  // use bracket notation to satisfy index signature rules
+                  (mr as any)['doctorId'] = (patientObj as any).assignedDoctorId;
+                }
+                this.medicalRecordsStore.createRecord(mr);
+              },
+              error: () => {
+                // still create record without doctor
+                this.medicalRecordsStore.createRecord(mr);
+              }
+            });
+          } catch (e) {
+            console.warn('Could not create medical record automatically', e);
+          }
         },
         error: (error) => {
           this.snackBar.open('❌ Error al registrar síntomas', 'Cerrar', {

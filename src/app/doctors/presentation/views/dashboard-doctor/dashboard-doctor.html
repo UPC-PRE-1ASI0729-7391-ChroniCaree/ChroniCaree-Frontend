@@ -22,12 +22,12 @@
         {{ exporting() ? 'Exportando…' : 'Exportar PDF' }}
       </button>
 
-      <button class="btn btn-primary">
+      <a routerLink="/appointments/schedule" class="btn btn-primary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
         Nueva Cita
-      </button>
+      </a>
     </div>
   </div>
 
@@ -79,10 +79,19 @@
     <!-- Upcoming Appointments -->
     <div class="card">
       <div class="card-header">
-        <h2 class="h3">Próximas Citas</h2>
+        <h2 class="h3">Citas de Hoy</h2>
         <a routerLink="/appointments" class="link-primary">Ver todas</a>
       </div>
       <div class="appointments-list">
+        @if (upcomingAppointments().length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <p>No hay citas programadas para hoy</p>
+          </div>
+        }
         @for (appointment of upcomingAppointments(); track appointment.id) {
           <div class="appointment-item">
             <div class="appointment-time">
@@ -96,7 +105,7 @@
               <p class="patient-name">{{ appointment.patientName }}</p>
               <p class="appointment-type">{{ appointment.type }}</p>
             </div>
-            <button class="btn-icon">
+            <button class="btn-icon" routerLink="/appointments/{{ appointment.id }}">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 5L16 12L9 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -110,11 +119,21 @@
     <div class="card">
       <div class="card-header">
         <h2 class="h3">Alertas Críticas</h2>
-        <a routerLink="/doctor/alert" class="link-danger">Ver más</a>
+
+        <a routerLink="/health-alerts" class="link-danger">Ver todas</a>
       </div>
       <div class="alerts-list">
+        @if (criticalAlerts().length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <p>No hay alertas críticas</p>
+          </div>
+        }
         @for (alert of criticalAlerts(); track alert.id) {
-          <div class="alert-item" [class.severity-high]="alert.severity === 'high'" [class.severity-medium]="alert.severity === 'medium'">
+          <div class="alert-item" [class.severity-high]="alert.severity === 'high' || alert.severity === 'critical'" [class.severity-medium]="alert.severity === 'medium'">
             <div class="alert-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.64537 18.3024 1.55296 18.6453 1.55199 18.9945C1.55101 19.3437 1.64151 19.6871 1.81445 19.9905C1.98738 20.2939 2.23675 20.5467 2.53773 20.7239C2.83871 20.901 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.901 21.4623 20.7239C21.7633 20.5467 22.0126 20.2939 22.1856 19.9905C22.3585 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3546 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15448C12.6817 2.98585 12.3437 2.89725 12 2.89725C11.6563 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32312 10.4683 3.56611 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -125,169 +144,54 @@
               <p class="alert-condition">{{ alert.condition }}</p>
               <p class="alert-time">{{ alert.time }}</p>
             </div>
-            <button class="btn btn-sm btn-primary">Revisar</button>
+            <button class="btn btn-sm btn-primary" routerLink="/health-alerts">Revisar</button>
           </div>
         }
       </div>
     </div>
   </div>
 
-  <!-- ===== Gráficos de evolución clínica ===== -->
-  <div class="clinical-charts-section">
+  <!-- Pending Reviews Section -->
+  <div class="pending-reviews-section">
     <div class="section-header">
-      <h2 class="h2">Gráficos de evolución</h2>
-
-      <!-- Filtro de periodo -->
-      <div class="period-toggle" data-html2canvas-ignore="true">
-        <mat-button-toggle-group [value]="rangeDays()" (change)="setRange($event.value)">
-          <mat-button-toggle [value]="7">7d</mat-button-toggle>
-          <mat-button-toggle [value]="14">14d</mat-button-toggle>
-          <mat-button-toggle [value]="30">30d</mat-button-toggle>
-          <mat-button-toggle [value]="60">60d</mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
+      <h2 class="h2">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Historiales Pendientes de Revisión
+      </h2>
+      <a routerLink="/medical-records" class="link-primary">Ver todos</a>
     </div>
-
-    <div class="charts-grid">
-      <!-- Glucosa -->
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Glucosa</mat-card-title>
-          <mat-card-subtitle>Rango terapéutico: 70–180 mg/dL</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de glucosa" shape-rendering="geometricPrecision">
-            <!-- grid -->
-            <g>
-              <line *ngFor="let g of gridLines; let i = index"
-                    [attr.x1]="0" [attr.x2]="600"
-                    [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
-                    stroke="#e9edf3" stroke-width="1"></line>
-            </g>
-
-            <!-- banda terapéutica -->
-            <rect
-              [attr.x]="24" [attr.width]="600-24-8"
-              [attr.y]="pointCy(180, 50, 220)"
-              [attr.height]="pointCy(70, 50, 220) - pointCy(180, 50, 220)"
-              fill="#81c784" fill-opacity="0.18" rx="2"></rect>
-
-            <!-- línea -->
-            <path [attr.d]="glucosePath()" fill="none" stroke="#2e7d32" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
-
-            <!-- puntos -->
-            <g>
-              <circle *ngFor="let p of glucose(); let i = index"
-                      [attr.r]="2.6"
-                      [attr.cx]="pointCx(i, glucose().length)"
-                      [attr.cy]="pointCy(p.value, 50, 220)"
-                      fill="#2e7d32" stroke="#ffffff" stroke-width="1.2"></circle>
-            </g>
+    
+    <div class="pending-records-grid">
+      @if (pendingRecords().length === 0) {
+        <div class="empty-state-large">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <div class="chart-footer">
-            <span>Escala: {{ labelMinMax(50, 220) }} mg/dL</span>
+          <h3>¡Todo al día!</h3>
+          <p>No hay historiales pendientes de revisión</p>
+        </div>
+      }
+      @for (record of pendingRecords(); track record.id) {
+        <div class="pending-record-card">
+          <div class="record-header">
+            <div class="record-badge">Pendiente</div>
+            <span class="record-date">{{ record.date }}</span>
           </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Tensión arterial -->
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Presión arterial</mat-card-title>
-          <mat-card-subtitle>Rangos: Sys 90–120 / Dia 60–80 mmHg</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de presión arterial" shape-rendering="geometricPrecision">
-            <!-- grid -->
-            <g>
-              <line *ngFor="let g of gridLines; let i = index"
-                    [attr.x1]="0" [attr.x2]="600"
-                    [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
-                    stroke="#e9edf3" stroke-width="1"></line>
-            </g>
-
-            <!-- bandas terapéuticas -->
-            <rect
-              [attr.x]="24" [attr.width]="600-24-8"
-              [attr.y]="pointCy(120, 40, 160)"
-              [attr.height]="pointCy(90, 40, 160) - pointCy(120, 40, 160)"
-              fill="#fff59d" fill-opacity="0.28" rx="2"></rect>
-
-            <rect
-              [attr.x]="24" [attr.width]="600-24-8"
-              [attr.y]="pointCy(80, 40, 160)"
-              [attr.height]="pointCy(60, 40, 160) - pointCy(80, 40, 160)"
-              fill="#bcaaa4" fill-opacity="0.24" rx="2"></rect>
-
-            <!-- líneas -->
-            <path [attr.d]="systolicPath()"  fill="none" stroke="#e53935" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
-            <path [attr.d]="diastolicPath()" fill="none" stroke="#8e24aa" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
-
-            <!-- puntos -->
-            <g>
-              <circle *ngFor="let p of systolic(); let i = index"
-                      [attr.r]="2.6"
-                      [attr.cx]="pointCx(i, systolic().length)"
-                      [attr.cy]="pointCy(p.value, 40, 160)"
-                      fill="#e53935" stroke="#ffffff" stroke-width="1.2"></circle>
-
-              <circle *ngFor="let p of diastolic(); let i = index"
-                      [attr.r]="2.6"
-                      [attr.cx]="pointCx(i, diastolic().length)"
-                      [attr.cy]="pointCy(p.value, 40, 160)"
-                      fill="#8e24aa" stroke="#ffffff" stroke-width="1.2"></circle>
-            </g>
-          </svg>
-          <div class="chart-legend">
-            <span class="legend-item"><span class="legend-dot systolic" style="background:#e53935;width:10px;height:10px;border-radius:50%;display:inline-block"></span> Sistólica</span>
-            <span class="legend-item"><span class="legend-dot diastolic" style="background:#8e24aa;width:10px;height:10px;border-radius:50%;display:inline-block"></span> Diastólica</span>
+          <div class="record-body">
+            <h3 class="record-patient">{{ record.patientName }}</h3>
+            <p class="record-type">{{ record.type }}</p>
           </div>
-          <div class="chart-footer">
-            <span>Escala: {{ labelMinMax(40, 160) }} mmHg</span>
+          <div class="record-actions">
+            <button class="btn btn-primary btn-sm" routerLink="/medical-records/{{ record.id }}">
+              Revisar historial
+            </button>
           </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Saturación -->
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Saturación O₂</mat-card-title>
-          <mat-card-subtitle>Rango terapéutico: 95–100%</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <svg viewBox="0 0 600 220" preserveAspectRatio="none" class="chart" role="img" aria-label="Evolución de saturación de oxígeno" shape-rendering="geometricPrecision">
-            <!-- grid -->
-            <g>
-              <line *ngFor="let g of gridLines; let i = index"
-                    [attr.x1]="0" [attr.x2]="600"
-                    [attr.y1]="(i===0?12:12 + (200 * g)/100)" [attr.y2]="(i===0?12:12 + (200 * g)/100)"
-                    stroke="#e9edf3" stroke-width="1"></line>
-            </g>
-
-            <!-- banda terapéutica -->
-            <rect
-              [attr.x]="24" [attr.width]="600-24-8"
-              [attr.y]="pointCy(100, 92, 100)"
-              [attr.height]="pointCy(95, 92, 100) - pointCy(100, 92, 100)"
-              fill="#64b5f6" fill-opacity="0.22" rx="2"></rect>
-
-            <!-- línea -->
-            <path [attr.d]="spo2Path()" fill="none" stroke="#1565c0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
-
-            <!-- puntos -->
-            <g>
-              <circle *ngFor="let p of spo2(); let i = index"
-                      [attr.r]="2.6"
-                      [attr.cx]="pointCx(i, spo2().length)"
-                      [attr.cy]="pointCy(p.value, 92, 100)"
-                      fill="#1565c0" stroke="#ffffff" stroke-width="1.2"></circle>
-            </g>
-          </svg>
-          <div class="chart-footer">
-            <span>Escala: {{ labelMinMax(92, 100) }} %</span>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      }
     </div>
   </div>
 
@@ -298,19 +202,19 @@
     </div>
     <div class="quick-stats-grid">
       <div class="quick-stat">
-        <div class="stat-number">32</div>
+        <div class="stat-number">{{ weeklyStats().consultations }}</div>
         <div class="stat-description">Consultas realizadas</div>
       </div>
       <div class="quick-stat">
-        <div class="stat-number">8</div>
-        <div class="stat-description">Nuevos pacientes</div>
+        <div class="stat-number">{{ pendingReviews() }}</div>
+        <div class="stat-description">Revisiones pendientes</div>
       </div>
       <div class="quick-stat">
-        <div class="stat-number">95%</div>
-        <div class="stat-description">Satisfacción</div>
+        <div class="stat-number">{{ activePatients() }}</div>
+        <div class="stat-description">Pacientes activos</div>
       </div>
       <div class="quick-stat">
-        <div class="stat-number">4.5h</div>
+        <div class="stat-number">{{ weeklyStats().avgDuration }}</div>
         <div class="stat-description">Tiempo promedio</div>
       </div>
     </div>

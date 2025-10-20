@@ -9,12 +9,12 @@
     </div>
   </div>
 
-  @if (loading()) {
+  <ng-container *ngIf="loading()">
     <div class="loading-overlay">
       <mat-spinner></mat-spinner>
       <p>Cargando perfil...</p>
     </div>
-  }
+  </ng-container>
 
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
     <!-- Información Personal -->
@@ -30,24 +30,16 @@
             <mat-label>Nombre</mat-label>
             <input matInput formControlName="firstName" placeholder="Ej: María">
             <mat-icon matPrefix>badge</mat-icon>
-            @if (profileForm.get('firstName')?.hasError('required')) {
-              <mat-error>El nombre es requerido</mat-error>
-            }
-            @if (profileForm.get('firstName')?.hasError('minlength')) {
-              <mat-error>Mínimo 2 caracteres</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">El nombre es requerido</mat-error>
+            <mat-error *ngIf="profileForm.get('firstName')?.hasError('minlength')">Mínimo 2 caracteres</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Apellido</mat-label>
             <input matInput formControlName="lastName" placeholder="Ej: García">
             <mat-icon matPrefix>badge</mat-icon>
-            @if (profileForm.get('lastName')?.hasError('required')) {
-              <mat-error>El apellido es requerido</mat-error>
-            }
-            @if (profileForm.get('lastName')?.hasError('minlength')) {
-              <mat-error>Mínimo 2 caracteres</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">El apellido es requerido</mat-error>
+            <mat-error *ngIf="profileForm.get('lastName')?.hasError('minlength')">Mínimo 2 caracteres</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -56,36 +48,24 @@
             <mat-icon matPrefix>cake</mat-icon>
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            @if (profileForm.get('birthDate')?.hasError('required')) {
-              <mat-error>La fecha de nacimiento es requerida</mat-error>
-            }
-            @if (calculatedAge() > 0) {
-              <mat-hint>Edad: {{ calculatedAge() }} años</mat-hint>
-            }
+            <mat-error *ngIf="profileForm.get('birthDate')?.hasError('required')">La fecha de nacimiento es requerida</mat-error>
+            <mat-hint *ngIf="calculatedAge() > 0">Edad: {{ calculatedAge() }} años</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Teléfono</mat-label>
             <input matInput type="tel" formControlName="phone" placeholder="Ej: 987654321">
             <mat-icon matPrefix>phone</mat-icon>
-            @if (profileForm.get('phone')?.hasError('required')) {
-              <mat-error>El teléfono es requerido</mat-error>
-            }
-            @if (profileForm.get('phone')?.hasError('pattern')) {
-              <mat-error>Debe ser un número de 9 dígitos</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">El teléfono es requerido</mat-error>
+            <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">Debe ser un número de 9 dígitos</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width-2col">
             <mat-label>Dirección</mat-label>
             <input matInput formControlName="address" placeholder="Ej: Av. Principal 123, Lima">
             <mat-icon matPrefix>home</mat-icon>
-            @if (profileForm.get('address')?.hasError('required')) {
-              <mat-error>La dirección es requerida</mat-error>
-            }
-            @if (profileForm.get('address')?.hasError('minlength')) {
-              <mat-error>Mínimo 5 caracteres</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('address')?.hasError('required')">La dirección es requerida</mat-error>
+            <mat-error *ngIf="profileForm.get('address')?.hasError('minlength')">Mínimo 5 caracteres</mat-error>
           </mat-form-field>
         </div>
       </mat-card-content>
@@ -105,15 +85,9 @@
             <input matInput type="number" formControlName="weight" placeholder="Ej: 70">
             <mat-icon matPrefix>scale</mat-icon>
             <span matSuffix>kg</span>
-            @if (profileForm.get('weight')?.hasError('required')) {
-              <mat-error>El peso es requerido</mat-error>
-            }
-            @if (profileForm.get('weight')?.hasError('min')) {
-              <mat-error>El peso mínimo es 20 kg</mat-error>
-            }
-            @if (profileForm.get('weight')?.hasError('max')) {
-              <mat-error>El peso máximo es 300 kg</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('required')">El peso es requerido</mat-error>
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('min')">El peso mínimo es 20 kg</mat-error>
+            <mat-error *ngIf="profileForm.get('weight')?.hasError('max')">El peso máximo es 300 kg</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -121,21 +95,14 @@
             <input matInput type="number" formControlName="height" placeholder="Ej: 165">
             <mat-icon matPrefix>height</mat-icon>
             <span matSuffix>cm</span>
-            @if (profileForm.get('height')?.hasError('required')) {
-              <mat-error>La altura es requerida</mat-error>
-            }
-            @if (profileForm.get('height')?.hasError('min')) {
-              <mat-error>La altura mínima es 50 cm</mat-error>
-            }
-            @if (profileForm.get('height')?.hasError('max')) {
-              <mat-error>La altura máxima es 250 cm</mat-error>
-            }
+            <mat-error *ngIf="profileForm.get('height')?.hasError('required')">La altura es requerida</mat-error>
+            <mat-error *ngIf="profileForm.get('height')?.hasError('min')">La altura mínima es 50 cm</mat-error>
+            <mat-error *ngIf="profileForm.get('height')?.hasError('max')">La altura máxima es 250 cm</mat-error>
           </mat-form-field>
         </div>
 
         <!-- BMI Calculator Display -->
-        @if (calculatedBMI() > 0) {
-          <div class="bmi-display">
+        <div class="bmi-display" *ngIf="calculatedBMI() > 0">
             <div class="bmi-header">
               <mat-icon class="bmi-icon">calculate</mat-icon>
               <h3>Índice de Masa Corporal (IMC)</h3>
@@ -170,7 +137,6 @@
               </div>
             </div>
           </div>
-        }
       </mat-card-content>
     </mat-card>
 

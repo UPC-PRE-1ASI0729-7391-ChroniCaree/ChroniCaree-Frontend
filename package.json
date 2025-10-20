@@ -4,10 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+  "build": "ng build",
+  "postbuild": "node ./scripts/postbuild-copy.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api": "json-server --watch server/db.json --routes server/routes.json --port 3000",
+    "api": "bash server/start.sh",
     "dev": "concurrently \"npm run api\" \"npm start\""
   },
   "prettier": {

@@ -94,6 +94,12 @@ export const routes: Routes = [
         loadComponent: () => import('./alerts/presentation/views/health-alerts/health-alerts').then(m => m.HealthAlertsComponent),
         title: `${baseTitle} - Mi Salud`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'agendar-cita',
+        loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
+        title: `${baseTitle} - Agendar Cita`,
+        data: { role: 'patient' }
       }
     ]
   },
@@ -124,6 +130,12 @@ export const routes: Routes = [
             .then((m) => m.MedicalDiagnosesComponent),
         title: `${baseTitle} - Diagnósticos Médicos`,
         data: { role: 'patient' },
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.MedicalRecordDetailComponent),
+        title: `${baseTitle} - Registro Médico`,
       },
     ],
   },
@@ -156,6 +168,12 @@ export const routes: Routes = [
         data: { role: 'doctor' }
       },
       {
+        path: 'patients/:id',
+        loadComponent: () => import('./doctors/presentation/views/patient-detail/patient-detail').then(m => m.DoctorsPatientDetailComponent),
+        title: `${baseTitle} - Detalle Paciente`,
+        data: { role: 'doctor' }
+      },
+      {
         path: 'appointments',
         loadComponent: () => import('./doctors/presentation/views/appointments-list/appointments-list').then(m => m.AppointmentsListComponent),
         title: `${baseTitle} - Mis Citas`,
@@ -170,7 +188,36 @@ export const routes: Routes = [
     ]
   },
 
-  // Coming Soon page (for features under development)
+
+  // Communication - Messages (shared by patient and doctor)
+  {
+    path: 'communication/messages',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./communication/presentation/components/inbox/inbox.component')
+            .then((m) => m.InboxComponent),
+        title: `${baseTitle} - Mensajes`,
+      },
+      {
+        path: 'compose',
+        loadComponent: () =>
+          import('./communication/presentation/components/message-compose/message-compose.component')
+            .then((m) => m.MessageComposeComponent),
+        title: `${baseTitle} - Nuevo Mensaje`,
+      },
+      {
+        path: 'thread/:id',
+        loadComponent: () =>
+          import('./communication/presentation/components/message-thread/message-thread.component')
+            .then((m) => m.MessageThreadComponent),
+        title: `${baseTitle} - Conversación`,
+      },
+    ],
+  },
+
+  // Coming Soon (restaurado, sin redirección a mensajes)
   {
     path: 'coming-soon',
     loadComponent: () =>
@@ -179,7 +226,13 @@ export const routes: Routes = [
     title: `${baseTitle} - Próximamente`,
   },
 
-  // 404 Not Found page
+
+  // Atajos legados
+  { path: 'messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+  { path: 'patient/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+  { path: 'doctor/messages', redirectTo: '/communication/messages', pathMatch: 'full' },
+
+  // 404
   {
     path: '404',
     loadComponent: () => import('./shared/presentation/components/not-found/not-found').then(m => m.NotFoundComponent),

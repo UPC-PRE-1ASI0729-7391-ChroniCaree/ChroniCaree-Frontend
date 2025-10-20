@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { DoctorStore } from '../../../application/doctor.store';
+import { UserStore } from '../../../../iam/application/user.store';
 
 /**
  * Edit Profile View - Doctor Profile Management
@@ -72,7 +73,8 @@ export class EditProfileDoctorComponent implements OnInit {
     private fb: FormBuilder,
     private doctorStore: DoctorStore,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private userStore: UserStore
   ) {
     this.initializeForm();
   }
@@ -103,14 +105,18 @@ export class EditProfileDoctorComponent implements OnInit {
   }
 
   private loadDoctorData(): void {
-    // Obtener el doctor actual del localStorage
-    const userStr = localStorage.getItem('currentUser');
-    if (userStr) {
+    // Obtener el doctor actual desde UserStore o fallback a localStorage
+    const user = this.userStore.currentUser$() || (() => {
       try {
-        const user = JSON.parse(userStr);
-        const doctorId = user.doctorId || 1; // Default to 1 for demo
-        
-        this.doctorStore.loadDoctorById(doctorId).subscribe({
+        const s = localStorage.getItem('currentUser');
+        return s ? JSON.parse(s) : null;
+      } catch { return null; }
+    })();
+
+    if (user) {
+      const doctorId = user.doctorId || 1; // Default to 1 for demo
+
+      this.doctorStore.loadDoctorById(doctorId).subscribe({
           next: () => {
             const doctor = this.currentDoctor();
             if (doctor) {
@@ -134,9 +140,6 @@ export class EditProfileDoctorComponent implements OnInit {
             this.showNotification('Error al cargar los datos del perfil', 'error');
           }
         });
-      } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
-      }
     }
   }
 
@@ -171,12 +174,16 @@ export class EditProfileDoctorComponent implements OnInit {
       next: () => {
         this.showNotification('✅ Perfil actualizado correctamente', 'success');
         
-        // Actualizar localStorage
-        const userStr = localStorage.getItem('currentUser');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          user.name = `Dr. ${formValue.firstName} ${formValue.lastName}`;
-          localStorage.setItem('currentUser', JSON.stringify(user));
+        // Update current user via UserStore so other components react
+        try {
+          const userStr = localStorage.getItem('currentUser');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            user.name = `Dr. ${formValue.firstName} ${formValue.lastName}`;
+            this.userStore.setCurrentUser(user);
+          }
+        } catch (e) {
+          console.error('Error updating currentUser after profile update:', e);
         }
       },
       error: (error) => {
