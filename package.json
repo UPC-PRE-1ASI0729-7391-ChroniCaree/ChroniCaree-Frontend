@@ -8,8 +8,8 @@
     "postbuild": "node ./scripts/postbuild-copy.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-  "api": "npm run json-server",
-  "json-server": "json-server --watch server/db.json --routes server/routes.json --port 3000",
+    "api": "npm run json-server",
+    "json-server": "json-server --watch server/db.json --routes server/routes.json --port 3000",
     "dev": "concurrently \"npm run api\" \"npm start\""
   },
   "prettier": {
@@ -34,8 +34,8 @@
     "@angular/material": "^20.2.8",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@ngx-translate/core": "^14.0.0",
-    "@ngx-translate/http-loader": "^7.0.0",
+  "@ngx-translate/core": "^17.0.0",
+  "@ngx-translate/http-loader": "^8.0.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "rxjs": "~7.8.0",

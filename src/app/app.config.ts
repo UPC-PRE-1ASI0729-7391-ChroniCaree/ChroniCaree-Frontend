@@ -4,12 +4,13 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 
 // ngx-translate providers (runtime JSON loader)
-// Note: Using a lightweight in-repo i18n util that fetches /i18n/<lang>.json directly.
+// Using TranslateModule.forRoot so behavior matches installed @ngx-translate versions
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 
 export function createTranslateLoader(http: HttpClient) {
+  // Load translation files from /i18n/ (en.json / es.json)
   return new TranslateHttpLoader(http, '/i18n/', '.json');
 }
 

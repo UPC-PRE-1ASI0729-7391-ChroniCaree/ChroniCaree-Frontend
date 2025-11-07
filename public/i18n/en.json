@@ -1,5 +1,4 @@
-
-{
+﻿{
   "alerts": {
     "title": "Alerts",
     "viewAll": "View all",
@@ -98,52 +97,19 @@
         "subtitle": "Basic details of your profile"
       },
       "errors": {
-        "firstName": {
-          "required": "First name is required",
-          "minlength": "Minimum 2 characters"
-        },
-        "lastName": {
-          "required": "Last name is required",
-          "minlength": "Minimum 2 characters"
-        },
-        "birthDate": {
-          "required": "Birth date is required"
-        },
-        "phone": {
-          "required": "Phone is required",
-          "pattern": "Must be a 9-digit number"
-        },
-        "address": {
-          "required": "Address is required",
-          "minlength": "Minimum 5 characters"
-        },
-        "weight": {
-          "required": "Weight is required",
-          "min": "Minimum weight is 20 kg",
-          "max": "Maximum weight is 300 kg"
-        },
-        "height": {
-          "required": "Height is required",
-          "min": "Minimum height is 50 cm",
-          "max": "Maximum height is 250 cm"
-        }
+        "firstName": { "required": "First name is required", "minlength": "Minimum 2 characters" },
+        "lastName": { "required": "Last name is required", "minlength": "Minimum 2 characters" },
+        "birthDate": { "required": "Birth date is required" },
+        "phone": { "required": "Phone is required", "pattern": "Must be a 9-digit number" },
+        "address": { "required": "Address is required", "minlength": "Minimum 5 characters" },
+        "weight": { "required": "Weight is required", "min": "Minimum weight is 20 kg", "max": "Maximum weight is 300 kg" },
+        "height": { "required": "Height is required", "min": "Minimum height is 50 cm", "max": "Maximum height is 250 cm" }
       },
       "ageLabel": "Age: {{age}} years",
-      "measurements": {
-        "title": "Body Measurements",
-        "subtitle": "Weight and height for BMI calculation"
-      },
+      "measurements": { "title": "Body Measurements", "subtitle": "Weight and height for BMI calculation" },
       "weight": "Weight (kg)",
       "height": "Height (cm)",
-      "bmi": {
-        "title": "Body Mass Index (BMI)",
-        "labels": {
-          "underweight": "Underweight",
-          "normal": "Normal",
-          "overweight": "Overweight",
-          "obesity": "Obesity"
-        }
-      }
+      "bmi": { "title": "Body Mass Index (BMI)", "labels": { "underweight": "Underweight", "normal": "Normal", "overweight": "Overweight", "obesity": "Obesity" } }
     }
   },
   "doctors": {
@@ -170,27 +136,9 @@
       "today": "Today's Appointments",
       "upcoming": "Upcoming Appointments",
       "loading": "Loading appointments...",
-      "empty": {
-        "title": "No appointments",
-        "subtitle": "No appointments found for the selected filter"
-      },
-      "status": {
-        "scheduled": "📅 Scheduled",
-        "confirmed": "✅ Confirmed",
-        "inProgress": "⏳ In Progress",
-        "completed": "✔️ Completed",
-        "cancelled": "❌ Cancelled",
-        "noShow": "🚫 No-show"
-      },
-      "actions": {
-        "confirm": "Confirm",
-        "start": "Start",
-        "complete": "Complete",
-        "cancel": "Cancel",
-        "todayBadge": "TODAY",
-        "scheduled": "Scheduled",
-        "completed": "Completed"
-      }
+      "empty": { "title": "No appointments", "subtitle": "No appointments found for the selected filter" },
+      "status": { "scheduled": "📅 Scheduled", "confirmed": "✅ Confirmed", "inProgress": "⏳ In Progress", "completed": "✔️ Completed", "cancelled": "❌ Cancelled", "noShow": "🚫 No-show" },
+      "actions": { "confirm": "Confirm", "start": "Start", "complete": "Complete", "cancel": "Cancel", "todayBadge": "TODAY", "scheduled": "Scheduled", "completed": "Completed" }
     }
   },
   "common": {
@@ -203,34 +151,3 @@
     "saveChanges": "Save Changes"
   }
 }
-    "birthDate": "Birth Date",
-    "phone": "Phone",
-    "address": "Address",
-    "cancel": "Cancel",
-    "saveChanges": "Save Changes"
-  }
-}
-  "doctors": {
-    "appointments": {
-      "title": "My Appointments",
-      "subtitle": "Manage your appointments with patients",
-      "today": "Today's Appointments",
-      "upcoming": "Upcoming Appointments",
-      "loading": "Loading appointments...",
-      "empty": {
-        "title": "No appointments",
-        "subtitle": "No appointments found for the selected filter"
-      },
-      "status": {
-        "scheduled": "📅 Scheduled",
-        "confirmed": "✅ Confirmed",
-        "inProgress": "⏳ In Progress",
-        "completed": "✔️ Completed",
-        "cancelled": "❌ Cancelled",
-        "noShow": "🚫 No-show"
-      }
-    }
-  }
-}
-
-
