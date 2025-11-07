@@ -71,6 +71,15 @@
       "password": "123456789",
       "isVerified": false,
       "twoFactorEnabled": false
+    },
+    {
+      "id": 1762556849497,
+      "email": "admin@gmail.com",
+      "role": "hospital_admin",
+      "name": "doctor1",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false
     }
   ],
   "tenants": [
@@ -86,6 +95,10 @@
     {
       "id": 1760136165157,
       "name": "hospital san lorenzo"
+    },
+    {
+      "id": 1762556849576,
+      "name": "1234"
     }
   ],
   "subscriptions": [

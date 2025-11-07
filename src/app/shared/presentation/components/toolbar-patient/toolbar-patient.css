@@ -41,7 +41,7 @@
 /* Navigation Menu */
 .nav-menu {
   flex: 1;
-  padding: 1rem 0.5rem; /* Add horizontal padding */
+  padding: 0.5rem 0.5rem; /* tighter padding to reduce vertical size */
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0; /* Important for flex child with overflow */
@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.875rem 1rem;
+  padding: 8px 12px;
   color: #64748b;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -60,7 +60,7 @@
   background: transparent;
   width: 100%;
   text-align: left;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   border-radius: 8px; /* Add border radius */
   margin: 0.25rem 0; /* Add vertical spacing */
 }
@@ -68,6 +68,55 @@
 .nav-item svg {
   flex-shrink: 0;
   stroke: #64748b;
+}
+
+/* Make the icon a fixed size and ensure the label can ellipsize instead of overflowing */
+.nav-item svg {
+  width: 20px; /* enforce icon size */
+  height: 20px;
+}
+
+.nav-item {
+  box-sizing: border-box; /* include padding in width calculations */
+}
+
+.nav-item > span {
+  display: block;
+  flex: 1 1 auto; /* grow to take remaining space but allow shrinking */
+  min-width: 0; /* required for text-overflow to work inside flex */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Stronger rules targeted at anchor nav-items and material badges to prevent overflow */
+.sidebar.sidebar-patient a.nav-item,
+.sidebar.sidebar-patient .nav-item {
+  padding: 8px 12px; /* match main nav items */
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.sidebar.sidebar-patient a.nav-item > span,
+.sidebar.sidebar-patient .nav-item > span,
+.sidebar.sidebar-patient .nav-item [matBadge] {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0; /* allow shrinking inside flex */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sidebar.sidebar-patient .nav-item svg {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.sidebar.sidebar-patient .sidebar-footer .nav-item {
+  padding: 8px 12px; /* align footer items with nav list */
 }
 
 .nav-item:hover {
@@ -99,26 +148,33 @@
 }
 
 .sidebar-footer .nav-item {
-  padding: 0.875rem 1rem; /* Reduce horizontal padding */
+  padding: 8px 12px; /* match main nav items */
   border-radius: 8px; /* Add border radius for better look */
   margin: 0.25rem 0; /* Add vertical spacing */
 }
 
+.sidebar-footer .nav-item.active {
+  background: #fef2f2;
+  color: #ef4444;
+  border-left: 3px solid #ef4444;
+  border-radius: 8px 8px 8px 0;
+}
+
 .logout {
-  color: #dc2626 !important;
+  color: #dc2626;
 }
 
 .logout svg {
-  stroke: #dc2626 !important;
+  stroke: #dc2626;
 }
 
 .logout:hover {
-  background: #fef2f2 !important;
-  color: #b91c1c !important;
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 .logout:hover svg {
-  stroke: #b91c1c !important;
+  stroke: #b91c1c;
 }
 
 /* Scrollbar */
