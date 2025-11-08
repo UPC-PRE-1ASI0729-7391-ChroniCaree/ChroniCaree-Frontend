@@ -27,6 +27,7 @@
   gap: 0.75rem;
   font-size: 1.25rem;
   font-weight: 700;
+  color: #ffffff; /* header logo text should be white and non-clickable */
 }
 
 .logo-img {
@@ -34,6 +35,10 @@
   height: 40px;
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.logo-text{
+  color: #FFFFFF;
 }
 
 /* Navigation Menu */

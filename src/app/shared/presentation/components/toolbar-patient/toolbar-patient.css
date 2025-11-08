@@ -28,7 +28,7 @@
   gap: 0.75rem;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #ef4444;
+  color: #ffffff; /* make header logo text white per request */
 }
 
 .logo-img {

@@ -1,65 +1,91 @@
 <!-- messages/presentation/components/inbox/inbox.component.html -->
-<div class="messages-shell">
-  <!-- Panel izquierdo: lista / bandeja -->
+<div class="messages-shell full-bleed">
+
+  <!-- Panel izquierdo: lista / bandeja (columna fija) -->
   <aside class="threads-pane">
-    <header class="pane-header">
-      <h1 class="pane-title">Mensajes</h1>
+    <div class="pane-top">
+      <div class="pane-title-wrap">
+        <h1 class="pane-title">Mensajes</h1>
+        <div class="pane-sub">Tus conversaciones</div>
+      </div>
 
-      <!-- CTA “Nuevo” visible para el paciente -->
-      <a *ngIf="role === 'PATIENT'" class="link-primary" routerLink="compose">+ Nuevo</a>
-    </header>
+      <div class="pane-actions">
+        <input type="search" placeholder="Buscar mensajes, pacientes..." class="search" aria-label="Buscar conversaciones" />
+        <a *ngIf="role === 'PATIENT'" class="btn btn-primary btn-sm" routerLink="compose">Nuevo</a>
+      </div>
+    </div>
 
-    <!-- Lista de hilos -->
-    <ul *ngIf="threadsVM.length > 0; else empty" class="thread-list">
-      <li *ngFor="let t of threadsVM; trackBy: trackByVmId" class="thread-item">
-        <a
-          class="thread-link"
-          [routerLink]="role === 'DOCTOR'
-            ? ['/doctor/messages/thread', t.id]
-            : ['thread', t.id]"
-          [class.urgent]="t.hasUrgentMessages"
-        >
-          <div class="thread-title">
-            <strong>
-              <!-- ⭐ Icono de urgencia -->
-              <span *ngIf="t.hasUrgentMessages" class="urgent-badge" title="Mensaje urgente">🚨</span>
-              {{ t.subject }}
-            </strong>
-            <div class="badges">
-              <!-- ⭐ Badge de mensajes sin leer -->
-              <span *ngIf="t.unreadCount && t.unreadCount > 0" class="badge unread-badge">
-                {{ t.unreadCount }}
-              </span>
-              <span class="badge" [class.closed]="t.status === 'CLOSED'">
-                {{ t.status === 'CLOSED' ? 'Cerrado' : 'Abierto' }}
-              </span>
+    <div class="threads-list-wrap">
+      <ul *ngIf="threadsVM.length > 0; else empty" class="thread-list">
+        <li *ngFor="let t of threadsVM; trackBy: trackByVmId" class="thread-item">
+          <div class="thread-card" role="button" tabindex="0" (click)="navigateToThread(t.id)">
+
+            <div class="card-left">
+              <div class="avatar">👤</div>
+            </div>
+
+            <div class="card-body">
+              <div class="card-header">
+                <div class="subject">{{ t.subject }}</div>
+                <div class="meta-right">
+                  <div class="time">{{ t.lastMessageAt | date:'short' }}</div>
+                  <div class="badge-wrap">
+                    <span *ngIf="t.unreadCount && t.unreadCount > 0" class="badge unread">{{ t.unreadCount }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Último mensaje destacado -->
+              <div class="card-last">
+                <div class="last-sender">
+                  {{ (t.previews && t.previews.length) ? ((t.previews[t.previews.length -1].senderId === userId) ? 'Tú' : (t.previews[t.previews.length -1].senderRole === 'PATIENT' ? 'Paciente' : 'Médico')) : '' }}
+                </div>
+                <div class="last-text">{{ (t.lastSnippet || '') | slice:0:140 }}{{ (t.lastSnippet || '').length > 140 ? '…' : '' }}</div>
+              </div>
+
+              <div class="card-preview">
+                <div *ngIf="expanded.has(t.id)" class="preview-list">
+                  <div *ngFor="let p of getVisiblePreviews(t)" class="preview-line">
+                    <span class="preview-role">{{ p.senderId === userId ? 'Tú' : (p.senderRole === 'PATIENT' ? 'Paciente' : 'Médico') }}</span>
+                    <span class="preview-text">{{ p.body | slice:0:120 }}{{ p.body.length > 120 ? '…' : '' }}</span>
+                  </div>
+                </div>
+
+                <div class="preview-actions">
+                  <button *ngIf="t.previews && t.previews.length > 4" class="btn-link small" (click)="$event.preventDefault(); toggleExpand(t.id)">
+                    {{ expanded.has(t.id) ? 'Mostrar menos' : 'Mostrar más' }}
+                  </button>
+                  <!-- Quick message: doctor puede abrir composer con patient preseleccionado (icon) -->
+                  <a *ngIf="role === 'DOCTOR' && getPatientId(t)" class="btn btn-outline btn-sm quick-msg" [routerLink]="['/communication/messages','compose']" [queryParams]="{ patientId: getPatientId(t) }" title="Enviar mensaje" (click)="$event.stopPropagation()">✉️</a>
+                </div>
+              </div>
             </div>
           </div>
-
-          <div class="thread-meta">
-            <span>{{ t.lastMessageAt | date:'short' }}</span>
-            <span class="muted">• {{ t.participantsCount }} participantes</span>
-          </div>
-
-          <div class="thread-snippet muted">
-            {{ t.lastSnippet || '—' }}
-          </div>
-        </a>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
 
     <ng-template #empty>
-      <div class="empty-state">
-        <p>No hay conversaciones todavía.</p>
-        <a *ngIf="role === 'PATIENT'" class="btn btn-primary btn-sm" routerLink="compose">
-          Nuevo mensaje
-        </a>
+      <div class="empty-state center">
+        <div class="empty-illustration">✉️</div>
+        <h3>No hay conversaciones</h3>
+        <p class="muted">Cuando tengas mensajes aparecerán aquí. Puedes iniciar una conversación si eres paciente.</p>
+        <a *ngIf="role === 'PATIENT'" class="btn btn-primary" routerLink="compose">Nuevo Mensaje</a>
       </div>
     </ng-template>
   </aside>
 
-  <!-- Panel derecho: aquí se monta compose/thread -->
+  <!-- Panel derecho: detalle / chat (ocupa resto) -->
   <section class="detail-pane">
-    <router-outlet></router-outlet>
+      <div class="detail-inner">
+      <router-outlet></router-outlet>
+      <!-- Placeholder cuando no hay hilo seleccionado: mejora UX visual -->
+      <div *ngIf="!hasDetail()" class="detail-empty center">
+        <h3>Selecciona una conversación para comenzar a chatear</h3>
+        <p class="muted">Aquí verás el chat cuando selecciones una conversación. Puedes responder desde el panel derecho.</p>
+      </div>
+    </div>
   </section>
+
+
 </div>

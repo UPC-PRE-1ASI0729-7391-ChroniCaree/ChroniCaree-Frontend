@@ -80,8 +80,7 @@ export const routes: Routes = [
           import('./communication/presentation/views/nudges-page/nudges-page')
             .then((m) => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
-
-        data: { role: 'patient' }
+        data: { role: 'patient' },
       },
       {
         path: 'medicamentos',
@@ -158,7 +157,6 @@ export const routes: Routes = [
           import('./doctors/presentation/views/edit-profile/edit-profile')
             .then((m) => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
-
         data: { role: 'doctor' }
       },
       {
@@ -192,14 +190,11 @@ export const routes: Routes = [
   // Communication - Messages (shared by patient and doctor)
   {
     path: 'communication/messages',
+    loadComponent: () =>
+      import('./communication/presentation/components/inbox/inbox.component')
+        .then((m) => m.InboxComponent),
+    title: `${baseTitle} - Mensajes`,
     children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./communication/presentation/components/inbox/inbox.component')
-            .then((m) => m.InboxComponent),
-        title: `${baseTitle} - Mensajes`,
-      },
       {
         path: 'compose',
         loadComponent: () =>

@@ -29,10 +29,19 @@
       <!-- Para -->
       <div class="row">
         <label class="label">Para</label>
-        <div class="pill">
-          <div class="avatar" aria-hidden="true">👨‍⚕️</div>
-          <span>{{ doctorId() ? 'Tu médico' : 'Sin médico asignado' }}</span>
+        <div *ngIf="currentRole === 'DOCTOR'; else patientRecipient">
+          <select class="input" [ngModel]="patientId()" (ngModelChange)="patientId.set($event)">
+            <option value="">Selecciona un paciente...</option>
+            <option *ngFor="let p of patientsList()" [value]="p.id">{{ p.firstName }} {{ p.lastName }}</option>
+          </select>
         </div>
+        <ng-template #patientRecipient>
+          <div class="pill">
+            <div class="avatar" aria-hidden="true">👨‍⚕️</div>
+            <span *ngIf="doctorName(); else showDoctorId">{{ doctorName() }}</span>
+            <ng-template #showDoctorId><span>{{ doctorId() ? 'Tu médico (ID: ' + doctorId() + ')' : 'Sin médico asignado' }}</span></ng-template>
+          </div>
+        </ng-template>
       </div>
 
       <!-- Título -->

@@ -1,107 +1,60 @@
-.thread-container {
+/* Modern chat styles for message-thread component */
+
+.thread-card {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: #fff;
-  border: 1px solid rgba(0,0,0,.06);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 26px rgba(0,0,0,.06);
 }
 
 .thread-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--color-border);
-  background: linear-gradient(135deg, rgba(38,181,166,.12), transparent);
+  padding: 1rem 1rem;
+  border-bottom: 1px solid var(--color-border, #e6e6e6);
+  background: linear-gradient(180deg, rgba(248,251,255,1), #fff);
 }
 
-.title { display: grid; gap: .25rem; }
-.meta { margin: 0; color: var(--color-text-secondary); font-size: .9rem; }
+.thread-header .subject { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.thread-header .participants { color: #666; font-size: 0.85rem; }
 
-.badge {
-  display: inline-block;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  background: rgba(23, 162, 184, .15);
-  color: var(--color-info);
-  font-weight: 600;
-  font-size: .75rem;
-}
-.badge.closed {
-  background: rgba(230,57,70,.15);
-  color: var(--color-cc-red);
-}
+.chat-root { height: 100%; display:flex; flex-direction:column; }
 
-.actions .btn { white-space: nowrap; }
+.chat-container { flex:1 1 auto; overflow-y:auto; padding:1rem; background: linear-gradient(180deg,#f8fbff 0%, #ffffff 100%);} 
 
-.messages {
-  padding: 1rem 1.25rem 0 1.25rem;
-  display: grid;
-  gap: .75rem;
-  background: linear-gradient(180deg, rgba(79,70,229,.06), transparent 120px);
-}
+.msgs { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.5rem; }
 
-.bubble {
-  max-width: 70ch;
-  background: #ffffff;
-  border: 1px solid rgba(0,0,0,.06);
-  border-left: 4px solid var(--color-info);
-  border-radius: 12px;
-  padding: .75rem .9rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,.05);
-}
-.bubble.from-doctor {
-  border-left-color: var(--color-cc-green);
-  background: linear-gradient(0deg, rgba(38,181,166,.03), #fff);
-}
-.bubble-header {
-  display: flex; justify-content: space-between;
-  font-size: .85rem; color: var(--color-text-secondary);
-}
-.subject { margin: .35rem 0 .25rem 0; color: var(--color-cc-dark-blue); }
-.body { margin: 0; }
+.msg { display:flex; max-width:85%; }
+.msg:not(.mine) { justify-content:flex-start; align-self:flex-start; }
+.msg.mine { justify-content:flex-end; align-self:flex-end; }
 
-.reply-box {
-  padding: 1rem 1.25rem 1.25rem;
-  border-top: 1px solid var(--color-border);
-  background: linear-gradient(0deg, rgba(38,181,166,.06), transparent);
-  display: grid; gap: .5rem;
-}
-.textarea {
-  width: 100%;
-  border: 1.6px solid var(--color-border);
-  border-radius: 12px;
-  padding: .9rem 1rem;
-  transition: border-color .2s ease, box-shadow .2s ease;
-}
-.textarea:focus {
-  outline: none;
-  border-color: var(--color-cc-green);
-  box-shadow: 0 0 0 4px rgba(38,181,166,.15);
-}
-.reply-actions {
-  display: flex; gap: .5rem; justify-content: flex-end;
-}
+.bubble { display:inline-block; padding:0.6rem 0.9rem; border-radius:14px; box-shadow:0 6px 12px rgba(18,38,63,0.06); background:#fff; color:#111; transition:transform .12s ease, box-shadow .12s ease; word-break:break-word; }
+.msg.mine .bubble { background: linear-gradient(90deg,#cfe9ff 0%, #9fd3ff 100%); color:#02263a; border-bottom-right-radius:6px; }
+.msg:not(.mine) .bubble { background:#f3f6f9; border:1px solid #e6eef7; color:#111; border-bottom-left-radius:6px; }
 
-.btn {
-  padding: .7rem 1rem; border-radius: 10px;
-  font-weight: 600; border: none; cursor: pointer;
-}
-.btn-primary {
-  background: linear-gradient(180deg, var(--color-cc-green), var(--color-cc-bold-green));
-  color: #fff; box-shadow: 0 8px 18px rgba(38,181,166,.25);
-}
-.btn-ghost { background: transparent; color: var(--color-text-secondary); }
-.btn-outline {
-  background: #fff; color: var(--color-cc-dark-blue);
-  border: 2px solid var(--color-cc-dark-blue);
-  padding: .65rem 1rem; border-radius: 10px;
-}
-.btn-outline:hover { background: var(--color-cc-dark-blue); color: #fff; }
+.bubble-header { display:flex; align-items:baseline; justify-content:space-between; gap:0.5rem; margin-bottom:0.25rem; }
+.sender { font-weight:600; font-size:0.85rem; }
+.sender-id { font-weight:400; color:#666; font-size:0.75rem; margin-left:0.35rem; }
+.time { font-size:0.75rem; color:#666; margin-left:0.5rem; }
+.body { font-size:0.95rem; line-height:1.3; }
+.subject { font-weight:700; margin-bottom:0.35rem; }
+.files { margin-top:0.5rem; display:flex; gap:0.4rem; flex-wrap:wrap; }
+.file { color:#0b67a1; text-decoration:underline; font-size:0.9rem; }
 
-.thread-closed {
-  padding: 1rem 1.25rem 1.25rem;
-  color: var(--color-text-secondary);
-  background: linear-gradient(0deg, rgba(230,57,70,.06), transparent);
-  border-top: 1px solid var(--color-border);
-}
+.compose-bar { border-top:1px solid var(--color-border,#e6e6e6); padding:0.6rem; background:#fff; display:flex; align-items:center; gap:0.5rem; }
+.compose-form { display:flex; align-items:center; gap:0.5rem; width:100%; }
+.compose-input { flex:1 1 auto; padding:0.6rem 0.9rem; border-radius:999px; border:1px solid #e3eef8; background:#f8fbff; font-size:0.95rem; outline:none; }
+.compose-input:focus { box-shadow:0 6px 18px rgba(10,95,182,0.07); border-color:#9fd3ff; }
+.btn-send { background: linear-gradient(90deg,#2a9df4,#1b7ed6); color:white; border:none; padding:0.5rem 0.9rem; border-radius:999px; font-weight:600; cursor:pointer; }
+.btn-send[disabled] { opacity:0.6; cursor:default; }
+.btn-danger { background:#ff6b6b; color:#fff; padding:0.4rem 0.6rem; border-radius:8px; border:none; }
+
+@media (max-width:720px){ .thread-header{padding:0.6rem;} .chat-container{padding:0.6rem;} .compose-bar{padding:0.4rem;} }
+
+/* Backwards-compatible selectors for older classes */
+.messages { padding:1rem 1.25rem 0 1.25rem; display:grid; gap:.75rem; }
+.bubble.from-doctor { border-left-color: var(--color-cc-green); }
