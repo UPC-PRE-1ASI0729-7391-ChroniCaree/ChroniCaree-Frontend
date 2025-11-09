@@ -1,0 +1,80 @@
+<div class="bp-container">
+  <header class="device-header">
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <div class="header-info">
+      <h1>❤️ Monitor de Presión Arterial</h1>
+      <div class="connection-status" [class.connected]="isConnected()">
+        <span class="status-dot"></span>
+        {{ isConnected() ? 'Conectado' : 'Desconectado' }}
+      </div>
+    </div>
+    <div class="battery">🔋 {{ batteryLevel() }}%</div>
+  </header>
+
+  @if (latestReading(); as reading) {
+    <section class="main-reading">
+      <div class="reading-card" [class]="bpStatus().class">
+        <div class="reading-values">
+          <div class="bp-reading">
+            <div class="sys-dias">
+              <span class="value">{{ reading.systolic }}</span>
+              <span class="separator">/</span>
+              <span class="value">{{ reading.diastolic }}</span>
+              <span class="unit">mmHg</span>
+            </div>
+            <div class="status-label">{{ bpStatus().label }}</div>
+          </div>
+          <div class="hr-reading">
+            <div class="hr-icon">💓</div>
+            <div class="hr-value">{{ reading.heartRate }} <span class="unit">bpm</span></div>
+          </div>
+        </div>
+        <div class="meta">
+          {{ reading.timestamp | date:'dd/MM/yy, h:mm a' }} · Posición: {{ reading.position || '—' }}
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-primary" (click)="refreshData()">🔄 Medir Ahora</button>
+        <button class="btn-secondary" (click)="registerSymptom()">📝 Registrar Síntoma</button>
+      </div>
+    </section>
+  }
+
+  @if (device(); as dev) {
+    <section class="info-section">
+      <h2>Información del Dispositivo</h2>
+      <div class="info-grid">
+        <div><strong>Fabricante:</strong> {{ dev.manufacturer }}</div>
+        <div><strong>Modelo:</strong> {{ dev.model }}</div>
+        <div><strong>Serie:</strong> {{ dev.serialNumber }}</div>
+      </div>
+    </section>
+  }
+
+  <section class="history-section">
+    <h2>📊 Historial</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Sistólica</th>
+          <th>Diastólica</th>
+          <th>Pulso</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of recentReadings(); track r.id) {
+          <tr>
+            <td>{{ r.timestamp | date:'dd/MM, HH:mm' }}</td>
+            <td>{{ r.systolic }}</td>
+            <td>{{ r.diastolic }}</td>
+            <td>{{ r.heartRate }}</td>
+            <td><span class="badge" [class]="bpStatus().class">{{ bpStatus().label }}</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</div>

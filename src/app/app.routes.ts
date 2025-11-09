@@ -212,6 +212,55 @@ export const routes: Routes = [
     ],
   },
 
+  // IoT Devices routes
+  {
+    path: 'devices',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./devices/presentation/views/device-list.view')
+            .then((m) => m.DeviceListView),
+        title: `${baseTitle} - Dispositivos IoT`,
+      },
+      {
+        path: 'glucometer',
+        loadComponent: () =>
+          import('./devices/presentation/components/glucometer/glucometer.component')
+            .then((m) => m.GlucometerComponent),
+        title: `${baseTitle} - Glucómetro`,
+      },
+      {
+        path: 'blood-pressure',
+        loadComponent: () =>
+          import('./devices/presentation/components/blood-pressure/blood-pressure.component')
+            .then((m) => m.BloodPressureComponent),
+        title: `${baseTitle} - Monitor de Presión Arterial`,
+      },
+      {
+        path: 'pulse-oximeter',
+        loadComponent: () =>
+          import('./devices/presentation/components/pulse-oximeter/pulse-oximeter.component')
+            .then((m) => m.PulseOximeterComponent),
+        title: `${baseTitle} - Oxímetro de Pulso`,
+      },
+      {
+        path: 'ecg',
+        loadComponent: () =>
+          import('./devices/presentation/components/ecg/ecg.component')
+            .then((m) => m.ECGComponent),
+        title: `${baseTitle} - Monitor ECG`,
+      },
+      {
+        path: 'smart-scale',
+        loadComponent: () =>
+          import('./devices/presentation/components/smart-scale/smart-scale.component')
+            .then((m) => m.SmartScaleComponent),
+        title: `${baseTitle} - Báscula Inteligente`,
+      },
+    ],
+  },
+
   // Coming Soon (restaurado, sin redirección a mensajes)
   {
     path: 'coming-soon',

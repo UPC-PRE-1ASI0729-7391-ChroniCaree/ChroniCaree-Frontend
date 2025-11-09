@@ -1,0 +1,390 @@
+.glucometer-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header */
+.device-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.btn-back {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: #2980b9;
+}
+
+.header-info h1 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #95a5a6;
+  font-size: 0.9rem;
+}
+
+.connection-status.connected {
+  color: #27ae60;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #95a5a6;
+}
+
+.connection-status.connected .status-dot {
+  background: #27ae60;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.battery-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Main Reading Card */
+.main-reading {
+  margin-bottom: 2rem;
+}
+
+.reading-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-left: 6px solid #3498db;
+  margin-bottom: 1.5rem;
+}
+
+.reading-card.low {
+  border-left-color: #e74c3c;
+  background: linear-gradient(135deg, #fff 0%, #ffe6e6 100%);
+}
+
+.reading-card.normal {
+  border-left-color: #27ae60;
+  background: linear-gradient(135deg, #fff 0%, #e6f7ed 100%);
+}
+
+.reading-card.high {
+  border-left-color: #f39c12;
+  background: linear-gradient(135deg, #fff 0%, #fff3e0 100%);
+}
+
+.reading-value-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.reading-label {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-bottom: 0.5rem;
+}
+
+.reading-value {
+  font-size: 4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1;
+}
+
+.reading-value .unit {
+  font-size: 1.5rem;
+  color: #7f8c8d;
+  font-weight: 400;
+}
+
+.reading-status {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  color: #2c3e50;
+}
+
+.reading-context {
+  font-size: 1rem;
+  color: #7f8c8d;
+  margin-top: 0.3rem;
+}
+
+.reading-meta {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-label {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.meta-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Range Bar */
+.reading-range {
+  margin-top: 1.5rem;
+}
+
+.range-bar {
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+.range-segment {
+  flex: 1;
+}
+
+.range-segment.low {
+  background: #e74c3c;
+}
+
+.range-segment.normal {
+  background: #27ae60;
+}
+
+.range-segment.high {
+  background: #f39c12;
+}
+
+.range-marker {
+  position: absolute;
+  top: -4px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid #2c3e50;
+  transform: translateX(-8px);
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: #ecf0f1;
+  color: #2c3e50;
+}
+
+.btn-secondary:hover {
+  background: #bdc3c7;
+  transform: translateY(-2px);
+}
+
+/* Device Info Section */
+.device-info-section, .history-section, .tips-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.device-info-section h2, .history-section h2, .tips-section h2 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* History Table */
+.history-table-container {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 0.75rem;
+  background: #ecf0f1;
+  color: #2c3e50;
+  font-weight: 600;
+  border-bottom: 2px solid #bdc3c7;
+}
+
+.history-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ecf0f1;
+  color: #2c3e50;
+}
+
+.history-table tr:hover {
+  background: #f8f9fa;
+}
+
+.value-cell {
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.low {
+  background: #ffe6e6;
+  color: #e74c3c;
+}
+
+.status-badge.normal {
+  background: #e6f7ed;
+  color: #27ae60;
+}
+
+.status-badge.high {
+  background: #fff3e0;
+  color: #f39c12;
+}
+
+/* Tips Section */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.tip-card {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.tip-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.tip-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .glucometer-container {
+    padding: 1rem;
+  }
+
+  .device-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .reading-value {
+    font-size: 3rem;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .history-table {
+    font-size: 0.85rem;
+  }
+}
