@@ -30,6 +30,36 @@
       </div>
     }
 
+    @if (stripeBlocked()) {
+      <div class="alert alert-warning stripe-blocked-banner">
+        <div class="icon-container">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="content">
+          <strong>⚠️ Stripe está siendo bloqueado</strong>
+          <p>Tu navegador o una extensión (AdBlock, uBlock Origin, etc.) está bloqueando Stripe. Para procesar pagos:</p>
+          <ol>
+            <li>Desactiva tu bloqueador de anuncios para este sitio</li>
+            <li>O añade <code>*.stripe.com</code> a la lista blanca</li>
+            <li>Recarga la página o haz clic en "Reintentar"</li>
+          </ol>
+          <div class="actions">
+            <button class="btn btn-primary" (click)="retryStripeLoad()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Step 1: Account Info -->
     @if (currentStep() === 1) {
       <div class="form-step">
@@ -135,85 +165,99 @@
           />
         </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="previousStep()">
-            Atrás
-          </button>
-          <button type="button" class="btn-primary" (click)="onNextStep()">
-            Siguiente
-          </button>
-        </div>
-      </div>
-    }
-
-    <!-- Step 3: Plan Selection -->
-    @if (currentStep() === 3) {
-      <div class="form-step">
-        <h2>Selecciona tu Plan</h2>
-        
-        <div class="plans-grid">
-          <div 
-            class="plan-card" 
-            [class.selected]="form().plan === 'basic'"
-            (click)="updateForm('plan', 'basic')"
-          >
-            <h3>Básico</h3>
-            <div class="plan-price">$99<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Hasta 50 pacientes</li>
-              <li>✓ 2 doctores</li>
-              <li>✓ Soporte básico</li>
-            </ul>
-          </div>
-
-          <div 
-            class="plan-card" 
-            [class.selected]="form().plan === 'professional'"
-            (click)="updateForm('plan', 'professional')"
-          >
-            <h3>Profesional</h3>
-            <div class="plan-price">$299<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Hasta 500 pacientes</li>
-              <li>✓ 10 doctores</li>
-              <li>✓ Soporte prioritario</li>
-              <li>✓ Análisis avanzado</li>
-            </ul>
-          </div>
-
-          <div 
-            class="plan-card recommended" 
-            [class.selected]="form().plan === 'enterprise'"
-            (click)="updateForm('plan', 'enterprise')"
-          >
-            <div class="recommended-badge">Recomendado</div>
-            <h3>Enterprise</h3>
-            <div class="plan-price">$799<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Pacientes ilimitados</li>
-              <li>✓ Doctores ilimitados</li>
-              <li>✓ Soporte 24/7</li>
-              <li>✓ Análisis avanzado</li>
-              <li>✓ API dedicada</li>
-              <li>✓ Personalización</li>
-            </ul>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="previousStep()">
+              Atrás
+            </button>
+            <button 
+              type="button" 
+              class="btn-primary" 
+              (click)="onNextToPlans()"
+              [disabled]="submitting()"
+            >
+              {{ submitting() ? 'Guardando...' : 'Siguiente' }}
+            </button>
           </div>
         </div>
+      }
 
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" (click)="previousStep()">
-            Atrás
-          </button>
-          <button 
-            type="button" 
-            class="btn-primary" 
-            (click)="onSubmit()"
-            [disabled]="submitting()"
-          >
-            {{ submitting() ? 'Registrando...' : 'Completar Registro' }}
-          </button>
+      <!-- Step 3: Plan Selection & Payment -->
+      @if (currentStep() === 3) {
+        <div class="form-step payment-step">
+          <h2>Selecciona tu Plan</h2>
+          
+          <!-- Loading Plans -->
+          @if (loadingPlans()) {
+            <div class="loading-container">
+              <div class="spinner"></div>
+              <p>Cargando planes...</p>
+            </div>
+          }
+          
+          <!-- Simple Plan Selector (no preview) -->
+          @if (!loadingPlans()) {
+            <div class="form-group">
+              <label for="planSelect">Elige un plan (opcional)</label>
+              <select id="planSelect" (change)="updateForm('selectedPlanId', $any($event.target).value)" [disabled]="submitting()">
+                <option [value]="null">-- Seleccionar más tarde --</option>
+                @for (plan of availablePlans(); track plan.id) {
+                  <option [value]="'' + plan.id">{{ plan.name }} — ${{ plan.price }} /mes</option>
+                }
+              </select>
+            </div>
+
+            <!-- If user selected a plan, show minimal payment inputs (no plan feature preview) -->
+            @if (form().selectedPlanId) {
+              <div class="payment-form">
+                <h3>Información de Pago</h3>
+
+                <div class="form-group">
+                  <label for="cardholderName">Nombre del titular</label>
+                  <input
+                    type="text"
+                    id="cardholderName"
+                    [value]="cardholderName()"
+                    (input)="cardholderName.set($any($event.target).value)"
+                    placeholder="Nombre completo en la tarjeta"
+                    [disabled]="submitting()"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label>Información de la tarjeta</label>
+                  <div #cardElement class="stripe-card-element"></div>
+                  <p class="helper-text">Procesamiento seguro con Stripe</p>
+                </div>
+
+                <div class="form-group checkbox-group">
+                  <input
+                    type="checkbox"
+                    id="acceptTerms"
+                    [checked]="acceptTerms()"
+                    (change)="acceptTerms.set($any($event.target).checked)"
+                    [disabled]="submitting()"
+                  />
+                  <label for="acceptTerms">Acepto los términos y condiciones de suscripción</label>
+                </div>
+              </div>
+            }
+          }
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="previousStep()" [disabled]="submitting()">
+              Atrás
+            </button>
+            <button 
+              type="button" 
+              class="btn-primary" 
+              (click)="onCompleteRegistration()"
+              [disabled]="!canProceedWithPayment() || submitting()"
+            >
+              {{ submitting() ? 'Procesando pago...' : 'Completar Registro' }}
+            </button>
+          </div>
         </div>
-      </div>
-    }
+      }
+    </div>
   </div>
-</div>

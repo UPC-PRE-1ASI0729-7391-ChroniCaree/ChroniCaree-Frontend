@@ -16,6 +16,6 @@ import { environment } from '../../../environments/environment';
 })
 export class NudgeApiEndpoint extends BaseApiEndpoint<Nudge, NudgeResource, BaseResponse, NudgeAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/nudges`, new NudgeAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.nudgesEndpointPath}`, new NudgeAssembler());
   }
 }

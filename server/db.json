@@ -7,116 +7,268 @@
       "name": "Ana Rodríguez",
       "password": "password123",
       "isVerified": true,
-      "twoFactorEnabled": false
+      "twoFactorEnabled": false,
+      "createdAt": "2024-01-10T00:00:00Z"
     },
     {
       "id": 2,
-      "email": "dr.maria@hospital.com",
+      "email": "dr.maria@hospital1.com",
       "role": "doctor",
       "name": "Dra. María López",
       "password": "password123",
       "isVerified": true,
-      "twoFactorEnabled": false
+      "twoFactorEnabled": false,
+      "createdAt": "2024-01-15T00:00:00Z"
     },
     {
       "id": 3,
-      "email": "dr.juan@chronicaree.com",
-      "role": "doctor",
-      "name": "Dr. Juan Torres",
+      "email": "admin1@hospital1.com",
+      "role": "hospital_admin",
+      "name": "Admin Hospital 1",
       "password": "password123",
       "isVerified": true,
-      "twoFactorEnabled": false
+      "twoFactorEnabled": false,
+      "tenantId": 1,
+      "createdAt": "2024-01-15T00:00:00Z"
     },
     {
       "id": 4,
-      "email": "admin@saludvida.com",
-      "role": "hospital_admin",
-      "name": "Admin SaludVida",
+      "email": "juan@b2c.com",
+      "role": "patient",
+      "name": "Juan Pérez",
       "password": "password123",
       "isVerified": true,
-      "twoFactorEnabled": false
+      "twoFactorEnabled": false,
+      "createdAt": "2024-02-10T00:00:00Z"
     },
     {
-      "id": 1760134180969,
-      "email": "andreo@123.com",
-      "role": "patient",
-      "name": "Andreow Santiago",
-      "password": "123456789",
-      "isVerified": false,
-      "twoFactorEnabled": false
+      "id": 5,
+      "email": "dr.carlos@hospital2.com",
+      "role": "doctor",
+      "name": "Dr. Carlos Méndez",
+      "password": "password123",
+      "isVerified": true,
+      "twoFactorEnabled": false,
+      "createdAt": "2024-02-01T00:00:00Z"
     },
     {
-      "id": 1760136165111,
-      "email": "jose@jose.com",
+      "id": 6,
+      "email": "admin2@hospital2.com",
       "role": "hospital_admin",
-      "name": "josee",
-      "password": "123456789",
-      "isVerified": false,
-      "twoFactorEnabled": false
+      "name": "Admin Hospital 2",
+      "password": "password123",
+      "isVerified": true,
+      "twoFactorEnabled": false,
+      "tenantId": 2,
+      "createdAt": "2024-02-01T00:00:00Z"
     },
     {
-      "id": 1760137119779,
-      "email": "123@123.com",
-      "role": "patient",
-      "name": "juan perez",
-      "password": "123456789",
+      "id": 1762826871788,
+      "email": "admin1@123.com",
+      "role": "hospital_admin",
+      "name": "Jose",
+      "password": "12345678",
       "isVerified": false,
-      "twoFactorEnabled": false
-    },
-    {
-      "id": 1760208835322,
-      "email": "a@a.com",
-      "role": "patient",
-      "name": "and ow",
-      "password": "123456789",
-      "isVerified": false,
-      "twoFactorEnabled": false
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-11T02:07:51.788Z",
+      "tenantId": null
     }
   ],
   "tenants": [
     {
       "id": 1,
+      "adminUserId": 3,
       "name": "Clínica SaludVida",
-      "address": "Av. Principal 123",
+      "address": "Av. Principal 123, Lima",
       "phone": "+51 999 888 777",
-      "plan": "enterprise",
+      "email": "admin1@hospital1.com",
       "status": "active",
-      "registrationDate": "2024-01-15"
+      "subscriptionId": 1,
+      "registrationDate": "2024-01-15T00:00:00Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 10
+      }
     },
     {
-      "id": 1760136165157,
-      "name": "hospital san lorenzo"
+      "id": 2,
+      "adminUserId": 6,
+      "name": "Hospital San Lorenzo",
+      "address": "Av. San Lorenzo 456, Lima",
+      "phone": "+51 987 654 321",
+      "email": "admin2@hospital2.com",
+      "status": "active",
+      "subscriptionId": 2,
+      "registrationDate": "2024-02-01T00:00:00Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": false,
+        "maxDoctors": 10
+      }
+    }
+  ],
+  "subscriptionPlans": [
+    {
+      "id": "patient_free",
+      "type": "patient",
+      "name": "Gratuito",
+      "price": 0,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": false,
+        "advancedReports": false,
+        "dataStorage": "6 months",
+        "support": "community",
+        "aiInsights": false,
+        "familySharing": false,
+        "availability": "Lunes a Viernes 24/7"
+      }
+    },
+    {
+      "id": "patient_standard",
+      "type": "patient",
+      "name": "Estándar",
+      "price": 19.99,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": true,
+        "advancedReports": false,
+        "dataStorage": "1 year",
+        "support": "priority",
+        "aiInsights": false,
+        "familySharing": false,
+        "availability": "24/7 Todos los días",
+        "homeVisits": true
+      }
+    },
+    {
+      "id": "patient_premium",
+      "type": "patient",
+      "name": "Premium",
+      "price": 49.99,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": true,
+        "advancedReports": true,
+        "dataStorage": "unlimited",
+        "support": "priority",
+        "aiInsights": true,
+        "familySharing": true,
+        "maxMembers": 5,
+        "availability": "24/7 Todos los días",
+        "homeVisits": true,
+        "specialistAccess": true
+      }
+    },
+    {
+      "id": "tenant_basic",
+      "type": "tenant",
+      "name": "Basic",
+      "price": 299,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "maxDoctors": 5,
+        "maxPatients": 100,
+        "basicAnalytics": true,
+        "advancedAnalytics": false,
+        "customBranding": false,
+        "apiAccess": false,
+        "support": "email",
+        "dataRetention": "1 year"
+      }
+    },
+    {
+      "id": "tenant_professional",
+      "type": "tenant",
+      "name": "Professional",
+      "price": 599,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "maxDoctors": 20,
+        "maxPatients": 500,
+        "basicAnalytics": true,
+        "advancedAnalytics": true,
+        "customBranding": true,
+        "apiAccess": true,
+        "support": "phone",
+        "dataRetention": "3 years"
+      }
+    },
+    {
+      "id": "tenant_enterprise",
+      "type": "tenant",
+      "name": "Enterprise",
+      "price": 999,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "maxDoctors": -1,
+        "maxPatients": -1,
+        "basicAnalytics": true,
+        "advancedAnalytics": true,
+        "customBranding": true,
+        "apiAccess": true,
+        "support": "dedicated",
+        "dataRetention": "unlimited",
+        "whiteLabel": true,
+        "customIntegrations": true
+      }
     }
   ],
   "subscriptions": [
     {
       "id": 1,
-      "payerType": "patient",
+      "payerType": "tenant",
       "payerId": 1,
-      "patientId": 1,
-      "plan": "premium",
+      "planId": "tenant_enterprise",
       "status": "active",
-      "startDate": "2025-01-01",
-      "endDate": "2025-12-31"
+      "startDate": "2024-01-15T00:00:00Z",
+      "endDate": "2025-01-15T00:00:00Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "admin1@hospital1.com",
+      "nextBillingDate": "2025-01-15T00:00:00Z",
+      "lastPaymentDate": "2024-12-15T00:00:00Z",
+      "lastPaymentAmount": 999
     },
     {
       "id": 2,
       "payerType": "tenant",
-      "payerId": 1,
-      "patientId": null,
-      "plan": "enterprise",
+      "payerId": 2,
+      "planId": "tenant_enterprise",
       "status": "active",
-      "startDate": "2024-01-15",
-      "endDate": "2025-01-15"
+      "startDate": "2024-02-01T00:00:00Z",
+      "endDate": "2025-02-01T00:00:00Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "admin2@hospital2.com",
+      "nextBillingDate": "2025-02-01T00:00:00Z",
+      "lastPaymentDate": "2025-01-01T00:00:00Z",
+      "lastPaymentAmount": 999
     }
   ],
   "patients": [
     {
       "id": 1,
       "userId": 1,
-      "assignedDoctorId": 2,
-      "tenantId": null,
-      "subscriptionId": 1,
+      "assignedDoctorId": 1,
+      "tenantId": 1,
+      "subscriptionId": null,
       "firstName": "Ana",
       "lastName": "Rodríguez",
       "dni": "12345678",
@@ -126,58 +278,34 @@
       "address": "Calle Lima 456",
       "weight": 68,
       "height": 1.65,
-      "bmi": 24.9
+      "bmi": 24.9,
+      "emergencyContact": {
+        "name": "Carlos Rodríguez",
+        "relationship": "spouse",
+        "phone": "+51 999 111 223"
+      }
     },
     {
-      "id": 1760134181081,
-      "userId": 1760134180969,
+      "id": 2,
+      "userId": 4,
       "assignedDoctorId": 2,
-      "tenantId": null,
+      "tenantId": 2,
       "subscriptionId": null,
-      "firstName": "Andreow",
-      "lastName": "Santiago",
-      "dni": "12345678",
-      "birthDate": "2005-10-05",
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "dni": "87654321",
+      "birthDate": "1985-08-22",
       "gender": "male",
-      "phone": "123456789",
-      "address": "Av 123",
-      "weight": 75,
-      "height": 1.75,
-      "bmi": 24.5
-    },
-    {
-      "id": 1760137119834,
-      "userId": 1760137119779,
-      "assignedDoctorId": 2,
-      "tenantId": null,
-      "subscriptionId": null,
-      "firstName": "juan",
-      "lastName": "perez",
-      "dni": "123456789",
-      "birthDate": "2004-06-16",
-      "gender": "male",
-      "phone": "123456789",
-      "address": "123 av",
-      "weight": 0,
-      "height": 0,
-      "bmi": 0
-    },
-    {
-      "id": 1760208835420,
-      "userId": 1760208835322,
-      "assignedDoctorId": null,
-      "tenantId": null,
-      "subscriptionId": null,
-      "firstName": "and",
-      "lastName": "ow",
-      "dni": "12345",
-      "birthDate": "2007-06-14",
-      "gender": "female",
-      "phone": "12345679",
-      "address": "123",
-      "weight": 0,
-      "height": 0,
-      "bmi": 0
+      "phone": "+51 998 777 666",
+      "address": "Jr. Huáscar 789",
+      "weight": 78,
+      "height": 1.8,
+      "bmi": 24.1,
+      "emergencyContact": {
+        "name": "María Pérez",
+        "relationship": "spouse",
+        "phone": "+51 998 777 667"
+      }
     }
   ],
   "doctors": [
@@ -192,242 +320,111 @@
       "specialty": "Endocrinología",
       "licenseNumber": "CMP-12345",
       "phone": "+51 999 333 444",
-      "isVerified": true
+      "isVerified": true,
+      "acceptingPatients": true,
+      "consultationFee": 80,
+      "languages": [
+        "Spanish",
+        "English"
+      ],
+      "joinedAt": "2024-01-15T00:00:00Z"
     },
     {
       "id": 2,
-      "userId": 3,
-      "tenantId": null,
-      "isIndependent": true,
-      "firstName": "Juan",
-      "lastName": "Torres",
+      "userId": 5,
+      "tenantId": 2,
+      "isIndependent": false,
+      "firstName": "Carlos",
+      "lastName": "Méndez",
       "dni": "11223344",
       "specialty": "Cardiología",
       "licenseNumber": "CMP-54321",
       "phone": "+51 999 555 666",
-      "isVerified": true
+      "isVerified": true,
+      "acceptingPatients": true,
+      "consultationFee": 100,
+      "languages": [
+        "Spanish"
+      ],
+      "joinedAt": "2024-02-01T00:00:00Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "doctorId": 1,
+      "tenantId": 1,
+      "date": "2025-11-15",
+      "time": "10:00",
+      "type": "CONSULTATION",
+      "status": "scheduled",
+      "notes": "Control de diabetes"
+    },
+    {
+      "id": 2,
+      "patientId": 2,
+      "doctorId": 2,
+      "tenantId": 2,
+      "date": "2025-11-16",
+      "time": "14:00",
+      "type": "FOLLOW_UP",
+      "status": "scheduled",
+      "notes": "Revisión post-ECG"
     }
   ],
   "records": [
     {
       "id": 1,
       "patientId": 1,
-      "doctorId": 2,
+      "doctorId": 1,
+      "tenantId": 1,
       "type": "vital_signs",
-      "date": "2025-10-10T08:30:00Z",
+      "date": "2025-11-10T09:00:00Z",
       "glucose": 95,
-      "bloodPressure": "120/80",
+      "bloodPressure": "118/75",
       "heartRate": 72,
       "temperature": 36.5,
       "weight": 68,
-      "notes": "Valores normales"
+      "notes": "Valores dentro de rango normal"
     },
     {
       "id": 2,
-      "patientId": 1,
+      "patientId": 2,
       "doctorId": 2,
-      "type": "symptoms",
-      "date": "2025-10-10T09:00:00Z",
-      "fatigue": 3,
-      "pain": 2,
-      "dizziness": 1,
-      "notes": "Leve cansancio reportado"
-    },
-    {
-      "id": 3,
-      "patientId": 1,
-      "doctorId": 2,
-      "type": "consultation",
-      "date": "2025-10-08T10:00:00Z",
-      "diagnosis": "Control de rutina",
-      "treatment": "Continuar con medicación actual - Dieta balanceada",
-      "notes": "Paciente estable, seguir monitoreo"
-    },
-    {
-      "id": 4,
-      "patientId": 1760134181081,
-      "doctorId": 2,
+      "tenantId": 2,
       "type": "vital_signs",
-      "date": "2025-10-09T14:00:00Z",
-      "glucose": 88,
-      "bloodPressure": "118/75",
+      "date": "2025-11-10T10:30:00Z",
+      "glucose": 90,
+      "bloodPressure": "125/80",
       "heartRate": 68,
       "temperature": 36.7,
-      "weight": 75,
-      "notes": "Primera evaluación - valores normales"
-    },
-    {
-      "id": 5,
-      "patientId": 1760134181081,
-      "doctorId": 2,
-      "type": "consultation",
-      "date": "2025-10-09T14:30:00Z",
-      "diagnosis": "Evaluación inicial",
-      "treatment": "Recomendaciones de estilo de vida saludable",
-      "notes": "Paciente joven, sin antecedentes relevantes"
-    },
-    {
-      "patientId": 1,
-      "type": "symptoms",
-      "date": "2025-10-11T19:06:14.321Z",
-      "glucose": 123,
-      "bloodPressure": "90/40",
-      "heartRate": 80,
-      "temperature": 37,
-      "fatigue": 9,
-      "pain": 2,
-      "dizziness": 2,
-      "notes": "estoy cansadoooooXDD",
-      "reviewStatus": "pending_review",
-      "doctorId": 2,
-      "id": 6
-    },
-    {
-      "patientId": 1,
-      "type": "symptoms",
-      "date": "2025-10-11T19:38:16.956Z",
-      "glucose": 123,
-      "bloodPressure": "123/60",
-      "heartRate": 80,
-      "temperature": 37,
-      "fatigue": 10,
-      "pain": 10,
-      "dizziness": 10,
-      "notes": "no puedo dormir me siento con mareos y temblores ",
-      "reviewStatus": "pending_review",
-      "doctorId": 2,
-      "id": 7
+      "weight": 78,
+      "notes": "Estable, sin hallazgos anormales"
     }
   ],
   "symptoms": [
     {
       "id": 1,
       "patientId": 1,
-      "glucose": 180,
-      "bloodPressure": "140/90",
-      "fatigue": 7,
-      "pain": 3,
-      "timestamp": "2025-04-05T08:30:00Z"
+      "tenantId": 1,
+      "glucose": 140,
+      "bloodPressure": "122/78",
+      "fatigue": 2,
+      "pain": 0,
+      "timestamp": "2025-11-10T08:00:00Z",
+      "notes": "Leve fatiga matutina, mejoró con desayuno"
     },
     {
       "id": 2,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "112/56",
-      "heartRate": 123,
-      "temperature": 35,
-      "oxygenSaturation": 23,
-      "fatigue": 6,
-      "pain": 3,
-      "dizziness": 9,
-      "notes": "Tengo mucho mareo ",
-      "timestamp": "2025-10-10T17:04:25.972Z",
-      "isEdited": false
-    },
-    {
-      "id": 3,
-      "patientId": 1,
-      "glucose": 12,
-      "bloodPressure": "140/60",
-      "heartRate": 100,
-      "temperature": 37.5,
-      "oxygenSaturation": 100,
-      "fatigue": 9,
-      "pain": 9,
-      "dizziness": 9,
-      "notes": "me estoy muriendo ayuda",
-      "timestamp": "2025-10-10T17:10:14.334Z",
-      "isEdited": false
-    },
-    {
-      "id": 4,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "122/12",
-      "heartRate": 32,
-      "temperature": 41,
-      "oxygenSaturation": 43,
-      "fatigue": 8,
-      "pain": 9,
-      "dizziness": 8,
-      "notes": "32",
-      "timestamp": "2025-10-10T20:10:09.598Z",
-      "isEdited": false
-    },
-    {
-      "id": 5,
-      "patientId": 1760134181081,
-      "glucose": 600,
-      "bloodPressure": "123/60",
-      "heartRate": 80,
-      "temperature": 37,
-      "oxygenSaturation": 100,
-      "fatigue": 9,
-      "pain": 9,
-      "dizziness": 9,
-      "notes": "me desamyoooo",
-      "timestamp": "2025-10-11T00:20:19.799Z",
-      "isEdited": false
-    },
-    {
-      "id": 6,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "12/60",
-      "heartRate": 80,
-      "temperature": 36,
-      "oxygenSaturation": 100,
-      "fatigue": 10,
-      "pain": 10,
-      "dizziness": 10,
-      "notes": "me siento mal",
-      "timestamp": "2025-10-11T02:30:44.421Z",
-      "isEdited": false
-    },
-    {
-      "id": 7,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "20/60",
-      "heartRate": 80,
-      "temperature": 36,
-      "oxygenSaturation": 100,
-      "fatigue": 10,
-      "pain": 10,
-      "dizziness": 5,
-      "notes": "me duele todo ",
-      "timestamp": "2025-10-11T02:32:47.554Z",
-      "isEdited": false
-    },
-    {
-      "id": 8,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "90/40",
-      "heartRate": 80,
-      "temperature": 37,
-      "oxygenSaturation": 100,
-      "fatigue": 9,
-      "pain": 2,
-      "dizziness": 2,
-      "notes": "estoy cansadoooooXDD",
-      "timestamp": "2025-10-11T19:06:14.258Z",
-      "isEdited": false
-    },
-    {
-      "id": 9,
-      "patientId": 1,
-      "glucose": 123,
-      "bloodPressure": "123/60",
-      "heartRate": 80,
-      "temperature": 37,
-      "oxygenSaturation": 100,
-      "fatigue": 10,
-      "pain": 10,
-      "dizziness": 10,
-      "notes": "no puedo dormir me siento con mareos y temblores ",
-      "timestamp": "2025-10-11T19:38:16.898Z",
-      "isEdited": false
+      "patientId": 2,
+      "tenantId": 2,
+      "heartRate": 88,
+      "bloodPressure": "130/82",
+      "fatigue": 3,
+      "dizziness": 1,
+      "timestamp": "2025-11-10T18:00:00Z",
+      "notes": "Cansancio tras jornada laboral"
     }
   ],
   "medications": [
@@ -436,323 +433,39 @@
       "patientId": 1,
       "name": "Metformina",
       "type": "pill",
-      "dosage": "500mg - 2 tabletas",
+      "dosage": "500mg",
       "schedule": {
         "frequency": "twice_daily",
         "times": [
           "08:00",
           "20:00"
         ],
-        "startDate": "2025-01-01T00:00:00Z",
-        "endDate": null
+        "startDate": "2024-01-20T00:00:00Z"
       },
-      "prescribedBy": "Dr. Juan Torres",
-      "prescribedDate": "2025-01-01T00:00:00Z",
+      "prescribedBy": "Dra. María López",
+      "prescribedDate": "2024-01-20T00:00:00Z",
       "status": "active",
-      "instructions": "Tomar con alimentos, preferiblemente después del desayuno y cena",
-      "sideEffects": [
-        "Náuseas leves",
-        "Dolor estomacal"
-      ],
-      "contraindications": [
-        "Enfermedad renal severa",
-        "Acidosis metabólica"
-      ],
-      "purpose": "Control de glucosa en sangre para diabetes tipo 2",
-      "refillDate": "2025-04-20T00:00:00Z",
-      "logs": [
-        {
-          "id": "log_1",
-          "medicationId": "med_1",
-          "scheduledTime": "2025-04-05T08:00:00Z",
-          "actualTime": "2025-04-05T08:05:00Z",
-          "status": "taken",
-          "notes": "Tomado con desayuno",
-          "createdAt": "2025-04-05T08:05:00Z"
-        },
-        {
-          "id": "log_2",
-          "medicationId": "med_1",
-          "scheduledTime": "2025-04-04T20:00:00Z",
-          "actualTime": "2025-04-04T20:10:00Z",
-          "status": "taken",
-          "createdAt": "2025-04-04T20:10:00Z"
-        },
-        {
-          "id": "log_3",
-          "medicationId": "med_1",
-          "scheduledTime": "2025-04-04T08:00:00Z",
-          "actualTime": "2025-04-04T08:00:00Z",
-          "status": "taken",
-          "createdAt": "2025-04-04T08:00:00Z"
-        }
-      ],
-      "createdAt": "2025-01-01T00:00:00Z",
-      "updatedAt": "2025-04-05T08:05:00Z"
+      "purpose": "Control de glucosa",
+      "createdAt": "2024-01-20T00:00:00Z"
     },
     {
       "id": "med_2",
-      "patientId": 1,
-      "name": "Enalapril",
+      "patientId": 2,
+      "name": "Atenolol",
       "type": "pill",
-      "dosage": "10mg - 5 tableta",
+      "dosage": "50mg",
       "schedule": {
         "frequency": "once_daily",
         "times": [
           "08:00"
         ],
-        "startDate": "2025-01-01T00:00:00.000Z"
+        "startDate": "2024-02-10T00:00:00Z"
       },
-      "prescribedBy": "Dr. Juan Torres",
-      "prescribedDate": "2025-01-01T00:00:00.000Z",
+      "prescribedBy": "Dr. Carlos Méndez",
+      "prescribedDate": "2024-02-10T00:00:00Z",
       "status": "active",
-      "instructions": "Tomar en ayunas o con alimentos, preferiblemente a la misma hora cada día",
-      "sideEffects": [
-        "Tos seca",
-        "Mareos"
-      ],
-      "contraindications": [
-        "Embarazo",
-        "Angioedema previo"
-      ],
-      "purpose": "Control de presión arterial - Hipertensión",
-      "refillDate": "2025-04-25T00:00:00.000Z",
-      "logs": [
-        {
-          "id": "log_4",
-          "medicationId": "med_2",
-          "scheduledTime": "2025-04-05T08:00:00.000Z",
-          "actualTime": "2025-04-05T08:05:00.000Z",
-          "status": "taken",
-          "notes": "Tomado con desayuno",
-          "createdAt": "2025-04-05T08:05:00.000Z"
-        },
-        {
-          "id": "log_5",
-          "medicationId": "med_2",
-          "scheduledTime": "2025-04-04T08:00:00.000Z",
-          "actualTime": "2025-04-04T08:00:00.000Z",
-          "status": "taken",
-          "createdAt": "2025-04-04T08:00:00.000Z"
-        }
-      ],
-      "createdAt": "2025-01-01T00:00:00.000Z",
-      "updatedAt": "2025-10-11T02:28:11.780Z"
-    },
-    {
-      "id": "med_3",
-      "patientId": 1,
-      "name": "Atorvastatina",
-      "type": "pill",
-      "dosage": "20mg - 1 tableta",
-      "schedule": {
-        "frequency": "once_daily",
-        "times": [
-          "21:00"
-        ],
-        "startDate": "2025-02-01T00:00:00Z",
-        "endDate": null
-      },
-      "prescribedBy": "Dr. Juan Torres",
-      "prescribedDate": "2025-02-01T00:00:00Z",
-      "status": "active",
-      "instructions": "Tomar antes de dormir. Evitar jugo de toronja",
-      "sideEffects": [
-        "Dolor muscular",
-        "Fatiga"
-      ],
-      "contraindications": [
-        "Enfermedad hepática activa",
-        "Embarazo"
-      ],
-      "purpose": "Reducción de colesterol y triglicéridos",
-      "refillDate": "2025-04-15T00:00:00Z",
-      "logs": [
-        {
-          "id": "log_6",
-          "medicationId": "med_3",
-          "scheduledTime": "2025-04-04T21:00:00Z",
-          "actualTime": "2025-04-04T21:15:00Z",
-          "status": "taken",
-          "createdAt": "2025-04-04T21:15:00Z"
-        },
-        {
-          "id": "log_7",
-          "medicationId": "med_3",
-          "scheduledTime": "2025-04-03T21:00:00Z",
-          "status": "missed",
-          "skippedReason": "Se me olvidó",
-          "createdAt": "2025-04-04T08:00:00Z"
-        }
-      ],
-      "createdAt": "2025-02-01T00:00:00Z",
-      "updatedAt": "2025-04-04T21:15:00Z"
-    },
-    {
-      "id": "med_4",
-      "patientId": 1,
-      "name": "Vitamina D3",
-      "type": "capsule",
-      "dosage": "2000 IU - 1 cápsula",
-      "schedule": {
-        "frequency": "once_daily",
-        "times": [
-          "12:00"
-        ],
-        "startDate": "2025-03-01T00:00:00Z",
-        "endDate": null
-      },
-      "prescribedBy": "Dr. Juan Torres",
-      "prescribedDate": "2025-03-01T00:00:00Z",
-      "status": "active",
-      "instructions": "Tomar con la comida principal del día",
-      "sideEffects": [],
-      "contraindications": [
-        "Hipercalcemia"
-      ],
-      "purpose": "Suplemento vitamínico para salud ósea",
-      "refillDate": "2025-05-01T00:00:00Z",
-      "logs": [
-        {
-          "id": "log_8",
-          "medicationId": "med_4",
-          "scheduledTime": "2025-04-05T12:00:00Z",
-          "status": "scheduled",
-          "createdAt": "2025-04-05T00:00:00Z"
-        }
-      ],
-      "createdAt": "2025-03-01T00:00:00Z",
-      "updatedAt": "2025-04-05T12:00:00Z"
-    },
-    {
-      "id": "med_1760211886656",
-      "patientId": "1",
-      "name": "amoxicilina",
-      "type": "pill",
-      "dosage": "2",
-      "schedule": {
-        "frequency": "once_daily",
-        "times": [
-          "09:00"
-        ],
-        "startDate": "2025-10-11T19:44:46.656Z"
-      },
-      "prescribedBy": "Doctor",
-      "prescribedDate": "2025-10-11T19:44:46.656Z",
-      "status": "active",
-      "sideEffects": [],
-      "contraindications": [],
-      "logs": [],
-      "createdAt": "2025-10-11T19:44:46.656Z",
-      "updatedAt": "2025-10-11T19:44:46.656Z"
-    }
-  ],
-  "alerts": [
-    {
-      "id": "alert_1",
-      "patientId": 1,
-      "type": "vital_sign_high",
-      "severity": "high",
-      "title": "Presión Arterial Sistólica alta ⬆️",
-      "message": "Tu Presión Arterial Sistólica está en 145 mmHg, fuera del rango normal (90-120 mmHg)",
-      "status": "active",
-      "metadata": {
-        "vitalSign": "Presión Arterial Sistólica",
-        "value": 145,
-        "unit": "mmHg",
-        "threshold": 120,
-        "measurement": "symptom_1"
-      },
-      "createdAt": "2025-04-05T10:30:00Z"
-    },
-    {
-      "id": "alert_2",
-      "patientId": 1,
-      "type": "vital_sign_high",
-      "severity": "critical",
-      "title": "Glucosa alta ⬆️",
-      "message": "Tu Glucosa está en 180 mg/dL, fuera del rango normal (70-100 mg/dL)",
-      "status": "active",
-      "metadata": {
-        "vitalSign": "Glucosa",
-        "value": 180,
-        "unit": "mg/dL",
-        "threshold": 100,
-        "measurement": "symptom_2"
-      },
-      "createdAt": "2025-04-05T14:15:00Z"
-    },
-    {
-      "id": "alert_3",
-      "patientId": 1,
-      "type": "vital_sign_low",
-      "severity": "medium",
-      "title": "Saturación de Oxígeno baja ⬇️",
-      "message": "Tu Saturación de Oxígeno está en 92%, fuera del rango normal (95-100%)",
-      "status": "active",
-      "metadata": {
-        "vitalSign": "Saturación de Oxígeno",
-        "value": 92,
-        "unit": "%",
-        "threshold": 95,
-        "measurement": "symptom_3"
-      },
-      "createdAt": "2025-04-05T09:00:00Z"
-    },
-    {
-      "id": "alert_4",
-      "patientId": 1,
-      "type": "vital_sign_high",
-      "severity": "high",
-      "title": "Frecuencia Cardíaca alta ⬆️",
-      "message": "Tu Frecuencia Cardíaca está en 110 bpm, fuera del rango normal (60-100 bpm)",
-      "status": "acknowledged",
-      "metadata": {
-        "vitalSign": "Frecuencia Cardíaca",
-        "value": 110,
-        "unit": "bpm",
-        "threshold": 100,
-        "measurement": "symptom_4"
-      },
-      "createdAt": "2025-04-04T16:20:00Z",
-      "acknowledgedAt": "2025-04-04T17:00:00Z",
-      "acknowledgedBy": "user_1",
-      "notes": "Después de ejercicio, monitoreando"
-    },
-    {
-      "id": "alert_5",
-      "patientId": 1,
-      "type": "medication_overdue",
-      "severity": "medium",
-      "title": "Medicación atrasada",
-      "message": "No has tomado Metformina a las 08:00 AM como estaba programado",
-      "status": "resolved",
-      "metadata": {
-        "medicationId": "med_1"
-      },
-      "createdAt": "2025-04-04T08:30:00Z",
-      "resolvedAt": "2025-04-04T09:15:00Z",
-      "notes": "Tomado con retraso"
-    }
-  ],
-  "adherence": [
-    {
-      "id": 1,
-      "medicationId": "med_1",
-      "patientId": 1,
-      "scheduledTime": "2025-04-05T08:00:00Z",
-      "takenAt": "2025-04-05T08:05:00Z",
-      "confirmed": true,
-      "skipped": false
-    },
-    {
-      "id": 2,
-      "medicationId": "med_1",
-      "patientId": 1,
-      "scheduledTime": "2025-04-05T20:00:00Z",
-      "takenAt": null,
-      "confirmed": false,
-      "skipped": false
+      "purpose": "Control de presión arterial",
+      "createdAt": "2024-02-10T00:00:00Z"
     }
   ],
   "devices": [
@@ -762,393 +475,119 @@
       "type": "glucometer",
       "brand": "Accu-Chek",
       "model": "Guide",
-      "lastSync": "2025-04-05T08:25:00Z",
-      "isActive": true
+      "lastSync": "2025-11-10T08:30:00Z",
+      "isActive": true,
+      "autoSyncEnabled": true
     },
     {
       "id": 2,
-      "patientId": 1,
+      "patientId": 2,
       "type": "blood_pressure",
       "brand": "Omron",
       "model": "M3",
-      "lastSync": "2025-04-05T08:30:00Z",
-      "isActive": true
+      "lastSync": "2025-11-10T18:15:00Z",
+      "isActive": true,
+      "autoSyncEnabled": true
     }
   ],
   "messages": [
     {
       "id": 1,
       "senderId": 1,
-      "receiverId": 3,
+      "receiverId": 2,
       "senderRole": "patient",
       "receiverRole": "doctor",
-      "subject": "Consulta sobre glucosa",
-      "content": "Doctor, mi glucosa está alta esta mañana.",
-      "timestamp": "2025-04-05T08:35:00Z",
-      "read": false,
-      "attachments": []
+      "subject": "Duda sobre glucosa matutina",
+      "content": "Doctora, hoy amanecí con 140 mg/dL. ¿Debo ajustar algo?",
+      "timestamp": "2025-11-10T08:30:00Z",
+      "read": false
     },
     {
       "id": 2,
-      "senderId": 3,
+      "senderId": 2,
       "receiverId": 1,
       "senderRole": "doctor",
       "receiverRole": "patient",
-      "subject": "Re: Consulta sobre glucosa",
-      "content": "Buenos días Ana, vamos a ajustar la medicación. Por favor mide tu glucosa después del desayuno también.",
-      "timestamp": "2025-04-05T09:15:00Z",
-      "read": true,
-      "attachments": []
-    },
-    {
-      "senderId": "1",
-      "receiverId": "2",
-      "senderRole": "PATIENT",
-      "receiverRole": "doctor",
-      "subject": "prueba",
-      "content": "prueba",
-      "timestamp": "2025-10-11T01:28:21.579Z",
-      "read": false,
-      "isUrgent": false,
-      "attachments": [],
-      "id": 3
-    },
-    {
-      "senderId": "1",
-      "receiverId": "2",
-      "senderRole": "PATIENT",
-      "receiverRole": "doctor",
-      "subject": "holaa me siento mal",
-      "content": "me siento mal",
-      "timestamp": "2025-10-11T02:28:40.809Z",
-      "read": false,
-      "isUrgent": true,
-      "attachments": [],
-      "id": 4
-    },
-    {
-      "senderId": "1",
-      "receiverId": "2",
-      "senderRole": "PATIENT",
-      "receiverRole": "doctor",
-      "subject": "hola",
-      "content": "holaaa",
-      "timestamp": "2025-10-11T23:36:16.860Z",
-      "read": false,
-      "isUrgent": true,
-      "attachments": [],
-      "id": 5
-    },
-    {
-      "senderId": "1",
-      "receiverId": "2",
-      "senderRole": "PATIENT",
-      "receiverRole": "doctor",
-      "subject": "xddd",
-      "content": "xdddddd no se",
-      "timestamp": "2025-10-11T23:36:37.782Z",
-      "read": false,
-      "isUrgent": true,
-      "attachments": [],
-      "id": 6
+      "subject": "Re: Duda sobre glucosa matutina",
+      "content": "Hola Ana, es un valor aceptable en ayunas. Sigue igual. Vemos en la cita del 15.",
+      "timestamp": "2025-11-10T10:00:00Z",
+      "read": true
     }
   ],
   "diagnoses": [
     {
       "id": 1,
       "patientId": 1,
-      "doctorId": 3,
+      "doctorId": 1,
       "icd10Code": "E11.9",
-      "diagnosisName": "Diabetes mellitus tipo 2 sin complicaciones",
+      "diagnosisName": "Diabetes mellitus tipo 2",
       "status": "controlled",
       "severity": "moderate",
       "diagnosedDate": "2023-01-15T00:00:00Z",
-      "resolvedDate": null,
-      "notes": "Paciente en tratamiento con Metformina. Glucosa en niveles aceptables con medicación.",
-      "treatment": "Metformina 500mg, 2 veces al día + dieta baja en azúcares + ejercicio 30 min/día",
+      "treatment": "Metformina + dieta + ejercicio",
       "followUpRequired": true,
-      "lastReviewDate": "2025-04-01T00:00:00Z",
-      "createdAt": "2023-01-15T00:00:00Z",
-      "updatedAt": "2025-04-01T00:00:00Z"
+      "lastReviewDate": "2025-11-10T00:00:00Z"
     },
     {
       "id": 2,
-      "patientId": 1,
-      "doctorId": 3,
+      "patientId": 2,
+      "doctorId": 2,
       "icd10Code": "I10",
-      "diagnosisName": "Hipertensión arterial esencial (primaria)",
+      "diagnosisName": "Hipertensión esencial",
       "status": "controlled",
       "severity": "moderate",
-      "diagnosedDate": "2023-06-20T00:00:00Z",
-      "resolvedDate": null,
-      "notes": "Presión arterial controlada con medicación. Paciente sigue indicaciones correctamente.",
-      "treatment": "Enalapril 10mg, 1 vez al día (mañanas) + reducción de sal + monitoreo regular",
+      "diagnosedDate": "2023-05-10T00:00:00Z",
+      "treatment": "Atenolol + reducción de sal",
       "followUpRequired": true,
-      "lastReviewDate": "2025-04-01T00:00:00Z",
-      "createdAt": "2023-06-20T00:00:00Z",
-      "updatedAt": "2025-04-01T00:00:00Z"
-    },
-    {
-      "id": 3,
-      "patientId": 1,
-      "doctorId": 3,
-      "icd10Code": "E78.5",
-      "diagnosisName": "Hiperlipidemia no especificada",
-      "status": "active",
-      "severity": "high",
-      "diagnosedDate": "2024-11-10T00:00:00Z",
-      "resolvedDate": null,
-      "notes": "Colesterol y triglicéridos elevados. Requiere cambios en dieta y posible medicación.",
-      "treatment": "Dieta baja en grasas saturadas + ejercicio cardiovascular + control en 3 meses",
-      "followUpRequired": true,
-      "lastReviewDate": "2025-02-10T00:00:00Z",
-      "createdAt": "2024-11-10T00:00:00Z",
-      "updatedAt": "2025-02-10T00:00:00Z"
-    },
-    {
-      "id": 4,
-      "patientId": 1,
-      "doctorId": 3,
-      "icd10Code": "J06.9",
-      "diagnosisName": "Infección aguda de las vías respiratorias superiores",
-      "status": "resolved",
-      "severity": "low",
-      "diagnosedDate": "2025-03-05T00:00:00Z",
-      "resolvedDate": "2025-03-20T00:00:00Z",
-      "notes": "Resfriado común tratado exitosamente. Sin complicaciones.",
-      "treatment": "Paracetamol 500mg cada 8 horas + reposo + hidratación",
-      "followUpRequired": false,
-      "lastReviewDate": "2025-03-20T00:00:00Z",
-      "createdAt": "2025-03-05T00:00:00Z",
-      "updatedAt": "2025-03-20T00:00:00Z"
+      "lastReviewDate": "2025-11-10T00:00:00Z"
     }
   ],
-  "treatmentPlans": [
+  "payments": [
     {
       "id": 1,
-      "patientId": 1,
-      "doctorId": 3,
-      "title": "Control de Diabetes",
-      "goals": "Control glucémico <140 mg/dL",
-      "medications": [
-        1
-      ],
-      "recommendations": "Dieta baja en azúcares, ejercicio 30 min/día",
-      "createdAt": "2025-04-01T10:00:00Z",
-      "updatedAt": "2025-04-05T10:00:00Z",
-      "status": "active"
-    }
-  ],
-  "appointments": [
-    {
-      "id": 1,
-      "patientId": 1,
-      "doctorId": 2,
-      "date": "2025-10-11",
-      "time": "10:00",
-      "type": "CONSULTATION",
-      "status": "cancelled",
-      "notes": "Control mensual de diabetes"
-    },
-    {
-      "id": 2,
-      "patientId": 1,
-      "doctorId": 2,
-      "date": "2025-10-10",
-      "time": "15:30",
-      "type": "FOLLOW_UP",
-      "status": "CONFIRMED",
-      "notes": "Revisión de presión arterial"
-    },
-    {
-      "id": 3,
-      "patientId": 1760134181081,
-      "doctorId": 2,
-      "date": "2025-10-12",
-      "time": "09:00",
-      "type": "INITIAL_ASSESSMENT",
-      "status": "cancelled",
-      "notes": "Primera consulta"
-    },
-    {
-      "id": 4,
-      "patientId": 1760134181081,
-      "doctorId": 2,
-      "date": "2025-10-15",
-      "time": "14:00",
-      "type": "ROUTINE_CHECKUP",
-      "status": "cancelled",
-      "notes": "Chequeo de rutina"
-    },
-    {
-      "patientId": 1,
-      "doctorId": 1,
-      "date": "2025-10-12",
-      "time": "13:30",
-      "type": "Emergencia",
-      "status": "scheduled",
-      "notes": "aaa",
-      "id": 5
-    },
-    {
-      "patientId": 1,
-      "doctorId": 1,
-      "date": "2025-10-24",
-      "time": "13:30",
-      "type": "Emergencia",
-      "status": "scheduled",
-      "notes": "adssad",
-      "id": 6
-    },
-    {
-      "patientId": 1,
-      "doctorId": 1,
-      "date": "2025-11-01",
-      "time": "14:30",
-      "type": "Seguimiento",
-      "status": "scheduled",
-      "notes": "XD",
-      "id": 7
-    },
-    {
-      "patientId": 1,
-      "doctorId": 2,
-      "date": "2025-10-24",
-      "time": "09:00",
-      "type": "Emergencia",
+      "subscriptionId": 1,
+      "payerType": "tenant",
+      "payerId": 1,
+      "amount": 999,
+      "currency": "USD",
       "status": "completed",
-      "notes": "prueba",
-      "id": 8
-    },
-    {
-      "patientId": 1,
-      "doctorId": 2,
-      "date": "2025-11-07",
-      "time": "15:00",
-      "type": "Seguimiento",
-      "status": "in_progress",
-      "notes": "xd",
-      "id": 9
-    },
-    {
-      "patientId": 1,
-      "doctorId": 2,
-      "date": "2025-10-17",
-      "time": "12:30",
-      "type": "Emergencia",
-      "status": "scheduled",
-      "notes": "estoy mal ",
-      "id": 10
-    }
-  ],
-  "staff": [
-    {
-      "id": 1,
-      "userId": 4,
-      "tenantId": 1,
-      "role": "admin",
-      "firstName": "Admin",
-      "lastName": "SaludVida",
-      "position": "Administrador del Sistema",
-      "phone": "+51 999 777 888"
-    }
-  ],
-  "nudges": [
-    {
-      "id": 1,
-      "patientId": 1,
-      "type": "medication_reminder",
-      "priority": "urgent",
-      "title": "¡Hora de tu medicamento!",
-      "message": "Es hora de tomar tu Metformina 500mg",
-      "actionLabel": "Registrar toma",
-      "actionRoute": "/medications",
-      "icon": "medication",
-      "isDismissed": true,
-      "isSnoozed": true,
-      "snoozeUntil": "2025-10-10T21:06:02.881Z",
-      "createdAt": "2025-04-05T08:00:00Z",
-      "dismissedAt": "2025-10-11T02:33:05.275Z"
+      "paymentMethod": "credit_card",
+      "transactionId": "txn_tenant_001",
+      "createdAt": "2024-01-15T00:00:00Z"
     },
     {
       "id": 2,
-      "patientId": 1,
-      "type": "symptom_log",
-      "priority": "high",
-      "title": "Registra tus síntomas",
-      "message": "No has registrado síntomas hoy. ¿Cómo te sientes?",
-      "actionLabel": "Registrar síntomas",
-      "actionRoute": "/clinical/symptoms/register",
-      "icon": "healing",
-      "isDismissed": true,
-      "isSnoozed": false,
-      "snoozeUntil": null,
-      "createdAt": "2025-04-05T09:00:00Z",
-      "dismissedAt": "2025-10-11T19:07:07.960Z"
+      "subscriptionId": 2,
+      "payerType": "tenant",
+      "payerId": 2,
+      "amount": 999,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "txn_tenant_002",
+      "createdAt": "2024-02-01T00:00:00Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": 1,
+      "userId": 3,
+      "tenantId": 1,
+      "action": "tenant_created",
+      "details": {
+        "tenantName": "Clínica SaludVida"
+      },
+      "timestamp": "2024-01-15T00:00:00Z"
     },
     {
-      "id": 3,
-      "patientId": 1,
-      "type": "hydration",
-      "priority": "medium",
-      "title": "Mantente hidratado",
-      "message": "Recuerda beber agua regularmente durante el día",
-      "actionLabel": null,
-      "actionRoute": null,
-      "icon": "water_drop",
-      "isDismissed": false,
-      "isSnoozed": true,
-      "snoozeUntil": "2025-10-10T21:06:09.196Z",
-      "createdAt": "2025-04-05T10:00:00Z",
-      "dismissedAt": null
-    },
-    {
-      "id": 4,
-      "patientId": 1,
-      "type": "appointment_reminder",
-      "priority": "high",
-      "title": "Cita próxima",
-      "message": "Tienes una cita con el Dr. Juan Torres el 15 de abril a las 10:00 AM",
-      "actionLabel": "Ver detalles",
-      "actionRoute": "/appointments",
-      "icon": "event",
-      "isDismissed": false,
-      "isSnoozed": true,
-      "snoozeUntil": "2025-10-10T18:55:21.775Z",
-      "createdAt": "2025-04-05T08:30:00Z",
-      "dismissedAt": null
-    },
-    {
-      "id": 5,
-      "patientId": 1,
-      "type": "exercise",
-      "priority": "medium",
-      "title": "¡Hora de moverte!",
-      "message": "Ya pasaron 3 horas sentado. Realiza una caminata de 10 minutos",
-      "actionLabel": null,
-      "actionRoute": null,
-      "icon": "directions_walk",
-      "isDismissed": false,
-      "isSnoozed": false,
-      "snoozeUntil": null,
-      "createdAt": "2025-04-05T11:00:00Z",
-      "dismissedAt": null
-    },
-    {
-      "id": 6,
-      "patientId": 1,
-      "type": "motivation",
-      "priority": "low",
-      "title": "¡Excelente progreso!",
-      "message": "Has cumplido con tu medicación 7 días seguidos. ¡Sigue así!",
-      "actionLabel": null,
-      "actionRoute": null,
-      "icon": "emoji_events",
-      "isDismissed": false,
-      "isSnoozed": false,
-      "snoozeUntil": null,
-      "createdAt": "2025-04-05T09:30:00Z",
-      "dismissedAt": null
+      "id": 2,
+      "userId": 6,
+      "tenantId": 2,
+      "action": "tenant_created",
+      "details": {
+        "tenantName": "Hospital San Lorenzo"
+      },
+      "timestamp": "2024-02-01T00:00:00Z"
     }
   ]
 }

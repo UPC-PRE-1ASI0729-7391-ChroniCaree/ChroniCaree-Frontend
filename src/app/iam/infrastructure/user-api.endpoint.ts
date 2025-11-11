@@ -12,6 +12,6 @@ import { environment } from '../../../environments/environment';
 })
 export class UserApiEndpoint extends BaseApiEndpoint<User, UserResource, BaseResponse, UserAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/users`, new UserAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.usersEndpointPath}`, new UserAssembler());
   }
 }

@@ -1,0 +1,112 @@
+<div class="patient-devices">
+    <div class="header">
+      <h1>Gestión de Dispositivos IoT</h1>
+      <button class="btn-primary" (click)="openModal()">
+        <span class="material-icons">add</span>
+        Registrar Dispositivo
+      </button>
+    </div>
+
+  <div class="devices-grid" *ngIf="devices().length > 0">
+    <div class="device-card" *ngFor="let device of devices()">
+      <div class="device-icon" [class]="'icon-' + device.type">
+        <span class="material-icons">{{ getDeviceIcon(device.type) }}</span>
+      </div>
+      
+      <div class="device-info">
+        <h3>{{ getDeviceLabel(device.type) }}</h3>
+        <p class="device-model">{{ device.brand }} - {{ device.model }}</p>
+        <p class="device-sync">
+          <span class="material-icons">sync</span>
+          {{ formatLastSync(device.lastSync) }}
+        </p>
+      </div>
+
+      <div class="device-status">
+        <span class="status-badge" [class.active]="device.isActive">
+          {{ device.isActive ? 'Activo' : 'Inactivo' }}
+        </span>
+        <span class="auto-sync-badge" *ngIf="device.autoSyncEnabled">
+          <span class="material-icons">sync</span>
+          Auto-sync
+        </span>
+      </div>
+
+      <div class="device-actions">
+        <button class="btn-icon" (click)="syncDevice(device)" title="Sincronizar">
+          <span class="material-icons">refresh</span>
+        </button>
+        <button class="btn-icon" (click)="toggleDeviceStatus(device)" 
+                [title]="device.isActive ? 'Desactivar' : 'Activar'">
+          <span class="material-icons">{{ device.isActive ? 'toggle_on' : 'toggle_off' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="devices().length === 0">
+    <span class="material-icons">devices</span>
+    <h3>No hay dispositivos registrados</h3>
+    <p>Registre dispositivos IoT para monitorear la salud del paciente.</p>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" *ngIf="showModal()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Registrar Nuevo Dispositivo</h3>
+        <button class="btn-close" (click)="closeModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Tipo de Dispositivo *</label>
+            <select formControlName="type">
+              <option value="">Seleccione...</option>
+              <option *ngFor="let type of deviceTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Marca *</label>
+            <input type="text" formControlName="brand" placeholder="Ej: Omron">
+          </div>
+
+          <div class="form-group">
+            <label>Modelo *</label>
+            <input type="text" formControlName="model" placeholder="Ej: M3">
+          </div>
+
+          <div class="form-group checkbox">
+            <input type="checkbox" formControlName="autoSyncEnabled" id="autoSync">
+            <label for="autoSync">Habilitar sincronización automática</label>
+          </div>
+
+          <div class="alert alert-success" *ngIf="successMessage()">
+            <span class="material-icons">check_circle</span>
+            {{ successMessage() }}
+          </div>
+          <div class="alert alert-error" *ngIf="errorMessage()">
+            <span class="material-icons">error</span>
+            {{ errorMessage() }}
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="closeModal()" [disabled]="isSubmitting()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="deviceForm.invalid || isSubmitting()">
+            <span class="spinner-small" *ngIf="isSubmitting()"></span>
+            {{ isSubmitting() ? 'Registrando...' : 'Registrar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

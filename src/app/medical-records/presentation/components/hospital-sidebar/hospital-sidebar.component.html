@@ -1,0 +1,70 @@
+<aside class="hospital-sidebar" [class.collapsed]="isCollapsed()">
+  <!-- Logo and Hospital Name -->
+  <div class="sidebar-header">
+    <div class="logo-container">
+      <span class="material-icons logo-icon">local_hospital</span>
+      <div class="hospital-info" *ngIf="!isCollapsed()">
+        <h3 class="hospital-name">{{ hospitalName() || 'Hospital' }}</h3>
+        <span class="admin-badge">Administrador</span>
+      </div>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()" title="Contraer/Expandir">
+      <span class="material-icons">
+        {{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <h4 class="section-title" *ngIf="!isCollapsed()">MENÚ PRINCIPAL</h4>
+      <ul class="nav-list">
+        <li 
+          *ngFor="let item of menuItems" 
+          class="nav-item"
+          [class.active]="isActive(item.id)">
+          <a 
+            class="nav-link" 
+            (click)="navigateTo(item)"
+            [title]="item.label">
+            <span class="material-icons nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+            <span 
+              class="nav-badge" 
+              *ngIf="!isCollapsed() && item.badge && getBadgeValue(item.badge)">
+              {{ getBadgeValue(item.badge) }}
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="nav-section">
+      <h4 class="section-title" *ngIf="!isCollapsed()">CONFIGURACIÓN</h4>
+      <ul class="nav-list">
+        <li 
+          *ngFor="let item of settingsItems" 
+          class="nav-item"
+          [class.active]="isActive(item.id)">
+          <a 
+            class="nav-link" 
+            (click)="navigateTo(item)"
+            [title]="item.label">
+            <span class="material-icons nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Footer with Logout -->
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
+      <span class="material-icons">logout</span>
+      <span class="logout-label" *ngIf="!isCollapsed()">Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>

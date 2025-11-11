@@ -80,8 +80,7 @@ export const routes: Routes = [
           import('./communication/presentation/views/nudges-page/nudges-page')
             .then((m) => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
-
-        data: { role: 'patient' }
+        data: { role: 'patient' },
       },
       {
         path: 'medicamentos',
@@ -99,6 +98,12 @@ export const routes: Routes = [
         path: 'agendar-cita',
         loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
         title: `${baseTitle} - Agendar Cita`,
+        data: { role: 'patient' }
+      },
+      {
+        path: 'subscription',
+        loadComponent: () => import('./patients/presentation/views/patient-subscription/patient-subscription.view').then(m => m.PatientSubscriptionView),
+        title: `${baseTitle} - Mi Suscripción`,
         data: { role: 'patient' }
       }
     ]
@@ -140,6 +145,82 @@ export const routes: Routes = [
     ],
   },
 
+  // Hospital Admin routes
+  {
+    path: 'hospital',
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./tenants/presentation/views/hospital-dashboard/hospital-dashboard.view')
+            .then((m) => m.HospitalDashboardView),
+        title: `${baseTitle} - Dashboard Hospital`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'doctors',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/hospital-doctors/hospital-doctors.view')
+            .then((m) => m.HospitalDoctorsView),
+        title: `${baseTitle} - Gestión de Doctores`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'doctors/add',
+        loadComponent: () =>
+          import('./doctors/presentation/views/add-doctor/add-doctor.view')
+            .then((m) => m.AddDoctorView),
+        title: `${baseTitle} - Agregar Doctor`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'patients',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/hospital-patients/hospital-patients.view')
+            .then((m) => m.HospitalPatientsView),
+        title: `${baseTitle} - Gestión de Pacientes`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'patient-onboarding',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/patient-onboarding/patient-onboarding.view')
+            .then((m) => m.PatientOnboardingView),
+        title: `${baseTitle} - Registro de Paciente`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'assignments',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/hospital-assignments/hospital-assignments.view')
+            .then((m) => m.HospitalAssignmentsView),
+        title: `${baseTitle} - Asignaciones Doctor-Paciente`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'patient-devices',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/patient-devices/patient-devices.view')
+            .then((m) => m.PatientDevicesView),
+        title: `${baseTitle} - Gestión de Dispositivos`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'subscription',
+        loadComponent: () =>
+          import('./tenants/presentation/views/hospital-subscription/hospital-subscription.view')
+            .then((m) => m.HospitalSubscriptionView),
+        title: `${baseTitle} - Suscripción`,
+        data: { role: 'hospital_admin' },
+      },
+    ],
+  },
+
   // Doctor routes
   {
     path: 'doctor',
@@ -158,7 +239,6 @@ export const routes: Routes = [
           import('./doctors/presentation/views/edit-profile/edit-profile')
             .then((m) => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
-
         data: { role: 'doctor' }
       },
       {
@@ -192,14 +272,11 @@ export const routes: Routes = [
   // Communication - Messages (shared by patient and doctor)
   {
     path: 'communication/messages',
+    loadComponent: () =>
+      import('./communication/presentation/components/inbox/inbox.component')
+        .then((m) => m.InboxComponent),
+    title: `${baseTitle} - Mensajes`,
     children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./communication/presentation/components/inbox/inbox.component')
-            .then((m) => m.InboxComponent),
-        title: `${baseTitle} - Mensajes`,
-      },
       {
         path: 'compose',
         loadComponent: () =>
@@ -213,6 +290,55 @@ export const routes: Routes = [
           import('./communication/presentation/components/message-thread/message-thread.component')
             .then((m) => m.MessageThreadComponent),
         title: `${baseTitle} - Conversación`,
+      },
+    ],
+  },
+
+  // IoT Devices routes
+  {
+    path: 'devices',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./devices/presentation/views/device-list.view')
+            .then((m) => m.DeviceListView),
+        title: `${baseTitle} - Dispositivos IoT`,
+      },
+      {
+        path: 'glucometer',
+        loadComponent: () =>
+          import('./devices/presentation/components/glucometer/glucometer.component')
+            .then((m) => m.GlucometerComponent),
+        title: `${baseTitle} - Glucómetro`,
+      },
+      {
+        path: 'blood-pressure',
+        loadComponent: () =>
+          import('./devices/presentation/components/blood-pressure/blood-pressure.component')
+            .then((m) => m.BloodPressureComponent),
+        title: `${baseTitle} - Monitor de Presión Arterial`,
+      },
+      {
+        path: 'pulse-oximeter',
+        loadComponent: () =>
+          import('./devices/presentation/components/pulse-oximeter/pulse-oximeter.component')
+            .then((m) => m.PulseOximeterComponent),
+        title: `${baseTitle} - Oxímetro de Pulso`,
+      },
+      {
+        path: 'ecg',
+        loadComponent: () =>
+          import('./devices/presentation/components/ecg/ecg.component')
+            .then((m) => m.ECGComponent),
+        title: `${baseTitle} - Monitor ECG`,
+      },
+      {
+        path: 'smart-scale',
+        loadComponent: () =>
+          import('./devices/presentation/components/smart-scale/smart-scale.component')
+            .then((m) => m.SmartScaleComponent),
+        title: `${baseTitle} - Báscula Inteligente`,
       },
     ],
   },

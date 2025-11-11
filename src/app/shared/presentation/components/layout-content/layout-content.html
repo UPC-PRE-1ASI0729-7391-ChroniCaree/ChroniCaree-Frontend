@@ -5,22 +5,24 @@
 <ng-template #withLayout>
   <div
     class="layout"
-    [class.role-doctor]="userRole() === 'doctor' || userRole() === 'hospital_admin'"
+    [class.role-doctor]="userRole() === 'doctor'"
+    [class.role-admin]="userRole() === 'hospital_admin'"
     [class.role-patient]="userRole() === 'patient'"
     [attr.data-role]="userRole() || 'guest'">
 
     <!-- Sidebar / Toolbar by role -->
-    <ng-container *ngIf="userRole() === 'doctor' || userRole() === 'hospital_admin'; else patientOrGuest">
+    <ng-container *ngIf="userRole() === 'doctor'">
       <app-toolbar-doctor />
     </ng-container>
-    <ng-template #patientOrGuest>
-      <ng-container *ngIf="userRole() === 'patient'; else guestToolbar">
-        <app-toolbar-patient />
-      </ng-container>
-      <ng-template #guestToolbar>
-        <div class="no-sidebar-placeholder" aria-hidden="true"></div>
-      </ng-template>
-    </ng-template>
+    <ng-container *ngIf="userRole() === 'hospital_admin'">
+      <app-toolbar-admin />
+    </ng-container>
+    <ng-container *ngIf="userRole() === 'patient'">
+      <app-toolbar-patient />
+    </ng-container>
+    <ng-container *ngIf="!userRole() || (userRole() !== 'doctor' && userRole() !== 'hospital_admin' && userRole() !== 'patient')">
+      <div class="no-sidebar-placeholder" aria-hidden="true"></div>
+    </ng-container>
 
     <!-- Main column -->
     <div class="layout-main">

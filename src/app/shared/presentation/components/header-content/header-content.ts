@@ -12,13 +12,6 @@ import { UserStore } from '../../../../iam/application/user.store';
   styleUrl: './header-content.css'
 })
 export class HeaderContentComponent implements OnInit {
-  readonly notifications = signal([
-    { id: 1, message: 'Nueva cita programada', unread: true },
-    { id: 2, message: 'Resultado de laboratorio disponible', unread: true },
-    { id: 3, message: 'Mensaje de paciente', unread: false }
-  ]);
-
-  showNotifications = signal(false);
   showUserMenu = signal(false);
 
   // Get user from localStorage
@@ -99,22 +92,8 @@ export class HeaderContentComponent implements OnInit {
     return role === 'doctor' ? '/doctor/dashboard' : '/patient/dashboard';
   }
 
-  toggleNotifications(): void {
-    this.showNotifications.update(v => !v);
-    if (this.showNotifications()) {
-      this.showUserMenu.set(false);
-    }
-  }
-
   toggleUserMenu(): void {
     this.showUserMenu.update(v => !v);
-    if (this.showUserMenu()) {
-      this.showNotifications.set(false);
-    }
-  }
-
-  getUnreadCount(): number {
-    return this.notifications().filter(n => n.unread).length;
   }
 
   /**
@@ -136,9 +115,16 @@ export class HeaderContentComponent implements OnInit {
     }
   }
 
+  /**
+   * Verifica si el usuario actual es un paciente
+   */
+  isPatient(): boolean {
+    const role = localStorage.getItem('userRole') || this.userStore.currentUser$()?.role;
+    return role === 'patient';
+  }
+
   closeMenus(): void {
     this.showUserMenu.set(false);
-    this.showNotifications.set(false);
   }
 
   logout(): void {

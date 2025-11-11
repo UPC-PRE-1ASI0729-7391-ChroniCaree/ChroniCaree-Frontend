@@ -44,17 +44,31 @@ export class MedicationStore {
     
     return this._medications()
       .filter(med => med.isActive)
-      .flatMap(med => 
-        med.schedule.times.map(time => ({
-          medication: med,
-          time,
-          taken: med.logs.some(log => 
-            log.scheduledTime.toDateString() === today.toDateString() &&
-            log.scheduledTime.getHours() === parseInt(time.split(':')[0]) &&
-            log.status === MedicationStatus.TAKEN
-          )
-        }))
-      )
+      .flatMap(med => {
+        const times = med.schedule?.times || [];
+        const logs = med.logs || [];
+        return times.map(time => {
+          // Normalize scheduledTime (support Date or ISO string)
+          const taken = logs.some(log => {
+            try {
+              const scheduled = log?.scheduledTime instanceof Date ? log.scheduledTime : new Date(log?.scheduledTime);
+              if (isNaN(scheduled.getTime())) return false;
+              const matchesDate = scheduled.toDateString() === today.toDateString();
+              const hour = parseInt((time || '0:00').split(':')[0], 10);
+              const matchesHour = scheduled.getHours() === hour;
+              return matchesDate && matchesHour && log.status === MedicationStatus.TAKEN;
+            } catch (e) {
+              return false;
+            }
+          });
+
+          return {
+            medication: med,
+            time,
+            taken
+          };
+        });
+      })
       .sort((a, b) => a.time.localeCompare(b.time));
   });
 

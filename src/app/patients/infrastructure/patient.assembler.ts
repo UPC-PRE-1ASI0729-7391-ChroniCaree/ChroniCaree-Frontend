@@ -1,40 +1,59 @@
-import { BaseAssembler } from '../../shared/infrastructure/base-assembler';
-import { BaseResponse } from '../../shared/infrastructure/base-response';
-import { Patient } from '../domain/model/patient.entity';
-import { PatientResource } from './patient.resource';
-
 /**
- * Patient Assembler - Convierte entre entidades de dominio y recursos de API para pacientes
+ * Patient Assembler
+ * Transforma datos raw del API en entidades del dominio
  */
-export class PatientAssembler implements BaseAssembler<Patient, PatientResource, BaseResponse> {
-  
+
+import { PatientEntity, EmergencyContact } from '../domain/model/patient.entity';
+import { PatientResource, EmergencyContactResource } from './patient.resource';
+
+export class PatientAssembler {
   /**
-   * Convierte un recurso (generalmente recibido del backend) en una entidad Patient del dominio
+   * Convierte un PatientResource (DTO) a PatientEntity (dominio)
    */
-  toEntityFromResource(resource: PatientResource): Patient {
-    return {
-      id: resource.id,
-      userId: resource.userId,
-      assignedDoctorId: resource.assignedDoctorId,
-      tenantId: resource.tenantId,
-      subscriptionId: resource.subscriptionId,
-      firstName: resource.firstName,
-      lastName: resource.lastName,
-      dni: resource.dni,
-      birthDate: resource.birthDate,
-      gender: resource.gender,
-      phone: resource.phone,
-      address: resource.address,
-      weight: resource.weight,
-      height: resource.height,
-      bmi: resource.bmi
+  static toEntity(resource: PatientResource): PatientEntity {
+    const emergencyContact: EmergencyContact = {
+      name: resource.emergencyContact?.name || '',
+      relationship: resource.emergencyContact?.relationship || '',
+      phone: resource.emergencyContact?.phone || '',
     };
+
+    return new PatientEntity(
+      resource.id,
+      resource.userId,
+      resource.assignedDoctorId,
+      resource.tenantId,
+      resource.subscriptionId,
+      resource.firstName,
+      resource.lastName,
+      resource.dni,
+      resource.birthDate,
+      resource.gender,
+      resource.phone,
+      resource.address,
+      resource.weight,
+      resource.height,
+      resource.bmi,
+      emergencyContact
+    );
   }
 
   /**
-   * Convierte una entidad Patient del dominio en un recurso (para envío o visualización en la API)
+   * Convierte una lista de PatientResource a PatientEntity[]
    */
-  toResourceFromEntity(entity: Patient): PatientResource {
+  static toEntityList(resources: PatientResource[]): PatientEntity[] {
+    return resources.map((resource) => this.toEntity(resource));
+  }
+
+  /**
+   * Convierte una PatientEntity a PatientResource (para enviar al API)
+   */
+  static toResource(entity: PatientEntity): PatientResource {
+    const emergencyContactResource: EmergencyContactResource = {
+      name: entity.emergencyContact.name,
+      relationship: entity.emergencyContact.relationship,
+      phone: entity.emergencyContact.phone,
+    };
+
     return {
       id: entity.id,
       userId: entity.userId,
@@ -50,14 +69,8 @@ export class PatientAssembler implements BaseAssembler<Patient, PatientResource,
       address: entity.address,
       weight: entity.weight,
       height: entity.height,
-      bmi: entity.bmi
+      bmi: entity.bmi,
+      emergencyContact: emergencyContactResource,
     };
-  }
-
-  /**
-   * Transforma una respuesta base en una lista de entidades Patient (actualmente sin implementación)
-   */
-  toEntitiesFromResponse(response: BaseResponse): Patient[] {
-    return [];
   }
 }

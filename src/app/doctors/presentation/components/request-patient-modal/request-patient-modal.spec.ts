@@ -2,15 +2,42 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RequestPatientModalComponent } from './request-patient-modal';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { environment } from '../../../../../environments/environment';
+import { Patient } from '../../../../patients/domain/model/patient.entity';
+import { Doctor } from '../../../domain/model/doctor.entity';
 
 describe('RequestPatientModalComponent', () => {
   let component: RequestPatientModalComponent;
   let fixture: ComponentFixture<RequestPatientModalComponent>;
   let httpMock: HttpTestingController;
 
+  // Helpers to create immutable mock domain objects. Using factories
+  // reduces duplication and makes it clear which fields are required.
+  const createPatient = (p: Partial<Patient>) => Object.freeze({
+    id: 0,
+    userId: 0,
+    assignedDoctorId: null,
+    firstName: '',
+    lastName: '',
+    dni: '',
+    birthDate: '',
+    gender: 'female',
+    phone: '',
+    subscriptionId: null,
+    ...p
+  }) as Readonly<Patient>;
+
+  const createDoctor = (d: Partial<Doctor>) => Object.freeze({
+    id: 0,
+    userId: 0,
+    firstName: '',
+    lastName: '',
+    specialty: '',
+    licenseNumber: '',
+    ...d
+  }) as Readonly<Doctor>;
+
   const mockAvailablePatients = [
-    {
+    createPatient({
       id: 2,
       userId: 4,
       assignedDoctorId: null,
@@ -21,8 +48,8 @@ describe('RequestPatientModalComponent', () => {
       gender: 'male',
       phone: '+51 999 222 333',
       subscriptionId: 2
-    },
-    {
+    }),
+    createPatient({
       id: 3,
       userId: 5,
       assignedDoctorId: null,
@@ -33,12 +60,12 @@ describe('RequestPatientModalComponent', () => {
       gender: 'female',
       phone: '+51 999 444 555',
       subscriptionId: null
-    }
+    })
   ];
 
   const mockAllPatients = [
     ...mockAvailablePatients,
-    {
+    createPatient({
       id: 1,
       userId: 1,
       assignedDoctorId: 2,
@@ -49,18 +76,18 @@ describe('RequestPatientModalComponent', () => {
       gender: 'female',
       phone: '+51 999 111 222',
       subscriptionId: 1
-    }
+    })
   ];
 
   const mockDoctors = [
-    {
+    createDoctor({
       id: 2,
       userId: 3,
       firstName: 'Juan',
       lastName: 'Torres',
       specialty: 'Cardiología',
       licenseNumber: 'CMP-54321'
-    }
+    })
   ];
 
   beforeEach(async () => {
@@ -88,8 +115,8 @@ describe('RequestPatientModalComponent', () => {
   it('should load available patients on init', () => {
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    expect(req.request.method).toBe('GET');
+  const req = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  expect(req.request.method).toBe('GET');
     req.flush(mockAllPatients);
 
     expect(component.availablePatients().length).toBe(2);
@@ -100,8 +127,8 @@ describe('RequestPatientModalComponent', () => {
   it('should filter out patients with assigned doctors', () => {
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    req.flush(mockAllPatients);
+  const req = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  req.flush(mockAllPatients);
 
     const available = component.availablePatients();
     expect(available.every(p => !p.id || p.id !== 1)).toBe(true);
@@ -111,8 +138,8 @@ describe('RequestPatientModalComponent', () => {
     spyOn(console, 'error');
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    req.error(new ProgressEvent('Network error'));
+  const req = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  req.error(new ProgressEvent('Network error'));
 
     expect(component.loading()).toBe(false);
     expect(component.error()).toBe('Error al cargar pacientes disponibles');
@@ -127,8 +154,8 @@ describe('RequestPatientModalComponent', () => {
   it('should compute selected patient', () => {
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    req.flush(mockAllPatients);
+  const req = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  req.flush(mockAllPatients);
 
     component.selectPatient(2);
     
@@ -150,22 +177,22 @@ describe('RequestPatientModalComponent', () => {
     spyOn(window, 'dispatchEvent');
     
     fixture.detectChanges();
-    const loadReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    loadReq.flush(mockAllPatients);
+  const loadReq = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  loadReq.flush(mockAllPatients);
 
     component.selectPatient(2);
     component.requestPatient();
 
     // Expect doctor lookup
-    const doctorReq = httpMock.expectOne(`${environment.apiBaseUrl}/doctors`);
-    expect(doctorReq.request.method).toBe('GET');
-    doctorReq.flush(mockDoctors);
+  const doctorReq = httpMock.expectOne(r => r.url.endsWith('/doctors'));
+  expect(doctorReq.request.method).toBe('GET');
+  doctorReq.flush(mockDoctors);
 
     // Expect patient update
-    const patchReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients/2`);
-    expect(patchReq.request.method).toBe('PATCH');
-    expect(patchReq.request.body).toEqual({ assignedDoctorId: 2 });
-    patchReq.flush({});
+  const patchReq = httpMock.expectOne(r => r.url.endsWith('/patients/2'));
+  expect(patchReq.request.method).toBe('PATCH');
+  expect(patchReq.request.body).toEqual({ assignedDoctorId: 2 });
+  patchReq.flush({});
 
     expect(component.requesting()).toBe(false);
     expect(window.dispatchEvent).toHaveBeenCalledWith(
@@ -179,7 +206,7 @@ describe('RequestPatientModalComponent', () => {
   it('should not request without selected patient', () => {
     component.requestPatient();
     
-    httpMock.expectNone(`${environment.apiBaseUrl}/doctors`);
+  httpMock.expectNone(r => r.url.endsWith('/doctors'));
     expect(component.requesting()).toBe(false);
   });
 
@@ -200,14 +227,14 @@ describe('RequestPatientModalComponent', () => {
     spyOn(window, 'alert');
     
     fixture.detectChanges();
-    const loadReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    loadReq.flush(mockAllPatients);
+  const loadReq = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  loadReq.flush(mockAllPatients);
 
     component.selectPatient(2);
     component.requestPatient();
 
-    const doctorReq = httpMock.expectOne(`${environment.apiBaseUrl}/doctors`);
-    doctorReq.flush(mockDoctors);
+  const doctorReq = httpMock.expectOne(r => r.url.endsWith('/doctors'));
+  doctorReq.flush(mockDoctors);
 
     expect(window.alert).toHaveBeenCalledWith('Error: No se encontró perfil de doctor');
     expect(component.requesting()).toBe(false);
@@ -220,17 +247,17 @@ describe('RequestPatientModalComponent', () => {
     spyOn(console, 'error');
     
     fixture.detectChanges();
-    const loadReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    loadReq.flush(mockAllPatients);
+  const loadReq = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  loadReq.flush(mockAllPatients);
 
     component.selectPatient(2);
     component.requestPatient();
 
-    const doctorReq = httpMock.expectOne(`${environment.apiBaseUrl}/doctors`);
-    doctorReq.flush(mockDoctors);
+  const doctorReq = httpMock.expectOne(r => r.url.endsWith('/doctors'));
+  doctorReq.flush(mockDoctors);
 
-    const patchReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients/2`);
-    patchReq.error(new ProgressEvent('Network error'));
+  const patchReq = httpMock.expectOne(r => r.url.endsWith('/patients/2'));
+  patchReq.error(new ProgressEvent('Network error'));
 
     expect(console.error).toHaveBeenCalled();
     expect(window.alert).toHaveBeenCalledWith('Error al asignar paciente. Intenta de nuevo.');
@@ -244,14 +271,14 @@ describe('RequestPatientModalComponent', () => {
     spyOn(console, 'error');
     
     fixture.detectChanges();
-    const loadReq = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    loadReq.flush(mockAllPatients);
+  const loadReq = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  loadReq.flush(mockAllPatients);
 
     component.selectPatient(2);
     component.requestPatient();
 
-    const doctorReq = httpMock.expectOne(`${environment.apiBaseUrl}/doctors`);
-    doctorReq.error(new ProgressEvent('Network error'));
+  const doctorReq = httpMock.expectOne(r => r.url.endsWith('/doctors'));
+  doctorReq.error(new ProgressEvent('Network error'));
 
     expect(console.error).toHaveBeenCalled();
     expect(window.alert).toHaveBeenCalledWith('Error al obtener información del doctor');
@@ -271,8 +298,8 @@ describe('RequestPatientModalComponent', () => {
   it('should map patients with subscription status', () => {
     fixture.detectChanges();
 
-    const req = httpMock.expectOne(`${environment.apiBaseUrl}/patients`);
-    req.flush(mockAvailablePatients);
+  const req = httpMock.expectOne(r => r.url.endsWith('/patients'));
+  req.flush(mockAvailablePatients);
 
     const patients = component.availablePatients();
     expect(patients[0].hasActiveSubscription).toBe(true);

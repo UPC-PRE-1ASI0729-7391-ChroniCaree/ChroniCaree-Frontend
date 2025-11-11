@@ -113,7 +113,7 @@ export class LoginComponent implements OnInit {
                 this.router.navigate(['/doctor/dashboard']);
                 break;
               case 'hospital_admin':
-                this.router.navigate(['/doctor/dashboard']); // TODO: Create hospital admin dashboard
+                this.router.navigate(['/hospital/dashboard']);
                 break;
               default:
                 this.router.navigate(['/home']);

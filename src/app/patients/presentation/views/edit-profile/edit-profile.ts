@@ -15,6 +15,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { PatientStore } from '../../../application/patient.store';
 import { Patient } from '../../../domain/model/patient.entity';
+import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
+import { SubscriptionEntity } from '../../../../subscriptions/domain/model/subscription.entity';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * Edit Profile View - US20: Actualizar perfil del paciente
@@ -42,6 +45,8 @@ import { Patient } from '../../../domain/model/patient.entity';
 })
 export class EditProfileComponent implements OnInit {
   profileForm!: FormGroup;
+  currentSubscription = signal<SubscriptionEntity | null>(null);
+  loadingSubscription = signal(false);
   
   // Computed BMI
   calculatedBMI = computed(() => {
@@ -99,7 +104,8 @@ export class EditProfileComponent implements OnInit {
     private snackBar: MatSnackBar,
     private router: Router,
     private dialog: MatDialog,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private subscriptionService: SubscriptionService
   ) {}
   
   get loading() {
@@ -113,6 +119,7 @@ export class EditProfileComponent implements OnInit {
   ngOnInit(): void {
     this.initializeForm();
     this.loadCurrentPatient();
+    this.loadSubscription();
   }
 
   private initializeForm(): void {
@@ -256,6 +263,45 @@ export class EditProfileComponent implements OnInit {
         console.error('Error updating patient:', error);
       }
     });
+  }
+
+  private async loadSubscription(): Promise<void> {
+    this.loadingSubscription.set(true);
+    try {
+      const patientId = this.currentPatient()?.id;
+      if (!patientId) return;
+
+      const subscription = await firstValueFrom(
+        this.subscriptionService.getActiveByPayerId('patient', patientId)
+      );
+      this.currentSubscription.set(subscription);
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+    } finally {
+      this.loadingSubscription.set(false);
+    }
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      'active': 'Activa',
+      'cancelled': 'Cancelada',
+      'expired': 'Expirada',
+      'pending': 'Pendiente'
+    };
+    return labels[status] || status;
+  }
+
+  navigateToSubscription(): void {
+    this.router.navigate(['/patient/subscription']);
   }
 
   onCancel(): void {

@@ -1,10 +1,12 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { MessagesStore } from '../../../application/messages.store';
 import { UserStore } from '../../../../iam/application/user.store';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { AssignedPatientsStore } from '../../../../doctors/application/assigned-patients.store';
+import { DoctorApiEndpoint } from '../../../../doctors/infrastructure/doctor-api.endpoint';
 
 @Component({
   standalone: true,
@@ -18,6 +20,9 @@ export class MessageComposeComponent implements OnInit {
   private userStore = inject(UserStore);
   private patientStore = inject(PatientStore);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private assignedPatientsStore = inject(AssignedPatientsStore);
+  private doctorApi = inject(DoctorApiEndpoint);
 
   subject = signal('');
   body = signal('');
@@ -27,22 +32,49 @@ export class MessageComposeComponent implements OnInit {
 
   patientId = signal('');
   doctorId = signal('');
+  doctorName = signal('');
+  // For doctors: list of assigned patients to choose from
+  patientsList = computed(() => this.assignedPatientsStore.patients());
+  // current user role inferred from userStore/localStorage (PATIENT | DOCTOR)
+  currentRole: 'PATIENT' | 'DOCTOR' | 'UNKNOWN' = 'UNKNOWN';
 
   ngOnInit(): void {
     // Obtener datos del usuario actual
-    const currentUser = this.userStore.currentUser$();
-    if (currentUser) {
-      // Cargar pacientes si no están cargados
+    const currentUser = this.userStore.currentUser$() || (() => {
+      try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); } catch { return null; }
+    })();
+
+    if (!currentUser || !currentUser.id) {
+      console.warn('MessageCompose: usuario no autenticado');
+      return;
+    }
+
+    const role = (currentUser.role || '').toString().toUpperCase();
+    this.currentRole = role === 'DOCTOR' ? 'DOCTOR' : (role === 'PATIENT' ? 'PATIENT' : 'UNKNOWN');
+
+    if (this.currentRole === 'PATIENT') {
+      // Cargar paciente asociado y fijar doctor destino
       const patients = this.patientStore.patients$();
       if (patients.length === 0) {
-        this.patientStore.loadAllPatients().subscribe({
-          next: () => {
-            this.resolvePatientAndDoctor(currentUser.id);
-          }
-        });
+        this.patientStore.loadAllPatients().subscribe({ next: (ps) => this.resolvePatientAndDoctor(currentUser.id) });
       } else {
         this.resolvePatientAndDoctor(currentUser.id);
       }
+    } else if (this.currentRole === 'DOCTOR') {
+      // Buscar doctor id por userId y cargar pacientes asignados
+      this.doctorApi.getAll().subscribe({ next: (doctors) => {
+        const doc = doctors.find((d: any) => d.userId === currentUser.id);
+        if (doc) {
+          const did = doc.id.toString();
+          this.doctorId.set(did);
+          this.assignedPatientsStore.loadPatientsByDoctor(doc.id);
+          // Si nos pasaron patientId por queryParams (quick message), pre-selecciónalo
+          const qp = this.route.snapshot.queryParamMap.get('patientId');
+          if (qp) {
+            this.patientId.set(qp.toString());
+          }
+        }
+      }, error: (err) => console.error('Error cargando doctores:', err) });
     }
   }
 
@@ -53,6 +85,14 @@ export class MessageComposeComponent implements OnInit {
     if (patient) {
       this.patientId.set(patient.id.toString());
       this.doctorId.set(patient.assignedDoctorId?.toString() || '');
+
+      // If we have a doctor id, fetch doctor's name for display
+      if (patient.assignedDoctorId) {
+        this.doctorApi.getById(patient.assignedDoctorId).subscribe({
+          next: (d: any) => this.doctorName.set(`${d.firstName || ''} ${d.lastName || ''}`.trim()),
+          error: () => this.doctorName.set('')
+        });
+      }
       
       if (!patient.assignedDoctorId) {
         console.warn('⚠️ Paciente sin médico asignado');
@@ -60,12 +100,16 @@ export class MessageComposeComponent implements OnInit {
     }
   }
 
-  canSend = computed(() =>
-    !this.sending() &&
-    this.subject().trim().length > 0 &&
-    this.body().trim().length > 0 &&
-    this.doctorId().length > 0  // Validar que haya un doctor asignado
-  );
+  canSend = computed(() => {
+    if (this.sending()) return false;
+    if (this.subject().trim().length === 0) return false;
+    if (this.body().trim().length === 0) return false;
+    // If patient, must have doctorId; if doctor, must select patientId
+    if (this.currentRole === 'PATIENT') return this.doctorId().length > 0;
+    if (this.currentRole === 'DOCTOR') return this.patientId().length > 0;
+    // fallback: require both
+    return this.doctorId().length > 0 && this.patientId().length > 0;
+  });
 
   onFiles(ev: Event) {
     const input = ev.target as HTMLInputElement;
@@ -89,14 +133,24 @@ export class MessageComposeComponent implements OnInit {
     
     this.sending.set(true);
     try {
+      // Build message according to current role
+      const role = this.currentRole === 'DOCTOR' ? 'DOCTOR' : 'PATIENT';
+      const senderId = role === 'DOCTOR' ? this.doctorId() : this.patientId();
+      const receiverId = role === 'DOCTOR' ? this.patientId() : this.doctorId();
+
+      if (!senderId || !receiverId) {
+        alert('Falta destinatario o remitente.');
+        return;
+      }
+
       await this.store.sendMessage({
         message: {
-          senderRole: 'PATIENT',
-          senderId: this.patientId(),
-          receiverId: this.doctorId(),
+          senderRole: role as any,
+          senderId: senderId,
+          receiverId: receiverId,
           subject: this.subject().trim(),
           body: this.body().trim(),
-          isUrgent: this.isUrgent()  // ⭐ Incluir flag de urgencia
+          isUrgent: this.isUrgent()
         },
         files: this.files()
       });
@@ -106,8 +160,12 @@ export class MessageComposeComponent implements OnInit {
       this.files.set([]);
       this.isUrgent.set(false);  // ⭐ Reset flag
       alert('Mensaje enviado correctamente.');
-      // Navegar de vuelta al inbox
-      this.router.navigate(['/communication/messages']);
+      // Navegar de vuelta al inbox según el rol (doctor usa ruta /doctor/messages)
+      if (this.currentRole === 'DOCTOR') {
+        this.router.navigate(['/doctor/messages']);
+      } else {
+        this.router.navigate(['/communication/messages']);
+      }
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
       alert('Error al enviar el mensaje. Por favor intenta de nuevo.');

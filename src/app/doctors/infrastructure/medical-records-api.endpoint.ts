@@ -23,12 +23,14 @@ interface PatientResource {
 export class MedicalRecordsApiEndpoint {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiBaseUrl;
+  private readonly recordsUrl = `${environment.apiBaseUrl}${environment.medicalRecordsEndpointPath}`;
+  private readonly patientsUrl = `${environment.apiBaseUrl}${environment.patientsEndpointPath}`;
 
   /**
    * Obtiene todos los registros médicos de un doctor
    */
   getRecordsByDoctor(doctorId: number): Observable<MedicalRecord[]> {
-    return this.http.get<MedicalRecordResource[]>(`${this.baseUrl}/records`).pipe(
+    return this.http.get<MedicalRecordResource[]>(this.recordsUrl).pipe(
       map(records => records.filter(r => r.doctorId === doctorId)),
       switchMap(records => {
         if (records.length === 0) {
@@ -38,7 +40,7 @@ export class MedicalRecordsApiEndpoint {
         // Obtener nombres de pacientes
         const patientIds = [...new Set(records.map(r => r.patientId))];
         const patientRequests = patientIds.map(id =>
-          this.http.get<PatientResource>(`${this.baseUrl}/patients/${id}`).pipe(
+          this.http.get<PatientResource>(`${this.patientsUrl}/${id}`).pipe(
             catchError(() => of(null))
           )
         );
@@ -71,7 +73,7 @@ export class MedicalRecordsApiEndpoint {
    * Obtiene registros de un paciente específico
    */
   getRecordsByPatient(patientId: number): Observable<MedicalRecord[]> {
-    return this.http.get<MedicalRecordResource[]>(`${this.baseUrl}/records`).pipe(
+    return this.http.get<MedicalRecordResource[]>(this.recordsUrl).pipe(
       map(records => records.filter(r => r.patientId === patientId)),
       map(records => records.map(r => MedicalRecordAssembler.toDomain(r))),
       catchError(() => of([]))
@@ -82,7 +84,7 @@ export class MedicalRecordsApiEndpoint {
    * Obtiene un registro específico por ID
    */
   getRecordById(recordId: number): Observable<MedicalRecord | null> {
-    return this.http.get<MedicalRecordResource>(`${this.baseUrl}/records/${recordId}`).pipe(
+    return this.http.get<MedicalRecordResource>(`${this.recordsUrl}/${recordId}`).pipe(
       map(resource => MedicalRecordAssembler.toDomain(resource)),
       catchError(() => of(null))
     );
@@ -92,7 +94,7 @@ export class MedicalRecordsApiEndpoint {
    * Crea un nuevo registro médico
    */
   createRecord(record: Partial<MedicalRecord>): Observable<MedicalRecord> {
-    return this.http.post<MedicalRecordResource>(`${this.baseUrl}/records`, record).pipe(
+    return this.http.post<MedicalRecordResource>(this.recordsUrl, record).pipe(
       map(resource => MedicalRecordAssembler.toDomain(resource))
     );
   }
@@ -102,7 +104,7 @@ export class MedicalRecordsApiEndpoint {
    */
   updateRecord(recordId: number, updates: Partial<MedicalRecord>): Observable<MedicalRecord> {
     return this.http.patch<MedicalRecordResource>(
-      `${this.baseUrl}/records/${recordId}`,
+      `${this.recordsUrl}/${recordId}`,
       updates
     ).pipe(
       map(resource => MedicalRecordAssembler.toDomain(resource))

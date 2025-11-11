@@ -15,6 +15,6 @@ import { environment } from '../../../environments/environment';
 })
 export class SymptomApiEndpoint extends BaseApiEndpoint<Symptom, SymptomResource, BaseResponse, SymptomAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/symptoms`, new SymptomAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.symptomsEndpointPath}`, new SymptomAssembler());
   }
 }

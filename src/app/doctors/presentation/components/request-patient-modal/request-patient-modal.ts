@@ -55,7 +55,7 @@ export class RequestPatientModalComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     
-    this.http.get<any[]>(`${environment.apiBaseUrl}/patients`).subscribe({
+    this.http.get<any[]>(`${environment.apiBaseUrl}${environment.patientsEndpointPath}`).subscribe({
       next: (patients) => {
         // Filtrar solo pacientes sin doctor asignado
         const available = patients.filter(p => !p.assignedDoctorId || p.assignedDoctorId === null);
@@ -130,7 +130,7 @@ export class RequestPatientModalComponent implements OnInit {
     const userId = currentUser.id;
     
     // Primero obtener el doctor ID
-    this.http.get<any[]>(`${environment.apiBaseUrl}/doctors`).subscribe({
+    this.http.get<any[]>(`${environment.apiBaseUrl}${environment.doctorsEndpointPath}`).subscribe({
       next: (doctors) => {
         const doctor = doctors.find(d => d.userId === userId);
         
@@ -141,7 +141,7 @@ export class RequestPatientModalComponent implements OnInit {
         }
         
         // Actualizar el paciente con assignedDoctorId
-        this.http.patch(`${environment.apiBaseUrl}/patients/${patientId}`, {
+        this.http.patch(`${environment.apiBaseUrl}${environment.patientsEndpointPath}/${patientId}`, {
           assignedDoctorId: doctor.id
         }).subscribe({
           next: () => {

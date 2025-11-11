@@ -12,9 +12,14 @@
         <span>Cuenta</span>
       </div>
       <div class="step-line" [class.completed]="currentStep() > 1"></div>
-      <div class="step" [class.active]="currentStep() === 2">
+      <div class="step" [class.active]="currentStep() === 2" [class.completed]="currentStep() > 2">
         <div class="step-circle">2</div>
         <span>Datos Personales</span>
+      </div>
+      <div class="step-line" [class.completed]="currentStep() > 2"></div>
+      <div class="step" [class.active]="currentStep() === 3">
+        <div class="step-circle">3</div>
+        <span>Plan</span>
       </div>
     </div>
 
@@ -178,14 +183,15 @@
           <button 
             type="button" 
             class="btn-primary" 
-            (click)="onSubmit()"
-            [disabled]="submitting()"
+            (click)="onNextStep()"
           >
-            {{ submitting() ? 'Registrando...' : 'Completar Registro' }}
+            Siguiente
           </button>
         </div>
       </div>
     }
+
+    <!-- No inline plan selection during registration. After completing personal data, the user will be redirected to the subscription flow. -->
 
     <!-- Footer -->
     <div class="register-footer">

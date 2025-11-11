@@ -15,6 +15,6 @@ import { environment } from '../../../environments/environment';
 })
 export class DiagnosisApiEndpoint extends BaseApiEndpoint<Diagnosis, DiagnosisResource, BaseResponse, DiagnosisAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/diagnoses`, new DiagnosisAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.diagnosesEndpointPath}`, new DiagnosisAssembler());
   }
 }

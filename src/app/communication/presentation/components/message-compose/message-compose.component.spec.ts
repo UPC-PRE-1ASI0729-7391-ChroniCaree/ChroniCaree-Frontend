@@ -20,8 +20,8 @@ describe('MessageComposeComponent', () => {
     const comp = fixture.componentInstance as MessageComposeComponent;
     const store = TestBed.inject(MessagesStore) as unknown as StoreMock;
 
-    comp.subject = 'Asunto x';
-    comp.body = 'Contenido';
+  comp.subject.set('Asunto x');
+  comp.body.set('Contenido');
     await comp.send();
 
     expect(store.sendMessage).toHaveBeenCalled();
@@ -30,8 +30,8 @@ describe('MessageComposeComponent', () => {
     // en nuestra implementación unifica subject+body en body si subject no existe en dominio:
     expect(arg.message.body).toContain('Contenido');
 
-    // reseteo del formulario
-    expect(comp.subject).toBe('');
-    expect(comp.body).toBe('');
+  // reseteo del formulario
+  expect(comp.subject()).toBe('');
+  expect(comp.body()).toBe('');
   });
 });

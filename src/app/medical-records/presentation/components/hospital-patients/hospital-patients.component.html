@@ -1,0 +1,82 @@
+<div class="hospital-patients">
+  <div class="section-header">
+    <h2>Pacientes del Hospital</h2>
+    <div class="filters">
+      <input 
+        type="text" 
+        placeholder="Buscar paciente..." 
+        class="search-input"
+        [value]="filters().searchTerm"
+        (input)="updateFilters({ searchTerm: $any($event.target).value })">
+      
+      <select 
+        class="filter-select"
+        [value]="filters().subscriptionStatus"
+        (change)="updateFilters({ subscriptionStatus: $any($event.target).value })">
+        <option value="all">Todos los planes</option>
+        <option value="premium">Premium</option>
+        <option value="family">Family</option>
+        <option value="free">Free</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="patients-grid" *ngIf="!isLoading() && filteredPatients().length > 0">
+    <div class="patient-card" *ngFor="let patient of filteredPatients()">
+      <div class="patient-header">
+        <div class="patient-avatar">
+          <span class="material-icons">person</span>
+        </div>
+        <div class="patient-basic-info">
+          <h3>{{ patient.fullName }}</h3>
+          <p>{{ patient.age }} años • {{ patient.gender }}</p>
+        </div>
+        <span class="subscription-badge" [class]="'badge-' + patient.subscriptionPlan.toLowerCase()">
+          {{ patient.subscriptionPlan }}
+        </span>
+      </div>
+
+      <div class="patient-details">
+        <div class="detail-item" *ngIf="patient.assignedDoctorName">
+          <span class="material-icons">medical_services</span>
+          <span>{{ patient.assignedDoctorName }}</span>
+        </div>
+        <div class="detail-item" *ngIf="!patient.assignedDoctorName">
+          <span class="material-icons">person_off</span>
+          <span class="no-doctor">Sin doctor asignado</span>
+        </div>
+        
+        <div class="conditions" *ngIf="patient.conditions.length > 0">
+          <span class="material-icons">healing</span>
+          <div class="condition-tags">
+            <span class="condition-tag" *ngFor="let condition of patient.conditions">
+              {{ condition }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="patient-actions">
+        <button class="btn-secondary" (click)="viewPatientDetails(patient.id)">
+          <span class="material-icons">visibility</span>
+          Ver perfil
+        </button>
+        <button class="btn-primary" (click)="assignDoctor(patient.id)">
+          <span class="material-icons">person_add</span>
+          Asignar doctor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading() && filteredPatients().length === 0">
+    <span class="material-icons">people_outline</span>
+    <h3>No hay pacientes</h3>
+    <p>No se encontraron pacientes con los filtros seleccionados.</p>
+  </div>
+
+  <div class="loading-state" *ngIf="isLoading()">
+    <div class="spinner"></div>
+    <p>Cargando pacientes...</p>
+  </div>
+</div>
