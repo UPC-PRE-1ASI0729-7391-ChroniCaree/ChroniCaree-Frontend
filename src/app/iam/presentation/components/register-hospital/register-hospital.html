@@ -151,54 +151,50 @@
       <div class="form-step">
         <h2>Selecciona tu Plan</h2>
         
-        <div class="plans-grid">
-          <div 
-            class="plan-card" 
-            [class.selected]="form().plan === 'basic'"
-            (click)="updateForm('plan', 'basic')"
-          >
-            <h3>Básico</h3>
-            <div class="plan-price">$99<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Hasta 50 pacientes</li>
-              <li>✓ 2 doctores</li>
-              <li>✓ Soporte básico</li>
-            </ul>
+        @if (loadingPlans()) {
+          <div class="loading-message">Cargando planes...</div>
+        } @else {
+          <div class="plans-grid">
+            @for (plan of availablePlans(); track plan.id) {
+              <div 
+                class="plan-card" 
+                [class.selected]="form().selectedPlanId === plan.id"
+                [class.recommended]="plan.name === 'Professional'"
+                (click)="selectPlan(plan.id)"
+              >
+                @if (plan.name === 'Professional') {
+                  <div class="recommended-badge">⭐ Recomendado</div>
+                }
+                <h3>{{ plan.name }}</h3>
+                <div class="plan-price">
+                  ${{ plan.price }}<span>/mes</span>
+                </div>
+                <ul class="plan-features">
+                  @if (plan.name === 'Basic') {
+                    <li>✓ 5 doctores</li>
+                    <li>✓ 100 pacientes</li>
+                    <li>✓ Analytics básico</li>
+                    <li>✓ Soporte email</li>
+                  }
+                  @if (plan.name === 'Professional') {
+                    <li>✓ 20 doctores</li>
+                    <li>✓ 500 pacientes</li>
+                    <li>✓ Analytics avanzado</li>
+                    <li>✓ API access</li>
+                    <li>✓ Soporte prioritario</li>
+                  }
+                  @if (plan.name === 'Enterprise') {
+                    <li>✓ Doctores ilimitados</li>
+                    <li>✓ Pacientes ilimitados</li>
+                    <li>✓ White label</li>
+                    <li>✓ Integraciones personalizadas</li>
+                    <li>✓ Soporte 24/7 dedicado</li>
+                  }
+                </ul>
+              </div>
+            }
           </div>
-
-          <div 
-            class="plan-card" 
-            [class.selected]="form().plan === 'professional'"
-            (click)="updateForm('plan', 'professional')"
-          >
-            <h3>Profesional</h3>
-            <div class="plan-price">$299<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Hasta 500 pacientes</li>
-              <li>✓ 10 doctores</li>
-              <li>✓ Soporte prioritario</li>
-              <li>✓ Análisis avanzado</li>
-            </ul>
-          </div>
-
-          <div 
-            class="plan-card recommended" 
-            [class.selected]="form().plan === 'enterprise'"
-            (click)="updateForm('plan', 'enterprise')"
-          >
-            <div class="recommended-badge">Recomendado</div>
-            <h3>Enterprise</h3>
-            <div class="plan-price">$799<span>/mes</span></div>
-            <ul class="plan-features">
-              <li>✓ Pacientes ilimitados</li>
-              <li>✓ Doctores ilimitados</li>
-              <li>✓ Soporte 24/7</li>
-              <li>✓ Análisis avanzado</li>
-              <li>✓ API dedicada</li>
-              <li>✓ Personalización</li>
-            </ul>
-          </div>
-        </div>
+        }
 
         <div class="form-actions">
           <button type="button" class="btn-secondary" (click)="previousStep()">
@@ -208,7 +204,7 @@
             type="button" 
             class="btn-primary" 
             (click)="onSubmit()"
-            [disabled]="submitting()"
+            [disabled]="submitting() || !form().selectedPlanId"
           >
             {{ submitting() ? 'Registrando...' : 'Completar Registro' }}
           </button>

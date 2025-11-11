@@ -32,12 +32,15 @@ interface UserResource {
 export class AppointmentApiEndpoint {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiBaseUrl;
+  private readonly appointmentsUrl = `${environment.apiBaseUrl}${environment.appointmentsEndpointPath}`;
+  private readonly patientsUrl = `${environment.apiBaseUrl}${environment.patientsEndpointPath}`;
+  private readonly usersUrl = `${environment.apiBaseUrl}${environment.usersEndpointPath}`;
 
   /**
    * Obtiene todas las citas de un doctor con datos enriquecidos del paciente
    */
   getAppointmentsByDoctor(doctorId: number): Observable<Appointment[]> {
-    return this.http.get<AppointmentResource[]>(`${this.baseUrl}/appointments`).pipe(
+    return this.http.get<AppointmentResource[]>(this.appointmentsUrl).pipe(
       map(appointments => appointments.filter(apt => apt.doctorId === doctorId)),
       switchMap(appointments => {
         if (appointments.length === 0) {
@@ -47,7 +50,7 @@ export class AppointmentApiEndpoint {
         // Obtener datos de pacientes
         const patientIds = [...new Set(appointments.map(apt => apt.patientId))];
         const patientRequests = patientIds.map(id =>
-          this.http.get<PatientResource>(`${this.baseUrl}/patients/${id}`).pipe(
+          this.http.get<PatientResource>(`${this.patientsUrl}/${id}`).pipe(
             catchError(() => of(null))
           )
         );
@@ -59,7 +62,7 @@ export class AppointmentApiEndpoint {
             // Obtener emails de usuarios
             const userIds = validPatients.map(p => p.userId);
             const userRequests = userIds.map(userId =>
-              this.http.get<UserResource>(`${this.baseUrl}/users/${userId}`).pipe(
+              this.http.get<UserResource>(`${this.usersUrl}/${userId}`).pipe(
                 catchError(() => of(null))
               )
             );
@@ -98,7 +101,7 @@ export class AppointmentApiEndpoint {
    * Obtiene una cita específica por ID
    */
   getAppointmentById(appointmentId: number): Observable<Appointment | null> {
-    return this.http.get<AppointmentResource>(`${this.baseUrl}/appointments/${appointmentId}`).pipe(
+    return this.http.get<AppointmentResource>(`${this.appointmentsUrl}/${appointmentId}`).pipe(
       map(resource => AppointmentAssembler.toDomain(resource)),
       catchError(() => of(null))
     );
@@ -108,7 +111,7 @@ export class AppointmentApiEndpoint {
    * ⭐ Obtiene todas las citas de un paciente
    */
   getAppointmentsByPatient(patientId: number): Observable<Appointment[]> {
-    return this.http.get<AppointmentResource[]>(`${this.baseUrl}/appointments`).pipe(
+    return this.http.get<AppointmentResource[]>(this.appointmentsUrl).pipe(
       map(appointments => appointments.filter(apt => apt.patientId === patientId)),
       map(appointments => appointments.map(resource => AppointmentAssembler.toDomain(resource))),
       catchError(error => {
@@ -123,7 +126,7 @@ export class AppointmentApiEndpoint {
    */
   create(appointmentData: Omit<Appointment, 'id'>): Observable<Appointment> {
     const resource = AppointmentAssembler.toResource(appointmentData as Appointment);
-    return this.http.post<AppointmentResource>(`${this.baseUrl}/appointments`, resource).pipe(
+    return this.http.post<AppointmentResource>(this.appointmentsUrl, resource).pipe(
       map(resource => AppointmentAssembler.toDomain(resource))
     );
   }
@@ -133,7 +136,7 @@ export class AppointmentApiEndpoint {
    */
   updateAppointmentStatus(appointmentId: number, status: string): Observable<Appointment> {
     return this.http.patch<AppointmentResource>(
-      `${this.baseUrl}/appointments/${appointmentId}`,
+      `${this.appointmentsUrl}/${appointmentId}`,
       { status }
     ).pipe(
       map(resource => AppointmentAssembler.toDomain(resource))
@@ -145,7 +148,7 @@ export class AppointmentApiEndpoint {
    */
   updateAppointmentNotes(appointmentId: number, notes: string): Observable<Appointment> {
     return this.http.patch<AppointmentResource>(
-      `${this.baseUrl}/appointments/${appointmentId}`,
+      `${this.appointmentsUrl}/${appointmentId}`,
       { notes }
     ).pipe(
       map(resource => AppointmentAssembler.toDomain(resource))

@@ -12,6 +12,6 @@ import { environment } from '../../../environments/environment';
 })
 export class TenantApiEndpoint extends BaseApiEndpoint<Tenant, TenantResource, BaseResponse, TenantAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/tenants`, new TenantAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.tenantsEndpointPath}`, new TenantAssembler());
   }
 }

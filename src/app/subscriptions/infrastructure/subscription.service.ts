@@ -19,11 +19,14 @@ import {
   UpdateSubscriptionRequest,
 } from './subscription.resource';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class SubscriptionService {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiBaseUrl;
+  private readonly subscriptionsUrl = `${environment.apiBaseUrl}${environment.subscriptionsEndpointPath}`;
 
   constructor(private http: HttpClient) {}
 

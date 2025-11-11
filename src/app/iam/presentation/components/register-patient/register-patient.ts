@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
-import { PatientStore } from '../../../../patients/application/patient.store';
+import { RegistrationFacade } from '../../../infrastructure/registration.facade';
+import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
+import { SubscriptionPlanEntity } from '../../../../subscriptions/domain/model/subscription-plan.entity';
 
 interface PatientRegistrationForm {
   // User data
@@ -19,6 +20,9 @@ interface PatientRegistrationForm {
   gender: string;
   phone: string;
   address: string;
+  
+  // Subscription data
+  selectedPlanId: string | null;
 }
 
 @Component({
@@ -28,7 +32,11 @@ interface PatientRegistrationForm {
   templateUrl: './register-patient.html',
   styleUrls: ['./register-patient.css']
 })
-export class RegisterPatientComponent {
+export class RegisterPatientComponent implements OnInit {
+  private registrationFacade = inject(RegistrationFacade);
+  private subscriptionService = inject(SubscriptionService);
+  private router = inject(Router);
+
   form = signal<PatientRegistrationForm>({
     email: '',
     password: '',
@@ -39,21 +47,37 @@ export class RegisterPatientComponent {
     birthDate: '',
     gender: 'male',
     phone: '',
-    address: ''
+    address: '',
+    selectedPlanId: null
   });
 
   currentStep = signal<number>(1);
   submitting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  availablePlans = signal<SubscriptionPlanEntity[]>([]);
+  loadingPlans = signal<boolean>(false);
 
-  constructor(
-    private userStore: UserStore,
-    private patientStore: PatientStore,
-    private router: Router
-  ) {}
+  ngOnInit(): void {
+    this.loadPlans();
+  }
+
+  private loadPlans(): void {
+    this.loadingPlans.set(true);
+    this.subscriptionService.getPlansByType('patient').subscribe({
+      next: (plans) => {
+        this.availablePlans.set(plans);
+        this.loadingPlans.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading plans:', err);
+        this.errorMessage.set('Error al cargar los planes disponibles');
+        this.loadingPlans.set(false);
+      }
+    });
+  }
 
   nextStep(): void {
-    if (this.currentStep() < 2) {
+    if (this.currentStep() < 3) {
       this.currentStep.update(step => step + 1);
     }
   }
@@ -64,7 +88,7 @@ export class RegisterPatientComponent {
     }
   }
 
-  updateForm(field: keyof PatientRegistrationForm, value: string): void {
+  updateForm(field: keyof PatientRegistrationForm, value: string | number | null): void {
     this.form.update(current => ({
       ...current,
       [field]: value
@@ -99,76 +123,74 @@ export class RegisterPatientComponent {
     return true;
   }
 
+  validateStep3(): boolean {
+    const f = this.form();
+    if (!f.selectedPlanId) {
+      this.errorMessage.set('Por favor selecciona un plan');
+      return false;
+    }
+    this.errorMessage.set(null);
+    return true;
+  }
+
   onNextStep(): void {
     if (this.currentStep() === 1 && this.validateStep1()) {
+      this.nextStep();
+    } else if (this.currentStep() === 2 && this.validateStep2()) {
       this.nextStep();
     }
   }
 
+  selectPlan(planId: string): void {
+    this.updateForm('selectedPlanId', planId);
+  }
+
   onSubmit(): void {
-    if (!this.validateStep1() || !this.validateStep2()) {
+    if (!this.validateStep1() || !this.validateStep2() || !this.validateStep3()) {
       return;
     }
 
     this.submitting.set(true);
     const f = this.form();
 
-    // Create user
-    const newUser = {
-      id: Date.now(),
+    const registrationData = {
       email: f.email,
-      role: 'patient' as const,
-      name: `${f.firstName} ${f.lastName}`,
       password: f.password,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
+      firstName: f.firstName,
+      lastName: f.lastName,
+      dni: f.dni,
+      birthDate: f.birthDate,
+      gender: f.gender as 'male' | 'female' | 'other',
+      phone: f.phone,
+      address: f.address,
+      planId: f.selectedPlanId!
     };
 
-    this.userStore.createUser(newUser).subscribe({
-      next: (user) => {
-        // Create patient profile
-        const newPatient = {
-          id: Date.now(),
-          userId: user.id,
-          assignedDoctorId: null,
-          tenantId: null,
-          subscriptionId: null,
-          firstName: f.firstName,
-          lastName: f.lastName,
-          dni: f.dni,
-          birthDate: f.birthDate,
-          gender: f.gender as 'male' | 'female' | 'other',
-          phone: f.phone,
-          address: f.address,
-          weight: 0,
-          height: 0,
-          bmi: 0,
-          emergencyContact: {
-            name: '',
-            relationship: '',
-            phone: ''
-          }
-        };
+    this.registrationFacade.registerPatient(registrationData).subscribe({
+      next: (result) => {
+        this.submitting.set(false);
+        
+        // Save user to localStorage
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          role: result.user.role,
+          name: result.user.name
+        }));
 
-        this.patientStore.createPatient(newPatient).subscribe({
-          next: () => {
-            this.submitting.set(false);
-            alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-            this.router.navigate(['/iam/login']);
-          },
-          error: (err) => {
-            this.submitting.set(false);
-            this.errorMessage.set('Error al crear el perfil de paciente');
-            console.error('Error creating patient:', err);
-          }
-        });
+        // Check if payment is required
+        if (result.requiresPayment) {
+          alert('¡Registro exitoso! Procede con el pago para activar tu suscripción.');
+          this.router.navigate(['/patient/subscription']);
+        } else {
+          alert('¡Registro exitoso! Tu plan gratuito ha sido activado.');
+          this.router.navigate([result.dashboardRoute]);
+        }
       },
       error: (err) => {
         this.submitting.set(false);
-        this.errorMessage.set('Error al crear el usuario');
-        console.error('Error creating user:', err);
+        this.errorMessage.set(err.message || 'Error al completar el registro');
+        console.error('Error in registration:', err);
       }
     });
   }

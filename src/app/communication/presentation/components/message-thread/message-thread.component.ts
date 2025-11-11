@@ -181,8 +181,8 @@ export class MessageThreadComponent implements AfterViewInit {
     const map = this.senderNames();
     if (map[id] !== undefined) return; // ya cacheado (incluye empty string)
 
-    // intento sencillo: GET /users/:id
-    this.http.get<any>(`${environment.apiBaseUrl}/users/${id}`).subscribe({
+    // GET /users/:id usando endpoint centralizado
+    this.http.get<any>(`${environment.apiBaseUrl}${environment.usersEndpointPath}/${id}`).subscribe({
       next: (u) => {
         const name = u?.name || (u?.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : '') || '';
         const cur = this.senderNames();

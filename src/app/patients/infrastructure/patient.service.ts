@@ -1,17 +1,11 @@
-/**
- * Patient Service
- * Servicio de infraestructura para comunicación con API de pacientes
- */
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
+import { environment } from '../../../environments/environment';
 import { PatientEntity, EmergencyContact } from '../domain/model/patient.entity';
 
-const BASE_URL = 'http://localhost:3000';
-const PATIENT_API = `${BASE_URL}/patients`;
+const PATIENT_API = `${environment.apiBaseUrl}${environment.patientsEndpointPath}`;
 
 @Injectable({
   providedIn: 'root',
@@ -79,9 +73,16 @@ export class PatientService {
     );
   }
 
-  /**
-   * Obtiene todos los pacientes de un tenant (hospital)
-   */
+  getByUserId(userId: string | number): Observable<PatientEntity | null> {
+    return this.http.get<any[]>(`${PATIENT_API}?userId=${userId}`).pipe(
+      map((resources) => resources.length > 0 ? this.toEntity(resources[0]) : null),
+      catchError((error) => {
+        console.error(`Error fetching patient for user ${userId}:`, error);
+        return throwError(() => new Error(`Failed to fetch patient for user ${userId}`));
+      })
+    );
+  }
+
   getByTenantId(tenantId: string | number): Observable<PatientEntity[]> {
     return this.http.get<any[]>(`${PATIENT_API}?tenantId=${tenantId}`).pipe(
       map((resources) => resources.map(r => this.toEntity(r))),

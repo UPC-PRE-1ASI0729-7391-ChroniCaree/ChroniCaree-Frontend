@@ -45,4 +45,8 @@ export interface UpdateSubscriptionRequest {
   status?: 'active' | 'cancelled' | 'past_due' | 'trial' | 'suspended';
   autoRenew?: boolean;
   paymentMethod?: 'credit_card' | 'debit_card' | 'paypal' | 'bank_transfer';
+  lastPaymentDate?: string;
+  lastPaymentAmount?: number;
+  nextBillingDate?: string;
+  endDate?: string;
 }

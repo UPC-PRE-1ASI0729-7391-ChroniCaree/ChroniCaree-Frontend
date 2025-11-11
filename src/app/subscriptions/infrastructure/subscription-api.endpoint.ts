@@ -3,8 +3,11 @@
  * Define las rutas del API para suscripciones
  */
 
+import { environment } from '../../../environments/environment';
+
 export class SubscriptionApiEndpoint {
-  private static readonly BASE_URL = '/subscriptions';
+  private static readonly BASE_URL = environment.subscriptionsEndpointPath;
+  private static readonly PLANS_URL = environment.plansEndpointPath;
 
   static getAll(): string {
     return this.BASE_URL;
@@ -35,14 +38,14 @@ export class SubscriptionApiEndpoint {
   }
 
   static getSubscriptionPlans(): string {
-    return '/subscriptionPlans';
+    return this.PLANS_URL;
   }
 
   static getSubscriptionPlanById(planId: string): string {
-    return `/subscriptionPlans?id=${planId}`;
+    return `${this.PLANS_URL}?id=${planId}`;
   }
 
   static getSubscriptionPlansByType(type: 'patient' | 'tenant'): string {
-    return `/subscriptionPlans?type=${type}`;
+    return `${this.PLANS_URL}?type=${type}`;
   }
 }

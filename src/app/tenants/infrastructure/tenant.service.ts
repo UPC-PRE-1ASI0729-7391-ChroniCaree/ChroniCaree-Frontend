@@ -10,9 +10,9 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 
 import { TenantEntity, TenantStatus, TenantSettings } from '../domain/model/tenant.entity';
+import { environment } from '../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const TENANT_API = `${BASE_URL}/tenants`;
+const TENANT_API = `${environment.apiBaseUrl}${environment.tenantsEndpointPath}`;
 
 export interface TenantResource {
   id: number;

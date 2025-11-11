@@ -12,9 +12,14 @@
         <span>Cuenta</span>
       </div>
       <div class="step-line" [class.completed]="currentStep() > 1"></div>
-      <div class="step" [class.active]="currentStep() === 2">
+      <div class="step" [class.active]="currentStep() === 2" [class.completed]="currentStep() > 2">
         <div class="step-circle">2</div>
         <span>Datos Personales</span>
+      </div>
+      <div class="step-line" [class.completed]="currentStep() > 2"></div>
+      <div class="step" [class.active]="currentStep() === 3">
+        <div class="step-circle">3</div>
+        <span>Plan</span>
       </div>
     </div>
 
@@ -178,8 +183,68 @@
           <button 
             type="button" 
             class="btn-primary" 
+            (click)="onNextStep()"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Plan Selection -->
+    @if (currentStep() === 3) {
+      <div class="form-step">
+        <h2>Selecciona tu Plan</h2>
+        
+        @if (loadingPlans()) {
+          <div class="loading-message">Cargando planes...</div>
+        } @else {
+          <div class="plans-grid">
+            @for (plan of availablePlans(); track plan.id) {
+              <div 
+                class="plan-card" 
+                [class.selected]="form().selectedPlanId === plan.id"
+                [class.recommended]="plan.name === 'Estándar'"
+                (click)="selectPlan(plan.id)"
+              >
+                @if (plan.name === 'Estándar') {
+                  <div class="recommended-badge">⭐ Recomendado</div>
+                }
+                <h3>{{ plan.name }}</h3>
+                <div class="plan-price">
+                  ${{ plan.price }}<span>/mes</span>
+                </div>
+                <ul class="plan-features">
+                  <li>✓ Acceso a doctores 24/7</li>
+                  @if (plan.name === 'Gratuito') {
+                    <li>✓ Disponibilidad Lunes-Viernes</li>
+                    <li>✓ Seguimiento básico</li>
+                  }
+                  @if (plan.name === 'Estándar') {
+                    <li>✓ Disponibilidad todos los días</li>
+                    <li>✓ Visitas a domicilio</li>
+                    <li>✓ Seguimiento de síntomas</li>
+                  }
+                  @if (plan.name === 'Premium') {
+                    <li>✓ Acceso a especialistas</li>
+                    <li>✓ Reportes avanzados con IA</li>
+                    <li>✓ Compartir con familia (5 miembros)</li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="previousStep()">
+            Atrás
+          </button>
+          <button 
+            type="button" 
+            class="btn-primary" 
             (click)="onSubmit()"
-            [disabled]="submitting()"
+            [disabled]="submitting() || !form().selectedPlanId"
           >
             {{ submitting() ? 'Registrando...' : 'Completar Registro' }}
           </button>

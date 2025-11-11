@@ -12,6 +12,6 @@ import { environment } from '../../../environments/environment';
 })
 export class DoctorApiEndpoint extends BaseApiEndpoint<Doctor, DoctorResource, BaseResponse, DoctorAssembler> {
   constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/doctors`, new DoctorAssembler());
+    super(http, `${environment.apiBaseUrl}${environment.doctorsEndpointPath}`, new DoctorAssembler());
   }
 }

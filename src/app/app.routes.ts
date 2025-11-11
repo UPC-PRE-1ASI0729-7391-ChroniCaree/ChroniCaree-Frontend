@@ -99,6 +99,12 @@ export const routes: Routes = [
         loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
         title: `${baseTitle} - Agendar Cita`,
         data: { role: 'patient' }
+      },
+      {
+        path: 'subscription',
+        loadComponent: () => import('./patients/presentation/views/patient-subscription/patient-subscription.view').then(m => m.PatientSubscriptionView),
+        title: `${baseTitle} - Mi Suscripción`,
+        data: { role: 'patient' }
       }
     ]
   },
@@ -151,7 +157,7 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./medical-records/presentation/views/hospital-dashboard/hospital-dashboard.view')
+          import('./tenants/presentation/views/hospital-dashboard/hospital-dashboard.view')
             .then((m) => m.HospitalDashboardView),
         title: `${baseTitle} - Dashboard Hospital`,
         data: { role: 'hospital_admin' },
@@ -194,6 +200,14 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/patient-devices/patient-devices.view')
             .then((m) => m.PatientDevicesView),
         title: `${baseTitle} - Gestión de Dispositivos`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'subscription',
+        loadComponent: () =>
+          import('./tenants/presentation/views/hospital-subscription/hospital-subscription.view')
+            .then((m) => m.HospitalSubscriptionView),
+        title: `${baseTitle} - Suscripción`,
         data: { role: 'hospital_admin' },
       },
     ],

@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
-import { TenantStore } from '../../../../tenants/application/tenant.store';
+import { RegistrationFacade } from '../../../infrastructure/registration.facade';
+import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
+import { SubscriptionPlanEntity } from '../../../../subscriptions/domain/model/subscription-plan.entity';
 
 interface HospitalRegistrationForm {
   // User data
@@ -16,7 +17,9 @@ interface HospitalRegistrationForm {
   hospitalName: string;
   address: string;
   phone: string;
-  plan: 'basic' | 'professional' | 'enterprise';
+  
+  // Subscription data
+  selectedPlanId: string | null;
 }
 
 @Component({
@@ -26,7 +29,11 @@ interface HospitalRegistrationForm {
   templateUrl: './register-hospital.html',
   styleUrls: ['./register-hospital.css']
 })
-export class RegisterHospitalComponent {
+export class RegisterHospitalComponent implements OnInit {
+  private registrationFacade = inject(RegistrationFacade);
+  private subscriptionService = inject(SubscriptionService);
+  private router = inject(Router);
+
   form = signal<HospitalRegistrationForm>({
     email: '',
     password: '',
@@ -35,18 +42,33 @@ export class RegisterHospitalComponent {
     hospitalName: '',
     address: '',
     phone: '',
-    plan: 'basic'
+    selectedPlanId: null
   });
 
   currentStep = signal<number>(1);
   submitting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  availablePlans = signal<SubscriptionPlanEntity[]>([]);
+  loadingPlans = signal<boolean>(false);
 
-  constructor(
-    private userStore: UserStore,
-    private tenantStore: TenantStore,
-    private router: Router
-  ) {}
+  ngOnInit(): void {
+    this.loadPlans();
+  }
+
+  private loadPlans(): void {
+    this.loadingPlans.set(true);
+    this.subscriptionService.getPlansByType('tenant').subscribe({
+      next: (plans) => {
+        this.availablePlans.set(plans);
+        this.loadingPlans.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading plans:', err);
+        this.errorMessage.set('Error al cargar los planes disponibles');
+        this.loadingPlans.set(false);
+      }
+    });
+  }
 
   nextStep(): void {
     if (this.currentStep() < 3) {
@@ -60,11 +82,15 @@ export class RegisterHospitalComponent {
     }
   }
 
-  updateForm(field: keyof HospitalRegistrationForm, value: string): void {
+  updateForm(field: keyof HospitalRegistrationForm, value: string | null): void {
     this.form.update(current => ({
       ...current,
       [field]: value
     }));
+  }
+
+  selectPlan(planId: string): void {
+    this.updateForm('selectedPlanId', planId);
   }
 
   validateStep1(): boolean {
@@ -95,6 +121,16 @@ export class RegisterHospitalComponent {
     return true;
   }
 
+  validateStep3(): boolean {
+    const f = this.form();
+    if (!f.selectedPlanId) {
+      this.errorMessage.set('Por favor selecciona un plan');
+      return false;
+    }
+    this.errorMessage.set(null);
+    return true;
+  }
+
   onNextStep(): void {
     if (this.currentStep() === 1 && this.validateStep1()) {
       this.nextStep();
@@ -104,64 +140,44 @@ export class RegisterHospitalComponent {
   }
 
   onSubmit(): void {
-    if (!this.validateStep1() || !this.validateStep2()) {
+    if (!this.validateStep1() || !this.validateStep2() || !this.validateStep3()) {
       return;
     }
 
     this.submitting.set(true);
     const f = this.form();
 
-    // 1. Create user (hospital_admin)
-    const newUser = {
-      id: Date.now(), // Mock ID
+    const registrationData = {
       email: f.email,
-      role: 'hospital_admin' as const,
-      name: f.adminName,
       password: f.password,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
+      adminName: f.adminName,
+      hospitalName: f.hospitalName,
+      address: f.address,
+      phone: f.phone,
+      planId: f.selectedPlanId!
     };
 
-    this.userStore.createUser(newUser).subscribe({
-      next: (user) => {
-        // 2. Create tenant (hospital)
-        const newTenant = {
-          id: Date.now(), // Mock ID
-          adminUserId: user.id,
-          name: f.hospitalName,
-          email: f.email,
-          address: f.address,
-          phone: f.phone,
-          plan: f.plan,
-          status: 'pending_subscription' as const,
-          registrationDate: new Date().toISOString(),
-          subscriptionId: null,
-          settings: {
-            allowIndependentDoctors: false,
-            requirePatientApproval: true,
-            maxDoctors: 10
-          }
-        };
+    this.registrationFacade.registerHospital(registrationData).subscribe({
+      next: (result) => {
+        this.submitting.set(false);
+        
+        // Save user to localStorage
+        localStorage.setItem('currentUser', JSON.stringify({
+          id: result.user.id,
+          email: result.user.email,
+          role: result.user.role,
+          name: result.user.name,
+          tenantId: result.user.tenantId
+        }));
 
-        this.tenantStore.createTenant(newTenant).subscribe({
-          next: () => {
-            this.submitting.set(false);
-            alert('¡Registro exitoso! Tu solicitud está siendo revisada.');
-            this.router.navigate(['/iam/login']);
-          },
-          error: (err) => {
-            this.submitting.set(false);
-            this.errorMessage.set('Error al registrar el hospital');
-            console.error('Error creating tenant:', err);
-          }
-        });
+        // Hospitals always need payment
+        alert('¡Registro exitoso! Procede con el pago para activar tu suscripción.');
+        this.router.navigate(['/hospital/subscription']);
       },
       error: (err) => {
         this.submitting.set(false);
-        this.errorMessage.set('Error al crear el usuario administrador');
-        console.error('Error creating user:', err);
+        this.errorMessage.set(err.message || 'Error al completar el registro');
+        console.error('Error in registration:', err);
       }
     });
   }

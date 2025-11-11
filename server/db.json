@@ -61,6 +61,39 @@
       "twoFactorEnabled": false,
       "tenantId": 2,
       "createdAt": "2024-02-01T00:00:00Z"
+    },
+    {
+      "id": 1762826871788,
+      "email": "admin1@123.com",
+      "role": "hospital_admin",
+      "name": "Jose",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-11T02:07:51.788Z",
+      "tenantId": null
+    },
+    {
+      "id": 1762836015040,
+      "email": "sanlorenzo@admin.com",
+      "role": "hospital_admin",
+      "name": "abimael",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-11T04:40:15.040Z",
+      "tenantId": 1762836015082
+    },
+    {
+      "id": 1762836830002,
+      "email": "lola@lola.com",
+      "role": "hospital_admin",
+      "name": "lola",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-11T04:53:50.002Z",
+      "tenantId": 1762836830047
     }
   ],
   "tenants": [
@@ -95,9 +128,125 @@
         "requirePatientApproval": false,
         "maxDoctors": 10
       }
+    },
+    {
+      "id": 1762826871836,
+      "name": "Clinica san agustin",
+      "subscriptionId": 3,
+      "status": "active"
+    },
+    {
+      "id": 1762836015082,
+      "name": "San Lorenzo de juan"
+    },
+    {
+      "id": 1762836830047,
+      "name": "1234444",
+      "subscriptionId": 6,
+      "status": "active"
     }
   ],
   "subscriptionPlans": [
+    {
+      "id": "patient_free",
+      "type": "patient",
+      "name": "Gratuito",
+      "price": 0,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": false,
+        "advancedReports": false,
+        "dataStorage": "6 months",
+        "support": "community",
+        "aiInsights": false,
+        "familySharing": false,
+        "availability": "Lunes a Viernes 24/7"
+      }
+    },
+    {
+      "id": "patient_standard",
+      "type": "patient",
+      "name": "Estándar",
+      "price": 19.99,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": true,
+        "advancedReports": false,
+        "dataStorage": "1 year",
+        "support": "priority",
+        "aiInsights": false,
+        "familySharing": false,
+        "availability": "24/7 Todos los días",
+        "homeVisits": true
+      }
+    },
+    {
+      "id": "patient_premium",
+      "type": "patient",
+      "name": "Premium",
+      "price": 49.99,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "doctorAccess": true,
+        "symptomTracking": true,
+        "medicationReminders": true,
+        "basicReports": true,
+        "advancedReports": true,
+        "dataStorage": "unlimited",
+        "support": "priority",
+        "aiInsights": true,
+        "familySharing": true,
+        "maxMembers": 5,
+        "availability": "24/7 Todos los días",
+        "homeVisits": true,
+        "specialistAccess": true
+      }
+    },
+    {
+      "id": "tenant_basic",
+      "type": "tenant",
+      "name": "Basic",
+      "price": 299,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "maxDoctors": 5,
+        "maxPatients": 100,
+        "basicAnalytics": true,
+        "advancedAnalytics": false,
+        "customBranding": false,
+        "apiAccess": false,
+        "support": "email",
+        "dataRetention": "1 year"
+      }
+    },
+    {
+      "id": "tenant_professional",
+      "type": "tenant",
+      "name": "Professional",
+      "price": 599,
+      "currency": "USD",
+      "billingPeriod": "monthly",
+      "features": {
+        "maxDoctors": 20,
+        "maxPatients": 500,
+        "basicAnalytics": true,
+        "advancedAnalytics": true,
+        "customBranding": true,
+        "apiAccess": true,
+        "support": "phone",
+        "dataRetention": "3 years"
+      }
+    },
     {
       "id": "tenant_enterprise",
       "type": "tenant",
@@ -108,8 +257,14 @@
       "features": {
         "maxDoctors": -1,
         "maxPatients": -1,
+        "basicAnalytics": true,
         "advancedAnalytics": true,
-        "support": "dedicated"
+        "customBranding": true,
+        "apiAccess": true,
+        "support": "dedicated",
+        "dataRetention": "unlimited",
+        "whiteLabel": true,
+        "customIntegrations": true
       }
     }
   ],
@@ -122,7 +277,12 @@
       "status": "active",
       "startDate": "2024-01-15T00:00:00Z",
       "endDate": "2025-01-15T00:00:00Z",
-      "autoRenew": true
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "admin1@hospital1.com",
+      "nextBillingDate": "2025-01-15T00:00:00Z",
+      "lastPaymentDate": "2024-12-15T00:00:00Z",
+      "lastPaymentAmount": 999
     },
     {
       "id": 2,
@@ -132,7 +292,70 @@
       "status": "active",
       "startDate": "2024-02-01T00:00:00Z",
       "endDate": "2025-02-01T00:00:00Z",
-      "autoRenew": true
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "admin2@hospital2.com",
+      "nextBillingDate": "2025-02-01T00:00:00Z",
+      "lastPaymentDate": "2025-01-01T00:00:00Z",
+      "lastPaymentAmount": 999
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1762826871836,
+      "planId": "tenant_basic",
+      "status": "active",
+      "startDate": "2025-11-11T02:08:57.824Z",
+      "endDate": "2025-12-11T02:08:57.824Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "nextBillingDate": "2025-12-11T02:08:57.824Z",
+      "lastPaymentDate": "2025-11-11T02:08:57.824Z",
+      "lastPaymentAmount": 299,
+      "id": 3
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1762836015082,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-11T04:40:15.191Z",
+      "endDate": "2025-12-11T04:40:15.191Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "sanlorenzo@admin.com",
+      "nextBillingDate": "2025-12-11T04:40:15.191Z",
+      "lastPaymentDate": "2025-11-11T04:40:15.191Z",
+      "lastPaymentAmount": 599,
+      "id": 4
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1762836830047,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-11T04:53:50.173Z",
+      "endDate": "2025-12-11T04:53:50.173Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "lola@lola.com",
+      "nextBillingDate": "2025-12-11T04:53:50.173Z",
+      "lastPaymentDate": "2025-11-11T04:53:50.173Z",
+      "lastPaymentAmount": 599,
+      "id": 5
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1762836830047,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-11T04:54:17.838Z",
+      "endDate": "2025-12-11T04:54:17.838Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "nextBillingDate": "2025-12-11T04:54:17.838Z",
+      "lastPaymentDate": "2025-11-11T04:54:17.838Z",
+      "lastPaymentAmount": 599,
+      "id": 6
     }
   ],
   "patients": [
@@ -439,6 +662,34 @@
       "paymentMethod": "credit_card",
       "transactionId": "txn_tenant_002",
       "createdAt": "2024-02-01T00:00:00Z"
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1762826871836,
+      "amount": 299,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SS70vBJEHGVCWjrwcbydlmJ",
+      "stripePaymentIntentId": "tok_1SS70vBJEHGVCWjrwcbydlmJ",
+      "updatedAt": "2025-11-11T02:08:57.730Z",
+      "createdAt": "2025-11-11T02:08:57.730Z",
+      "id": 3
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1762836830047,
+      "amount": 599,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SS9avBJEHGVCWjrShCho8FX",
+      "stripePaymentIntentId": "tok_1SS9avBJEHGVCWjrShCho8FX",
+      "updatedAt": "2025-11-11T04:54:17.754Z",
+      "createdAt": "2025-11-11T04:54:17.755Z",
+      "id": 4
     }
   ],
   "auditLogs": [
