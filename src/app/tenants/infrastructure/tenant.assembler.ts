@@ -14,7 +14,19 @@ export class TenantAssembler implements BaseAssembler<Tenant, TenantResource, Ba
   toEntityFromResource(resource: TenantResource): Tenant {
     return {
       id: resource.id,
-      name: resource.name
+      adminUserId: (resource as any).adminUserId || 0,
+      name: resource.name,
+      address: (resource as any).address || '',
+      phone: (resource as any).phone || '',
+      email: (resource as any).email || '',
+      status: (resource as any).status || 'pending_subscription',
+      subscriptionId: (resource as any).subscriptionId || null,
+      registrationDate: (resource as any).registrationDate || new Date().toISOString(),
+      settings: (resource as any).settings || {
+        allowIndependentDoctors: false,
+        requirePatientApproval: true,
+        maxDoctors: 5
+      }
     };
   }
 

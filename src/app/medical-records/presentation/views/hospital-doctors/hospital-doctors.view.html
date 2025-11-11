@@ -1,0 +1,155 @@
+<div class="hospital-doctors">
+  <!-- Header -->
+  <div class="doctors-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <mat-icon>medical_services</mat-icon>
+          Gestión de Doctores
+        </h1>
+        <p class="subtitle">Administra los médicos y sus pacientes asignados</p>
+      </div>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        class="add-doctor-btn"
+        (click)="openAddDoctorDialog()">
+        <mat-icon>add</mat-icon>
+        Agregar Doctor
+      </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <mat-icon class="stat-icon doctor-icon">medical_services</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalDoctors() }}</span>
+          <span class="stat-label">Doctores Activos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon patient-icon">people</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalPatients() }}</span>
+          <span class="stat-label">Pacientes Asignados</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctors List -->
+  <div class="doctors-list">
+    @for (doctor of doctors(); track doctor.id) {
+      <mat-expansion-panel class="doctor-card">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="doctor-header-info">
+              <div class="doctor-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="doctor-details">
+                <h3>{{ doctor.name }}</h3>
+                <div class="doctor-meta">
+                  <span class="specialty">
+                    <mat-icon>local_hospital</mat-icon>
+                    {{ doctor.specialty }}
+                  </span>
+                  <span class="patients-count">
+                    <mat-icon>people</mat-icon>
+                    {{ doctor.patients.length }} pacientes
+                  </span>
+                </div>
+              </div>
+            </div>
+          </mat-panel-title>
+          <mat-panel-description>
+            <div class="doctor-actions" (click)="$event.stopPropagation()">
+              <button 
+                mat-icon-button 
+                color="primary"
+                (click)="editDoctor(doctor.id)"
+                matTooltip="Editar doctor">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn"
+                (click)="deleteDoctor(doctor.id)"
+                matTooltip="Eliminar doctor">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Expanded Content: Doctor Info + Patients -->
+        <div class="doctor-expanded-content">
+          <!-- Contact Info -->
+          <div class="contact-section">
+            <h4>Información de Contacto</h4>
+            <div class="contact-details">
+              <div class="contact-item">
+                <mat-icon>email</mat-icon>
+                <span>{{ doctor.email }}</span>
+              </div>
+              <div class="contact-item">
+                <mat-icon>badge</mat-icon>
+                <span>Licencia: {{ doctor.licenseNumber }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patients List -->
+          <div class="patients-section">
+            <h4>
+              Pacientes Asignados ({{ doctor.patients.length }})
+            </h4>
+            @if (doctor.patients.length === 0) {
+              <div class="no-patients">
+                <mat-icon>info</mat-icon>
+                <p>Este doctor no tiene pacientes asignados aún</p>
+                <a routerLink="/hospital/assignments" mat-button color="primary">
+                  <mat-icon>assignment</mat-icon>
+                  Asignar Pacientes
+                </a>
+              </div>
+            } @else {
+              <div class="patients-list">
+                @for (patient of doctor.patients; track patient.id) {
+                  <div 
+                    class="patient-item"
+                    (click)="viewPatient(patient.id)">
+                    <div class="patient-info">
+                      <mat-icon class="patient-icon">person</mat-icon>
+                      <div class="patient-details">
+                        <span class="patient-name">{{ patient.name }}</span>
+                        <span class="patient-meta">{{ patient.age }} años</span>
+                      </div>
+                    </div>
+                    <mat-chip class="condition-chip">
+                      {{ patient.condition }}
+                    </mat-chip>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </mat-expansion-panel>
+    } @empty {
+      <div class="empty-state">
+        <mat-icon>medical_services</mat-icon>
+        <h3>No hay doctores registrados</h3>
+        <p>Comienza agregando el primer doctor de tu hospital</p>
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="openAddDoctorDialog()">
+          <mat-icon>add</mat-icon>
+          Agregar Primer Doctor
+        </button>
+      </div>
+    }
+  </div>
+</div>

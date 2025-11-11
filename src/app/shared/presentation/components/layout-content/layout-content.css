@@ -16,6 +16,13 @@
   transition: margin-left 0.3s ease;
 }
 
+/* Specific margin for admin role */
+.layout.role-admin .layout-main,
+.layout.role-doctor .layout-main,
+.layout.role-patient .layout-main {
+  margin-left: 280px;
+}
+
 /* When toolbar is collapsed */
 :host-context(.toolbar.collapsed) ~ .layout-main {
   margin-left: 80px;

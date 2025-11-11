@@ -1,0 +1,377 @@
+.hospital-doctors {
+  padding: 2rem;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.doctors-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.title-section h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.title-section h1 mat-icon {
+  color: #7c3aed;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.subtitle {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.add-doctor-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0 1.5rem;
+  height: 48px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.25);
+  transition: all 0.3s ease;
+}
+
+.add-doctor-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(124, 58, 237, 0.35);
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  font-size: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+
+.doctor-icon {
+  color: #7c3aed;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.patient-icon {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Doctors List */
+.doctors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.doctor-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.doctor-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.doctor-header-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.doctor-avatar {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doctor-avatar mat-icon {
+  color: white;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.doctor-details h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.doctor-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.doctor-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.doctor-meta mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.specialty {
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+.patients-count {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.doctor-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Expanded Content */
+.doctor-expanded-content {
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact-section h4,
+.patients-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+
+.contact-item mat-icon {
+  color: #7c3aed;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Patients List */
+.patients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.patient-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.patient-item:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+}
+
+.patient-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.patient-icon {
+  color: #3b82f6;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.patient-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.patient-meta {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.condition-chip {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* No Patients State */
+.no-patients {
+  text-align: center;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.no-patients mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.no-patients p {
+  color: #64748b;
+  margin: 0 0 1rem 0;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state mat-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #64748b;
+  margin: 0 0 2rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hospital-doctors {
+    padding: 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .add-doctor-btn {
+    width: 100%;
+  }
+
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .doctor-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .patient-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

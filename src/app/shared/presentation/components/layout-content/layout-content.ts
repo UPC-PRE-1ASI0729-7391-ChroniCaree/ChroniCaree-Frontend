@@ -4,6 +4,7 @@ import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { ToolbarDoctorComponent } from '../toolbar-doctor/toolbar-doctor';
 import { ToolbarPatientComponent } from '../toolbar-patient/toolbar-patient';
+import { ToolbarAdminComponent } from '../toolbar-admin/toolbar-admin';
 import { HeaderContentComponent } from '../header-content/header-content';
 import { FooterContentComponent } from '../footer-content/footer-content';
 
@@ -15,6 +16,7 @@ import { FooterContentComponent } from '../footer-content/footer-content';
     RouterOutlet,
     ToolbarDoctorComponent,
     ToolbarPatientComponent,
+    ToolbarAdminComponent,
     HeaderContentComponent,
     FooterContentComponent
   ],

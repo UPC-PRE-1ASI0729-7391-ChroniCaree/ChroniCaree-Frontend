@@ -1,0 +1,27 @@
+/* Hospital Layout - Main Container */
+
+.hospital-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Adjust main content when sidebar is collapsed */
+.hospital-layout:has(.hospital-sidebar.collapsed) .main-content {
+  margin-left: 80px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 80px;
+  }
+}

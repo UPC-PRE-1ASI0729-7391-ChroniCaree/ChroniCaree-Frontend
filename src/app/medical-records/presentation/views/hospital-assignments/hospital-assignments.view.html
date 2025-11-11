@@ -1,0 +1,154 @@
+<div class="hospital-assignments">
+  <!-- Header -->
+  <div class="assignments-header">
+    <div class="title-section">
+      <h1>
+        <mat-icon>assignment</mat-icon>
+        Asignaciones Doctor-Paciente
+      </h1>
+      <p class="subtitle">Gestiona las asignaciones de pacientes a doctores</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="stat-badge unassigned">
+        <mat-icon>person_off</mat-icon>
+        <span>{{ unassignedPatients().length }} Sin Asignar</span>
+      </div>
+      <div class="stat-badge assigned">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ assignedPatients().length }} Asignados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="assignments-content">
+    <!-- Unassigned Patients Section -->
+    <div class="unassigned-section">
+      <div class="section-header">
+        <h2>
+          <mat-icon>person_add</mat-icon>
+          Pacientes Sin Asignar
+        </h2>
+        <mat-chip class="count-chip">{{ unassignedPatients().length }}</mat-chip>
+      </div>
+
+      <div class="patients-grid">
+        @for (patient of unassignedPatients(); track patient.id) {
+          <mat-card class="patient-card unassigned">
+            <div class="card-header">
+              <div class="patient-info">
+                <mat-icon class="patient-icon">person</mat-icon>
+                <div>
+                  <h3>{{ patient.name }}</h3>
+                  <p class="patient-meta">{{ patient.age }} años • {{ patient.condition }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="assignment-control">
+              <mat-form-field appearance="outline" class="doctor-select">
+                <mat-label>Asignar a doctor</mat-label>
+                <mat-select 
+                  placeholder="Seleccione un doctor"
+                  (selectionChange)="assignPatientToDoctor(patient.id, $event.value)">
+                  @for (doctor of doctors(); track doctor.id) {
+                    <mat-option [value]="doctor.id">
+                      <div class="doctor-option">
+                        <span class="doctor-name">{{ doctor.name }}</span>
+                        <span class="doctor-specialty">{{ doctor.specialty }}</span>
+                        <mat-chip class="patient-count-chip">
+                          {{ doctor.patientCount }} pacientes
+                        </mat-chip>
+                      </div>
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card>
+        } @empty {
+          <div class="empty-state-small">
+            <mat-icon>check_circle</mat-icon>
+            <p>¡Excelente! Todos los pacientes están asignados</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Assigned Patients by Doctor Section -->
+    <div class="assigned-section">
+      <div class="section-header">
+        <h2>
+          <mat-icon>assignment_turned_in</mat-icon>
+          Asignaciones Actuales
+        </h2>
+      </div>
+
+      <div class="doctors-assignments">
+        @for (doctor of doctors(); track doctor.id) {
+          @if (getPatientsByDoctor(doctor.id).length > 0) {
+            <div class="doctor-assignment-group">
+              <div class="doctor-group-header">
+                <div class="doctor-info">
+                  <mat-icon class="doctor-icon">medical_services</mat-icon>
+                  <div>
+                    <h3>{{ doctor.name }}</h3>
+                    <p class="doctor-specialty">{{ doctor.specialty }}</p>
+                  </div>
+                </div>
+                <mat-chip class="patient-count-chip">
+                  {{ getPatientsByDoctor(doctor.id).length }} pacientes
+                </mat-chip>
+              </div>
+
+              <div class="assigned-patients-list">
+                @for (patient of getPatientsByDoctor(doctor.id); track patient.id) {
+                  <div class="assigned-patient-card">
+                    <div class="patient-info">
+                      <mat-icon class="patient-icon">person</mat-icon>
+                      <div class="patient-details">
+                        <h4>{{ patient.name }}</h4>
+                        <p class="patient-meta">{{ patient.age }} años • {{ patient.condition }}</p>
+                      </div>
+                    </div>
+                    <button 
+                      mat-icon-button 
+                      color="warn"
+                      (click)="unassignPatient(patient.id)"
+                      matTooltip="Desasignar paciente">
+                      <mat-icon>link_off</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        } @empty {
+          <div class="empty-state">
+            <mat-icon>assignment</mat-icon>
+            <h3>No hay asignaciones aún</h3>
+            <p>Comienza asignando pacientes a los doctores</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Footer -->
+  <div class="quick-actions">
+    <a routerLink="/hospital/doctors" mat-button color="primary">
+      <mat-icon>medical_services</mat-icon>
+      Ver Doctores
+    </a>
+    <a routerLink="/hospital/patients" mat-button color="primary">
+      <mat-icon>people</mat-icon>
+      Ver Pacientes
+    </a>
+    <a routerLink="/hospital/patient-onboarding" mat-raised-button color="primary">
+      <mat-icon>person_add</mat-icon>
+      Registrar Nuevo Paciente
+    </a>
+  </div>
+</div>

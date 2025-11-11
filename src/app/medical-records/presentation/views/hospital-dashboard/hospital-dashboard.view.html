@@ -1,0 +1,149 @@
+<div class="hospital-dashboard">
+    <!-- Header Section -->
+    <header class="dashboard-header">
+    <div class="header-content">
+      <div class="hospital-info">
+        <h1 class="hospital-name">{{ hospitalName() }}</h1>
+        <div class="status-badges">
+          <span class="status-badge" [ngClass]="getStatusColor(subscriptionStatus())">
+            {{ getStatusText(subscriptionStatus()) }}
+          </span>
+          <span class="plan-badge" [ngClass]="getPlanBadgeColor(subscriptionPlanName())">
+            Plan {{ subscriptionPlanName() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-refresh" (click)="refreshData()" [disabled]="isLoadingStats()">
+          <span class="material-icons">refresh</span>
+          Actualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-summary" *ngIf="!isLoadingStats() && dashboardStats()">
+      <div class="stat-card">
+        <div class="stat-icon doctors-icon">
+          <span class="material-icons">medical_services</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Doctores</div>
+          <div class="stat-value">
+            {{ doctorsCount() }} / {{ maxDoctors() }}
+          </div>
+          <div class="stat-progress" *ngIf="maxDoctors() !== 'Ilimitado'">
+            <div class="progress-bar" 
+                 [style.width.%]="doctorsProgressPercentage()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon patients-icon">
+          <span class="material-icons">people</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Pacientes</div>
+          <div class="stat-value">{{ dashboardStats()?.totalPatients || 0 }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon invitations-icon">
+          <span class="material-icons">mail_outline</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Invitaciones Pendientes</div>
+          <div class="stat-value">{{ dashboardStats()?.pendingInvitations || 0 }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon slots-icon">
+          <span class="material-icons">add_circle_outline</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Espacios Disponibles</div>
+          <div class="stat-value">
+            {{ maxDoctors() === 'Ilimitado' ? '∞' : (dashboardStats()?.availableDoctorSlots || 0) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoadingStats()">
+      <div class="spinner"></div>
+      <p>Cargando datos del hospital...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-banner" *ngIf="errorMessage() && !isLoadingStats()">
+      <span class="material-icons">error_outline</span>
+      <p>{{ errorMessage() }}</p>
+      <button (click)="refreshData()">Reintentar</button>
+    </div>
+
+    <!-- Pending Subscription Warning -->
+    <div class="warning-banner" *ngIf="isPendingSubscription()">
+      <span class="material-icons">warning</span>
+      <div class="warning-content">
+        <strong>Suscripción Pendiente</strong>
+        <p>Para habilitar todas las funcionalidades, debe completar la suscripción de su hospital.</p>
+      </div>
+      <button class="btn-primary" routerLink="/subscriptions/plans">
+        Completar Suscripción
+      </button>
+    </div>
+
+    <!-- Doctors Limit Warning -->
+    <div class="warning-banner warning-soft" *ngIf="doctorsLimitReached() && !isPendingSubscription()">
+      <span class="material-icons">info</span>
+      <div class="warning-content">
+        <strong>Límite alcanzado ({{ doctorsCount() }}/{{ maxDoctors() }})</strong>
+        <p>Ha alcanzado el límite de doctores para su plan. Actualice su plan para agregar más doctores.</p>
+      </div>
+      <button class="btn-upgrade" routerLink="/subscriptions/upgrade">
+        Actualizar Plan
+      </button>
+    </div>
+  </header>
+
+  <!-- Tabs Navigation -->
+  <nav class="tabs-navigation" *ngIf="!isPendingSubscription()">
+    <button 
+      *ngFor="let tab of tabs"
+      class="tab-button"
+      [class.active]="activeTab() === tab.id"
+      (click)="selectTab(tab.id)">
+      <span class="material-icons">{{ tab.icon }}</span>
+      <span class="tab-label">{{ tab.label }}</span>
+    </button>
+  </nav>
+
+  <!-- Tab Content -->
+  <div class="tab-content" *ngIf="!isPendingSubscription() && !isLoadingStats()">
+    <!-- Doctors Tab -->
+    <div class="tab-pane" *ngIf="activeTab() === 'doctors'">
+      <app-doctors-management></app-doctors-management>
+    </div>
+
+    <!-- Patients Tab -->
+    <div class="tab-pane" *ngIf="activeTab() === 'patients'">
+      <app-hospital-patients></app-hospital-patients>
+    </div>
+
+    <!-- Assignments Tab -->
+    <div class="tab-pane" *ngIf="activeTab() === 'assignments'">
+      <app-doctor-patient-assignment></app-doctor-patient-assignment>
+    </div>
+
+    <!-- Statistics Tab -->
+    <div class="tab-pane" *ngIf="activeTab() === 'statistics'">
+      <app-hospital-statistics></app-hospital-statistics>
+    </div>
+  </div>
+</div>

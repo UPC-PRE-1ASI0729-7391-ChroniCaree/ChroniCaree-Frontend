@@ -23,7 +23,12 @@ export class DoctorAssembler implements BaseAssembler<Doctor, DoctorResource, Ba
       specialty: resource.specialty,
       licenseNumber: resource.licenseNumber,
       phone: resource.phone,
-      isVerified: resource.isVerified
+      isVerified: resource.isVerified,
+      acceptingPatients: resource.acceptingPatients ?? true,
+      consultationFee: resource.consultationFee ?? 0,
+      languages: resource.languages ?? [],
+      education: resource.education ?? [],
+      joinedAt: resource.joinedAt ?? new Date().toISOString()
     };
   }
 
@@ -42,7 +47,12 @@ export class DoctorAssembler implements BaseAssembler<Doctor, DoctorResource, Ba
       specialty: entity.specialty,
       licenseNumber: entity.licenseNumber,
       phone: entity.phone,
-      isVerified: entity.isVerified
+      isVerified: entity.isVerified,
+      acceptingPatients: entity.acceptingPatients,
+      consultationFee: entity.consultationFee,
+      languages: entity.languages,
+      education: entity.education,
+      joinedAt: entity.joinedAt
     };
   }
 

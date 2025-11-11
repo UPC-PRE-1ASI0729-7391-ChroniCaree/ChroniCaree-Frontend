@@ -1,0 +1,172 @@
+<div class="hospital-patients">
+  <!-- Header -->
+  <div class="patients-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>
+          <mat-icon>people</mat-icon>
+          Gestión de Pacientes
+        </h1>
+        <p class="subtitle">Visualiza y administra todos los pacientes del hospital</p>
+      </div>
+      <a 
+        routerLink="/hospital/patient-onboarding" 
+        mat-raised-button 
+        color="primary" 
+        class="add-patient-btn">
+        <mat-icon>person_add</mat-icon>
+        Registrar Paciente
+      </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-cards">
+      <div class="stat-card total">
+        <mat-icon class="stat-icon">people</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ totalPatients() }}</span>
+          <span class="stat-label">Total Pacientes</span>
+        </div>
+      </div>
+      <div class="stat-card active">
+        <mat-icon class="stat-icon">check_circle</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ activePatients() }}</span>
+          <span class="stat-label">Activos</span>
+        </div>
+      </div>
+      <div class="stat-card critical">
+        <mat-icon class="stat-icon">warning</mat-icon>
+        <div class="stat-info">
+          <span class="stat-value">{{ criticalPatients() }}</span>
+          <span class="stat-label">Críticos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label>Buscar paciente, condición o doctor...</mat-label>
+        <input 
+          matInput 
+          [(ngModel)]="searchTerm"
+          placeholder="Ej: María, Diabetes, Dr. Pérez">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Patients List -->
+  <div class="patients-list">
+    @for (patient of filteredPatients(); track patient.id) {
+      <div 
+        class="patient-card"
+        (click)="viewPatientDetails(patient.id)">
+        <div class="patient-header">
+          <div class="patient-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="patient-main-info">
+            <h3>{{ patient.name }}</h3>
+            <div class="patient-meta">
+              <span class="meta-item">
+                <mat-icon>cake</mat-icon>
+                {{ patient.age }} años
+              </span>
+              <span class="meta-item">
+                <mat-icon>{{ patient.gender === 'Masculino' ? 'male' : 'female' }}</mat-icon>
+                {{ patient.gender }}
+              </span>
+            </div>
+          </div>
+          <mat-chip 
+            class="status-chip"
+            [style.background-color]="getStatusColor(patient.status) + '20'"
+            [style.color]="getStatusColor(patient.status)">
+            {{ getStatusLabel(patient.status) }}
+          </mat-chip>
+        </div>
+
+        <div class="patient-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <mat-icon class="detail-icon">medical_information</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Condición</span>
+                <span class="detail-value">{{ patient.condition }}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <mat-icon class="detail-icon doctor-icon">medical_services</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Doctor Asignado</span>
+                <span class="detail-value">{{ patient.assignedDoctor }}</span>
+                <span class="detail-specialty">{{ patient.doctorSpecialty }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <mat-icon class="detail-icon">event</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Última Visita</span>
+                <span class="detail-value">{{ patient.lastVisit | date: 'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+            <div class="detail-actions">
+              <button 
+                mat-button 
+                color="primary"
+                (click)="$event.stopPropagation(); viewPatientDetails(patient.id)">
+                <mat-icon>visibility</mat-icon>
+                Ver Detalles
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      @if (searchTerm()) {
+        <div class="empty-state">
+          <mat-icon>search_off</mat-icon>
+          <h3>No se encontraron pacientes</h3>
+          <p>No hay pacientes que coincidan con "{{ searchTerm() }}"</p>
+          <button 
+            mat-button 
+            color="primary"
+            (click)="searchTerm.set('')">
+            <mat-icon>clear</mat-icon>
+            Limpiar búsqueda
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>people</mat-icon>
+          <h3>No hay pacientes registrados</h3>
+          <p>Comienza registrando el primer paciente del hospital</p>
+          <a 
+            routerLink="/hospital/patient-onboarding"
+            mat-raised-button 
+            color="primary">
+            <mat-icon>person_add</mat-icon>
+            Registrar Primer Paciente
+          </a>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Quick Actions Footer -->
+  <div class="quick-actions">
+    <a routerLink="/hospital/assignments" mat-button color="primary">
+      <mat-icon>assignment</mat-icon>
+      Ver Asignaciones
+    </a>
+    <a routerLink="/hospital/doctors" mat-button color="primary">
+      <mat-icon>medical_services</mat-icon>
+      Ver Doctores
+    </a>
+  </div>
+</div>

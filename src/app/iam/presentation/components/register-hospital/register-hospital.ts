@@ -119,7 +119,9 @@ export class RegisterHospitalComponent {
       name: f.adminName,
       password: f.password,
       isVerified: false,
-      twoFactorEnabled: false
+      twoFactorEnabled: false,
+      createdAt: new Date().toISOString(),
+      tenantId: null
     };
 
     this.userStore.createUser(newUser).subscribe({
@@ -127,12 +129,20 @@ export class RegisterHospitalComponent {
         // 2. Create tenant (hospital)
         const newTenant = {
           id: Date.now(), // Mock ID
+          adminUserId: user.id,
           name: f.hospitalName,
+          email: f.email,
           address: f.address,
           phone: f.phone,
           plan: f.plan,
-          status: 'pending' as const,
-          registrationDate: new Date().toISOString()
+          status: 'pending_subscription' as const,
+          registrationDate: new Date().toISOString(),
+          subscriptionId: null,
+          settings: {
+            allowIndependentDoctors: false,
+            requirePatientApproval: true,
+            maxDoctors: 10
+          }
         };
 
         this.tenantStore.createTenant(newTenant).subscribe({

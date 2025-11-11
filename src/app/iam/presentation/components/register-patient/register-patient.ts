@@ -121,7 +121,9 @@ export class RegisterPatientComponent {
       name: `${f.firstName} ${f.lastName}`,
       password: f.password,
       isVerified: false,
-      twoFactorEnabled: false
+      twoFactorEnabled: false,
+      createdAt: new Date().toISOString(),
+      tenantId: null
     };
 
     this.userStore.createUser(newUser).subscribe({
@@ -137,12 +139,17 @@ export class RegisterPatientComponent {
           lastName: f.lastName,
           dni: f.dni,
           birthDate: f.birthDate,
-          gender: f.gender,
+          gender: f.gender as 'male' | 'female' | 'other',
           phone: f.phone,
           address: f.address,
           weight: 0,
           height: 0,
-          bmi: 0
+          bmi: 0,
+          emergencyContact: {
+            name: '',
+            relationship: '',
+            phone: ''
+          }
         };
 
         this.patientStore.createPatient(newPatient).subscribe({

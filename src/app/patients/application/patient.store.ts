@@ -1,7 +1,7 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Patient } from '../domain/model/patient.entity';
-import { PatientApiEndpoint } from '../infrastructure/patient-api.endpoint';
+import { PatientService } from '../infrastructure/patient.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,13 +17,13 @@ export class PatientStore {
   readonly loading$ = this.loading.asReadonly();
   readonly error$ = this.error.asReadonly();
 
-  constructor(private patientApi: PatientApiEndpoint) {}
+  constructor(private patientService: PatientService) {}
 
   loadAllPatients(): Observable<Patient[]> {
     this.loading.set(true);
     this.error.set(null);
     
-    return this.patientApi.getAll().pipe(
+    return this.patientService.getAll().pipe(
       tap({
         next: (patients) => {
           this.patients.set(patients);
@@ -42,7 +42,7 @@ export class PatientStore {
     this.loading.set(true);
     this.error.set(null);
     
-    return this.patientApi.getById(id).pipe(
+    return this.patientService.getById(id).pipe(
       tap({
         next: (patient) => {
           this.selectedPatient.set(patient);
@@ -61,7 +61,7 @@ export class PatientStore {
     this.loading.set(true);
     this.error.set(null);
     
-    return this.patientApi.create(patient).pipe(
+    return this.patientService.create(patient).pipe(
       tap({
         next: (newPatient) => {
           this.patients.update(patients => [...patients, newPatient]);
@@ -80,7 +80,7 @@ export class PatientStore {
     this.loading.set(true);
     this.error.set(null);
     
-    return this.patientApi.update(patient, patient.id).pipe(
+    return this.patientService.update(patient, patient.id).pipe(
       tap({
         next: (updatedPatient) => {
           this.patients.update(patients => 
@@ -102,7 +102,7 @@ export class PatientStore {
     this.loading.set(true);
     this.error.set(null);
     
-    return this.patientApi.delete(id).pipe(
+    return this.patientService.delete(id).pipe(
       tap({
         next: () => {
           this.patients.update(patients => patients.filter(p => p.id !== id));

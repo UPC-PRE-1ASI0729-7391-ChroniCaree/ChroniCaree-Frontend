@@ -19,7 +19,9 @@ export class UserAssembler implements BaseAssembler<User, UserResource, BaseResp
       name: resource.name,
       password: resource.password,
       isVerified: resource.isVerified,
-      twoFactorEnabled: resource.twoFactorEnabled
+      twoFactorEnabled: resource.twoFactorEnabled,
+      createdAt: resource.createdAt ?? new Date().toISOString(),
+      tenantId: resource.tenantId ?? null
     };
   }
 
@@ -34,7 +36,9 @@ export class UserAssembler implements BaseAssembler<User, UserResource, BaseResp
       name: entity.name,
       password: entity.password,
       isVerified: entity.isVerified,
-      twoFactorEnabled: entity.twoFactorEnabled
+      twoFactorEnabled: entity.twoFactorEnabled,
+      createdAt: entity.createdAt,
+      tenantId: entity.tenantId
     };
   }
 

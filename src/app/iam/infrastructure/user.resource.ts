@@ -8,4 +8,6 @@ export interface UserResource extends BaseResource {
   password: string;
   isVerified: boolean;
   twoFactorEnabled: boolean;
+  tenantId?: number | null;
+  createdAt?: string;
 }

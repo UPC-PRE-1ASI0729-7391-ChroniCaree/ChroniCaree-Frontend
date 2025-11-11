@@ -1,17 +1,41 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BaseApiEndpoint } from '../../shared/infrastructure/base-api-endpoint';
-import { BaseResponse } from '../../shared/infrastructure/base-response';
-import { Patient } from '../domain/model/patient.entity';
-import { PatientResource } from './patient.resource';
-import { PatientAssembler } from './patient.assembler';
-import { environment } from '../../../environments/environment';
+/**
+ * Patient API Endpoints
+ * Centraliza las URLs del API de pacientes
+ */
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PatientApiEndpoint extends BaseApiEndpoint<Patient, PatientResource, BaseResponse, PatientAssembler> {
-  constructor(http: HttpClient) {
-    super(http, `${environment.apiBaseUrl}/patients`, new PatientAssembler());
+const BASE_URL = 'http://localhost:3000';
+const PATIENT_API = `${BASE_URL}/patients`;
+
+export class PatientApiEndpoint {
+  static getAll(): string {
+    return PATIENT_API;
+  }
+
+  static getById(id: string | number): string {
+    return `${PATIENT_API}/${id}`;
+  }
+
+  static getByUserId(userId: string | number): string {
+    return `${PATIENT_API}?userId=${userId}`;
+  }
+
+  static getByDoctorId(doctorId: string | number): string {
+    return `${PATIENT_API}?assignedDoctorId=${doctorId}`;
+  }
+
+  static getByTenantId(tenantId: string | number): string {
+    return `${PATIENT_API}?tenantId=${tenantId}`;
+  }
+
+  static create(): string {
+    return PATIENT_API;
+  }
+
+  static update(id: string | number): string {
+    return `${PATIENT_API}/${id}`;
+  }
+
+  static delete(id: string | number): string {
+    return `${PATIENT_API}/${id}`;
   }
 }
