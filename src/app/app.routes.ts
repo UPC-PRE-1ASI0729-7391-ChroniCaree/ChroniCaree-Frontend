@@ -171,6 +171,14 @@ export const routes: Routes = [
         data: { role: 'hospital_admin' },
       },
       {
+        path: 'doctors/add',
+        loadComponent: () =>
+          import('./doctors/presentation/views/add-doctor/add-doctor.view')
+            .then((m) => m.AddDoctorView),
+        title: `${baseTitle} - Agregar Doctor`,
+        data: { role: 'hospital_admin' },
+      },
+      {
         path: 'patients',
         loadComponent: () =>
           import('./medical-records/presentation/views/hospital-patients/hospital-patients.view')

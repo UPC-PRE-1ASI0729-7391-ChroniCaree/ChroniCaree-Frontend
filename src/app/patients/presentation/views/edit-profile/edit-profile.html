@@ -140,6 +140,71 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Subscription Section -->
+    <mat-card class="section-card subscription-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="section-icon subscription-icon">card_membership</mat-icon>
+        <mat-card-title>Mi Suscripción</mat-card-title>
+        <mat-card-subtitle>Información de tu plan actual</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="loadingSubscription()" class="loading-subscription">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Cargando suscripción...</p>
+        </div>
+
+        <div *ngIf="!loadingSubscription() && currentSubscription()" class="subscription-info">
+          <div class="subscription-status">
+            <span class="status-badge" [class.active]="currentSubscription()!.status === 'active'"
+                  [class.expired]="currentSubscription()!.isExpired"
+                  [class.cancelled]="currentSubscription()!.status === 'cancelled'">
+              {{ getStatusLabel(currentSubscription()!.status) }}
+            </span>
+          </div>
+          
+          <div class="subscription-details-grid">
+            <div class="detail-item">
+              <mat-icon>event</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Inicio</span>
+                <span class="detail-value">{{ formatDate(currentSubscription()!.startDate) }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <mat-icon>update</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Renovación</span>
+                <span class="detail-value">{{ formatDate(currentSubscription()!.endDate) }}</span>
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <mat-icon>credit_card</mat-icon>
+              <div class="detail-content">
+                <span class="detail-label">Último pago</span>
+                <span class="detail-value">${{ currentSubscription()!.lastPaymentAmount }} USD</span>
+              </div>
+            </div>
+          </div>
+          
+          <button mat-stroked-button color="primary" class="manage-subscription-btn" (click)="navigateToSubscription()">
+            <mat-icon>settings</mat-icon>
+            Gestionar Suscripción
+          </button>
+        </div>
+
+        <div *ngIf="!loadingSubscription() && !currentSubscription()" class="no-subscription">
+          <mat-icon class="no-sub-icon">info</mat-icon>
+          <p class="no-sub-text">No tienes una suscripción activa</p>
+          <button mat-raised-button color="primary" (click)="navigateToSubscription()">
+            <mat-icon>add</mat-icon>
+            Ver Planes Disponibles
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Action Buttons -->
     <div class="action-buttons">
         <button 

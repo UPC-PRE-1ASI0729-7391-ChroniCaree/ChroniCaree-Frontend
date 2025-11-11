@@ -101,17 +101,26 @@ export class NudgeStore {
     this.loading.set(true);
     this.error.set(null);
     
-    const patientIdNumber = parseInt(patientId, 10);
-    
+    const patientIdNumber = Number(patientId);
+
     // shareReplay(1) asegura que múltiples suscripciones usen la misma petición HTTP
     this.currentRequest = this.nudgeApi.getAll().pipe(
       tap({
         next: (allNudges) => {
-          // ✅ Filtrar solo los nudges del paciente actual
-          const patientNudges = allNudges.filter(n => n.patientId === patientIdNumber);
-          console.log(`✅ NudgeStore: ${patientNudges.length} nudges encontrados para paciente ${patientId}`);
-          this.nudges.set(patientNudges);
-          this.loading.set(false);
+          try {
+            // Asegurar que la respuesta es un array antes de filtrar
+            const arr = Array.isArray(allNudges) ? allNudges : [];
+            // ✅ Filtrar solo los nudges del paciente actual
+            const patientNudges = arr.filter(n => n && n.patientId === patientIdNumber);
+            console.log(`✅ NudgeStore: ${patientNudges.length} nudges encontrados para paciente ${patientId}`);
+            this.nudges.set(patientNudges);
+          } catch (e) {
+            console.error('Error procesando nudges para patientId', patientId, e);
+            this.nudges.set([]);
+            this.error.set('Error al procesar nudges');
+          } finally {
+            this.loading.set(false);
+          }
         },
         error: (err) => {
           this.error.set('Error al cargar nudges');

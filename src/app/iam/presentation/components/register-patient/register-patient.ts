@@ -22,7 +22,7 @@ interface PatientRegistrationForm {
   address: string;
   
   // Subscription data
-  selectedPlanId: string | null;
+  selectedPlanId?: string | null;
 }
 
 @Component({
@@ -123,21 +123,13 @@ export class RegisterPatientComponent implements OnInit {
     return true;
   }
 
-  validateStep3(): boolean {
-    const f = this.form();
-    if (!f.selectedPlanId) {
-      this.errorMessage.set('Por favor selecciona un plan');
-      return false;
-    }
-    this.errorMessage.set(null);
-    return true;
-  }
 
   onNextStep(): void {
     if (this.currentStep() === 1 && this.validateStep1()) {
       this.nextStep();
     } else if (this.currentStep() === 2 && this.validateStep2()) {
-      this.nextStep();
+      // No inline plan selection during registration — submit and redirect to subscription flow
+      this.onSubmit();
     }
   }
 
@@ -146,14 +138,14 @@ export class RegisterPatientComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.validateStep1() || !this.validateStep2() || !this.validateStep3()) {
+    if (!this.validateStep1() || !this.validateStep2()) {
       return;
     }
 
     this.submitting.set(true);
     const f = this.form();
 
-    const registrationData = {
+    const registrationData: any = {
       email: f.email,
       password: f.password,
       firstName: f.firstName,
@@ -162,30 +154,28 @@ export class RegisterPatientComponent implements OnInit {
       birthDate: f.birthDate,
       gender: f.gender as 'male' | 'female' | 'other',
       phone: f.phone,
-      address: f.address,
-      planId: f.selectedPlanId!
+      address: f.address
+      // Do NOT send planId during initial registration — user will select a plan next
     };
 
     this.registrationFacade.registerPatient(registrationData).subscribe({
       next: (result) => {
         this.submitting.set(false);
-        
-        // Save user to localStorage
-        localStorage.setItem('currentUser', JSON.stringify({
-          id: result.user.id,
-          email: result.user.email,
-          role: result.user.role,
-          name: result.user.name
-        }));
 
-        // Check if payment is required
-        if (result.requiresPayment) {
-          alert('¡Registro exitoso! Procede con el pago para activar tu suscripción.');
-          this.router.navigate(['/patient/subscription']);
-        } else {
-          alert('¡Registro exitoso! Tu plan gratuito ha sido activado.');
-          this.router.navigate([result.dashboardRoute]);
+        // Save user to localStorage
+        try {
+          localStorage.setItem('currentUser', JSON.stringify({
+            id: result.user.id,
+            email: result.user.email,
+            role: result.user.role,
+            name: result.user.name
+          }));
+        } catch (e) {
+          console.warn('Could not persist currentUser to localStorage', e);
         }
+
+        // Redirect user to subscription flow to choose plan and complete payment
+        this.router.navigate(['/patient/subscription']);
       },
       error: (err) => {
         this.submitting.set(false);

@@ -181,14 +181,12 @@ export class HospitalSubscriptionView implements OnInit, AfterViewInit, OnDestro
         }).toPromise();
       }
 
-      this.success.set('¡Pago procesado exitosamente! Suscripción activada.');
+      this.success.set('¡Pago procesado exitosamente! Redirigiendo al dashboard...');
       
-      // Recargar datos
+      // Redirigir al dashboard
       setTimeout(() => {
-        this.loadData();
-        this.cancelPayment();
-        this.success.set(null);
-      }, 3000);
+        this.router.navigate(['/hospital/dashboard']);
+      }, 2000);
 
     } catch (err: any) {
       console.error('❌ Error processing payment:', err);

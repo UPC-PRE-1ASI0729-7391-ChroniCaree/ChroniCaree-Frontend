@@ -21,7 +21,7 @@ import { FooterContentComponent } from '../footer-content/footer-content';
     FooterContentComponent
   ],
   templateUrl: './layout-content.html',
-  styleUrl: './layout-content.css'
+  styleUrls: ['./layout-content.css']
 })
 export class LayoutContentComponent {
   currentUrl = signal<string>('');
@@ -33,10 +33,12 @@ export class LayoutContentComponent {
     const url = this.currentUrl();
     // Fullscreen ONLY for: /, /home, /iam/* (login, register), /404
     // coming-soon and dashboards should show WITH layout
-    return url === '/' || 
-           url.startsWith('/iam') || 
-           url.startsWith('/home') ||
-           url === '/404';
+    // also allow patient subscription page to be fullscreen like IAM routes
+    return url === '/' ||
+      url.startsWith('/iam') ||
+      url.startsWith('/home') ||
+      url === '/404' ||
+      url.startsWith('/patient/subscription');
   });
 
   // Get user role from signal instead of computed

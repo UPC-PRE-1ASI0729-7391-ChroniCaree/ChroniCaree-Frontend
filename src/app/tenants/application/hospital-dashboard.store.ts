@@ -117,20 +117,58 @@ export class HospitalDashboardStore {
           doctorsCount: this.doctorService.countByTenantId(tenantId),
           doctors: this.doctorService.getByTenantId(tenantId),
           // Nota: getPatientsByTenantId no existe, se calcula por doctores
-          pendingInvitations: this.invitationService.getPendingByTenantId(tenantId)
+          pendingInvitations: this.invitationService.getPendingByTenantId(tenantId).pipe(
+            catchError(() => of([]))  // Si falla (404), retornar array vacío
+          )
         });
       }),
       switchMap(result => {
-        // Validar que la suscripción esté activa
-        if (!result.subscription.isActive) {
-          return throwError(() => new Error(
-            'No se puede acceder al dashboard. La suscripción no está activa.'
-          ));
+        // Si no hay suscripción, permitir acceso limitado
+        if (!result.subscription || !result.subscription.isActive) {
+          // Dashboard con acceso limitado (sin suscripción activa)
+          const limitedStats: HospitalDashboardStats = {
+            totalDoctors: 0,
+            maxDoctors: 0,
+            availableDoctorSlots: 0,
+            totalPatients: 0,
+            pendingInvitations: 0,
+            activeSubscription: false,
+            planName: 'Sin Plan',
+            subscriptionStatus: 'inactive'
+          };
+
+          this._stats.set(limitedStats);
+          this._doctors.set([]);
+
+          return of({
+            success: true,
+            message: 'Dashboard en modo limitado. Activa tu suscripción.',
+            data: limitedStats
+          });
         }
 
         // Validar que el plan exista
         if (!result.subscriptionPlan) {
-          return throwError(() => new Error('Plan de suscripción no encontrado'));
+          // Permitir dashboard sin plan específico
+          const limitedStats: HospitalDashboardStats = {
+            totalDoctors: result.doctorsCount,
+            maxDoctors: 5,
+            availableDoctorSlots: 5 - result.doctorsCount,
+            totalPatients: 0,
+            pendingInvitations: result.pendingInvitations.length,
+            activeSubscription: result.subscription.isActive,
+            planName: 'Plan Básico',
+            subscriptionStatus: result.subscription.status
+          };
+
+          this._stats.set(limitedStats);
+          this._doctors.set(result.doctors);
+
+          return of({
+            success: true,
+            message: 'Dashboard cargado',
+            data: limitedStats
+          });
         }
 
         // Calcular pacientes asociados a los doctores del hospital

@@ -1,4 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, signal, computed, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -23,8 +25,10 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
   private stripeService = inject(StripeService);
   private subscriptionService = inject(SubscriptionService);
   private patientService = inject(PatientService);
+  private router = inject(Router);
 
   loading = signal(false);
+  stripeBlocked = signal(false);
   patientId = signal<number>(0);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
@@ -62,18 +66,18 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
 
     try {
       const userId = this.getUserId();
-      
-      const patient = await this.patientService.getByUserId(userId).toPromise();
-      
+
+      const patient = await firstValueFrom(this.patientService.getByUserId(userId));
+
       if (!patient) {
         throw new Error('No se encontró el perfil del paciente');
       }
 
       this.patientId.set(patient.id);
-      
+
       const [subscription, plans] = await Promise.all([
-        this.subscriptionService.getActiveByPayerId('patient', patient.id).toPromise(),
-        this.subscriptionService.getPlansByType('patient').toPromise()
+        firstValueFrom(this.subscriptionService.getActiveByPayerId('patient', patient.id)),
+        firstValueFrom(this.subscriptionService.getPlansByType('patient'))
       ]);
 
       this.currentSubscription.set(subscription || null);
@@ -95,11 +99,16 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
     this.selectedPlan.set(plan);
     this.showPaymentForm.set(true);
     
+    // Montar el elemento de tarjeta de Stripe
     setTimeout(() => {
       if (this.cardElementRef?.nativeElement) {
         this.stripeService.createCardElement(this.cardElementRef.nativeElement);
       }
     }, 100);
+  }
+
+  reloadPage(): void {
+    window.location.reload();
   }
 
   async subscribeToPlan(plan: SubscriptionPlanEntity): Promise<void> {
@@ -110,7 +119,7 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
       const patId = this.patientId();
       const email = this.getPatientEmail();
       
-      await this.subscriptionService.create({
+      await firstValueFrom(this.subscriptionService.create({
         payerType: 'patient',
         payerId: patId,
         patientId: patId,
@@ -118,7 +127,7 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
         autoRenew: true,
         paymentMethod: 'credit_card',
         billingEmail: email
-      }).toPromise();
+      }));
 
       this.success.set('¡Suscripción activada exitosamente!');
       setTimeout(() => {
@@ -133,9 +142,12 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
   }
 
   async processPayment(): Promise<void> {
+    if (!this.canProceed()) return;
+
     const plan = this.selectedPlan();
+    const patId = this.patientId();
     
-    if (!plan) {
+    if (!plan || !patId) {
       this.error.set('Información incompleta para procesar el pago');
       return;
     }
@@ -144,9 +156,10 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
     this.success.set(null);
 
     try {
-      const patId = this.patientId();
       const email = this.getPatientEmail();
+      console.log('💳 Procesando pago...');
 
+      // 1. Procesar pago con Stripe
       const payment = await this.paymentStore.processPayment(
         0,
         patId,
@@ -155,7 +168,10 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
         this.cardholderName()
       );
 
-      await this.subscriptionService.create({
+      console.log('✅ Pago procesado:', payment);
+
+      // 2. Crear suscripción después del pago exitoso
+      const newSub = await firstValueFrom(this.subscriptionService.create({
         payerType: 'patient',
         payerId: patId,
         patientId: patId,
@@ -163,19 +179,25 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
         autoRenew: true,
         paymentMethod: 'credit_card',
         billingEmail: email
-      }).toPromise();
+      }));
+
+      console.log('✅ Suscripción creada:', newSub);
 
       this.success.set('¡Pago procesado exitosamente! Suscripción activada.');
       
       setTimeout(() => {
-        this.loadData();
-        this.cancelPayment();
-        this.success.set(null);
-      }, 3000);
+        this.router.navigate(['/patient/dashboard']);
+      }, 2000);
 
     } catch (err: any) {
-      console.error('Error processing payment:', err);
-      this.error.set(err.message || 'Error procesando el pago');
+      console.error('❌ Error processing payment:', err);
+      const msg = err?.message || '';
+      if (msg.includes('Failed to fetch') || msg.toLowerCase().includes('blocked')) {
+        this.error.set('Error cargando recursos de Stripe (posible bloqueador). Desactiva adblock y prueba de nuevo.');
+        this.stripeBlocked.set(true);
+      } else {
+        this.error.set(msg || 'Error procesando el pago. Por favor intenta nuevamente.');
+      }
     }
   }
 

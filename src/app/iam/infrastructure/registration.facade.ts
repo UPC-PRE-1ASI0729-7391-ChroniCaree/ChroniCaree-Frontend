@@ -24,8 +24,8 @@ export interface PatientRegistrationData {
   phone: string;
   address: string;
   
-  // Subscription data
-  planId: string;
+  // Subscription data (optional during initial registration)
+  planId?: string | null;
 }
 
 export interface HospitalRegistrationData {
@@ -110,43 +110,36 @@ export class RegistrationFacade {
 
         return this.patientStore.createPatient(newPatient).pipe(
           switchMap((patient) => {
-            // Step 3: Get plan details
-            return this.subscriptionService.getPlanById(data.planId).pipe(
-              switchMap((plan) => {
-                if (!plan) {
-                  throw new Error('Plan no encontrado');
-                }
+            // Step 3: If a planId was provided, get plan details; otherwise skip and return result
+            if (data.planId) {
+              return this.subscriptionService.getPlanById(data.planId).pipe(
+                switchMap((plan) => {
+                  if (!plan) {
+                    throw new Error('Plan no encontrado');
+                  }
 
-                // Step 4: Create subscription
-                const subscriptionRequest = {
-                  planId: plan.id,
-                  payerType: 'patient' as const,
-                  payerId: patient.id,
-                  paymentMethod: 'credit_card' as const,
-                  billingEmail: data.email,
-                  autoRenew: true
-                };
+                  // Do NOT create the subscription here if the plan requires payment.
+                  // Instead, return the created user and patient and indicate whether payment is required.
+                  return this.patientStore.updatePatient(patient).pipe(
+                    map(() => ({
+                      user,
+                      profile: patient,
+                      requiresPayment: plan.price > 0,
+                      dashboardRoute: '/patient/dashboard'
+                    }))
+                  );
+                })
+              );
+            }
 
-                return this.subscriptionService.create(subscriptionRequest).pipe(
-                  switchMap((subscription) => {
-                    // Step 5: Update patient with subscription ID
-                    const updatedPatient = {
-                      ...patient,
-                      subscriptionId: subscription.id
-                    };
-                    
-                    return this.patientStore.updatePatient(updatedPatient).pipe(
-                      map(() => ({
-                        user,
-                        profile: updatedPatient,
-                        subscriptionId: subscription.id,
-                        requiresPayment: plan.price > 0,
-                        dashboardRoute: '/patient/dashboard'
-                      }))
-                    );
-                  })
-                );
-              })
+            // No plan selected during registration: update patient and return success without payment requirement
+            return this.patientStore.updatePatient(patient).pipe(
+              map(() => ({
+                user,
+                profile: patient,
+                requiresPayment: false,
+                dashboardRoute: '/patient/dashboard'
+              }))
             );
           })
         );

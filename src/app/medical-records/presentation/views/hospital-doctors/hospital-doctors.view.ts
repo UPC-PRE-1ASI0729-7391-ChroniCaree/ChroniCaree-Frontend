@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -46,6 +46,7 @@ interface Patient {
 export class HospitalDoctorsView implements OnInit {
   private hospitalStore = inject(HospitalDashboardStore);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
   private doctorService = inject(DoctorService);
   private patientService = inject(PatientService);
 
@@ -131,18 +132,7 @@ export class HospitalDoctorsView implements OnInit {
   }
 
   openAddDoctorDialog() {
-    // TODO: Open dialog to add new doctor
-    console.log('Opening add doctor dialog...');
-    // const dialogRef = this.dialog.open(AddDoctorDialogComponent, {
-    //   width: '600px',
-    //   data: {}
-    // });
-    // 
-    // dialogRef.afterClosed().subscribe(result => {
-    //   if (result) {
-    //     // Refresh doctors list
-    //   }
-    // });
+    this.router.navigate(['/hospital/doctors/add']);
   }
 
   viewPatient(patientId: number) {

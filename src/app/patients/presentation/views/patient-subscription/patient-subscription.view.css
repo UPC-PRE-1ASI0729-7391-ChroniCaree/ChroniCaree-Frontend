@@ -80,6 +80,98 @@
   border: 1px solid #cfc;
 }
 
+.alert-warning {
+  background-color: #fff3cd;
+  border-left: 4px solid #ff9800;
+  color: #856404;
+}
+
+/* Stripe Blocked Banner */
+.stripe-blocked-banner {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
+  animation: slideDown 0.5s ease-out;
+}
+
+.stripe-blocked-banner .icon-container {
+  flex-shrink: 0;
+}
+
+.stripe-blocked-banner .icon-container svg {
+  color: #ff9800;
+}
+
+.stripe-blocked-banner .content {
+  flex: 1;
+}
+
+.stripe-blocked-banner strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #e65100;
+}
+
+.stripe-blocked-banner p {
+  margin: 0 0 0.75rem 0;
+  color: #5d4037;
+  line-height: 1.6;
+}
+
+.stripe-blocked-banner ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  color: #5d4037;
+}
+
+.stripe-blocked-banner ol li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.stripe-blocked-banner code {
+  background: rgba(255, 152, 0, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  color: #e65100;
+}
+
+.stripe-blocked-banner .actions {
+  margin-top: 1rem;
+}
+
+.stripe-blocked-banner .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.stripe-blocked-banner .btn:hover {
+  background: #f57c00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.stripe-blocked-banner .btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .subscription-card {
   background: white;
   border-radius: 12px;

@@ -23,10 +23,13 @@ export class StripeService {
   initializeStripe(): void {
     if (typeof Stripe !== 'undefined') {
       this.stripe = Stripe(environment.stripePublishableKey);
+      console.log('✅ Stripe inicializado correctamente');
     } else {
       console.error('❌ Stripe.js no está cargado');
     }
   }
+
+
 
   /**
    * Crea un elemento de tarjeta de Stripe

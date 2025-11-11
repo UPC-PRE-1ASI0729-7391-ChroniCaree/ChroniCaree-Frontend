@@ -382,6 +382,10 @@
 .btn-primary {
   background: var(--color-cc-green);
   color: white;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -397,6 +401,7 @@
 
 .btn-full {
   width: 100%;
+  max-width: 400px;
 }
 
 .processing {

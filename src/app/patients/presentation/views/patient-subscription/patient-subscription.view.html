@@ -18,6 +18,34 @@
     <span>{{ error() }}</span>
   </div>
 
+  <div *ngIf="stripeBlocked()" class="alert alert-warning stripe-blocked-banner">
+    <div class="icon-container">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <div class="content">
+      <strong>⚠️ Stripe está siendo bloqueado</strong>
+      <p>Tu navegador o una extensión (AdBlock, uBlock Origin, etc.) está bloqueando Stripe. Para procesar pagos:</p>
+      <ol>
+        <li>Desactiva tu bloqueador de anuncios para este sitio</li>
+        <li>O añade <code>*.stripe.com</code> a la lista blanca</li>
+        <li>Recarga la página o haz clic en "Reintentar"</li>
+      </ol>
+      <div class="actions">
+        <button class="btn btn-primary" (click)="reloadPage()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Reintentar (Recargar página)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div *ngIf="success()" class="alert alert-success">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -68,59 +96,41 @@
         </div>
 
         <div class="plan-features">
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.doctorAccess">
+          <div class="feature">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Acceso a doctores</span>
           </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.availability">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>{{ getPatientFeatures(plan.features)!.availability }}</span>
-          </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.homeVisits">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>Visitas a domicilio</span>
-          </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.specialistAccess">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>Acceso a especialistas</span>
-          </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.symptomTracking">
+          <div class="feature">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Seguimiento de síntomas</span>
           </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.medicationReminders">
+          <div class="feature">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Recordatorios de medicamentos</span>
           </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.advancedReports">
+          <div class="feature" *ngIf="plan.price > 0">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>Reportes avanzados</span>
+            <span>Reportes básicos</span>
           </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.aiInsights">
+          <div class="feature" *ngIf="plan.price > 19.99">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Análisis con IA</span>
           </div>
-          <div class="feature" *ngIf="getPatientFeatures(plan.features)?.familySharing">
+          <div class="feature" *ngIf="plan.price > 19.99">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>Compartir con familia (hasta {{ getPatientFeatures(plan.features)!.maxMembers }} miembros)</span>
+            <span>Compartir con familia</span>
           </div>
         </div>
 
