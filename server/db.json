@@ -72,6 +72,149 @@
       "twoFactorEnabled": false,
       "createdAt": "2025-11-11T02:07:51.788Z",
       "tenantId": null
+    },
+    {
+      "id": 1763230235524,
+      "email": "andreow@and.com",
+      "role": "patient",
+      "name": "123456789 123456789",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:10:35.524Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763230470185,
+      "email": "4557 8809 9313 5445",
+      "role": "hospital_admin",
+      "name": "4557 8809 9313 5445",
+      "password": "4557 8809 9313 5445",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:14:30.185Z",
+      "tenantId": 1763230470217
+    },
+    {
+      "id": 1763230477452,
+      "email": "4557 8809 9313 5445",
+      "role": "hospital_admin",
+      "name": "4557 8809 9313 5445",
+      "password": "4557 8809 9313 5445",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:14:37.452Z",
+      "tenantId": 1763230477496
+    },
+    {
+      "id": 1763231307189,
+      "email": "fix/core-flow-correction",
+      "role": "hospital_admin",
+      "name": "fix/core-flow-correction",
+      "password": "fix/core-flow-correction",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:28:27.189Z",
+      "tenantId": 1763231307233
+    },
+    {
+      "id": 1763232042412,
+      "email": "jom@jom.123",
+      "role": "hospital_admin",
+      "name": "andreowJOM",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:40:42.412Z",
+      "tenantId": 1763232042450
+    },
+    {
+      "id": 1763232429824,
+      "email": "matke@matk.com",
+      "role": "hospital_admin",
+      "name": "matttke",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:47:09.824Z",
+      "tenantId": 1763232429866
+    },
+    {
+      "id": 1763232860762,
+      "email": "joseeee@joseee.com",
+      "role": "hospital_admin",
+      "name": "joseee",
+      "password": "123123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T18:54:20.762Z",
+      "tenantId": 1763232860800
+    },
+    {
+      "id": 1763233391938,
+      "email": "AAAA@mmm.com",
+      "role": "hospital_admin",
+      "name": "AAA",
+      "password": "123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:03:11.938Z",
+      "tenantId": 1763233391974
+    },
+    {
+      "id": 1763233633901,
+      "email": "AAAA@mmm.com",
+      "role": "hospital_admin",
+      "name": "AAA",
+      "password": "123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:07:13.901Z",
+      "tenantId": 1763233633947
+    },
+    {
+      "id": 1763233670474,
+      "email": "AAAA@mmm.com",
+      "role": "hospital_admin",
+      "name": "AAA",
+      "password": "123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:07:50.474Z",
+      "tenantId": 1763233670521
+    },
+    {
+      "id": 1763233681570,
+      "email": "AAAA@mmm.com",
+      "role": "hospital_admin",
+      "name": "AAA",
+      "password": "123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:08:01.570Z",
+      "tenantId": 1763233681616
+    },
+    {
+      "id": 1763233708904,
+      "email": "dasdasds",
+      "role": "hospital_admin",
+      "name": "fasdsa",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:08:28.904Z",
+      "tenantId": 1763233708948
+    },
+    {
+      "id": 1763233905052,
+      "email": "12312@132154gdsf.com",
+      "role": "hospital_admin",
+      "name": "123213213",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:11:45.052Z",
+      "tenantId": 1763233905095
     }
   ],
   "tenants": [
@@ -105,6 +248,173 @@
         "allowIndependentDoctors": false,
         "requirePatientApproval": false,
         "maxDoctors": 10
+      }
+    },
+    {
+      "id": 1763230470217,
+      "name": "4557 8809 9313 5445"
+    },
+    {
+      "id": 1763230477496,
+      "name": "4557 8809 9313 5445"
+    },
+    {
+      "id": 1763231307233,
+      "name": "fix/core-flow-correction",
+      "address": "Av. San Lorenzo 456, Lima",
+      "phone": "+51 987 654 321",
+      "email": "admin2@hospital2.com",
+      "status": "active",
+      "subscriptionId": 2,
+      "registrationDate": "2024-02-01T00:00:00Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": false,
+        "maxDoctors": 10
+      }
+    },
+    {
+      "id": 1763232042450,
+      "adminUserId": 1763232042412,
+      "name": "CERROOOO",
+      "address": "nosenosenoseno",
+      "phone": "213125415",
+      "email": "jom@jom.123",
+      "status": "active",
+      "subscriptionId": 5,
+      "registrationDate": "2025-11-15T18:40:42.450Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763232429866,
+      "adminUserId": 1763232429824,
+      "name": "amorheterosexual",
+      "address": "1234135235",
+      "phone": "GASASDASDF",
+      "email": "matke@matk.com",
+      "status": "active",
+      "subscriptionId": 5,
+      "registrationDate": "2025-11-15T18:47:09.866Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763232860800,
+      "adminUserId": 1763232860762,
+      "name": "12312321321sfad3",
+      "address": "fdaadfaf",
+      "phone": "sfasfsa21313",
+      "email": "joseeee@joseee.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T18:54:20.800Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233391974,
+      "adminUserId": 1763233391938,
+      "name": "afsjkldafsjkl",
+      "address": "jfioajfioaji",
+      "phone": "fsdnaofno",
+      "email": "AAAA@mmm.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T19:03:11.974Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233633947,
+      "adminUserId": 1763233633901,
+      "name": "afsjkldafsjkl",
+      "address": "jfioajfioaji",
+      "phone": "fsdnaofno",
+      "email": "AAAA@mmm.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T19:07:13.947Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233670521,
+      "adminUserId": 1763233670474,
+      "name": "afsjkldafsjkl",
+      "address": "jfioajfioaji",
+      "phone": "fsdnaofno",
+      "email": "AAAA@mmm.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T19:07:50.521Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233681616,
+      "adminUserId": 1763233681570,
+      "name": "afsjkldafsjkl",
+      "address": "jfioajfioaji",
+      "phone": "fsdnaofno",
+      "email": "AAAA@mmm.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T19:08:01.616Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233708948,
+      "adminUserId": 1763233708904,
+      "name": "sadasd",
+      "address": "dsaadasd",
+      "phone": "asdasdads",
+      "email": "dasdasds",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-15T19:08:28.948Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763233905095,
+      "adminUserId": 1763233905052,
+      "name": "sfafafrewqv",
+      "address": "123124bfdeb",
+      "phone": "13123124124",
+      "email": "12312@132154gdsf.com",
+      "status": "active",
+      "subscriptionId": 7,
+      "registrationDate": "2025-11-15T19:11:45.095Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
       }
     }
   ],
@@ -260,6 +570,82 @@
       "nextBillingDate": "2025-02-01T00:00:00Z",
       "lastPaymentDate": "2025-01-01T00:00:00Z",
       "lastPaymentAmount": 999
+    },
+    {
+      "payerType": "patient",
+      "payerId": 1763230235623,
+      "patientId": 1763230235623,
+      "planId": "patient_standard",
+      "status": "active",
+      "startDate": "2025-11-15T18:11:38.974Z",
+      "endDate": "2025-12-15T18:11:38.974Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "andreow@and.com",
+      "nextBillingDate": "2025-12-15T18:11:38.974Z",
+      "lastPaymentDate": "2025-11-15T18:11:38.974Z",
+      "lastPaymentAmount": 19.99,
+      "id": 3
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763231307233,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-15T18:30:06.443Z",
+      "endDate": "2025-12-15T18:30:06.443Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "fix/core-flow-correction",
+      "nextBillingDate": "2025-12-15T18:30:06.443Z",
+      "lastPaymentDate": "2025-11-15T18:30:06.443Z",
+      "lastPaymentAmount": 599,
+      "id": 4
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763232042450,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-15T18:41:05.426Z",
+      "endDate": "2025-12-15T18:41:05.426Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "jom@jom.123",
+      "nextBillingDate": "2025-12-15T18:41:05.426Z",
+      "lastPaymentDate": "2025-11-15T18:41:05.426Z",
+      "lastPaymentAmount": 599,
+      "id": 5
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763232429866,
+      "planId": "tenant_enterprise",
+      "status": "active",
+      "startDate": "2025-11-15T18:47:34.820Z",
+      "endDate": "2025-12-15T18:47:34.820Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "matke@matk.com",
+      "nextBillingDate": "2025-12-15T18:47:34.820Z",
+      "lastPaymentDate": "2025-11-15T18:47:34.820Z",
+      "lastPaymentAmount": 999,
+      "id": 6
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763233905095,
+      "planId": "tenant_enterprise",
+      "status": "active",
+      "startDate": "2025-11-15T19:13:25.738Z",
+      "endDate": "2025-12-15T19:13:25.738Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "12312@132154gdsf.com",
+      "nextBillingDate": "2025-12-15T19:13:25.738Z",
+      "lastPaymentDate": "2025-11-15T19:13:25.738Z",
+      "lastPaymentAmount": 999,
+      "id": 7
     }
   ],
   "patients": [
@@ -305,6 +691,28 @@
         "name": "María Pérez",
         "relationship": "spouse",
         "phone": "+51 998 777 667"
+      }
+    },
+    {
+      "id": 1763230235623,
+      "userId": 1763230235524,
+      "assignedDoctorId": null,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "123456789",
+      "lastName": "123456789",
+      "dni": "123456789",
+      "birthDate": "2025-10-29",
+      "gender": "male",
+      "phone": "123456789",
+      "address": "123456789",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0,
+      "emergencyContact": {
+        "name": "",
+        "relationship": "",
+        "phone": ""
       }
     }
   ],
@@ -566,6 +974,76 @@
       "paymentMethod": "credit_card",
       "transactionId": "txn_tenant_002",
       "createdAt": "2024-02-01T00:00:00Z"
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "patient",
+      "payerId": 1763230235623,
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STnwkBJEHGVCWjr8iGoYOrT",
+      "stripePaymentIntentId": "tok_1STnwkBJEHGVCWjr8iGoYOrT",
+      "updatedAt": "2025-11-15T18:11:38.894Z",
+      "createdAt": "2025-11-15T18:11:38.894Z",
+      "id": 3
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763231307233,
+      "amount": 599,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SToEbBJEHGVCWjrPVGGKduG",
+      "stripePaymentIntentId": "tok_1SToEbBJEHGVCWjrPVGGKduG",
+      "updatedAt": "2025-11-15T18:30:06.358Z",
+      "createdAt": "2025-11-15T18:30:06.358Z",
+      "id": 4
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763232042450,
+      "amount": 599,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SToPEBJEHGVCWjr3QK43tYb",
+      "stripePaymentIntentId": "tok_1SToPEBJEHGVCWjr3QK43tYb",
+      "updatedAt": "2025-11-15T18:41:05.358Z",
+      "createdAt": "2025-11-15T18:41:05.358Z",
+      "id": 5
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763232429866,
+      "amount": 999,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SToVWBJEHGVCWjruqzXvOFM",
+      "stripePaymentIntentId": "tok_1SToVWBJEHGVCWjruqzXvOFM",
+      "updatedAt": "2025-11-15T18:47:34.750Z",
+      "createdAt": "2025-11-15T18:47:34.750Z",
+      "id": 6
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763233905095,
+      "amount": 999,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STouXBJEHGVCWjrsJTGaNBm",
+      "stripePaymentIntentId": "tok_1STouXBJEHGVCWjrsJTGaNBm",
+      "updatedAt": "2025-11-15T19:13:25.635Z",
+      "createdAt": "2025-11-15T19:13:25.635Z",
+      "id": 7
     }
   ],
   "auditLogs": [
