@@ -12,7 +12,7 @@ import { Medication } from '../../../domain/model/medication.entity';
 import { MedicationStore } from '../../../application/medication.store';
 
 export interface MedicationEditDialogData {
-  medication: Medication;
+  medication?: Medication;
 }
 
 @Component({
@@ -36,50 +36,90 @@ export class MedicationEditDialogComponent {
   private dialogRef = inject(MatDialogRef<MedicationEditDialogComponent>);
   private medicationStore = inject(MedicationStore);
   private snackBar = inject(MatSnackBar);
-  data = inject<MedicationEditDialogData>(MAT_DIALOG_DATA);
+  data = inject<MedicationEditDialogData>(MAT_DIALOG_DATA) as MedicationEditDialogData | undefined;
 
   loading = signal(false);
 
   editForm = new FormGroup({
-    name: new FormControl(this.data.medication.name, [Validators.required]),
-    dosage: new FormControl(this.data.medication.dosage, [Validators.required]),
-    instructions: new FormControl(this.data.medication.instructions || '')
+    name: new FormControl(this.data?.medication?.name || '', [Validators.required]),
+    dosage: new FormControl(this.data?.medication?.dosage || '', [Validators.required]),
+    instructions: new FormControl(this.data?.medication?.instructions || '')
   });
 
   onSubmit(): void {
     if (this.editForm.valid && !this.loading()) {
       this.loading.set(true);
 
-      const updatedMedication = new Medication({
-        ...this.data.medication,
-        name: this.editForm.value.name!,
-        dosage: this.editForm.value.dosage!,
-        instructions: this.editForm.value.instructions || undefined,
-        updatedAt: new Date()
-      });
+      const formValues = this.editForm.value;
 
-      this.medicationStore.updateMedication(this.data.medication.id, updatedMedication).subscribe({
-        next: () => {
-          this.loading.set(false);
-          this.snackBar.open('Medicación actualizada exitosamente', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            panelClass: ['success-snackbar']
-          });
-          this.dialogRef.close(true);
-        },
-        error: (error) => {
-          this.loading.set(false);
-          console.error('Error updating medication:', error);
-          this.snackBar.open('Error al actualizar la medicación', 'Cerrar', {
-            duration: 4000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
+      // If data.medication exists and has an id -> update, otherwise create
+      const isUpdate = !!(this.data && this.data.medication && this.data.medication.id);
+
+      if (isUpdate) {
+        const updatedMedication = new Medication({
+          ...this.data!.medication!,
+          name: formValues.name!,
+          dosage: formValues.dosage!,
+          instructions: formValues.instructions || undefined,
+          updatedAt: new Date()
+        });
+
+        this.medicationStore.updateMedication(this.data!.medication!.id, updatedMedication).subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.snackBar.open('Medicación actualizada exitosamente', 'Cerrar', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              panelClass: ['success-snackbar']
+            });
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            this.loading.set(false);
+            console.error('Error updating medication:', error);
+            this.snackBar.open('Error al actualizar la medicación', 'Cerrar', {
+              duration: 4000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+      } else {
+        // Create new medication
+        const newMed = new Medication({
+          patientId: this.data?.medication?.patientId || '',
+          name: formValues.name!,
+          dosage: formValues.dosage!,
+          instructions: formValues.instructions || undefined,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+
+        this.medicationStore.createMedication(newMed).subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.snackBar.open('Medicación creada exitosamente', 'Cerrar', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              panelClass: ['success-snackbar']
+            });
+            this.dialogRef.close(true);
+          },
+          error: (error) => {
+            this.loading.set(false);
+            console.error('Error creating medication:', error);
+            this.snackBar.open('Error al crear la medicación', 'Cerrar', {
+              duration: 4000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+      }
     }
   }
 

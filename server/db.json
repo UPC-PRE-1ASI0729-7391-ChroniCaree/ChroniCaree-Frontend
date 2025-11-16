@@ -215,6 +215,72 @@
       "twoFactorEnabled": false,
       "createdAt": "2025-11-15T19:11:45.052Z",
       "tenantId": 1763233905095
+    },
+    {
+      "id": 1763233905053,
+      "email": "dasdsa213@dsasaewq.com",
+      "role": "doctor",
+      "name": "JOSJOSE JOSJOSE",
+      "password": "tempui492ona",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:32:44.532Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763233905054,
+      "email": "123214@santiago.com",
+      "role": "patient",
+      "name": "mathias santiagoao1",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:34:24.074Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763233905055,
+      "email": "12333@12314.com",
+      "role": "patient",
+      "name": "aandress 12312312",
+      "password": "123123123123",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T19:43:39.414Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763233905056,
+      "email": "roblox@roblox.com",
+      "role": "patient",
+      "name": "roblox roblox",
+      "password": "robloxroblox",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T20:22:34.116Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763240159374,
+      "email": "clau@clauuuuuuuuu.com",
+      "role": "patient",
+      "name": "clauuuuuuuuu clauuuuuuuuu",
+      "password": "clauuuuuuuuu",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T20:55:59.374Z",
+      "tenantId": null
+    },
+    {
+      "id": 1763240473271,
+      "email": "perrro@perrrossssss.com",
+      "role": "patient",
+      "name": "perrrossssss perrrossssss",
+      "password": "perrrossssss",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-15T21:01:13.271Z",
+      "tenantId": null
     }
   ],
   "tenants": [
@@ -646,6 +712,54 @@
       "lastPaymentDate": "2025-11-15T19:13:25.738Z",
       "lastPaymentAmount": 999,
       "id": 7
+    },
+    {
+      "payerType": "patient",
+      "payerId": 1763240159417,
+      "patientId": 1763240159417,
+      "planId": "patient_standard",
+      "status": "active",
+      "startDate": "2025-11-15T20:56:17.077Z",
+      "endDate": "2025-12-15T20:56:17.077Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "clau@clauuuuuuuuu.com",
+      "nextBillingDate": "2025-12-15T20:56:17.077Z",
+      "lastPaymentDate": "2025-11-15T20:56:17.077Z",
+      "lastPaymentAmount": 19.99,
+      "id": 8
+    },
+    {
+      "payerType": "patient",
+      "payerId": 1763240473344,
+      "patientId": 1763240473344,
+      "planId": "patient_standard",
+      "status": "active",
+      "startDate": "2025-11-15T21:01:21.704Z",
+      "endDate": "2025-12-15T21:01:21.704Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "perrro@perrrossssss.com",
+      "nextBillingDate": "2025-12-15T21:01:21.704Z",
+      "lastPaymentDate": "2025-11-15T21:01:21.704Z",
+      "lastPaymentAmount": 19.99,
+      "id": 9
+    },
+    {
+      "payerType": "patient",
+      "payerId": 1763240473344,
+      "patientId": 1763240473344,
+      "planId": "patient_standard",
+      "status": "active",
+      "startDate": "2025-11-15T21:01:24.531Z",
+      "endDate": "2025-12-15T21:01:24.531Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "perrro@perrrossssss.com",
+      "nextBillingDate": "2025-12-15T21:01:24.531Z",
+      "lastPaymentDate": "2025-11-15T21:01:24.531Z",
+      "lastPaymentAmount": 19.99,
+      "id": 10
     }
   ],
   "patients": [
@@ -714,6 +828,116 @@
         "relationship": "",
         "phone": ""
       }
+    },
+    {
+      "userId": 1763233905054,
+      "firstName": "mathias",
+      "lastName": "santiagoao1",
+      "dni": "123456789",
+      "birthDate": "2025-11-19",
+      "gender": "male",
+      "phone": "123123123123",
+      "address": "12314fdsgfg",
+      "weight": 63,
+      "height": 1.83,
+      "bmi": 188121.5,
+      "emergencyContact": {
+        "name": "andreowss",
+        "relationship": "esposo",
+        "phone": "123456789"
+      },
+      "assignedDoctorId": null,
+      "tenantId": null,
+      "subscriptionId": null,
+      "id": 1763230235624
+    },
+    {
+      "userId": 1763233905055,
+      "firstName": "aandress",
+      "lastName": "12312312",
+      "dni": "12312",
+      "birthDate": "2025-11-13",
+      "gender": "male",
+      "phone": "123213213213",
+      "address": "21sdvsgfd",
+      "weight": 33,
+      "height": 1.33,
+      "bmi": 186556.6,
+      "emergencyContact": {
+        "name": "gokuu213",
+        "relationship": "adddd",
+        "phone": "12321314"
+      },
+      "assignedDoctorId": 3,
+      "tenantId": 1763233905095,
+      "subscriptionId": 3,
+      "id": 1763230235625
+    },
+    {
+      "userId": 1763233905056,
+      "firstName": "roblox",
+      "lastName": "roblox",
+      "dni": "robloxroblox",
+      "birthDate": "2025-11-16",
+      "gender": "male",
+      "phone": "roblox",
+      "address": "roblox",
+      "weight": 321,
+      "height": 23,
+      "bmi": 6068.1,
+      "emergencyContact": {
+        "name": "roblox",
+        "relationship": "roblox",
+        "phone": "roblox"
+      },
+      "assignedDoctorId": 3,
+      "tenantId": 1763233905095,
+      "subscriptionId": 3,
+      "id": 1763230235626
+    },
+    {
+      "id": 1763240159417,
+      "userId": 1763240159374,
+      "assignedDoctorId": 3,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "clauuuuuuuuu",
+      "lastName": "clauuuuuuuuu",
+      "dni": "clauuuuuuuuu",
+      "birthDate": "2025-11-05",
+      "gender": "male",
+      "phone": "clauuuuuuuuu",
+      "address": "clauuuuuuuuu",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0,
+      "emergencyContact": {
+        "name": "",
+        "relationship": "",
+        "phone": ""
+      }
+    },
+    {
+      "id": 1763240473344,
+      "userId": 1763240473271,
+      "assignedDoctorId": 3,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "perrrossssss",
+      "lastName": "perrrossssss",
+      "dni": "perrrossssss",
+      "birthDate": "2025-10-28",
+      "gender": "male",
+      "phone": "perrrossssss",
+      "address": "perrrossssss",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0,
+      "emergencyContact": {
+        "name": "",
+        "relationship": "",
+        "phone": ""
+      }
     }
   ],
   "doctors": [
@@ -755,6 +979,26 @@
         "Spanish"
       ],
       "joinedAt": "2024-02-01T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 1763233905053,
+      "tenantId": 1763233905095,
+      "isIndependent": true,
+      "firstName": "JOSJOSE",
+      "lastName": "JOSJOSE",
+      "dni": "N/A",
+      "specialty": "Neurología",
+      "licenseNumber": "1231234",
+      "phone": "1231241241",
+      "isVerified": false,
+      "acceptingPatients": false,
+      "consultationFee": 0,
+      "languages": [
+        "es"
+      ],
+      "education": [],
+      "joinedAt": "2025-11-15T19:32:44.580Z"
     }
   ],
   "appointments": [
@@ -779,6 +1023,26 @@
       "type": "FOLLOW_UP",
       "status": "scheduled",
       "notes": "Revisión post-ECG"
+    },
+    {
+      "patientId": 1763240159417,
+      "doctorId": 3,
+      "date": "2025-11-16",
+      "time": "12:00",
+      "type": "Emergencia",
+      "status": "scheduled",
+      "notes": "me seitno mal ",
+      "id": 3
+    },
+    {
+      "patientId": 1763240159417,
+      "doctorId": 3,
+      "date": "2025-11-21",
+      "time": "15:00",
+      "type": "Seguimiento",
+      "status": "scheduled",
+      "notes": "me muero ",
+      "id": 4
     }
   ],
   "records": [
@@ -809,6 +1073,70 @@
       "temperature": 36.7,
       "weight": 78,
       "notes": "Estable, sin hallazgos anormales"
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "symptoms",
+      "date": "2025-11-15T21:38:43.988Z",
+      "glucose": 123,
+      "bloodPressure": "123/80",
+      "heartRate": 123,
+      "temperature": 36,
+      "fatigue": 2,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "mal",
+      "reviewStatus": "pending_review",
+      "doctorId": 3,
+      "id": 3
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "symptoms",
+      "date": "2025-11-15T21:48:44.429Z",
+      "glucose": 122,
+      "bloodPressure": "123/80",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 2,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "unu",
+      "reviewStatus": "pending_review",
+      "doctorId": 3,
+      "id": 4
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "symptoms",
+      "date": "2025-11-15T21:57:04.210Z",
+      "glucose": 120,
+      "bloodPressure": "120/80",
+      "heartRate": 80,
+      "temperature": 37,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "ME MUERO",
+      "reviewStatus": "pending_review",
+      "doctorId": 3,
+      "id": 5
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "symptoms",
+      "date": "2025-11-15T21:59:17.178Z",
+      "glucose": 180,
+      "bloodPressure": "160/30",
+      "heartRate": 90,
+      "temperature": 39,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "ME MUEROOO",
+      "reviewStatus": "pending_review",
+      "doctorId": 3,
+      "id": 6
     }
   ],
   "symptoms": [
@@ -833,6 +1161,66 @@
       "dizziness": 1,
       "timestamp": "2025-11-10T18:00:00Z",
       "notes": "Cansancio tras jornada laboral"
+    },
+    {
+      "id": 3,
+      "patientId": 1763240159417,
+      "glucose": 123,
+      "bloodPressure": "123/80",
+      "heartRate": 123,
+      "temperature": 36,
+      "oxygenSaturation": 98,
+      "fatigue": 2,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "mal",
+      "timestamp": "2025-11-15T21:38:43.934Z",
+      "isEdited": false
+    },
+    {
+      "id": 4,
+      "patientId": 1763240159417,
+      "glucose": 122,
+      "bloodPressure": "123/80",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 65,
+      "fatigue": 2,
+      "pain": 2,
+      "dizziness": 2,
+      "notes": "unu",
+      "timestamp": "2025-11-15T21:48:44.369Z",
+      "isEdited": false
+    },
+    {
+      "id": 5,
+      "patientId": 1763240159417,
+      "glucose": 120,
+      "bloodPressure": "120/80",
+      "heartRate": 80,
+      "temperature": 37,
+      "oxygenSaturation": 90,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "ME MUERO",
+      "timestamp": "2025-11-15T21:57:04.159Z",
+      "isEdited": false
+    },
+    {
+      "id": 6,
+      "patientId": 1763240159417,
+      "glucose": 180,
+      "bloodPressure": "160/30",
+      "heartRate": 90,
+      "temperature": 39,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "ME MUEROOO",
+      "timestamp": "2025-11-15T21:59:17.122Z",
+      "isEdited": false
     }
   ],
   "medications": [
@@ -920,6 +1308,19 @@
       "content": "Hola Ana, es un valor aceptable en ayunas. Sigue igual. Vemos en la cita del 15.",
       "timestamp": "2025-11-10T10:00:00Z",
       "read": true
+    },
+    {
+      "senderId": "1763240159417",
+      "receiverId": "3",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "hola",
+      "content": "me siento mal doc",
+      "timestamp": "2025-11-15T21:40:14.516Z",
+      "read": false,
+      "isUrgent": true,
+      "attachments": [],
+      "id": 3
     }
   ],
   "diagnoses": [
@@ -948,6 +1349,116 @@
       "treatment": "Atenolol + reducción de sal",
       "followUpRequired": true,
       "lastReviewDate": "2025-11-10T00:00:00Z"
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "Asma",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 3
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "Hiperlipidemia (Colesterol Alto)",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 4
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "thyroid_disorder",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 5
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "Diabetes Tipo 2",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 6
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "Hipertensión Arterial",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 7
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "kidney_disease",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 8
+    },
+    {
+      "patientId": 1763230235625,
+      "diagnosisName": "depression",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T19:43:39.487Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T19:43:39.487Z",
+      "id": 9
+    },
+    {
+      "patientId": 1763230235626,
+      "diagnosisName": "Diabetes Tipo 2",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T20:22:34.210Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T20:22:34.210Z",
+      "id": 10
+    },
+    {
+      "patientId": 1763230235626,
+      "diagnosisName": "copd",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T20:22:34.210Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T20:22:34.210Z",
+      "id": 11
+    },
+    {
+      "patientId": 1763230235626,
+      "diagnosisName": "diabetes_type_1",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T20:22:34.210Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T20:22:34.210Z",
+      "id": 12
+    },
+    {
+      "patientId": 1763230235626,
+      "diagnosisName": "Asma",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-15T20:22:34.210Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-15T20:22:34.210Z",
+      "id": 13
     }
   ],
   "payments": [
@@ -1044,6 +1555,48 @@
       "updatedAt": "2025-11-15T19:13:25.635Z",
       "createdAt": "2025-11-15T19:13:25.635Z",
       "id": 7
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "patient",
+      "payerId": 1763240159417,
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STqW4BJEHGVCWjrRpreubtf",
+      "stripePaymentIntentId": "tok_1STqW4BJEHGVCWjrRpreubtf",
+      "updatedAt": "2025-11-15T20:56:17.001Z",
+      "createdAt": "2025-11-15T20:56:17.001Z",
+      "id": 8
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "patient",
+      "payerId": 1763240473344,
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STqazBJEHGVCWjrVuIMAgaT",
+      "stripePaymentIntentId": "tok_1STqazBJEHGVCWjrVuIMAgaT",
+      "updatedAt": "2025-11-15T21:01:21.618Z",
+      "createdAt": "2025-11-15T21:01:21.618Z",
+      "id": 9
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "patient",
+      "payerId": 1763240473344,
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STqb2BJEHGVCWjrpVmxPq73",
+      "stripePaymentIntentId": "tok_1STqb2BJEHGVCWjrpVmxPq73",
+      "updatedAt": "2025-11-15T21:01:24.448Z",
+      "createdAt": "2025-11-15T21:01:24.448Z",
+      "id": 10
     }
   ],
   "auditLogs": [

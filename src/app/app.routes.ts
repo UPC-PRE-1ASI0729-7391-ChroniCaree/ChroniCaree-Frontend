@@ -95,7 +95,7 @@ export const routes: Routes = [
         data: { role: 'patient' }
       },
       {
-        path: 'agendar-cita',
+        path: 'appointments/new',
         loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
         title: `${baseTitle} - Agendar Cita`,
         data: { role: 'patient' }
@@ -216,6 +216,14 @@ export const routes: Routes = [
           import('./tenants/presentation/views/hospital-subscription/hospital-subscription.view')
             .then((m) => m.HospitalSubscriptionView),
         title: `${baseTitle} - Suscripción`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./tenants/presentation/views/hospital-profile/hospital-profile.view')
+            .then((m) => m.HospitalProfileView),
+        title: `${baseTitle} - Perfil Hospital`,
         data: { role: 'hospital_admin' },
       },
     ],

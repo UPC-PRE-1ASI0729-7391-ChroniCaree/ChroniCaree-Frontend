@@ -137,7 +137,8 @@ export class AppointmentSchedulerComponent implements OnInit {
       });
 
       alert('¡Cita agendada exitosamente! Tu médico recibirá una notificación.');
-      this.router.navigate(['/patient/citas']);
+      // After successful scheduling, redirect patient to their dashboard
+      this.router.navigate(['/patient/dashboard']);
     } catch (error) {
       console.error('Error al agendar cita:', error);
       alert('Error al agendar la cita. Por favor intenta de nuevo.');

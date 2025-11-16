@@ -2,9 +2,14 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -24,9 +29,14 @@ import { UserStore } from '../../../../iam/application/user.store';
     CommonModule,
     RouterModule,
     MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatTableModule,
+    MatExpansionModule,
+    MatDividerModule,
+    MatListModule,
     MatChipsModule,
     MatTooltipModule,
     MatTabsModule,
@@ -248,6 +258,35 @@ export class MedicationHistoryComponent implements OnInit {
   }
 
   /**
+   * Add medication (opens the same edit dialog in create mode)
+   */
+  addMedication(): void {
+    const patientId = this.currentPatientId();
+    if (!patientId) {
+      this.snackBar.open('No se pudo identificar al paciente', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    const blank = new Medication({ patientId });
+
+    const dialogRef = this.dialog.open(MedicationEditDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
+      data: { medication: blank },
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe((success: boolean) => {
+      if (success) {
+        // reload medications for patient
+        this.medicationStore.forceReload(patientId).subscribe();
+        this.snackBar.open('Medicación agregada', 'Cerrar', { duration: 2500 });
+      }
+    });
+  }
+
+  /**
    * Delete medication
    */
   deleteMedication(medication: Medication): void {
@@ -266,6 +305,40 @@ export class MedicationHistoryComponent implements OnInit {
         if (patientId) {
           this.medicationStore.forceReload(patientId).subscribe();
         }
+      }
+    });
+  }
+
+  /**
+   * Quick create medication from the right-side panel (simple UX)
+   */
+  quickCreateMedication(name: string, dosage: string): void {
+    const patientId = this.currentPatientId();
+    if (!patientId) {
+      this.snackBar.open('No se pudo identificar al paciente', 'Cerrar', { duration: 3000 });
+      return;
+    }
+    if (!name || !dosage) {
+      this.snackBar.open('Por favor completa nombre y dosificación', 'Cerrar', { duration: 2500 });
+      return;
+    }
+
+    const med = new Medication({
+      patientId,
+      name,
+      dosage,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    this.medicationStore.createMedication(med).subscribe({
+      next: () => {
+        this.snackBar.open('Medicación creada', 'Cerrar', { duration: 2500 });
+        this.medicationStore.forceReload(patientId).subscribe();
+      },
+      error: (err) => {
+        console.error('Error creating medication', err);
+        this.snackBar.open('Error al crear medicación', 'Cerrar', { duration: 3000 });
       }
     });
   }

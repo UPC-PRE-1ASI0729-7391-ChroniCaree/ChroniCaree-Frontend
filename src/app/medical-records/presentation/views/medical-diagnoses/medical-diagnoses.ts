@@ -8,7 +8,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DiagnosisStore } from '../../../application/diagnosis.store';
+import { MedicalRecordsStore } from '../../../../doctors/application/medical-records.store';
 import { Diagnosis, DiagnosisStatus, DiagnosisSeverity } from '../../../domain/model/diagnosis.entity';
+import { RecordType } from '../../../../doctors/domain/model/medical-record.entity';
 import { PatientStore } from '../../../../patients/application/patient.store';
 
 /**
@@ -31,6 +33,7 @@ import { PatientStore } from '../../../../patients/application/patient.store';
 })
 export class MedicalDiagnosesComponent implements OnInit {
   private readonly diagnosisStore = inject(DiagnosisStore);
+  private readonly medicalRecordsStore = inject(MedicalRecordsStore);
   private readonly patientStore = inject(PatientStore);
   private readonly router = inject(Router);
 
@@ -46,6 +49,34 @@ export class MedicalDiagnosesComponent implements OnInit {
 
   // Diagnósticos filtrados (ahora por paciente actual)
   filteredDiagnoses = computed(() => {
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) return [];
+
+    const currentUser = JSON.parse(currentUserStr);
+    const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
+    if (!currentPatient) return [];
+
+    // When filter is 'all' include both diagnoses and symptom records mapped to a diagnosis-like shape
+    if (this.selectedFilter() === 'all') {
+      // Map medical records (symptoms) into a lightweight diagnosis-shaped object
+      const records = this.medicalRecordsStore.records().filter(r => r.patientId === currentPatient.id);
+      const mappedRecords = records.map((r) => ({
+        id: -(r.id || Math.floor(Math.random() * 1000000)), // negative id to avoid clashes
+        patientId: r.patientId,
+        diagnosisName: r.type === undefined ? 'Registro Médico' : (r.type === RecordType.SYMPTOMS ? 'Registro de Síntomas' : 'Registro Médico'),
+        icd10Code: '',
+        diagnosedDate: (r as any).date || new Date().toISOString(),
+        severity: DiagnosisSeverity.LOW,
+        status: DiagnosisStatus.MONITORING,
+        notes: (r as any).notes || undefined,
+        isFromMedicalRecord: true
+      } as unknown as Diagnosis));
+
+      const diagnoses = this.diagnoses().filter(d => d.patientId === currentPatient.id);
+      return [...mappedRecords, ...diagnoses];
+    }
+
+    // For other filters, only return diagnoses (keep existing behavior)
     const diagnoses = (() => {
       switch (this.selectedFilter()) {
         case 'active':
@@ -58,15 +89,6 @@ export class MedicalDiagnosesComponent implements OnInit {
           return this.diagnoses();
       }
     })();
-
-    // ✅ Filtrar solo diagnósticos del paciente actual
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (!currentUserStr) return [];
-
-    const currentUser = JSON.parse(currentUserStr);
-    const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
-    
-    if (!currentPatient) return [];
 
     return diagnoses.filter(d => d.patientId === currentPatient.id);
   });
@@ -81,13 +103,15 @@ export class MedicalDiagnosesComponent implements OnInit {
     
     if (!currentPatient) return { total: 0, active: 0, controlled: 0, resolved: 0 };
 
+    // Include medical records count in the total so the patient sees symptom entries as part of history
     const patientDiagnoses = this.diagnoses().filter(d => d.patientId === currentPatient.id);
+    const patientRecords = this.medicalRecordsStore.records().filter(r => r.patientId === currentPatient.id);
     const active = this.activeDiagnoses().filter(d => d.patientId === currentPatient.id);
     const controlled = this.controlledDiagnoses().filter(d => d.patientId === currentPatient.id);
     const resolved = this.resolvedDiagnoses().filter(d => d.patientId === currentPatient.id);
 
     return {
-      total: patientDiagnoses.length,
+      total: patientDiagnoses.length + patientRecords.length,
       active: active.length,
       controlled: controlled.length,
       resolved: resolved.length
@@ -123,6 +147,9 @@ export class MedicalDiagnosesComponent implements OnInit {
             next: () => console.log('✅ Diagnósticos cargados (se filtrarán por paciente)'),
             error: (error) => console.error('❌ Error loading diagnoses:', error)
           });
+
+          // Cargar registros médicos del paciente (p. ej., registros de síntomas)
+          this.medicalRecordsStore.loadRecordsByPatient(patient.id);
         } else {
           console.error(`❌ Medical-Diagnoses: No se encontró paciente para userId ${userId}`);
         }

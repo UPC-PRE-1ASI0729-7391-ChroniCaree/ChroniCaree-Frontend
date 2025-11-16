@@ -19,6 +19,8 @@ import { SymptomConfirmationDialogComponent } from '../../components/symptom-con
 import { PatientStore } from '../../../../patients/application/patient.store';
 import { UserStore } from '../../../../iam/application/user.store';
 import { MedicalRecordsStore } from '../../../../doctors/application/medical-records.store';
+import { AlertStore } from '../../../../alerts/application/alert.store';
+import { AlertType, AlertSeverity, AlertStatus } from '../../../../alerts/domain/model/alert.entity';
 import { RecordType, ReviewStatus } from '../../../../doctors/domain/model/medical-record.entity';
 
 /**
@@ -48,6 +50,7 @@ export class RegisterSymptomsComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly symptomStore = inject(SymptomStore);
   private readonly patientStore = inject(PatientStore);
+  private readonly alertStore = inject(AlertStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
@@ -181,7 +184,7 @@ export class RegisterSymptomsComponent implements OnInit {
       console.log(`✅ Register-Symptoms: Registrando síntoma para paciente ${patientId}`);
 
       this.symptomStore.createSymptom(newSymptom).subscribe({
-        next: () => {
+        next: (createdSymptom) => {
           // Detectar valores críticos
           const hasCriticalValues = this.detectCriticalValues(newSymptom);
           
@@ -243,6 +246,44 @@ export class RegisterSymptomsComponent implements OnInit {
                 this.medicalRecordsStore.createRecord(mr);
               }
             });
+          
+          // If critical values detected, create an alert for the patient so it shows in 'Mi Salud'
+          if (hasCriticalValues) {
+            try {
+              const patientIdStr = String(patientId);
+              const alertPayload = {
+                patientId: patientIdStr,
+                type: AlertType.SYMPTOM_SEVERE,
+                severity: AlertSeverity.CRITICAL,
+                title: 'Alerta: Valores críticos detectados',
+                message: 'Se han detectado valores críticos en tu reporte de salud. Por favor contacta a tu médico o acude a emergencias si empeoras.',
+                status: AlertStatus.ACTIVE,
+                metadata: {
+                  symptomId: createdSymptom?.id ?? null,
+                  glucose: newSymptom.glucose,
+                  bloodPressure: newSymptom.bloodPressure,
+                  heartRate: newSymptom.heartRate,
+                  temperature: newSymptom.temperature,
+                  oxygenSaturation: newSymptom.oxygenSaturation,
+                  fatigue: newSymptom.fatigue,
+                  pain: newSymptom.pain,
+                  dizziness: newSymptom.dizziness
+                },
+                createdAt: new Date().toISOString()
+              } as any;
+
+              this.alertStore.createAlert(alertPayload).subscribe({
+                next: (created) => {
+                  console.log('Alert created for critical symptom:', created.id);
+                },
+                error: (err) => {
+                  console.error('Error creating alert for critical symptom', err);
+                }
+              });
+            } catch (e) {
+              console.warn('Could not create alert for critical symptom', e);
+            }
+          }
           } catch (e) {
             console.warn('Could not create medical record automatically', e);
           }
@@ -306,6 +347,20 @@ export class RegisterSymptomsComponent implements OnInit {
     }
     if (symptom.dizziness && symptom.dizziness > 8) {
       return true;
+    }
+
+    // Nueva regla: si el promedio de las 3 escalas (fatigue, pain, dizziness)
+    // es mayor a 7, consideramos que hay una situación preocupante y generamos alerta.
+    try {
+      const f = typeof symptom.fatigue === 'number' ? symptom.fatigue : 0;
+      const p = typeof symptom.pain === 'number' ? symptom.pain : 0;
+      const d = typeof symptom.dizziness === 'number' ? symptom.dizziness : 0;
+      const avg = (f + p + d) / 3;
+      if (avg > 7) {
+        return true;
+      }
+    } catch (e) {
+      // ignore any unexpected structure
     }
     
     return false;
