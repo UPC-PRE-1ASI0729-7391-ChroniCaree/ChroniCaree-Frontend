@@ -3,7 +3,7 @@
  * Centraliza las URLs del API de pacientes
  */
 
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const PATIENT_API = `${environment.apiBaseUrl}${environment.patientsEndpointPath}`;
 

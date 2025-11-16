@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { InvitationEntity, InvitationStatus, InvitationRole } from '../domain/model/invitation.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const INVITATION_API = `${environment.apiBaseUrl}/invitations`;
 

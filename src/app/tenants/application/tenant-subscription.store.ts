@@ -9,7 +9,7 @@ import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { TenantEntity, TenantStatus } from '../../tenants/domain/model/tenant.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { SubscriptionEntity } from '../../subscriptions/domain/model/subscription.entity';
 import { SubscriptionPlanEntity, TenantPlanFeatures } from '../../subscriptions/domain/model/subscription-plan.entity';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';

@@ -10,7 +10,7 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../domain/model/user.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const USER_API = `${environment.apiBaseUrl}${environment.usersEndpointPath}`;
 

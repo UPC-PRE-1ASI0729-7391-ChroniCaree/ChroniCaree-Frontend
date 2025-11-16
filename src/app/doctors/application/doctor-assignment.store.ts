@@ -11,7 +11,7 @@ import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { PatientEntity } from '../../patients/domain/model/patient.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { DoctorEntity } from '../../doctors/domain/model/doctor.entity';
 import { SubscriptionEntity } from '../../subscriptions/domain/model/subscription.entity';
 import { SubscriptionPlanEntity } from '../../subscriptions/domain/model/subscription-plan.entity';

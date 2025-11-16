@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DeviceEntity, DeviceType } from '../domain/model/device.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const DEVICE_API = `${environment.apiBaseUrl}/devices`;
 

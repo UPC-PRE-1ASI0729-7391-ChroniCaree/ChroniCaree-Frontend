@@ -14,7 +14,7 @@ import { DoctorEntity, Education } from '../../doctors/domain/model/doctor.entit
 import { TenantEntity } from '../../tenants/domain/model/tenant.entity';
 import { SubscriptionPlanEntity } from '../../subscriptions/domain/model/subscription-plan.entity';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface DoctorRegistrationByHospitalRequest {
   // Tenant info

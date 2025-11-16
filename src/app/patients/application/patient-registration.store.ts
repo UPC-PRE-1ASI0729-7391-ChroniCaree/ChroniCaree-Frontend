@@ -10,7 +10,7 @@ import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../../iam/domain/model/user.entity';
 import { PatientEntity, EmergencyContact } from '../../patients/domain/model/patient.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 export interface PatientRegistrationRequest {
   // User data

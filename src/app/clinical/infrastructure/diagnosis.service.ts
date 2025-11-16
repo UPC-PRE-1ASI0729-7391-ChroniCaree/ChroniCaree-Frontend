@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DiagnosisEntity, DiagnosisStatus, DiagnosisSeverity, DiagnosisSource } from '../domain/model/diagnosis.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const DIAGNOSIS_API = `${environment.apiBaseUrl}${environment.diagnosesEndpointPath}`;
 

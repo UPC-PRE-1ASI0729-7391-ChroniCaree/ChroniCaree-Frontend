@@ -10,7 +10,7 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { DoctorEntity, Education } from '../domain/model/doctor.entity';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const DOCTOR_API = `${environment.apiBaseUrl}${environment.doctorsEndpointPath}`;
 
