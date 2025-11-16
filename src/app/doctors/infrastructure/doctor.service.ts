@@ -10,9 +10,9 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { DoctorEntity, Education } from '../domain/model/doctor.entity';
+import { environment } from '../../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const DOCTOR_API = `${BASE_URL}/doctors`;
+const DOCTOR_API = `${environment.apiBaseUrl}${environment.doctorsEndpointPath}`;
 
 export interface DoctorResource {
   id: number;

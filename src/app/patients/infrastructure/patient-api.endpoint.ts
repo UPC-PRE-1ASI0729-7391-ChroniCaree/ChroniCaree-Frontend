@@ -3,8 +3,9 @@
  * Centraliza las URLs del API de pacientes
  */
 
-const BASE_URL = 'http://localhost:3000';
-const PATIENT_API = `${BASE_URL}/patients`;
+import { environment } from '../../../../environments/environment';
+
+const PATIENT_API = `${environment.apiBaseUrl}${environment.patientsEndpointPath}`;
 
 export class PatientApiEndpoint {
   static getAll(): string {

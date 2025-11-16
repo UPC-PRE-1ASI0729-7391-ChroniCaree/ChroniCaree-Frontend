@@ -10,6 +10,7 @@ import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../../iam/domain/model/user.entity';
 import { TenantEntity, TenantStatus } from '../../tenants/domain/model/tenant.entity';
+import { environment } from '../../../../environments/environment';
 
 export interface HospitalRegistrationRequest {
   // User data
@@ -31,7 +32,7 @@ export interface HospitalRegistrationResult {
   providedIn: 'root',
 })
 export class HospitalRegistrationStore {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   // Signals para estado reactivo
   private readonly _isRegistering = signal(false);

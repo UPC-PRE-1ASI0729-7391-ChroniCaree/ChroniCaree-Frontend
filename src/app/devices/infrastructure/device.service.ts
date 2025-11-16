@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DeviceEntity, DeviceType } from '../domain/model/device.entity';
+import { environment } from '../../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const DEVICE_API = `${BASE_URL}/devices`;
+const DEVICE_API = `${environment.apiBaseUrl}/devices`;
 
 /**
  * Device Resource (DTO para comunicación con API)

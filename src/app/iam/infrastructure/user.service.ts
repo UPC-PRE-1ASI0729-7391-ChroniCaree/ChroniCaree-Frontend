@@ -10,9 +10,9 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../domain/model/user.entity';
+import { environment } from '../../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const USER_API = `${BASE_URL}/users`;
+const USER_API = `${environment.apiBaseUrl}${environment.usersEndpointPath}`;
 
 export interface UserResource {
   id: number;

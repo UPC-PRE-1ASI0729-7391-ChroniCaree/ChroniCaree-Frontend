@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { InvitationEntity, InvitationStatus, InvitationRole } from '../domain/model/invitation.entity';
+import { environment } from '../../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const INVITATION_API = `${BASE_URL}/invitations`;
+const INVITATION_API = `${environment.apiBaseUrl}/invitations`;
 
 /**
  * Invitation Resource (DTO para comunicación con API)

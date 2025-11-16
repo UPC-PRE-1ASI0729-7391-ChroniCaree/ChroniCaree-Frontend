@@ -11,6 +11,7 @@ import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { PatientEntity } from '../../patients/domain/model/patient.entity';
+import { environment } from '../../../../environments/environment';
 import { DoctorEntity } from '../../doctors/domain/model/doctor.entity';
 import { SubscriptionEntity } from '../../subscriptions/domain/model/subscription.entity';
 import { SubscriptionPlanEntity } from '../../subscriptions/domain/model/subscription-plan.entity';
@@ -32,7 +33,7 @@ export interface DoctorAssignmentResult {
   providedIn: 'root',
 })
 export class DoctorAssignmentStore {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   // Signals para estado reactivo
   private readonly _isAssigning = signal(false);

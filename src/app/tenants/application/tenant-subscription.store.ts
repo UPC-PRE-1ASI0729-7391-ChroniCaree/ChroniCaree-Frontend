@@ -9,6 +9,7 @@ import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { TenantEntity, TenantStatus } from '../../tenants/domain/model/tenant.entity';
+import { environment } from '../../../../environments/environment';
 import { SubscriptionEntity } from '../../subscriptions/domain/model/subscription.entity';
 import { SubscriptionPlanEntity, TenantPlanFeatures } from '../../subscriptions/domain/model/subscription-plan.entity';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';
@@ -31,7 +32,7 @@ export interface TenantSubscriptionResult {
   providedIn: 'root',
 })
 export class TenantSubscriptionStore {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   // Signals para estado reactivo
   private readonly _isActivating = signal(false);

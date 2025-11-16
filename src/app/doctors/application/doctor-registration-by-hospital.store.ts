@@ -14,6 +14,7 @@ import { DoctorEntity, Education } from '../../doctors/domain/model/doctor.entit
 import { TenantEntity } from '../../tenants/domain/model/tenant.entity';
 import { SubscriptionPlanEntity } from '../../subscriptions/domain/model/subscription-plan.entity';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';
+import { environment } from '../../../../environments/environment';
 
 export interface DoctorRegistrationByHospitalRequest {
   // Tenant info
@@ -46,7 +47,7 @@ export interface DoctorRegistrationResult {
   providedIn: 'root',
 })
 export class DoctorRegistrationByHospitalStore {
-  private readonly baseUrl = 'http://localhost:3000';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   // Signals para estado reactivo
   private readonly _isRegistering = signal(false);

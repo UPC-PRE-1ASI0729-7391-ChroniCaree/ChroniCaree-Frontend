@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { DiagnosisEntity, DiagnosisStatus, DiagnosisSeverity, DiagnosisSource } from '../domain/model/diagnosis.entity';
+import { environment } from '../../../../environments/environment';
 
-const BASE_URL = 'http://localhost:3000';
-const DIAGNOSIS_API = `${BASE_URL}/diagnoses`;
+const DIAGNOSIS_API = `${environment.apiBaseUrl}${environment.diagnosesEndpointPath}`;
 
 /**
  * Diagnosis Resource (DTO para comunicación con API)
