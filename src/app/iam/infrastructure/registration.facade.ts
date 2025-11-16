@@ -4,6 +4,7 @@ import { switchMap, map, catchError } from 'rxjs/operators';
 import { UserStore } from '../application/user.store';
 import { PatientStore } from '../../patients/application/patient.store';
 import { TenantStore } from '../../tenants/application/tenant.store';
+import { DoctorService } from '../../doctors/infrastructure/doctor.service';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';
 import { PaymentStore } from '../../payments/application/payment.store';
 import { UserEntity } from '../domain/model/user.entity';
@@ -64,6 +65,7 @@ export class RegistrationFacade {
   private tenantStore = inject(TenantStore);
   private subscriptionService = inject(SubscriptionService);
   private paymentStore = inject(PaymentStore);
+  private doctorService = inject(DoctorService);
 
   /**
    * Register patient with complete flow: User → Patient → Subscription
@@ -83,12 +85,16 @@ export class RegistrationFacade {
     };
 
     return this.userStore.createUser(newUser).pipe(
-      switchMap((user) => {
-        // Step 2: Create patient profile
+      // After creating the user, fetch doctors and pick the most recently joined
+      switchMap((user) => this.doctorService.getAll().pipe(
+        map((doctors) => ({ user, lastDoctor: (doctors && doctors.length) ? doctors.reduce((a, b) => new Date(a.joinedAt) > new Date(b.joinedAt) ? a : b) : null }))
+      )),
+      switchMap(({ user, lastDoctor }) => {
+        // Step 2: Create patient profile, assigning the last registered doctor when available
         const newPatient = {
           id: Date.now(),
           userId: user.id,
-          assignedDoctorId: null,
+          assignedDoctorId: lastDoctor ? lastDoctor.id : null,
           tenantId: null,
           subscriptionId: null,
           firstName: data.firstName,

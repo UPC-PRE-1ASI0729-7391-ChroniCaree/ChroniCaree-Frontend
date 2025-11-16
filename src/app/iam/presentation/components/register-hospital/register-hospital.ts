@@ -62,8 +62,6 @@ export class RegisterHospitalComponent implements AfterViewInit {
   loadingPlans = signal<boolean>(false);
   cardholderName = signal<string>('');
   acceptTerms = signal<boolean>(false);
-  // Stripe availability signals
-  stripeAvailable = signal(false);
   stripeBlocked = signal(false);
   
   private cardMounted = false;
@@ -115,9 +113,14 @@ export class RegisterHospitalComponent implements AfterViewInit {
     }));
   }
 
-  selectPlan(planId: unknown): void {
+  selectPlan(planOrId: unknown): void {
+    // Accept either a plan object or an id. Normalize to string id.
+    let id: unknown = planOrId;
+    if (planOrId && typeof planOrId === 'object' && 'id' in (planOrId as any)) {
+      id = (planOrId as any).id;
+    }
     // store the plan id as string to avoid type mismatches between number/uuid
-    this.updateForm('selectedPlanId', String(planId));
+    this.updateForm('selectedPlanId', String(id));
     // Montar el card element después de seleccionar el plan
     setTimeout(() => {
       if (!this.cardMounted && this.cardElement) {
@@ -153,7 +156,6 @@ export class RegisterHospitalComponent implements AfterViewInit {
         this.stripeService.createCardElement(cardElementContainer);
         this.cardMounted = true;
         this.stripeBlocked.set(false);
-        this.stripeAvailable.set(true);
       } catch (err: any) {
         console.error('Error mounting Stripe card element (register):', err);
         this.errorMessage.set('No se pudo inicializar el formulario de pago. Revisa si tienes un bloqueador de anuncios.');
@@ -239,7 +241,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
           address: f.address,
           phone: f.phone,
           email: f.email,
-          status: 'active',
+          status: 'pending',
           subscriptionId: null,
           registrationDate: new Date().toISOString(),
           settings: {
@@ -279,18 +281,16 @@ export class RegisterHospitalComponent implements AfterViewInit {
               },
               error: (err: any) => {
                 console.error('Error updating user tenantId:', err);
-                // Guardar datos incluso si falla la actualización
-                this.createdUserId = updatedUser.id;
+                // Even if user update fails, proceed with what we have
+                this.createdUserId = user.id;
                 this.createdTenantId = tenant.id;
-
                 localStorage.setItem('currentUser', JSON.stringify({
-                  id: updatedUser.id,
-                  email: updatedUser.email,
-                  role: updatedUser.role,
-                  name: updatedUser.name,
+                  id: user.id,
+                  email: user.email,
+                  role: user.role,
+                  name: user.name,
                   tenantId: tenant.id
                 }));
-
                 this.loadPlans();
                 this.submitting.set(false);
                 this.nextStep();
@@ -361,15 +361,39 @@ export class RegisterHospitalComponent implements AfterViewInit {
             this.tenantStore.updateTenant(updatedTenant).subscribe({
               next: () => {
                 this.submitting.set(false);
-                alert('¡Registro completado exitosamente! Redirigiendo al dashboard...');
-                this.router.navigate(['/hospital/dashboard']);
+                // Ensure currentUser is properly set with all required fields
+                const currentUser = {
+                  id: this.createdUserId!,
+                  email: this.form().email,
+                  role: 'hospital_admin',
+                  name: this.form().adminName,
+                  tenantId: this.createdTenantId,
+                  isVerified: true
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Add small delay to ensure localStorage is written
+                setTimeout(() => {
+                  window.location.href = '/hospital/dashboard';
+                }, 100);
               },
               error: (err: any) => {
                 console.error('Error updating tenant subscription:', err);
                 // Continuar de todos modos
                 this.submitting.set(false);
-                alert('¡Registro completado exitosamente! Redirigiendo al dashboard...');
-                this.router.navigate(['/hospital/dashboard']);
+                const currentUser = {
+                  id: this.createdUserId!,
+                  email: this.form().email,
+                  role: 'hospital_admin',
+                  name: this.form().adminName,
+                  tenantId: this.createdTenantId,
+                  isVerified: true
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                setTimeout(() => {
+                  window.location.href = '/hospital/dashboard';
+                }, 100);
               }
             });
           },
@@ -377,14 +401,36 @@ export class RegisterHospitalComponent implements AfterViewInit {
             console.error('Error loading tenant:', err);
             // Continuar de todos modos
             this.submitting.set(false);
-            alert('¡Registro completado exitosamente! Redirigiendo al dashboard...');
-            this.router.navigate(['/hospital/dashboard']);
+            const currentUser = {
+              id: this.createdUserId!,
+              email: this.form().email,
+              role: 'hospital_admin',
+              name: this.form().adminName,
+              tenantId: this.createdTenantId,
+              isVerified: true
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            setTimeout(() => {
+              window.location.href = '/hospital/dashboard';
+            }, 100);
           }
         });
       } else {
         this.submitting.set(false);
-        alert('¡Registro completado exitosamente! Redirigiendo al dashboard...');
-        this.router.navigate(['/hospital/dashboard']);
+        const currentUser = {
+          id: this.createdUserId!,
+          email: this.form().email,
+          role: 'hospital_admin',
+          name: this.form().adminName,
+          tenantId: this.createdTenantId,
+          isVerified: true
+        };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        setTimeout(() => {
+          window.location.href = '/hospital/dashboard';
+        }, 100);
       }
 
     } catch (error: any) {
@@ -407,6 +453,30 @@ export class RegisterHospitalComponent implements AfterViewInit {
   getPlanAnalytics(plan: SubscriptionPlanEntity): string {
     const features = plan.features as any;
     return features.advancedAnalytics ? 'avanzadas' : 'básicas';
+  }
+
+  // Accepts the raw `features` object from a plan and returns a normalized
+  // tenant-features-like object so the template can safely read numeric
+  // properties such as `maxDoctors` and `maxPatients`.
+  getTenantFeatures(features: any): { maxDoctors: number; maxPatients: number; advancedAnalytics?: boolean; customBranding?: boolean; support?: string } {
+    if (!features || typeof features !== 'object') {
+      return { maxDoctors: 0, maxPatients: 0, advancedAnalytics: false, customBranding: false, support: 'email' };
+    }
+
+    // If features already contains tenant fields, return them preserving
+    // sentinel values (e.g. -1 for unlimited).
+    if (typeof features.maxDoctors !== 'undefined' || typeof features.maxPatients !== 'undefined') {
+      return {
+        maxDoctors: typeof features.maxDoctors !== 'undefined' ? features.maxDoctors : 0,
+        maxPatients: typeof features.maxPatients !== 'undefined' ? features.maxPatients : 0,
+        advancedAnalytics: !!features.advancedAnalytics,
+        customBranding: !!features.customBranding,
+        support: features.support ?? 'email'
+      };
+    }
+
+    // Otherwise return safe defaults for non-tenant plans
+    return { maxDoctors: 0, maxPatients: 0, advancedAnalytics: false, customBranding: false, support: 'email' };
   }
 
   getSelectedPlanName(): string {

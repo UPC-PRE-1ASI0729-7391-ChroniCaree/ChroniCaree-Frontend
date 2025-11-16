@@ -5,51 +5,52 @@
       <button mat-icon-button routerLink="/patient/dashboard">
         <mat-icon>arrow_back</mat-icon>
       </button>
-      <div class="medication-history-container">
-        <!-- Header -->
-        <div class="page-header">
-          <div class="header-content">
-            <button mat-icon-button routerLink="/patient/dashboard">
-              <mat-icon>arrow_back</mat-icon>
-            </button>
-            <div class="header-text">
-              <h1>💊 Mis Medicamentos</h1>
-              <p>Historial y registro de medicación</p>
+
+      <div class="header-text">
+        <h1>💊 Mis Medicamentos</h1>
+        <p>Historial y registro de medicación</p>
+      </div>
+
+      <div class="header-actions">
+        <button mat-flat-button color="primary" (click)="addMedication()">
+          <mat-icon>add</mat-icon>
+          Agregar Medicamento
+        </button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="adherenceStats() as stats">
+      <mat-card class="stats-card">
+        <mat-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <mat-icon>trending_up</mat-icon>
+              <div class="stat-details">
+                <span class="stat-label">Adherencia</span>
+                <span class="stat-value" [class]="getAdherenceColorClass(stats.rate)">
+                  {{ stats.rate }}%
+                </span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>check_circle</mat-icon>
+              <div class="stat-details">
+                <span class="stat-label">Tomados</span>
+                <span class="stat-value">{{ stats.taken }}</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>cancel</mat-icon>
+              <div class="stat-details">
+                <span class="stat-label">Omitidos</span>
+                <span class="stat-value">{{ stats.missed }}</span>
+              </div>
             </div>
           </div>
-
-          <ng-container *ngIf="adherenceStats() as stats">
-            <mat-card class="stats-card">
-              <mat-card-content>
-                <div class="stats-grid">
-                  <div class="stat-item">
-                    <mat-icon>trending_up</mat-icon>
-                    <div class="stat-details">
-                      <span class="stat-label">Adherencia</span>
-                      <span class="stat-value" [class]="getAdherenceColorClass(stats.rate)">
-                        {{ stats.rate }}%
-                      </span>
-                    </div>
-                  </div>
-                  <div class="stat-item">
-                    <mat-icon>check_circle</mat-icon>
-                    <div class="stat-details">
-                      <span class="stat-label">Tomados</span>
-                      <span class="stat-value">{{ stats.taken }}</span>
-                    </div>
-                  </div>
-                  <div class="stat-item">
-                    <mat-icon>cancel</mat-icon>
-                    <div class="stat-details">
-                      <span class="stat-label">Omitidos</span>
-                      <span class="stat-value">{{ stats.missed }}</span>
-                    </div>
-                  </div>
-                </div>
-              </mat-card-content>
-            </mat-card>
-          </ng-container>
-        </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+  </div>
 
         <!-- Loading -->
         <ng-container *ngIf="loading(); else content">
@@ -61,179 +62,161 @@
 
         <!-- Content -->
         <ng-template #content>
-          <mat-tab-group [(selectedIndex)]="selectedTab" class="medication-tabs">
-            <!-- Active Medications Tab -->
-            <mat-tab label="Activos ({{ activeMedications().length }})">
-              <div class="tab-content">
-                <ng-container *ngIf="activeMedications().length === 0; else hasMeds">
-                  <div class="empty-state">
-                    <mat-icon>medication</mat-icon>
-                    <p>No tienes medicamentos activos</p>
-                    <button mat-raised-button color="primary">
-                      <mat-icon>add</mat-icon>
-                      Agregar Medicamento
-                    </button>
-                  </div>
-                </ng-container>
-
-                <ng-template #hasMeds>
-                  <div class="medications-grid">
-                    <mat-card class="medication-item" *ngFor="let medication of activeMedications()">
-                      <mat-card-header>
-                        <mat-icon mat-card-avatar>{{ getMedicationIcon(medication) }}</mat-icon>
-                        <mat-card-title>{{ medication.name }}</mat-card-title>
-                        <mat-card-subtitle>{{ medication.dosage }}</mat-card-subtitle>
-                      </mat-card-header>
-
-                      <mat-card-content>
-                        <!-- Status and adherence -->
-                        <div class="med-info-row">
-                          <mat-chip [highlighted]="true" [color]="getStatusColor(medication.status)">
-                            {{ getStatusLabel(medication.status) }}
-                          </mat-chip>
-                          <div class="adherence-indicator" [class]="getAdherenceColorClass(medication.adherenceRate)">
-                            <mat-icon>timeline</mat-icon>
-                            <span>{{ medication.adherenceRate }}%</span>
-                          </div>
-                        </div>
-
-                        <!-- Schedule -->
-                        <div class="schedule-section">
-                          <p class="section-title">
-                            <mat-icon>schedule</mat-icon>
-                            Horarios
-                          </p>
-                          <div class="time-chips">
-                            <mat-chip *ngFor="let time of medication.todaySchedule">{{ time }}</mat-chip>
-                          </div>
-                        </div>
-
-                        <!-- Instructions -->
-                        <div class="instructions-section" *ngIf="medication.instructions">
-                          <p class="section-title">
-                            <mat-icon>info</mat-icon>
-                            Instrucciones
-                          </p>
-                          <p class="instructions-text">{{ medication.instructions }}</p>
-                        </div>
-
-                        <!-- Prescribed by -->
-                        <div class="prescribed-info">
-                          <mat-icon>person</mat-icon>
-                          <span>Prescrito por: {{ medication.prescribedBy }}</span>
-                        </div>
-
-                        <!-- Refill warning -->
-                        <div class="refill-warning" *ngIf="medication.needsRefill">
-                          <mat-icon>warning</mat-icon>
-                          <span>Necesita reabastecimiento</span>
-                        </div>
-
-                        <!-- Last taken -->
-                        <div class="last-taken" *ngIf="medication.lastTaken">
-                          <mat-icon>check_circle</mat-icon>
-                          <span>Último: {{ formatDate(medication.lastTaken) }} - {{ formatTime(medication.lastTaken) }}</span>
-                        </div>
-                      </mat-card-content>
-
-                      <mat-card-actions>
-                        <button mat-button (click)="viewDetails(medication)">
-                          <mat-icon>visibility</mat-icon>
-                          Ver Detalles
+          <div class="two-column">
+            <div class="left">
+              <mat-tab-group [(selectedIndex)]="selectedTab" class="medication-tabs">
+                <!-- Active Medications Tab -->
+                <mat-tab label="Activos ({{ activeMedications().length }})">
+                  <div class="tab-content">
+                    <ng-container *ngIf="activeMedications().length === 0; else hasMeds">
+                      <div class="empty-state">
+                        <mat-icon>medication</mat-icon>
+                        <p>No tienes medicamentos activos</p>
+                        <button mat-raised-button color="primary" (click)="addMedication()">
+                          <mat-icon>add</mat-icon>
+                          Agregar Medicamento
                         </button>
-                        <button mat-button color="primary" (click)="editMedication(medication)">
-                          <mat-icon>edit</mat-icon>
-                          Editar
-                        </button>
-                        <button mat-button color="warn" (click)="deleteMedication(medication)">
-                          <mat-icon>delete</mat-icon>
-                          Eliminar
-                        </button>
-                      </mat-card-actions>
-                    </mat-card>
-                  </div>
-                </ng-template>
-              </div>
-            </mat-tab>
+                      </div>
+                    </ng-container>
 
-            <!-- All Medications Tab -->
-            <mat-tab label="Todos ({{ medications().length }})">
-              <div class="tab-content">
-                <ng-container *ngIf="medications().length === 0; else hasAnyMeds">
-                  <div class="empty-state">
-                    <mat-icon>medication</mat-icon>
-                    <p>No se encontraron medicamentos</p>
-                  </div>
-                </ng-container>
+                    <ng-template #hasMeds>
+                      <mat-accordion class="med-accordion" multi>
+                        <mat-expansion-panel *ngFor="let medication of activeMedications()">
+                          <mat-expansion-panel-header>
+                            <mat-panel-title>
+                              <div class="med-header">
+                                <mat-icon class="med-icon">{{ getMedicationIcon(medication) }}</mat-icon>
+                                <div>
+                                  <strong>{{ medication.name }}</strong>
+                                  <div class="dosage-text">{{ medication.dosage }}</div>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                              <span class="adherence-small" [class]="getAdherenceColorClass(medication.adherenceRate)">{{ medication.adherenceRate }}%</span>
+                            </mat-panel-description>
+                          </mat-expansion-panel-header>
 
-                <ng-template #hasAnyMeds>
-                  <div class="table-container">
-                    <table mat-table [dataSource]="medications()" class="medications-table">
-                      <!-- Name Column -->
-                      <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef>Medicamento</th>
-                        <td mat-cell *matCellDef="let med">
-                          <div class="med-name-cell">
-                            <mat-icon>{{ getMedicationIcon(med) }}</mat-icon>
-                            <div>
-                              <strong>{{ med.name }}</strong>
-                              <span class="dosage-text">{{ med.dosage }}</span>
+                          <div class="panel-body">
+                            <div class="panel-row">
+                              <mat-chip [color]="getStatusColor(medication.status)">{{ getStatusLabel(medication.status) }}</mat-chip>
+                              <div class="meta-item">Prescrito por: {{ medication.prescribedBy }}</div>
+                              <div class="meta-item">Último: {{ medication.lastTaken ? (formatDate(medication.lastTaken) + ' ' + formatTime(medication.lastTaken)) : '—' }}</div>
+                            </div>
+
+                            <mat-divider></mat-divider>
+
+                            <div class="panel-content">
+                              <div class="section">
+                                <p class="section-title"><mat-icon>schedule</mat-icon> Horarios</p>
+                                <div class="time-chips"><mat-chip *ngFor="let t of medication.todaySchedule">{{ t }}</mat-chip></div>
+                              </div>
+
+                              <div class="section" *ngIf="medication.instructions">
+                                <p class="section-title"><mat-icon>info</mat-icon> Instrucciones</p>
+                                <p class="instructions-text">{{ medication.instructions }}</p>
+                              </div>
+                            </div>
+
+                            <div class="panel-actions">
+                              <button mat-button color="primary" (click)="editMedication(medication)"><mat-icon>edit</mat-icon> Editar</button>
+                              <button mat-button color="warn" (click)="deleteMedication(medication)"><mat-icon>delete</mat-icon> Eliminar</button>
                             </div>
                           </div>
-                        </td>
-                      </ng-container>
-
-                      <!-- Status Column -->
-                      <ng-container matColumnDef="status">
-                        <th mat-header-cell *matHeaderCellDef>Estado</th>
-                        <td mat-cell *matCellDef="let med">
-                          <mat-chip [color]="getStatusColor(med.status)">
-                            {{ getStatusLabel(med.status) }}
-                          </mat-chip>
-                        </td>
-                      </ng-container>
-
-                      <!-- Adherence Column -->
-                      <ng-container matColumnDef="adherence">
-                        <th mat-header-cell *matHeaderCellDef>Adherencia</th>
-                        <td mat-cell *matCellDef="let med">
-                          <span [class]="'adherence-badge ' + getAdherenceColorClass(med.adherenceRate)">
-                            {{ med.adherenceRate }}%
-                          </span>
-                        </td>
-                      </ng-container>
-
-                      <!-- Prescribed Date Column -->
-                      <ng-container matColumnDef="prescribed">
-                        <th mat-header-cell *matHeaderCellDef>Fecha Prescripción</th>
-                        <td mat-cell *matCellDef="let med">
-                          {{ formatDate(med.prescribedDate) }}
-                        </td>
-                      </ng-container>
-
-                      <!-- Actions Column -->
-                      <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef>Acciones</th>
-                        <td mat-cell *matCellDef="let med">
-                          <button mat-icon-button [matTooltip]="'Ver detalles'" (click)="viewDetails(med)">
-                            <mat-icon>visibility</mat-icon>
-                          </button>
-                          <button mat-icon-button [matTooltip]="'Editar'" color="primary" (click)="editMedication(med)">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                          <button mat-icon-button [matTooltip]="'Eliminar'" color="warn" (click)="deleteMedication(med)">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </td>
-                      </ng-container>
-
-                      <tr mat-header-row *matHeaderRowDef="['name', 'status', 'adherence', 'prescribed', 'actions']"></tr>
-                      <tr mat-row *matRowDef="let row; columns: ['name', 'status', 'adherence', 'prescribed', 'actions'];"></tr>
-                    </table>
+                        </mat-expansion-panel>
+                      </mat-accordion>
+                    </ng-template>
                   </div>
-                </ng-template>
-              </div>
-            </mat-tab>
-          </mat-tab-group>
+                </mat-tab>
+
+                <!-- All Medications Tab -->
+                <mat-tab label="Todos ({{ medications().length }})">
+                  <div class="tab-content">
+                    <ng-container *ngIf="medications().length === 0; else hasAnyMeds">
+                      <div class="empty-state">
+                        <mat-icon>medication</mat-icon>
+                        <p>No se encontraron medicamentos</p>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #hasAnyMeds>
+                      <mat-accordion class="med-accordion" multi>
+                        <mat-expansion-panel *ngFor="let med of medications()">
+                          <mat-expansion-panel-header>
+                            <mat-panel-title>
+                              <div class="med-header">
+                                <mat-icon class="med-icon">{{ getMedicationIcon(med) }}</mat-icon>
+                                <div>
+                                  <strong>{{ med.name }}</strong>
+                                  <div class="dosage-text">{{ med.dosage }}</div>
+                                </div>
+                              </div>
+                            </mat-panel-title>
+                            <mat-panel-description>
+                              <span class="adherence-small" [class]="getAdherenceColorClass(med.adherenceRate)">{{ med.adherenceRate }}%</span>
+                            </mat-panel-description>
+                          </mat-expansion-panel-header>
+
+                          <div class="panel-body">
+                            <div class="panel-row">
+                              <mat-chip [color]="getStatusColor(med.status)">{{ getStatusLabel(med.status) }}</mat-chip>
+                              <div class="meta-item">Prescrito: {{ med.prescribedBy }}</div>
+                              <div class="meta-item">Fecha: {{ formatDate(med.prescribedDate) }}</div>
+                            </div>
+
+                            <mat-divider></mat-divider>
+
+                            <div class="panel-content">
+                              <div class="section">
+                                <p class="section-title"><mat-icon>schedule</mat-icon> Horarios</p>
+                                <div class="time-chips"><mat-chip *ngFor="let t of med.todaySchedule">{{ t }}</mat-chip></div>
+                              </div>
+
+                              <div class="section" *ngIf="med.instructions">
+                                <p class="section-title"><mat-icon>info</mat-icon> Instrucciones</p>
+                                <p class="instructions-text">{{ med.instructions }}</p>
+                              </div>
+                            </div>
+
+                            <div class="panel-actions">
+                              <button mat-button color="primary" (click)="editMedication(med)"><mat-icon>edit</mat-icon> Editar</button>
+                              <button mat-button color="warn" (click)="deleteMedication(med)"><mat-icon>delete</mat-icon> Eliminar</button>
+                            </div>
+                          </div>
+                        </mat-expansion-panel>
+                      </mat-accordion>
+                    </ng-template>
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+
+            <div class="right">
+              <mat-card class="quick-add-card">
+                <mat-card-title>Agregar medicamento rápido</mat-card-title>
+                <mat-card-content>
+                  <p>Usa este panel para añadir un medicamento rápidamente.</p>
+                  <mat-form-field appearance="fill" style="width: 100%; margin-top:0.5rem;">
+                    <mat-label>Nombre</mat-label>
+                    <input matInput #quickName />
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" style="width: 100%; margin-top:0.5rem;">
+                    <mat-label>Dosificación</mat-label>
+                    <input matInput #quickDosage />
+                  </mat-form-field>
+                  <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                    <button mat-flat-button color="primary" (click)="quickCreateMedication(quickName.value, quickDosage.value)">
+                      <mat-icon>add</mat-icon>
+                      Agregar
+                    </button>
+                    <button mat-stroked-button (click)="addMedication()">
+                      <mat-icon>edit</mat-icon>
+                      Más opciones
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
         </ng-template>
       </div>

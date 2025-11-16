@@ -309,6 +309,66 @@ export class HospitalDashboardStore {
   }
 
   /**
+   * Registra un doctor sin validar suscripción (flujo admin interno).
+   * Útil para permitir que el administrador cree doctores directamente
+   * aunque el tenant no tenga suscripción activa.
+   */
+  registerDoctorAsAdmin(request: RegisterDoctorFromHospitalRequest): Observable<HospitalDashboardResult> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.tenantService.getById(request.tenantId).pipe(
+      switchMap(tenant => {
+        if (!tenant) {
+          return throwError(() => new Error('Hospital no encontrado'));
+        }
+
+        // No validamos suscripción ni límites: admin puede crear doctores.
+        // Verificar que el email no esté registrado y crear usuario + doctor.
+        return this.userService.emailExists(request.email).pipe(
+          switchMap(exists => {
+            if (exists) {
+              return throwError(() => new Error('El email ya está registrado'));
+            }
+
+            // Crear usuario para el doctor
+            return this.userService.create({
+              email: request.email,
+              password: request.password,
+              role: 'doctor',
+              name: `${request.firstName} ${request.lastName}`
+            });
+          }),
+          switchMap(user => {
+            // Crear el doctor vinculado al tenant
+            return this.doctorService.create({
+              userId: user.id,
+              tenantId: request.tenantId,
+              firstName: request.firstName,
+              lastName: request.lastName,
+              dni: 'N/A',
+              licenseNumber: request.licenseNumber,
+              specialty: request.specialty,
+              phone: request.phone || ''
+            });
+          }),
+          map(doctor => ({
+            success: true,
+            message: `Doctor ${doctor.fullName} registrado exitosamente (admin)`,
+            data: doctor
+          }))
+        );
+      }),
+      tap(() => this._loading.set(false)),
+      catchError(error => {
+        this._loading.set(false);
+        this._error.set(error.message);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Invita un doctor por email
    */
   inviteDoctor(request: InviteDoctorRequest): Observable<HospitalDashboardResult> {

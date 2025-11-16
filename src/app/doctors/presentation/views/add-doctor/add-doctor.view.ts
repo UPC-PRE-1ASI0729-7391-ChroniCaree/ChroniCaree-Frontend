@@ -126,7 +126,8 @@ export class AddDoctorView {
       phone: f.phone
     };
 
-    this.dashboardStore.registerDoctor(request).subscribe({
+    // Use admin flow that doesn't require tenant subscription
+    this.dashboardStore.registerDoctorAsAdmin(request).subscribe({
       next: () => {
         this.success.set(true);
         this.submitting.set(false);

@@ -144,6 +144,45 @@
   gap: 1.5rem;
 }
 
+.med-accordion {
+  width: 100%;
+}
+
+.med-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.med-icon {
+  color: #3b82f6;
+}
+
+.adherence-small {
+  font-weight: 700;
+}
+
+.panel-body {
+  padding: 0.75rem 0 0.5rem 0;
+}
+
+.panel-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.panel-content .section {
+  margin: 0.5rem 0;
+}
+
+.panel-actions {
+  display:flex;
+  gap:0.5rem;
+  margin-top:0.75rem;
+}
+
 .medication-item {
   transition: all 0.3s ease;
 }
@@ -372,5 +411,35 @@
 
   .header-text h1 {
     font-size: 1.5rem;
+  }
+}
+
+/* Two-column layout for medication history */
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.two-column .left {
+  min-width: 0;
+}
+
+.two-column .right {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.quick-add-card {
+  padding: 1rem;
+}
+
+@media (max-width: 900px) {
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+  .two-column .right {
+    position: static;
   }
 }

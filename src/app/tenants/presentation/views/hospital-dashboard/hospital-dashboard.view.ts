@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -104,26 +105,21 @@ export class HospitalDashboardView implements OnInit {
             let plan: SubscriptionPlanEntity | null = null;
 
             if (stats.activeSubscription) {
-              // Obtener detalles de suscripción
-              const doctors = this.dashboardStore.doctors();
-              if (doctors.length > 0) {
-                const firstDoctor = doctors[0];
-                const tenantIdFromDoctor = firstDoctor.tenantId;
-                
-                // Buscar suscripción activa del tenant
-                if (tenantIdFromDoctor) {
+              // Buscar suscripción activa del tenant usando el tenantId actual
+              try {
+                const subs = await firstValueFrom(this.subscriptionService.getActiveByPayerId('tenant', tenantId));
+                if (subs) {
+                  subscription = subs;
+                  // Obtener el plan
                   try {
-                    const subs = await this.subscriptionService.getActiveByPayerId('tenant', tenantIdFromDoctor).toPromise();
-                    if (subs) {
-                      subscription = subs;
-                      // Obtener el plan
-                      const planResult = await this.subscriptionService.getPlanById(subs.planId).toPromise();
-                      plan = planResult ?? null;
-                    }
+                    const planResult = await firstValueFrom(this.subscriptionService.getPlanById(subs.planId));
+                    plan = planResult ?? null;
                   } catch (err) {
-                    console.error('Error loading subscription:', err);
+                    console.error('Error loading plan for subscription:', err);
                   }
                 }
+              } catch (err) {
+                console.error('Error loading subscription:', err);
               }
             }
 

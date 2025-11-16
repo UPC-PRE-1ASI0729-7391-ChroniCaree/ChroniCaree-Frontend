@@ -52,23 +52,8 @@ export class LoginComponent implements OnInit {
   }
 
   quickLogin(type: 'doctor' | 'patient'): void {
-    // Pre-fill form with test credentials
-    if (type === 'doctor') {
-      this.form.set({
-        email: 'dr.juan@chronicaree.com',
-        password: 'password123',
-        rememberMe: false
-      });
-    } else {
-      this.form.set({
-        email: 'ana@b2c.com',
-        password: 'password123',
-        rememberMe: false
-      });
-    }
-    
-    // Automatically submit
-    setTimeout(() => this.onSubmit(), 100);
+    // Quick login was removed from UI; method retained as no-op for backward compatibility.
+    return;
   }
 
   onSubmit(): void {

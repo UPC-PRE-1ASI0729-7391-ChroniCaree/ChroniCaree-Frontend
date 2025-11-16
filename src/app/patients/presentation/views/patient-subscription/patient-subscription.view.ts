@@ -129,11 +129,10 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
         billingEmail: email
       }));
 
-      this.success.set('¡Suscripción activada exitosamente!');
+      this.success.set('¡Suscripción activada exitosamente! Redirigiendo...');
       setTimeout(() => {
-        this.loadData();
-        this.success.set(null);
-      }, 3000);
+        this.router.navigate(['/patient/dashboard']);
+      }, 2000);
     } catch (err: any) {
       this.error.set(err.message || 'Error al procesar la suscripción');
     } finally {
@@ -229,10 +228,6 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
 
   getStatusClass(status: string): string {
     return `status-${status}`;
-  }
-
-  getPatientFeatures(features: any): any {
-    return features;
   }
 
   private getUserId(): number {

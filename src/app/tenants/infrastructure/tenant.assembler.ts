@@ -33,10 +33,19 @@ export class TenantAssembler implements BaseAssembler<Tenant, TenantResource, Ba
   /**
    * Convierte una entidad Tenant a un recurso TenantResource
    */
-  toResourceFromEntity(entity: Tenant): TenantResource {
+  toResourceFromEntity(entity: Tenant): any {
+    // Return all fields for creation/update
     return {
       id: entity.id,
-      name: entity.name
+      adminUserId: entity.adminUserId,
+      name: entity.name,
+      address: entity.address,
+      phone: entity.phone,
+      email: entity.email,
+      status: entity.status,
+      subscriptionId: entity.subscriptionId,
+      registrationDate: entity.registrationDate,
+      settings: entity.settings
     };
   }
 

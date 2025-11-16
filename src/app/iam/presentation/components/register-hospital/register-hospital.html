@@ -194,19 +194,46 @@
             </div>
           }
           
-          <!-- Simple Plan Selector (no preview) -->
+          <!-- Plan Cards -->
           @if (!loadingPlans()) {
-            <div class="form-group">
-              <label for="planSelect">Elige un plan (opcional)</label>
-              <select id="planSelect" (change)="updateForm('selectedPlanId', $any($event.target).value)" [disabled]="submitting()">
-                <option [value]="null">-- Seleccionar más tarde --</option>
-                @for (plan of availablePlans(); track plan.id) {
-                  <option [value]="'' + plan.id">{{ plan.name }} — ${{ plan.price }} /mes</option>
-                }
-              </select>
+            <div class="plans-grid">
+              @for (plan of availablePlans(); track plan.id) {
+                <div 
+                  class="plan-card"
+                  [class.selected]="form().selectedPlanId === '' + plan.id"
+                  (click)="selectPlan(plan)"
+                >
+                  <div class="plan-header">
+                    <span class="plan-badge">{{ plan.name }}</span>
+                    <h3 class="plan-name">{{ plan.name }}</h3>
+                  </div>
+                  
+                  <div class="plan-body">
+                    <div class="plan-price">
+                      ${{ plan.price }}
+                      <small>/mes</small>
+                    </div>
+                    
+                    <ul class="plan-features">
+                      <li>
+                        {{ getTenantFeatures(plan.features).maxDoctors === -1 ? 'Doctores ilimitados' : getTenantFeatures(plan.features).maxDoctors + ' doctores' }}
+                      </li>
+                      <li>
+                        {{ getTenantFeatures(plan.features).maxPatients === -1 ? 'Pacientes ilimitados' : getTenantFeatures(plan.features).maxPatients + ' pacientes' }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              }
             </div>
 
-            <!-- If user selected a plan, show minimal payment inputs (no plan feature preview) -->
+            <div class="form-group">
+              <button type="button" class="btn-link" (click)="updateForm('selectedPlanId', null)">
+                Continuar sin un plan
+              </button>
+            </div>
+            
+            <!-- If user selected a plan, show payment form -->
             @if (form().selectedPlanId) {
               <div class="payment-form">
                 <h3>Información de Pago</h3>
