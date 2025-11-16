@@ -129,9 +129,9 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
         billingEmail: email
       }));
 
-      this.success.set('¡Suscripción activada exitosamente! Redirigiendo...');
+      this.success.set('¡Suscripción activada exitosamente! Redirigiendo al login...');
       setTimeout(() => {
-        this.router.navigate(['/patient/dashboard']);
+        this.router.navigate(['/']);
       }, 2000);
     } catch (err: any) {
       this.error.set(err.message || 'Error al procesar la suscripción');
@@ -182,10 +182,10 @@ export class PatientSubscriptionView implements OnInit, AfterViewInit, OnDestroy
 
       console.log('✅ Suscripción creada:', newSub);
 
-      this.success.set('¡Pago procesado exitosamente! Suscripción activada.');
-      
+      this.success.set('¡Pago procesado exitosamente! Suscripción activada. Redirigiendo al login...');
+
       setTimeout(() => {
-        this.router.navigate(['/patient/dashboard']);
+        this.router.navigate(['/']);
       }, 2000);
 
     } catch (err: any) {

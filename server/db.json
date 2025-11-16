@@ -281,6 +281,28 @@
       "twoFactorEnabled": false,
       "createdAt": "2025-11-15T21:01:13.271Z",
       "tenantId": null
+    },
+    {
+      "id": 1763265159785,
+      "email": "GAFSADFASFAS@GAFSADFASFAS.com",
+      "role": "hospital_admin",
+      "name": "GAFSADFASFAS",
+      "password": "GAFSADFASFAS",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-16T03:52:39.785Z",
+      "tenantId": 1763265159826
+    },
+    {
+      "id": 1763265233455,
+      "email": "r2qreqr@r2qreqr.com",
+      "role": "hospital_admin",
+      "name": "r2qreqr",
+      "password": "r2qreqrr2qreqr",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-16T03:53:53.455Z",
+      "tenantId": 1763265233506
     }
   ],
   "tenants": [
@@ -477,6 +499,38 @@
       "status": "active",
       "subscriptionId": 7,
       "registrationDate": "2025-11-15T19:11:45.095Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763265159826,
+      "adminUserId": 1763265159785,
+      "name": "GAFSADFASFdsafadgAS",
+      "address": "sad",
+      "phone": "safqregq",
+      "email": "GAFSADFASFAS@GAFSADFASFAS.com",
+      "status": "active",
+      "subscriptionId": 11,
+      "registrationDate": "2025-11-16T03:52:39.826Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1763265233506,
+      "adminUserId": 1763265233455,
+      "name": "sadagad",
+      "address": "fdafadgb",
+      "phone": "rtwbwr",
+      "email": "r2qreqr@r2qreqr.com",
+      "status": "active",
+      "subscriptionId": 12,
+      "registrationDate": "2025-11-16T03:53:53.506Z",
       "settings": {
         "allowIndependentDoctors": false,
         "requirePatientApproval": true,
@@ -760,6 +814,36 @@
       "lastPaymentDate": "2025-11-15T21:01:24.531Z",
       "lastPaymentAmount": 19.99,
       "id": 10
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763265159826,
+      "planId": "tenant_enterprise",
+      "status": "active",
+      "startDate": "2025-11-16T03:52:49.645Z",
+      "endDate": "2025-12-16T03:52:49.645Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "GAFSADFASFAS@GAFSADFASFAS.com",
+      "nextBillingDate": "2025-12-16T03:52:49.645Z",
+      "lastPaymentDate": "2025-11-16T03:52:49.645Z",
+      "lastPaymentAmount": 999,
+      "id": 11
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1763265233506,
+      "planId": "tenant_enterprise",
+      "status": "active",
+      "startDate": "2025-11-16T03:54:05.958Z",
+      "endDate": "2025-12-16T03:54:05.958Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "r2qreqr@r2qreqr.com",
+      "nextBillingDate": "2025-12-16T03:54:05.958Z",
+      "lastPaymentDate": "2025-11-16T03:54:05.958Z",
+      "lastPaymentAmount": 999,
+      "id": 12
     }
   ],
   "patients": [
@@ -1597,6 +1681,34 @@
       "updatedAt": "2025-11-15T21:01:24.448Z",
       "createdAt": "2025-11-15T21:01:24.448Z",
       "id": 10
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763265159826,
+      "amount": 999,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STx1BBJEHGVCWjrqmKg58SZ",
+      "stripePaymentIntentId": "tok_1STx1BBJEHGVCWjrqmKg58SZ",
+      "updatedAt": "2025-11-16T03:52:49.564Z",
+      "createdAt": "2025-11-16T03:52:49.564Z",
+      "id": 11
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1763265233506,
+      "amount": 999,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1STx2PBJEHGVCWjrYJne9hLm",
+      "stripePaymentIntentId": "tok_1STx2PBJEHGVCWjrYJne9hLm",
+      "updatedAt": "2025-11-16T03:54:05.888Z",
+      "createdAt": "2025-11-16T03:54:05.888Z",
+      "id": 12
     }
   ],
   "auditLogs": [

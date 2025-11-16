@@ -179,11 +179,11 @@ export class HospitalSubscriptionView implements OnInit, AfterViewInit, OnDestro
         }));
       }
 
-      this.success.set('¡Pago procesado exitosamente! Redirigiendo al dashboard...');
-      
-      // Redirect to dashboard with a full page reload
+      this.success.set('¡Pago procesado exitosamente! Redirigiendo al login...');
+
+      // Redirect to login (root) with full page reload so user can sign in
       setTimeout(() => {
-        window.location.href = '/hospital/dashboard';
+        window.location.href = '/';
       }, 2000);
 
     } catch (err: any) {
