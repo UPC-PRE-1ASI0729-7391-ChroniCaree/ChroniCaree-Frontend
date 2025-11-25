@@ -1,11 +1,16 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { NudgePanelComponent } from '../../components/nudge-panel/nudge-panel';
 import { NudgeStore } from '../../../application/nudge.store';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { NudgePriority, NudgeType } from '../../../domain/model/nudge.entity';
 
 /**
  * Nudges Page Component
@@ -17,9 +22,13 @@ import { PatientStore } from '../../../../patients/application/patient.store';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterLink,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
     NudgePanelComponent
   ],
   templateUrl: './nudges-page.html',
@@ -29,6 +38,13 @@ export class NudgesPageComponent implements OnInit {
   private readonly nudgeStore = inject(NudgeStore);
   private readonly patientStore = inject(PatientStore);
   private readonly router = inject(Router);
+
+  // Form state para crear recordatorio rápido
+  showCreateForm = false;
+  createTitle = '';
+  createMessage = '';
+  createPriority: NudgePriority = NudgePriority.MEDIUM;
+  private currentPatientId: number | null = null;
 
   get activeCount() {
     return this.nudgeStore.activeCount;
@@ -61,6 +77,7 @@ export class NudgesPageComponent implements OnInit {
 
         if (patient) {
           console.log(`✅ Nudges-Page: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
+              this.currentPatientId = patient.id;
           
           // ✅ Cargar nudges usando el patientId
           this.nudgeStore.loadNudgesByPatient(patient.id.toString()).subscribe({
@@ -75,5 +92,46 @@ export class NudgesPageComponent implements OnInit {
         console.error('❌ Nudges-Page: Error cargando pacientes:', err);
       }
     });
+  }
+
+  /** Crea un nuevo recordatorio/nudge usando NudgeStore */
+  createNudge(): void {
+    if (!this.currentPatientId) {
+      console.error('No hay paciente seleccionado para crear recordatorio');
+      return;
+    }
+
+    const payload = {
+      patientId: this.currentPatientId,
+      type: NudgeType.MEDICATION_REMINDER,
+      priority: this.createPriority,
+      title: this.createTitle || 'Recordatorio rápido',
+      message: this.createMessage || 'Recordatorio creado desde UI',
+      actionLabel: 'Ver',
+      actionRoute: '/patient/dashboard',
+      icon: 'notifications'
+    } as any;
+
+    this.nudgeStore.createNudge(payload).subscribe({
+      next: (n) => {
+        console.log('✅ Recordatorio creado', n);
+        // limpiar campos y cerrar form
+        this.createTitle = '';
+        this.createMessage = '';
+        this.showCreateForm = false;
+      },
+      error: (err) => console.error('❌ Error creando recordatorio:', err)
+    });
+  }
+
+  /** Toggle para mostrar/ocultar el formulario de creación */
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+    if (!this.showCreateForm) {
+      // Limpiar campos al cerrar
+      this.createTitle = '';
+      this.createMessage = '';
+      this.createPriority = NudgePriority.MEDIUM;
+    }
   }
 }

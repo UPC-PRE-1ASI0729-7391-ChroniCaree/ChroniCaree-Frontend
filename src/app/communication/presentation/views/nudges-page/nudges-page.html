@@ -10,7 +10,7 @@
         <p>Gestiona tus notificaciones y recordatorios importantes</p>
       </div>
     </div>
-    <div class="header-stats">
+    <div class="header-actions">
       <div class="stat-card">
         <mat-icon class="stat-icon">notifications_active</mat-icon>
         <div class="stat-content">
@@ -18,6 +18,10 @@
           <span class="stat-label">Activos</span>
         </div>
       </div>
+      <button mat-raised-button color="primary" (click)="toggleCreateForm()" class="create-btn">
+        <mat-icon>add</mat-icon>
+        Crear Recordatorio
+      </button>
     </div>
   </div>
 
@@ -30,6 +34,43 @@
       </div>
     } @else {
       <div class="nudges-full-panel">
+        <!-- Quick create form -->
+        @if (showCreateForm) {
+          <div class="create-reminder-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Título</mat-label>
+                <input matInput placeholder="Ej: Tomar medicamento" [(ngModel)]="createTitle" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="form-field form-field-wide">
+                <mat-label>Mensaje</mat-label>
+                <input matInput placeholder="Detalles del recordatorio" [(ngModel)]="createMessage" />
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Prioridad</mat-label>
+                <mat-select [(ngModel)]="createPriority">
+                  <mat-option [value]="'low'">🟢 Baja</mat-option>
+                  <mat-option [value]="'medium'">🟡 Media</mat-option>
+                  <mat-option [value]="'high'">🟠 Alta</mat-option>
+                  <mat-option [value]="'urgent'">🔴 Urgente</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div class="form-actions">
+                <button mat-raised-button color="primary" (click)="createNudge()">
+                  <mat-icon>check</mat-icon>
+                  Guardar
+                </button>
+                <button mat-button (click)="toggleCreateForm()">
+                  <mat-icon>close</mat-icon>
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
         <app-nudge-panel />
       </div>
     }

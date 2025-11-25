@@ -4,11 +4,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
-import { MatChipsModule } from '@angular/material/chips';
-import { AlertStore } from '../../../application/alert.store';
-import { Alert, AlertSeverity } from '../../../domain/model/alert.entity';
-import { RouterLink } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+  import { MatChipsModule } from '@angular/material/chips';
+  import { NudgeStore } from '../../../../communication/application/nudge.store';
+  import { Nudge, NudgePriority } from '../../../../communication/domain/model/nudge.entity';
+  import { RouterLink } from '@angular/router';
+  import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-alert-panel',
@@ -29,77 +29,120 @@ import { TranslateModule } from '@ngx-translate/core';
 export class AlertPanelComponent {
   @Input() maxItems: number = 3;
 
-  readonly alertStore = inject(AlertStore);
+  readonly nudgeStore = inject(NudgeStore);
 
-  // Computed: alertas críticas limitadas
   readonly topAlerts = computed(() => {
-    const critical = this.alertStore.criticalAlerts();
-    const high = this.alertStore.highAlerts();
-    const combined = [...critical, ...high];
-    return combined.slice(0, this.maxItems);
+    const priorityNudges = this.nudgeStore.priorityNudges();
+    const activeNudges = this.nudgeStore.activeNudges();
+
+    // Combinar sin duplicados, priorizando los de mayor prioridad
+    const combined: Nudge[] = [
+      ...priorityNudges,
+      ...activeNudges.filter((n: Nudge) => !priorityNudges.some((p: Nudge) => p.id === n.id))
+    ];
+
+    return combined.slice(0, this.maxItems).map((n: Nudge) => {
+      const severity = this.mapPriorityToSeverity(n.priority);
+      return {
+        id: String(n.id),
+        severity,
+        typeIcon: n.icon || 'notifications',
+        title: n.title,
+        message: n.message,
+        createdAt: n.createdAt,
+        timeSinceCreated: this.getTimeAgoFrom(n.createdAt)
+      };
+    });
   });
 
-  readonly hasMoreAlerts = computed(() => {
-    const critical = this.alertStore.criticalAlerts();
-    const high = this.alertStore.highAlerts();
-    return (critical.length + high.length) > this.maxItems;
-  });
-
-  readonly criticalCount = computed(() => this.alertStore.criticalCount());
-  readonly loading = computed(() => this.alertStore.loading());
+  readonly hasMoreAlerts = computed(() => this.nudgeStore.activeCount() > this.maxItems);
+  readonly criticalCount = computed(() => this.nudgeStore.priorityNudges().length);
+  readonly loading = computed(() => this.nudgeStore.loading$());
 
   /**
    * Reconoce una alerta
    */
-  acknowledgeAlert(alert: Alert): void {
-    this.alertStore.acknowledgeAlert(alert.id, 'current-user', 'Reconocido desde dashboard')
-      .subscribe({
-        next: () => console.log('Alerta reconocida'),
-        error: (err: any) => console.error('Error al reconocer alerta:', err)
-      });
+  // Acknowledge -> map to dismissing the nudge (no ack concept in nudges)
+  acknowledgeAlert(alert: any): void {
+    const id = Number(alert.id);
+    if (Number.isNaN(id)) return console.error('Invalid nudge id', alert?.id);
+    this.nudgeStore.dismissNudge(id).subscribe({
+      next: () => console.log('Recordatorio descartado (acknowledged)'),
+      error: (err: any) => console.error('Error al descartar recordatorio:', err)
+    });
   }
 
   /**
    * Descarta una alerta
    */
-  dismissAlert(alert: Alert): void {
-    this.alertStore.dismissAlert(alert.id, 'Descartado desde dashboard')
-      .subscribe({
-        next: () => console.log('Alerta descartada'),
-        error: (err: any) => console.error('Error al descartar alerta:', err)
-      });
+  dismissAlert(alert: any): void {
+    const id = Number(alert.id);
+    if (Number.isNaN(id)) return console.error('Invalid nudge id', alert?.id);
+    this.nudgeStore.dismissNudge(id).subscribe({
+      next: () => console.log('Recordatorio descartado'),
+      error: (err: any) => console.error('Error al descartar recordatorio:', err)
+    });
   }
 
   /**
    * Helper para formato de tiempo
    */
-  getTimeAgo(alert: Alert): string {
-    return alert.timeSinceCreated;
+  getTimeAgo(alert: any): string {
+    return alert.timeSinceCreated || alert.createdAt || '';
   }
 
   /**
    * Helper para clase CSS de severidad
    */
-  getSeverityClass(severity: AlertSeverity): string {
-    const classes: Record<AlertSeverity, string> = {
-      [AlertSeverity.LOW]: 'severity-low',
-      [AlertSeverity.MEDIUM]: 'severity-medium',
-      [AlertSeverity.HIGH]: 'severity-high',
-      [AlertSeverity.CRITICAL]: 'severity-critical'
+  getSeverityClass(severity: string): string {
+    const classes: Record<string, string> = {
+      low: 'severity-low',
+      medium: 'severity-medium',
+      high: 'severity-high',
+      critical: 'severity-critical'
     };
-    return classes[severity];
+    return classes[severity] || '';
   }
 
   /**
    * Helper para etiqueta de severidad
    */
-  getSeverityLabel(severity: AlertSeverity): string {
-    const labels: Record<AlertSeverity, string> = {
-      [AlertSeverity.LOW]: 'Baja',
-      [AlertSeverity.MEDIUM]: 'Media',
-      [AlertSeverity.HIGH]: 'Alta',
-      [AlertSeverity.CRITICAL]: 'Crítica'
+  getSeverityLabel(severity: string): string {
+    const labels: Record<string, string> = {
+      low: 'Baja',
+      medium: 'Media',
+      high: 'Alta',
+      critical: 'Crítica'
     };
-    return labels[severity];
+    return labels[severity] || '';
+  }
+
+  /**
+   * Devuelve un texto legible desde un ISO date
+   */
+  private getTimeAgoFrom(iso: string): string {
+    const created = new Date(iso).getTime();
+    if (Number.isNaN(created)) return '';
+    const diffMs = Date.now() - created;
+    const diffMins = Math.floor(diffMs / (60 * 1000));
+    if (diffMins < 1) return 'Hace unos segundos';
+    if (diffMins < 60) return `Hace ${diffMins} min`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `Hace ${diffHours} h`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `Hace ${diffDays} d`;
+  }
+
+  private mapPriorityToSeverity(priority: NudgePriority): string {
+    switch (priority) {
+      case NudgePriority.URGENT:
+        return 'critical';
+      case NudgePriority.HIGH:
+        return 'high';
+      case NudgePriority.MEDIUM:
+        return 'medium';
+      default:
+        return 'low';
+    }
   }
 }

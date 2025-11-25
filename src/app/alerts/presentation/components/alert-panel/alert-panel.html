@@ -8,7 +8,7 @@
           <span class="critical-badge" [matBadge]="criticalCount()" matBadgeColor="warn" matBadgeSize="small"></span>
         }
       </div>
-      <a routerLink="/patient/salud" class="view-all-link">
+      <a routerLink="/patient/recordatorios" class="view-all-link">
         {{ 'alerts.viewAll' | translate }}
         <mat-icon>arrow_forward</mat-icon>
       </a>
@@ -77,7 +77,7 @@
 
       @if (hasMoreAlerts()) {
         <div class="more-alerts">
-          <a routerLink="/patient/salud" class="more-link">
+          <a routerLink="/patient/recordatorios" class="more-link">
             {{ 'alerts.actions.seeAll' | translate }}
           </a>
         </div>

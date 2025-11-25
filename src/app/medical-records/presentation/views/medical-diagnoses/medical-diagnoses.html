@@ -191,10 +191,12 @@
               <mat-icon>visibility</mat-icon>
               Ver Detalles
             </button>
-            <button mat-button>
-              <mat-icon>edit</mat-icon>
-              Actualizar
-            </button>
+            @if (!asAny(diagnosis).isFromMedicalRecord) {
+              <button mat-button (click)="updateDiagnosis(diagnosis)">
+                <mat-icon>edit</mat-icon>
+                Actualizar
+              </button>
+            }
           </mat-card-actions>
         </mat-card>
       }

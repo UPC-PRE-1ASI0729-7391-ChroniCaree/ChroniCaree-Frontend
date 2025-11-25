@@ -374,12 +374,12 @@ export class RegisterHospitalComponent implements AfterViewInit {
                 
                 // Add small delay to ensure localStorage is written
                 setTimeout(() => {
-                  window.location.href = '/';
+                  window.location.href = '/hospital/dashboard';
                 }, 100);
               },
               error: (err: any) => {
                 console.error('Error updating tenant subscription:', err);
-                // Continuar de todos modos y redirigir al login
+                // Continuar de todos modos
                 this.submitting.set(false);
                 const currentUser = {
                   id: this.createdUserId!,
@@ -392,7 +392,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 
                 setTimeout(() => {
-                  window.location.href = '/';
+                  window.location.href = '/hospital/dashboard';
                 }, 100);
               }
             });
@@ -412,7 +412,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
             setTimeout(() => {
-              window.location.href = '/';
+              window.location.href = '/hospital/dashboard';
             }, 100);
           }
         });
@@ -429,7 +429,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = '/hospital/dashboard';
         }, 100);
       }
 
