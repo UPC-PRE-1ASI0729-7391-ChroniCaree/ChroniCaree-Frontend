@@ -1800,6 +1800,81 @@
       "id": 12
     }
   ],
+  "nudges": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "type": "medication_reminder",
+      "priority": "high",
+      "title": "Tomar medicamento",
+      "message": "Es hora de tomar tu medicamento de la mañana",
+      "actionLabel": "Marcar como tomado",
+      "actionRoute": "/patient/medicamentos",
+      "icon": "medication",
+      "createdAt": "2025-11-25T08:00:00Z",
+      "dismissedAt": null,
+      "snoozedUntil": null
+    },
+    {
+      "id": 2,
+      "patientId": 1,
+      "type": "appointment_reminder",
+      "priority": "medium",
+      "title": "Cita médica próxima",
+      "message": "Tienes una cita con el Dr. Pérez mañana a las 10:00",
+      "actionLabel": "Ver detalles",
+      "actionRoute": "/patient/appointments/new",
+      "icon": "calendar",
+      "createdAt": "2025-11-24T18:00:00Z",
+      "dismissedAt": null,
+      "snoozedUntil": null
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "medication_reminder",
+      "priority": "medium",
+      "title": "12321",
+      "message": "xdxfsdf",
+      "actionLabel": "Ver",
+      "actionRoute": "/patient/dashboard",
+      "icon": "notifications",
+      "id": 3
+    }
+  ],
+  "alerts": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "type": "vital_signs",
+      "severity": "high",
+      "title": "Presión arterial elevada",
+      "message": "Tu presión arterial está por encima de lo normal: 145/90 mmHg",
+      "source": "blood_pressure_monitor",
+      "status": "active",
+      "createdAt": "2025-11-25T07:30:00Z",
+      "acknowledgedAt": null,
+      "acknowledgedBy": null,
+      "resolvedAt": null,
+      "resolution": null,
+      "timeSinceCreated": "2h"
+    },
+    {
+      "id": 2,
+      "patientId": 1,
+      "type": "medication",
+      "severity": "medium",
+      "title": "Medicamento pendiente",
+      "message": "No has registrado tu medicamento de la mañana",
+      "source": "medication_tracker",
+      "status": "active",
+      "createdAt": "2025-11-25T09:00:00Z",
+      "acknowledgedAt": null,
+      "acknowledgedBy": null,
+      "resolvedAt": null,
+      "resolution": null,
+      "timeSinceCreated": "30min"
+    }
+  ],
   "auditLogs": [
     {
       "id": 1,

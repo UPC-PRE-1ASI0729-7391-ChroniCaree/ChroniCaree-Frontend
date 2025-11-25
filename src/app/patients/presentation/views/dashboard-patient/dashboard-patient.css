@@ -493,7 +493,6 @@
 }
 
 /* Appointments */
-.appointments-list { padding: var(--spacing-md); }
 .appointment-item {
   display: flex;
   align-items: center;
@@ -550,77 +549,130 @@
 }
 .btn-icon:hover { background: var(--color-cc-green); color: white; }
 
-/* Symptoms */
-.symptoms-list { padding: var(--spacing-md); }
-.symptom-item {
+/* Alerts (Symptoms as Alerts) */
+.alerts-list { 
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.alert-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-sm);
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
   border: 2px solid;
-  border-left-width: 4px;
+  border-left-width: 6px;
+  transition: all 0.3s ease;
+  background: white;
 }
-.symptom-item.severity-low {
+
+.alert-item.severity-low {
   border-color: var(--color-info);
-  background: rgba(23, 162, 184, 0.05);
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.03) 0%, white 100%);
 }
-.symptom-item.severity-medium {
+
+.alert-item.severity-medium {
   border-color: var(--color-warning);
-  background: rgba(255, 193, 7, 0.05);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.03) 0%, white 100%);
 }
-.symptom-item.severity-high {
+
+.alert-item.severity-high {
   border-color: var(--color-cc-red);
-  background: rgba(230, 57, 70, 0.05);
+  background: linear-gradient(135deg, rgba(230, 57, 70, 0.03) 0%, white 100%);
 }
-.symptom-item:hover {
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+.alert-item:hover {
+  transform: translateX(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
-.symptom-icon {
-  width: 40px;
-  height: 40px;
+
+.alert-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  font-size: 24px;
 }
-.severity-low .symptom-icon { background: rgba(23, 162, 184, 0.1); }
-.severity-medium .symptom-icon { background: rgba(255, 193, 7, 0.1); }
-.severity-high .symptom-icon { background: rgba(230, 57, 70, 0.1); }
-.symptom-details { flex: 1; }
-.symptom-name {
-  font-weight: var(--font-weight-semibold);
+
+.severity-low .alert-icon { 
+  background: rgba(23, 162, 184, 0.15);
+  color: var(--color-info);
+}
+
+.severity-medium .alert-icon { 
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--color-warning);
+}
+
+.severity-high .alert-icon { 
+  background: rgba(230, 57, 70, 0.15);
+  color: var(--color-cc-red);
+}
+
+.alert-content { 
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-weight: 600;
+  font-size: 1rem;
   color: var(--color-cc-dark-blue);
   margin: 0 0 var(--spacing-xs) 0;
+  line-height: 1.4;
 }
-.symptom-time {
-  font-size: 13px;
+
+.alert-message {
+  font-size: 0.875rem;
   color: var(--color-text-secondary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.alert-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
 }
 
 /* Severity Badges */
 .severity-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: var(--font-weight-semibold);
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+
 .severity-badge.severity-low {
-  background: rgba(23, 162, 184, 0.15);
+  background: rgba(23, 162, 184, 0.2);
   color: var(--color-info);
+  border: 1px solid rgba(23, 162, 184, 0.3);
 }
+
 .severity-badge.severity-medium {
-  background: rgba(255, 193, 7, 0.15);
+  background: rgba(255, 193, 7, 0.2);
   color: var(--color-warning);
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
+
 .severity-badge.severity-high {
-  background: rgba(230, 57, 70, 0.15);
+  background: rgba(230, 57, 70, 0.2);
   color: var(--color-cc-red);
+  border: 1px solid rgba(230, 57, 70, 0.3);
 }
 
 /* Empty States */

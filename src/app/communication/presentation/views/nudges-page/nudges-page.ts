@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { NudgePanelComponent } from '../../components/nudge-panel/nudge-panel';
 import { NudgeStore } from '../../../application/nudge.store';
 import { PatientStore } from '../../../../patients/application/patient.store';
@@ -23,6 +26,9 @@ import { NudgePriority, NudgeType } from '../../../domain/model/nudge.entity';
     RouterLink,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
     NudgePanelComponent
   ],
   templateUrl: './nudges-page.html',
@@ -34,6 +40,7 @@ export class NudgesPageComponent implements OnInit {
   private readonly router = inject(Router);
 
   // Form state para crear recordatorio rápido
+  showCreateForm = false;
   createTitle = '';
   createMessage = '';
   createPriority: NudgePriority = NudgePriority.MEDIUM;
@@ -108,11 +115,23 @@ export class NudgesPageComponent implements OnInit {
     this.nudgeStore.createNudge(payload).subscribe({
       next: (n) => {
         console.log('✅ Recordatorio creado', n);
-        // limpiar campos
+        // limpiar campos y cerrar form
         this.createTitle = '';
         this.createMessage = '';
+        this.showCreateForm = false;
       },
       error: (err) => console.error('❌ Error creando recordatorio:', err)
     });
+  }
+
+  /** Toggle para mostrar/ocultar el formulario de creación */
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+    if (!this.showCreateForm) {
+      // Limpiar campos al cerrar
+      this.createTitle = '';
+      this.createMessage = '';
+      this.createPriority = NudgePriority.MEDIUM;
+    }
   }
 }
