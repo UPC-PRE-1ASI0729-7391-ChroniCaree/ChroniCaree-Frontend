@@ -30,6 +30,19 @@
       </div>
     } @else {
       <div class="nudges-full-panel">
+        <!-- Quick create form -->
+        <div class="create-reminder-form" style="margin-bottom:1rem; display:flex; gap:.5rem; align-items:center;">
+          <input placeholder="Título" [(ngModel)]="createTitle" />
+          <input placeholder="Mensaje" [(ngModel)]="createMessage" />
+          <select [(ngModel)]="createPriority">
+            <option [ngValue]="'low'">Baja</option>
+            <option [ngValue]="'medium'">Media</option>
+            <option [ngValue]="'high'">Alta</option>
+            <option [ngValue]="'urgent'">Urgente</option>
+          </select>
+          <button class="btn btn-primary" (click)="createNudge()">Crear</button>
+        </div>
+
         <app-nudge-panel />
       </div>
     }

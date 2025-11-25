@@ -12,6 +12,7 @@ import { SymptomStore } from '../../../../clinical/application/symptom.store';
 import { DiagnosisStore } from '../../../../medical-records/application/diagnosis.store';
 import { MedicationStore } from '../../../../medications/application/medication.store';
 import { AlertStore } from '../../../../alerts/application/alert.store';
+import { DoctorStore } from '../../../../doctors/application/doctor.store';
 import { AppointmentsStore } from '../../../../doctors/application/appointments.store';
 import { Appointment } from '../../../../doctors/domain/model/appointment.entity';
 
@@ -149,8 +150,23 @@ export class DashboardPatient implements OnInit {
 
     return patientAppointments.map((apt: Appointment) => ({
       id: apt.id,
-      doctorName: 'Dr. Asignado', // TODO: obtener nombre del doctor
-      specialty: 'Especialidad', // TODO: obtener especialidad
+      // Resolver doctor dinámicamente desde DoctorStore usando doctorId
+      doctorName: (() => {
+        try {
+          const doc = this.doctorStore.doctors$().find(d => d.id === apt.doctorId);
+          return doc ? `Dr. ${doc.firstName} ${doc.lastName}` : 'Dr. Asignado';
+        } catch (e) {
+          return 'Dr. Asignado';
+        }
+      })(),
+      specialty: (() => {
+        try {
+          const doc = this.doctorStore.doctors$().find(d => d.id === apt.doctorId);
+          return doc ? doc.specialty : 'Especialidad';
+        } catch (e) {
+          return 'Especialidad';
+        }
+      })(),
       date: this.formatAppointmentDate(apt.date),
       time: apt.time,
       type: apt.type,
@@ -196,7 +212,8 @@ export class DashboardPatient implements OnInit {
     private diagnosisStore: DiagnosisStore,
     private medicationStore: MedicationStore,
     private alertStore: AlertStore,
-    private appointmentsStore: AppointmentsStore
+    private appointmentsStore: AppointmentsStore,
+    private doctorStore: DoctorStore
   ) {}
 
   ngOnInit(): void {
@@ -284,6 +301,12 @@ export class DashboardPatient implements OnInit {
 
           // ✅ Cargar citas del paciente actual
           this.appointmentsStore.loadAppointmentsByPatient(patient.id).subscribe();
+
+          // ✅ Cargar lista de doctores (para resolver doctorId -> nombre/especialidad)
+          this.doctorStore.loadAllDoctors().subscribe({
+            next: (docs) => console.log(`✅ Dashboard-Patient: ${docs.length} doctores cargados`),
+            error: (err) => console.error('❌ Dashboard-Patient: Error cargando doctores:', err)
+          });
         } else {
           console.warn('⚠️ Dashboard-Patient: No se encontró paciente para userId:', userId);
         }
