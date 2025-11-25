@@ -1,0 +1,344 @@
+<div class="diagnosis-detail-container">
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando diagnóstico...</p>
+    </div>
+  }
+
+  @if (diagnosis() && !loading()) {
+    <!-- Header con acción -->
+    <div class="detail-header">
+      <button mat-icon-button class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-content">
+        <div class="header-main">
+          @if (diagnosis()!.icd10Code) {
+            <div class="icd-badge">
+              <mat-icon>qr_code_2</mat-icon>
+              <span>{{ diagnosis()!.icd10Code }}</span>
+            </div>
+          }
+          <h1>{{ diagnosis()!.diagnosisName || 'Diagnóstico sin nombre' }}</h1>
+        </div>
+        <div class="header-badges">
+          @if (currentStatusInfo(); as statusInfo) {
+            <mat-chip [class]="statusInfo.color" class="status-chip">
+              <mat-icon>{{ statusInfo.icon }}</mat-icon>
+              {{ statusInfo.label }}
+            </mat-chip>
+          }
+          @if (currentSeverityInfo(); as severityInfo) {
+            <mat-chip [class]="severityInfo.color" class="severity-chip">
+              <mat-icon>{{ severityInfo.icon }}</mat-icon>
+              {{ severityInfo.label }}
+            </mat-chip>
+          }
+        </div>
+      </div>
+      <div class="header-actions">
+        @if (!isEditMode()) {
+          <button mat-raised-button color="primary" (click)="enableEditMode()">
+            <mat-icon>edit</mat-icon>
+            Actualizar Diagnóstico
+          </button>
+        } @else {
+          <button mat-button (click)="cancelEdit()">
+            <mat-icon>close</mat-icon>
+            Cancelar
+          </button>
+          <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="diagnosisForm.invalid">
+            <mat-icon>save</mat-icon>
+            Guardar Cambios
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Modo Vista: Información del diagnóstico -->
+    @if (!isEditMode()) {
+      <div class="view-mode">
+        <!-- Timeline Card -->
+        <mat-card class="info-card timeline-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>schedule</mat-icon>
+            <mat-card-title>Línea de Tiempo</mat-card-title>
+            <mat-card-subtitle>Historial del diagnóstico</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="timeline">
+              <!-- Fecha de diagnóstico -->
+              <div class="timeline-item">
+                <div class="timeline-icon diagnosed">
+                  <mat-icon>medical_information</mat-icon>
+                </div>
+                <div class="timeline-content">
+                  <h4>Diagnosticado</h4>
+                  <p class="date">{{ formatDate(diagnosis()!.diagnosedDate) }}</p>
+                  <p class="elapsed">Hace {{ getDaysSince(diagnosis()!.diagnosedDate) }} días</p>
+                </div>
+              </div>
+
+              <!-- Última revisión -->
+              @if (diagnosis()!.lastReviewDate) {
+                <div class="timeline-item">
+                  <div class="timeline-icon reviewed">
+                    <mat-icon>update</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Última Revisión por el Doctor</h4>
+                    <p class="date">{{ formatDate(diagnosis()!.lastReviewDate) }}</p>
+                    <p class="elapsed">Hace {{ getDaysSince(diagnosis()!.lastReviewDate) }} días</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Fecha de actualización -->
+              @if (diagnosis()!.updatedAt) {
+                <div class="timeline-item">
+                  <div class="timeline-icon updated">
+                    <mat-icon>edit_calendar</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Última Actualización</h4>
+                    <p class="date">{{ formatDate(diagnosis()!.updatedAt) }}</p>
+                    <p class="elapsed">Hace {{ getDaysSince(diagnosis()!.updatedAt) }} días</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Fecha de resolución -->
+              @if (diagnosis()!.resolvedDate) {
+                <div class="timeline-item">
+                  <div class="timeline-icon resolved">
+                    <mat-icon>check_circle</mat-icon>
+                  </div>
+                  <div class="timeline-content">
+                    <h4>Resuelto</h4>
+                    <p class="date">{{ formatDate(diagnosis()!.resolvedDate) }}</p>
+                    <p class="elapsed">Hace {{ getDaysSince(diagnosis()!.resolvedDate) }} días</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Información Médica -->
+        <mat-card class="info-card medical-info-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>medical_services</mat-icon>
+            <mat-card-title>Información Médica</mat-card-title>
+            <mat-card-subtitle>Detalles clínicos del diagnóstico</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-grid">
+              <!-- Tratamiento -->
+              @if (diagnosis()!.treatment) {
+                <div class="info-item">
+                  <div class="info-label">
+                    <mat-icon>medication</mat-icon>
+                    <span>Tratamiento Prescrito</span>
+                  </div>
+                  <div class="info-value treatment-box">
+                    {{ diagnosis()!.treatment }}
+                  </div>
+                </div>
+              }
+
+              <!-- Notas médicas -->
+              @if (diagnosis()!.notes) {
+                <div class="info-item full-width">
+                  <div class="info-label">
+                    <mat-icon>description</mat-icon>
+                    <span>Notas Médicas</span>
+                  </div>
+                  <div class="info-value notes-box">
+                    {{ diagnosis()!.notes }}
+                  </div>
+                </div>
+              }
+
+              <!-- Seguimiento requerido -->
+              <div class="info-item">
+                <div class="info-label">
+                  <mat-icon>event_available</mat-icon>
+                  <span>Seguimiento Médico</span>
+                </div>
+                <div class="info-value">
+                  @if (diagnosis()!.followUpRequired) {
+                    <mat-chip class="follow-up-chip required">
+                      <mat-icon>warning</mat-icon>
+                      Requiere Seguimiento
+                    </mat-chip>
+                  } @else {
+                    <mat-chip class="follow-up-chip not-required">
+                      <mat-icon>check</mat-icon>
+                      No Requiere Seguimiento
+                    </mat-chip>
+                  }
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Estadísticas rápidas -->
+        <div class="stats-row">
+          <mat-card class="stat-card">
+            <mat-icon>calendar_today</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ getDaysSince(diagnosis()!.diagnosedDate) }}</span>
+              <span class="stat-label">Días desde diagnóstico</span>
+            </div>
+          </mat-card>
+
+          @if (diagnosis()!.lastReviewDate) {
+            <mat-card class="stat-card">
+              <mat-icon>update</mat-icon>
+              <div class="stat-content">
+                <span class="stat-value">{{ getDaysSince(diagnosis()!.lastReviewDate) }}</span>
+                <span class="stat-label">Días desde última revisión</span>
+              </div>
+            </mat-card>
+          }
+
+          @if (diagnosis()!.followUpRequired) {
+            <mat-card class="stat-card attention">
+              <mat-icon>event_note</mat-icon>
+              <div class="stat-content">
+                <span class="stat-value">⚠️</span>
+                <span class="stat-label">Requiere seguimiento</span>
+              </div>
+            </mat-card>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Modo Edición: Formulario -->
+    @if (isEditMode()) {
+      <div class="edit-mode">
+        <form [formGroup]="diagnosisForm">
+          <mat-card class="form-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>edit</mat-icon>
+              <mat-card-title>Actualizar Diagnóstico</mat-card-title>
+              <mat-card-subtitle>Modifica los campos necesarios</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="form-grid">
+                <!-- Nombre del diagnóstico -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Nombre del Diagnóstico</mat-label>
+                  <input matInput formControlName="diagnosisName" placeholder="Ej: Diabetes mellitus tipo 2">
+                  <mat-icon matPrefix>medical_information</mat-icon>
+                  <mat-error>Este campo es requerido</mat-error>
+                </mat-form-field>
+
+                <!-- Código ICD-10 -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Código ICD-10</mat-label>
+                  <mat-select formControlName="icd10Code">
+                    @for (code of icd10Codes; track code.code) {
+                      <mat-option [value]="code.code">
+                        {{ code.code }} - {{ code.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>qr_code_2</mat-icon>
+                  <mat-error>Selecciona un código ICD-10</mat-error>
+                </mat-form-field>
+
+                <!-- Estado -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Estado del Diagnóstico</mat-label>
+                  <mat-select formControlName="status">
+                    @for (status of statusOptions; track status.value) {
+                      <mat-option [value]="status.value">
+                        <mat-icon [class]="status.color">{{ status.icon }}</mat-icon>
+                        {{ status.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>track_changes</mat-icon>
+                  <mat-error>Selecciona un estado</mat-error>
+                </mat-form-field>
+
+                <!-- Severidad -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Severidad</mat-label>
+                  <mat-select formControlName="severity">
+                    @for (severity of severityOptions; track severity.value) {
+                      <mat-option [value]="severity.value">
+                        <mat-icon [class]="severity.color">{{ severity.icon }}</mat-icon>
+                        {{ severity.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>priority_high</mat-icon>
+                  <mat-error>Selecciona una severidad</mat-error>
+                </mat-form-field>
+
+                <!-- Fecha de diagnóstico -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Diagnóstico</mat-label>
+                  <input matInput [matDatepicker]="diagnosedPicker" formControlName="diagnosedDate">
+                  <mat-datepicker-toggle matSuffix [for]="diagnosedPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #diagnosedPicker></mat-datepicker>
+                  <mat-icon matPrefix>event</mat-icon>
+                  <mat-error>Fecha requerida</mat-error>
+                </mat-form-field>
+
+                <!-- Fecha de resolución (opcional) -->
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de Resolución (opcional)</mat-label>
+                  <input matInput [matDatepicker]="resolvedPicker" formControlName="resolvedDate">
+                  <mat-datepicker-toggle matSuffix [for]="resolvedPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #resolvedPicker></mat-datepicker>
+                  <mat-icon matPrefix>check_circle</mat-icon>
+                </mat-form-field>
+
+                <!-- Tratamiento -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Tratamiento Prescrito</mat-label>
+                  <textarea matInput formControlName="treatment" rows="3" 
+                    placeholder="Describe el tratamiento médico prescrito"></textarea>
+                  <mat-icon matPrefix>medication</mat-icon>
+                </mat-form-field>
+
+                <!-- Notas -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notas Médicas</mat-label>
+                  <textarea matInput formControlName="notes" rows="4" 
+                    placeholder="Añade notas adicionales sobre tu diagnóstico, cómo te has sentido, etc."></textarea>
+                  <mat-icon matPrefix>description</mat-icon>
+                </mat-form-field>
+
+                <!-- Seguimiento requerido -->
+                <div class="toggle-field">
+                  <mat-slide-toggle formControlName="followUpRequired">
+                    <div class="toggle-label">
+                      <mat-icon>event_available</mat-icon>
+                      <span>Requiere seguimiento médico</span>
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Nota informativa -->
+          <mat-card class="info-banner">
+            <mat-icon>info</mat-icon>
+            <div class="banner-content">
+              <h4>Nota importante</h4>
+              <p>Al guardar los cambios, se actualizará automáticamente la fecha de última revisión con la fecha y hora actual.</p>
+            </div>
+          </mat-card>
+        </form>
+      </div>
+    }
+  }
+</div>
