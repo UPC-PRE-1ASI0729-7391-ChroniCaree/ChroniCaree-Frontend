@@ -137,6 +137,14 @@ export const routes: Routes = [
         data: { role: 'patient' },
       },
       {
+        path: 'diagnoses/:id',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/diagnosis-detail/diagnosis-detail')
+            .then((m) => m.DiagnosisDetailComponent),
+        title: `${baseTitle} - Detalle de Diagnóstico`,
+        data: { role: 'patient' },
+      },
+      {
         path: ':id',
         loadComponent: () =>
           import('./medical-records/presentation/views/medical-record-detail/medical-record-detail').then(m => m.MedicalRecordDetailComponent),

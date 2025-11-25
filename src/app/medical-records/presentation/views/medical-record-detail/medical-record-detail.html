@@ -1,44 +1,238 @@
-<div class="medical-record-detail">
-  <button class="btn btn-ghost back-btn" (click)="goBack()">← Volver</button>
+<div class="medical-record-container">
+  @if (loading$()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando registro médico...</p>
+    </div>
+  }
 
-  <ng-container *ngIf="record$() as r; else loadingTpl">
-    <h2>Registro médico — {{ r?.type }}</h2>
-    <p class="muted">Fecha: {{ r?.date | date:'short' }}</p>
-
-    <section class="detail-block">
-      <div *ngIf="r?.type === 'vital_signs'">
-        <h4>Signos vitales</h4>
-        <p><strong>Glucosa:</strong> {{ r?.glucose ?? '—' }} mg/dL</p>
-        <p><strong>Presión:</strong> {{ r?.bloodPressure || '—' }}</p>
-        <p><strong>Pulso:</strong> {{ r?.heartRate ?? '—' }} bpm</p>
-        <p><strong>Temperatura:</strong> {{ r?.temperature ?? '—' }} °C</p>
-        <p><strong>Peso:</strong> {{ r?.weight ?? '—' }} kg</p>
+  @if (record$(); as record) {
+    <!-- Header -->
+    <div class="record-header">
+      <button mat-icon-button class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-content">
+        <div class="header-main">
+          <div class="type-badge">
+            <mat-icon>{{ getRecordTypeIcon(record.type) }}</mat-icon>
+            <span>{{ getRecordTypeLabel(record.type) }}</span>
+          </div>
+          <h1>Registro Médico #{{ record.id }}</h1>
+          <p class="date">{{ formatDate(record.date) }}</p>
+        </div>
+        <div class="header-badges">
+          <mat-chip [class]="getReviewStatusColor(record.reviewStatus)" class="status-chip">
+            <mat-icon>{{ record.reviewStatus === 'reviewed' ? 'check_circle' : 'pending' }}</mat-icon>
+            {{ getReviewStatusLabel(record.reviewStatus) }}
+          </mat-chip>
+        </div>
       </div>
+    </div>
 
-      <div *ngIf="r?.type === 'symptoms'">
-        <h4>Síntomas reportados</h4>
-        <p><strong>Fatiga:</strong> {{ r?.fatigue ?? '—' }}</p>
-        <p><strong>Dolor:</strong> {{ r?.pain ?? '—' }}</p>
-        <p><strong>Mareo:</strong> {{ r?.dizziness ?? '—' }}</p>
-        <p><strong>Notas:</strong> {{ r?.notes || '—' }}</p>
-      </div>
+    <!-- Content Cards -->
+    <div class="content-section">
+      <!-- Signos Vitales -->
+      @if (record.type === 'vital_signs') {
+        <mat-card class="data-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>monitor_heart</mat-icon>
+            <mat-card-title>Signos Vitales</mat-card-title>
+            <mat-card-subtitle>Mediciones registradas</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="vital-signs-grid">
+              <div class="vital-item">
+                <div class="vital-icon glucose">
+                  <mat-icon>water_drop</mat-icon>
+                </div>
+                <div class="vital-content">
+                  <span class="vital-label">Glucosa</span>
+                  <span class="vital-value">{{ record.glucose || '—' }} <span class="unit">mg/dL</span></span>
+                </div>
+              </div>
 
-      <div *ngIf="r?.type === 'consultation'">
-        <h4>Consulta / Diagnóstico</h4>
-        <p><strong>Diagnóstico:</strong> {{ r?.diagnosis || '—' }}</p>
-        <p><strong>Tratamiento:</strong> {{ r?.treatment || '—' }}</p>
-        <p><strong>Notas:</strong> {{ r?.notes || '—' }}</p>
-      </div>
-    </section>
+              <div class="vital-item">
+                <div class="vital-icon pressure">
+                  <mat-icon>favorite</mat-icon>
+                </div>
+                <div class="vital-content">
+                  <span class="vital-label">Presión Arterial</span>
+                  <span class="vital-value">{{ record.bloodPressure || '—' }} <span class="unit">mmHg</span></span>
+                </div>
+              </div>
 
-    <section class="meta">
-      <p><strong>Revisión:</strong> {{ r?.reviewStatus || '—' }}</p>
-      <p *ngIf="r?.reviewedBy"><strong>Revisado por:</strong> {{ r.reviewedBy }}</p>
-      <p *ngIf="r?.reviewedAt"><strong>Revisado en:</strong> {{ r.reviewedAt | date:'short' }}</p>
-    </section>
-  </ng-container>
+              <div class="vital-item">
+                <div class="vital-icon heart">
+                  <mat-icon>ecg_heart</mat-icon>
+                </div>
+                <div class="vital-content">
+                  <span class="vital-label">Frecuencia Cardíaca</span>
+                  <span class="vital-value">{{ record.heartRate || '—' }} <span class="unit">bpm</span></span>
+                </div>
+              </div>
 
-  <ng-template #loadingTpl>
-    <p class="muted">Cargando registro...</p>
-  </ng-template>
+              <div class="vital-item">
+                <div class="vital-icon temperature">
+                  <mat-icon>thermostat</mat-icon>
+                </div>
+                <div class="vital-content">
+                  <span class="vital-label">Temperatura</span>
+                  <span class="vital-value">{{ record.temperature || '—' }} <span class="unit">°C</span></span>
+                </div>
+              </div>
+
+              <div class="vital-item">
+                <div class="vital-icon weight">
+                  <mat-icon>monitor_weight</mat-icon>
+                </div>
+                <div class="vital-content">
+                  <span class="vital-label">Peso</span>
+                  <span class="vital-value">{{ record.weight || '—' }} <span class="unit">kg</span></span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Síntomas -->
+      @if (record.type === 'symptoms') {
+        <mat-card class="data-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>healing</mat-icon>
+            <mat-card-title>Síntomas Reportados</mat-card-title>
+            <mat-card-subtitle>Síntomas del paciente</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="symptoms-grid">
+              @if (record.fatigue) {
+                <div class="symptom-item">
+                  <mat-icon>battery_alert</mat-icon>
+                  <div class="symptom-content">
+                    <span class="symptom-label">Fatiga</span>
+                    <span class="symptom-value">{{ record.fatigue }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (record.pain) {
+                <div class="symptom-item">
+                  <mat-icon>local_hospital</mat-icon>
+                  <div class="symptom-content">
+                    <span class="symptom-label">Dolor</span>
+                    <span class="symptom-value">{{ record.pain }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (record.dizziness) {
+                <div class="symptom-item">
+                  <mat-icon>psychology</mat-icon>
+                  <div class="symptom-content">
+                    <span class="symptom-label">Mareo</span>
+                    <span class="symptom-value">{{ record.dizziness }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (record.notes) {
+              <mat-divider></mat-divider>
+              <div class="notes-section">
+                <div class="notes-label">
+                  <mat-icon>description</mat-icon>
+                  <span>Notas Adicionales</span>
+                </div>
+                <p class="notes-text">{{ record.notes }}</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Consulta -->
+      @if (record.type === 'consultation') {
+        <mat-card class="data-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>medical_services</mat-icon>
+            <mat-card-title>Consulta Médica</mat-card-title>
+            <mat-card-subtitle>Diagnóstico y tratamiento</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            @if (record.diagnosis) {
+              <div class="consultation-section">
+                <div class="section-label">
+                  <mat-icon>assignment</mat-icon>
+                  <h4>Diagnóstico</h4>
+                </div>
+                <p class="section-content">{{ record.diagnosis }}</p>
+              </div>
+            }
+
+            @if (record.treatment) {
+              <mat-divider></mat-divider>
+              <div class="consultation-section">
+                <div class="section-label">
+                  <mat-icon>medication</mat-icon>
+                  <h4>Tratamiento</h4>
+                </div>
+                <p class="section-content">{{ record.treatment }}</p>
+              </div>
+            }
+
+            @if (record.notes) {
+              <mat-divider></mat-divider>
+              <div class="consultation-section">
+                <div class="section-label">
+                  <mat-icon>description</mat-icon>
+                  <h4>Notas del Médico</h4>
+                </div>
+                <p class="section-content">{{ record.notes }}</p>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Review Information -->
+      <mat-card class="meta-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>verified</mat-icon>
+          <mat-card-title>Información de Revisión</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <mat-icon>assignment_turned_in</mat-icon>
+              <div class="meta-content">
+                <span class="meta-label">Estado</span>
+                <span class="meta-value">{{ getReviewStatusLabel(record.reviewStatus) }}</span>
+              </div>
+            </div>
+
+            @if (record.reviewedBy) {
+              <div class="meta-item">
+                <mat-icon>person</mat-icon>
+                <div class="meta-content">
+                  <span class="meta-label">Revisado por</span>
+                  <span class="meta-value">{{ record.reviewedBy }}</span>
+                </div>
+              </div>
+            }
+
+            @if (record.reviewedAt) {
+              <div class="meta-item">
+                <mat-icon>schedule</mat-icon>
+                <div class="meta-content">
+                  <span class="meta-label">Fecha de revisión</span>
+                  <span class="meta-value">{{ formatDate(record.reviewedAt) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 </div>

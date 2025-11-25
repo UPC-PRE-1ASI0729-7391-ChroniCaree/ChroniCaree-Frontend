@@ -1246,6 +1246,22 @@
       "notes": "aaa",
       "reviewStatus": "pending_review",
       "id": 7
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "symptoms",
+      "date": "2025-11-25T10:36:36.139Z",
+      "glucose": 120,
+      "bloodPressure": "120/80",
+      "heartRate": 100,
+      "temperature": 38,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "123",
+      "reviewStatus": "pending_review",
+      "doctorId": 3,
+      "id": 8
     }
   ],
   "symptoms": [
@@ -1344,6 +1360,21 @@
       "dizziness": 8,
       "notes": "aaa",
       "timestamp": "2025-11-25T09:34:20.969Z",
+      "isEdited": false
+    },
+    {
+      "id": 8,
+      "patientId": 1763240159417,
+      "glucose": 120,
+      "bloodPressure": "120/80",
+      "heartRate": 100,
+      "temperature": 38,
+      "oxygenSaturation": 100,
+      "fatigue": 10,
+      "pain": 10,
+      "dizziness": 10,
+      "notes": "123",
+      "timestamp": "2025-11-25T10:36:36.087Z",
       "isEdited": false
     }
   ],
@@ -1873,6 +1904,27 @@
       "resolvedAt": null,
       "resolution": null,
       "timeSinceCreated": "30min"
+    },
+    {
+      "patientId": "1763240159417",
+      "type": "symptom_severe",
+      "severity": "critical",
+      "title": "Alerta: Valores críticos detectados",
+      "message": "Se han detectado valores críticos en tu reporte de salud. Por favor contacta a tu médico o acude a emergencias si empeoras.",
+      "status": "active",
+      "metadata": {
+        "symptomId": 8,
+        "glucose": 120,
+        "bloodPressure": "120/80",
+        "heartRate": 100,
+        "temperature": 38,
+        "oxygenSaturation": 100,
+        "fatigue": 10,
+        "pain": 10,
+        "dizziness": 10
+      },
+      "createdAt": "2025-11-25T10:36:36.140Z",
+      "id": "5ce3ffb4-5513-4def-90ba-cf9e273b8662"
     }
   ],
   "auditLogs": [
