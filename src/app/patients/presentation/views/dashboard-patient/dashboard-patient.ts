@@ -1,11 +1,11 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { Router, RouterLink } from '@angular/router';
 import { OnboardingComponent } from '../../../../shared/presentation/components/onboarding/onboarding';
 import { NudgePanelComponent } from '../../../../communication/presentation/components/nudge-panel/nudge-panel';
 import { MedicationLogComponent } from '../../../../medications/presentation/components/medication-log/medication-log';
-import { AlertPanelComponent } from '../../../../alerts/presentation/components/alert-panel/alert-panel';
+import { MatIconModule } from '@angular/material/icon';
 import { PatientStore } from '../../../application/patient.store';
 import { UserStore } from '../../../../iam/application/user.store';
 import { SymptomStore } from '../../../../clinical/application/symptom.store';
@@ -19,7 +19,7 @@ import { Appointment } from '../../../../doctors/domain/model/appointment.entity
 @Component({
   selector: 'app-dashboard-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, AlertPanelComponent, TranslateModule],
+  imports: [CommonModule, RouterLink, OnboardingComponent, NudgePanelComponent, MedicationLogComponent, MatIconModule, TranslateModule],
   templateUrl: './dashboard-patient.html',
   styleUrl: './dashboard-patient.css'
 })
@@ -156,6 +156,7 @@ export class DashboardPatient implements OnInit {
           const doc = this.doctorStore.doctors$().find(d => d.id === apt.doctorId);
           return doc ? `Dr. ${doc.firstName} ${doc.lastName}` : 'Dr. Asignado';
         } catch (e) {
+          console.warn('Error resolving doctor name:', e);
           return 'Dr. Asignado';
         }
       })(),
@@ -164,6 +165,7 @@ export class DashboardPatient implements OnInit {
           const doc = this.doctorStore.doctors$().find(d => d.id === apt.doctorId);
           return doc ? doc.specialty : 'Especialidad';
         } catch (e) {
+          console.warn('Error resolving specialty:', e);
           return 'Especialidad';
         }
       })(),
@@ -205,15 +207,15 @@ export class DashboardPatient implements OnInit {
   });
 
   constructor(
-    private router: Router,
-    private patientStore: PatientStore,
-    private userStore: UserStore,
-    private symptomStore: SymptomStore,
-    private diagnosisStore: DiagnosisStore,
-    private medicationStore: MedicationStore,
-    private alertStore: AlertStore,
-    private appointmentsStore: AppointmentsStore,
-    private doctorStore: DoctorStore
+    private readonly router: Router,
+    private readonly patientStore: PatientStore,
+    private readonly userStore: UserStore,
+    private readonly symptomStore: SymptomStore,
+    private readonly diagnosisStore: DiagnosisStore,
+    private readonly medicationStore: MedicationStore,
+    private readonly alertStore: AlertStore,
+    private readonly appointmentsStore: AppointmentsStore,
+    private readonly doctorStore: DoctorStore
   ) {}
 
   ngOnInit(): void {
@@ -249,7 +251,7 @@ export class DashboardPatient implements OnInit {
 
     // React to user changes (login/logout/switch) to reload patient data without full page refresh
     try {
-      window.addEventListener('userChanged', (ev: any) => {
+      globalThis.addEventListener('userChanged', (ev: any) => {
         const detailUser = ev?.detail;
         const userId = detailUser?.id || (this.userStore.currentUser$()?.id);
         if (userId) {
@@ -258,7 +260,7 @@ export class DashboardPatient implements OnInit {
         }
       });
     } catch (e) {
-      // ignore in non-browser environments
+      console.warn('Event listener setup failed (non-browser environment):', e);
     }
   }
 
@@ -387,5 +389,26 @@ export class DashboardPatient implements OnInit {
    */
   protected trackById(index: number, item: { id?: any }) {
     return item?.id ?? index;
+  }
+
+  /** Helper para clase CSS de severidad (usada por la vista de alertas de síntomas) */
+  protected getSeverityClass(severity: string): string {
+    const classes: Record<string, string> = {
+      low: 'severity-low',
+      medium: 'severity-medium',
+      high: 'severity-high'
+    };
+    return classes[severity] || '';
+  }
+
+  /**
+   * Elimina un síntoma (usado desde la UI cuando el síntoma se trata como alerta)
+   */
+  protected deleteSymptomById(symptomId: number): void {
+    if (!symptomId) return;
+    this.symptomStore.deleteSymptom(symptomId).subscribe({
+      next: () => console.log(`✅ Dashboard-Patient: Síntoma ${symptomId} eliminado`),
+      error: (err) => console.error('❌ Error eliminando síntoma desde dashboard:', err)
+    });
   }
 }
