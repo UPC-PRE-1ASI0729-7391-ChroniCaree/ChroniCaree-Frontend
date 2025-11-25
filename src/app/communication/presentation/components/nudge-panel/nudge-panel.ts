@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NudgeStore } from '../../../application/nudge.store';
 import { Nudge, NudgePriority } from '../../../domain/model/nudge.entity';
+import {TranslatePipe} from '@ngx-translate/core';
 
 /**
  * Nudge Panel Component
@@ -26,7 +27,8 @@ import { Nudge, NudgePriority } from '../../../domain/model/nudge.entity';
     MatIconModule,
     MatBadgeModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslatePipe
   ],
   templateUrl: './nudge-panel.html',
   styleUrls: ['./nudge-panel.css']
@@ -81,7 +83,7 @@ export class NudgePanelComponent implements OnInit {
    */
   snoozeNudge(nudgeId: number, event: Event): void {
     event.stopPropagation(); // Evita que se active la acción principal
-    
+
     this.nudgeStore.snoozeNudge(nudgeId, 1).subscribe({
       next: () => {
         this.snackBar.open('Recordatorio pospuesto por 1 hora', 'OK', { duration: 2000 });

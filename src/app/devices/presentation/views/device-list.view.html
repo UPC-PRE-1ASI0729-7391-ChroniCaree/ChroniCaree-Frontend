@@ -1,25 +1,25 @@
 <div class="device-list-container">
   <header class="page-header">
-    <h1>📱 Dispositivos Médicos IoT</h1>
-    <p class="subtitle">Conecta y monitorea tus dispositivos de salud en tiempo real</p>
+    <h1>{{ 'devices.list.title' | translate }}</h1>
+    <p class="subtitle">{{ 'devices.list.subtitle' | translate }}</p>
   </header>
 
   <div class="devices-grid">
     @for (device of devices; track device.type) {
-      <div 
-        class="device-card" 
+      <div
+        class="device-card"
         [style.border-color]="device.color"
         (click)="selectDevice(device.type)">
         <div class="device-icon" [style.background-color]="device.color + '20'">
           <span class="icon">{{ device.icon }}</span>
         </div>
         <div class="device-info">
-          <h3 class="device-name">{{ device.name }}</h3>
-          <p class="device-description">{{ device.description }}</p>
+          <h3 class="device-name">{{ device.nameKey | translate }}</h3>
+          <p class="device-description">{{ device.descriptionKey | translate }}</p>
         </div>
         <div class="device-action">
           <button class="btn-connect" [style.background-color]="device.color">
-            Conectar
+            {{ 'devices.list.connect' | translate }}
           </button>
         </div>
       </div>
@@ -27,27 +27,27 @@
   </div>
 
   <section class="info-section">
-    <h2>💡 Beneficios del Monitoreo IoT</h2>
+    <h2>{{ 'devices.benefits.title' | translate }}</h2>
     <div class="benefits-grid">
       <div class="benefit-card">
         <span class="benefit-icon">📊</span>
-        <h4>Datos en Tiempo Real</h4>
-        <p>Visualiza tus métricas de salud actualizadas constantemente</p>
+        <h4>{{ 'devices.benefits.realTime.title' | translate }}</h4>
+        <p>{{ 'devices.benefits.realTime.description' | translate }}</p>
       </div>
       <div class="benefit-card">
         <span class="benefit-icon">🔔</span>
-        <h4>Alertas Automáticas</h4>
-        <p>Recibe notificaciones cuando tus valores estén fuera de rango</p>
+        <h4>{{ 'devices.benefits.alerts.title' | translate }}</h4>
+        <p>{{ 'devices.benefits.alerts.description' | translate }}</p>
       </div>
       <div class="benefit-card">
         <span class="benefit-icon">📈</span>
-        <h4>Historial Completo</h4>
-        <p>Accede al histórico de todas tus mediciones</p>
+        <h4>{{ 'devices.benefits.history.title' | translate }}</h4>
+        <p>{{ 'devices.benefits.history.description' | translate }}</p>
       </div>
       <div class="benefit-card">
         <span class="benefit-icon">👨‍⚕️</span>
-        <h4>Compartir con Médicos</h4>
-        <p>Tu doctor puede ver tus datos remotamente</p>
+        <h4>{{ 'devices.benefits.share.title' | translate }}</h4>
+        <p>{{ 'devices.benefits.share.description' | translate }}</p>
       </div>
     </div>
   </section>

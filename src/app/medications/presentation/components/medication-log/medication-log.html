@@ -1,15 +1,16 @@
 <div class="medication-log-container">
-  <!-- Header with stats -->
   <div class="log-header">
-    <h3>💊 Medicamentos de Hoy</h3>
-    <a routerLink="/patient/medicamentos" class="view-all-link">Ver todos →</a>
+    <h3>💊 {{ 'medications.todayTitle' | translate }}</h3>
+    <a routerLink="/patient/medicamentos" class="view-all-link">
+      {{ 'medications.viewAll' | translate }}
+    </a>
   </div>
 
   <ng-container *ngIf="adherenceStats() as stats">
     <div class="adherence-summary">
       <mat-chip [highlighted]="true" [color]="getAdherenceColor(stats.average)">
         <mat-icon>trending_up</mat-icon>
-        Adherencia: {{ stats.average }}%
+        {{ 'medications.adherence' | translate:{ value: stats.average } }}
       </mat-chip>
     </div>
   </ng-container>
@@ -17,7 +18,7 @@
   <ng-container *ngIf="loading(); else notLoading">
     <div class="loading-state">
       <mat-icon>hourglass_empty</mat-icon>
-      <p>Cargando medicamentos...</p>
+      <p>{{ 'medications.loading' | translate }}</p>
     </div>
   </ng-container>
 
@@ -25,28 +26,43 @@
     <ng-container *ngIf="todaySchedule().length === 0; else hasSchedule">
       <div class="empty-state">
         <mat-icon>medication</mat-icon>
-        <p>No tienes medicamentos programados para hoy</p>
+        <p>{{ 'medications.emptyToday' | translate }}</p>
       </div>
     </ng-container>
 
     <ng-template #hasSchedule>
       <div class="medication-list">
-        <mat-card class="medication-card" *ngFor="let item of todaySchedule()" [class.taken]="item.taken" [class.past]="isTimePast(item.time)">
+        <mat-card
+          class="medication-card"
+          *ngFor="let item of todaySchedule()"
+          [class.taken]="item.taken"
+          [class.past]="isTimePast(item.time)"
+        >
           <mat-card-content>
             <div class="medication-info">
-              <!-- Icon and time -->
               <div class="med-icon-time">
                 <mat-icon [class.taken-icon]="item.taken">
                   {{ getMedicationIcon(item.medication) }}
                 </mat-icon>
                 <div class="time-info">
                   <span class="time">{{ item.time }}</span>
-                  <mat-icon *ngIf="item.taken" class="check-icon" [matTooltip]="'Tomado'">check_circle</mat-icon>
-                  <mat-icon *ngIf="!item.taken && isTimePast(item.time)" class="warning-icon" [matTooltip]="'Hora pasada'">schedule</mat-icon>
+                  <mat-icon
+                    *ngIf="item.taken"
+                    class="check-icon"
+                    [matTooltip]="'medications.tooltip.taken' | translate"
+                  >
+                    check_circle
+                  </mat-icon>
+                  <mat-icon
+                    *ngIf="!item.taken && isTimePast(item.time)"
+                    class="warning-icon"
+                    [matTooltip]="'medications.tooltip.past' | translate"
+                  >
+                    schedule
+                  </mat-icon>
                 </div>
               </div>
 
-              <!-- Medication details -->
               <div class="med-details">
                 <h4>{{ item.medication.name }}</h4>
                 <p class="dosage">{{ item.medication.dosage }}</p>
@@ -56,39 +72,42 @@
                 </p>
               </div>
 
-              <!-- Actions -->
               <div class="med-actions">
                 <ng-container *ngIf="!item.taken; else takenBadge">
-                  <button 
-                    mat-raised-button 
+                  <button
+                    mat-raised-button
                     color="primary"
                     [disabled]="processingMedId() === item.medication.id"
                     (click)="markAsTaken(item.medication, item.time)"
-                    matTooltip="Marcar como tomado">
+                    [matTooltip]="'medications.tooltip.markTaken' | translate"
+                  >
                     <mat-icon>check</mat-icon>
-                    Tomado
+                    {{ 'medications.actions.taken' | translate }}
                   </button>
-                  <button 
+                  <button
                     mat-stroked-button
                     [disabled]="processingMedId() === item.medication.id"
                     (click)="markAsMissed(item.medication, item.time)"
-                    matTooltip="Omitir medicamento">
+                    [matTooltip]="'medications.tooltip.markMissed' | translate"
+                  >
                     <mat-icon>close</mat-icon>
-                    Omitir
+                    {{ 'medications.actions.missed' | translate }}
                   </button>
                 </ng-container>
                 <ng-template #takenBadge>
                   <div class="taken-badge">
                     <mat-icon>check_circle</mat-icon>
-                    <span>Completado</span>
+                    <span>{{ 'medications.status.completed' | translate }}</span>
                   </div>
                 </ng-template>
               </div>
             </div>
 
-            <!-- Adherence indicator -->
             <div class="adherence-bar">
-              <div class="adherence-progress" [style.width.%]="item.medication.adherenceRate"></div>
+              <div
+                class="adherence-progress"
+                [style.width.%]="item.medication.adherenceRate"
+              ></div>
             </div>
           </mat-card-content>
         </mat-card>
@@ -100,11 +119,16 @@
     <div class="log-footer">
       <div class="stat">
         <mat-icon>medication</mat-icon>
-        <span>{{ count.active }} activos</span>
+        <span>
+        {{ 'medications.footer.active' | translate:{ count: count.active } }}
+      </span>
       </div>
+
       <div class="stat warning" *ngIf="count.needRefill > 0">
         <mat-icon>warning</mat-icon>
-        <span>{{ count.needRefill }} necesitan reabastecimiento</span>
+        <span>
+        {{ 'medications.footer.needRefill' | translate:{ count: count.needRefill } }}
+      </span>
       </div>
     </div>
   </ng-container>

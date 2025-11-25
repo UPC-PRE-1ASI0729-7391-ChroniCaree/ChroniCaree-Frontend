@@ -1,19 +1,29 @@
 <div class="dashboard-container">
   <!-- Onboarding Component -->
   <app-onboarding />
-
   <ng-container *ngIf="loading(); else mainContent">
     <div class="loading-overlay">
       <div class="spinner"></div>
       <p>{{ 'patients.loading' | translate }}</p>
     </div>
   </ng-container>
+
   <ng-template #mainContent>
     <!-- Header Section -->
     <div class="dashboard-header">
       <div class="welcome-section">
-  <h1 class="h1">{{ 'patients.greeting' | translate:{name: patientName()} }} 👋</h1>
-  <p class="text">{{ age() }} {{ 'patients.years' | translate }} • IMC: {{ bmi() }} • {{ primaryCondition() }}</p>
+        <h1 class="h1">
+          {{ 'patients.greeting' | translate:{name: patientName()} }} 👋
+        </h1>
+        <p class="text">
+          {{ age() }} {{ 'patients.years' | translate }}
+          • {{ 'patients.bmiLabel' | translate }}: {{ bmi() }}
+          • {{
+            primaryCondition()
+              ? primaryCondition()
+              : ('patients.noActiveDiagnoses' | translate)
+          }}
+        </p>
       </div>
       <div class="quick-actions">
         <button class="btn btn-primary" routerLink="/clinical/symptoms/register">
@@ -160,14 +170,6 @@
         </div>
         <div class="nudges-preview">
           <app-nudge-panel />
-          <!-- (Opcional) CTA pequeño -->
-          <!--
-          <div style="margin-top:.75rem;">
-            <button class="btn btn-secondary btn-sm" routerLink="/communication/messages/compose">
-              Escribir al médico
-            </button>
-          </div>
-          -->
         </div>
       </div>
     </div>

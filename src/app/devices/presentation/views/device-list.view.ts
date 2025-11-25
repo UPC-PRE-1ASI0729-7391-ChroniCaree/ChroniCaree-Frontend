@@ -2,13 +2,14 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserStore } from '../../../iam/application/user.store';
+import { TranslateModule } from '@ngx-translate/core';
 
 type DeviceType = 'glucometer' | 'blood-pressure' | 'pulse-oximeter' | 'ecg' | 'smart-scale';
 
 interface DeviceOption {
   type: DeviceType;
-  name: string;
-  description: string;
+  nameKey: string;
+  descriptionKey: string;
   icon: string;
   color: string;
 }
@@ -16,7 +17,7 @@ interface DeviceOption {
 @Component({
   standalone: true,
   selector: 'cc-device-list',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './device-list.view.html',
   styleUrls: ['./device-list.view.css']
 })
@@ -29,36 +30,36 @@ export class DeviceListView implements OnInit {
   devices: DeviceOption[] = [
     {
       type: 'glucometer',
-      name: 'Glucómetro',
-      description: 'Monitoreo de niveles de glucosa en sangre para control de diabetes',
+      nameKey: 'devices.options.glucometer.name',
+      descriptionKey: 'devices.options.glucometer.description',
       icon: '🩸',
       color: '#e74c3c'
     },
     {
       type: 'blood-pressure',
-      name: 'Monitor de Presión Arterial',
-      description: 'Medición de presión sistólica, diastólica y ritmo cardíaco',
+      nameKey: 'devices.options.bloodPressure.name',
+      descriptionKey: 'devices.options.bloodPressure.description',
       icon: '❤️',
       color: '#3498db'
     },
     {
       type: 'pulse-oximeter',
-      name: 'Oxímetro de Pulso',
-      description: 'Saturación de oxígeno (SpO2) y frecuencia cardíaca en tiempo real',
+      nameKey: 'devices.options.pulseOximeter.name',
+      descriptionKey: 'devices.options.pulseOximeter.description',
       icon: '🫁',
       color: '#2ecc71'
     },
     {
       type: 'ecg',
-      name: 'Monitor ECG',
-      description: 'Electrocardiograma portátil para análisis del ritmo cardíaco',
+      nameKey: 'devices.options.ecg.name',
+      descriptionKey: 'devices.options.ecg.description',
       icon: '📈',
       color: '#9b59b6'
     },
     {
       type: 'smart-scale',
-      name: 'Báscula Inteligente',
-      description: 'Peso, IMC, composición corporal y análisis de masa',
+      nameKey: 'devices.options.smartScale.name',
+      descriptionKey: 'devices.options.smartScale.description',
       icon: '⚖️',
       color: '#f39c12'
     }

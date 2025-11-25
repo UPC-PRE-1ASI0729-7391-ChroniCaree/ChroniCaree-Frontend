@@ -4,22 +4,22 @@
     "viewAll": "Ver todo",
     "loading": "Cargando alertas...",
     "empty": {
-      "title": "No hay alertas activas",
-      "subtitle": "Estás al día. No hay alertas en este momento."
+      "title": "Sin alertas activas",
+      "subtitle": "Estás al día. No hay alertas por ahora."
     },
     "actions": {
       "acknowledge": "Reconocer",
       "resolve": "Resolver",
       "dismiss": "Descartar",
-      "seeAll": "Ver todas las alertas →"
+      "seeAll": "Ver todas las alertas"
     },
     "stats": {
       "critical": "Críticas",
-      "high": "Alta",
-      "medium": "Media",
-      "low": "Baja"
+      "high": "Altas",
+      "medium": "Medias",
+      "low": "Bajas"
     },
-    "subtitle": "Supervisa tus signos vitales y alertas de salud",
+    "subtitle": "Monitorea tus signos vitales y alertas de salud",
     "tab": {
       "active": "Activas",
       "acknowledged": "Reconocidas",
@@ -27,17 +27,18 @@
     },
     "acknowledged": {
       "empty": {
-        "title": "No hay alertas reconocidas",
+        "title": "Sin alertas reconocidas",
         "subtitle": "Las alertas que reconozcas aparecerán aquí"
       }
     },
     "resolved": {
       "empty": {
-        "title": "No hay alertas resueltas",
+        "title": "Sin alertas resueltas",
         "subtitle": "Las alertas resueltas aparecerán aquí"
       }
     }
   },
+
   "clinical": {
     "registerSymptoms": "Registrar síntomas",
     "saving": "Guardando síntomas...",
@@ -46,7 +47,7 @@
     "notes": "Notas",
     "submit": "Guardar síntomas",
     "cancel": "Cancelar",
-    "fatigue": "Cansancio",
+    "fatigue": "Fatiga",
     "pain": "Dolor",
     "dizziness": "Mareos",
     "none": "Ninguno",
@@ -54,14 +55,15 @@
     "severe": "Severo",
     "confirmation": {
       "title": "¡Síntomas registrados!",
-      "subtitle": "Tu información ha sido guardada con éxito",
-      "summary": "Resumen de tu entrada",
-      "doctorNotified": "Doctor notificado",
+      "subtitle": "Tu información se ha guardado correctamente",
+      "summary": "Resumen de tu registro",
+      "doctorNotified": "Médico notificado",
       "criticalValues": "Se detectaron valores críticos",
       "viewHistory": "Ver mi historial",
       "backToDashboard": "Volver al panel"
     }
   },
+
   "patients": {
     "loading": "Cargando tu información...",
     "greeting": "Hola, {{name}}!",
@@ -82,29 +84,142 @@
     "reminders": "Recordatorios",
     "recentSymptoms": "Síntomas recientes",
     "viewHistory": "Ver historial",
-    "noRecentSymptoms": "No hay síntomas recientes registrados",
-    "severity": { "low": "Leve", "medium": "Moderado", "high": "Grave" },
+    "noRecentSymptoms": "No se han registrado síntomas recientes",
+    "severity": {
+      "low": "Leve",
+      "medium": "Moderado",
+      "high": "Severo"
+    },
     "editProfile": {
       "title": "Editar perfil",
       "subtitle": "US20: Actualiza tu información personal",
       "loading": "Cargando perfil...",
-      "personal": { "title": "Informacion personal", "subtitle": "Datos básicos de tu perfil" },
+      "personal": {
+        "title": "Información personal",
+        "subtitle": "Datos básicos de tu perfil"
+      },
       "errors": {
-        "firstName": { "required": "El nombre es obligatorio", "minlength": "Mínimo 2 caracteres" },
-        "lastName": { "required": "El apellido es obligatorio", "minlength": "Mínimo 2 caracteres" },
-        "birthDate": { "required": "La fecha de nacimiento es obligatoria" },
-        "phone": { "required": "El teléfono es obligatorio", "pattern": "Debe ser un número de 9 dígitos" },
-        "address": { "required": "La dirección es obligatoria", "minlength": "Mínimo 5 caracteres" },
-        "weight": { "required": "El peso es obligatorio", "min": "Peso mínimo 20 kg", "max": "Peso máximo 300 kg" },
-        "height": { "required": "La altura es obligatoria", "min": "Altura mínima 50 cm", "max": "Altura máxima 250 cm" }
+        "firstName": {
+          "required": "El nombre es obligatorio",
+          "minlength": "Mínimo 2 caracteres"
+        },
+        "lastName": {
+          "required": "El apellido es obligatorio",
+          "minlength": "Mínimo 2 caracteres"
+        },
+        "birthDate": {
+          "required": "La fecha de nacimiento es obligatoria"
+        },
+        "phone": {
+          "required": "El teléfono es obligatorio",
+          "pattern": "Debe ser un número de 9 dígitos"
+        },
+        "address": {
+          "required": "La dirección es obligatoria",
+          "minlength": "Mínimo 5 caracteres"
+        },
+        "weight": {
+          "required": "El peso es obligatorio",
+          "min": "El peso mínimo es 20 kg",
+          "max": "El peso máximo es 300 kg"
+        },
+        "height": {
+          "required": "La talla es obligatoria",
+          "min": "La talla mínima es 50 cm",
+          "max": "La talla máxima es 250 cm"
+        }
       },
       "ageLabel": "Edad: {{age}} años",
-      "measurements": { "title": "Medidas corporales", "subtitle": "Peso y altura para cálculo de IMC" },
+      "measurements": {
+        "title": "Medidas corporales",
+        "subtitle": "Peso y talla para el cálculo del IMC"
+      },
       "weight": "Peso (kg)",
-      "height": "Altura (cm)",
-      "bmi": { "title": "Índice de Masa Corporal (IMC)", "labels": { "underweight": "Bajo peso", "normal": "Normal", "overweight": "Sobrepeso", "obesity": "Obesidad" } }
+      "height": "Talla (cm)",
+      "bmi": {
+        "title": "Índice de Masa Corporal (IMC)",
+        "labels": {
+          "underweight": "Bajo peso",
+          "normal": "Normal",
+          "overweight": "Sobrepeso",
+          "obesity": "Obesidad"
+        }
+      }
+    },
+    "bmiLabel": "IMC",
+    "noActiveDiagnoses": "No tienes diagnósticos activos"
+  },
+
+  "medications": {
+    "todayTitle": "Medicaciones de hoy",
+    "viewAll": "Ver todas",
+    "adherence": "Adherencia",
+    "loading": "Cargando medicamentos...",
+    "emptyToday": "No tienes medicamentos programados para hoy",
+    "status": {
+      "taken": "Tomado",
+      "missed": "Omitido",
+      "completed": "Completado",
+      "pastDue": "Vencido"
+    },
+    "actions": {
+      "taken": "Tomado",
+      "missed": "Omitir",
+      "markTaken": "Marcar como tomado",
+      "markMissed": "Omitir medicamento"
+    },
+    "footer": {
+      "active": "{{count}} activos",
+      "needRefill": "{{count}} requieren reposición"
+    },
+    "history": {
+      "title": "💊 Mis Medicamentos",
+      "subtitle": "Historial y registro de medicación",
+      "addMedication": "Agregar medicamento",
+      "stats": {
+        "adherence": "Adherencia",
+        "taken": "Tomados",
+        "missed": "Omitidos"
+      },
+      "loading": "Cargando medicamentos...",
+      "tabs": {
+        "active": "Activos ({{count}})",
+        "all": "Todos ({{count}})"
+      },
+      "emptyActive": "No tienes medicamentos activos",
+      "emptyAll": "No se encontraron medicamentos",
+      "prescribedBy": "Prescrito por:",
+      "prescribed": "Prescrito:",
+      "date": "Fecha:",
+      "lastTaken": "Último:",
+      "schedules": "Horarios",
+      "instructions": "Instrucciones",
+      "actions": {
+        "edit": "Editar",
+        "delete": "Eliminar"
+      },
+      "quickAdd": {
+        "title": "Agregar medicamento rápido",
+        "description": "Usa este panel para añadir un medicamento rápidamente.",
+        "name": "Nombre",
+        "dosage": "Dosificación",
+        "add": "Agregar",
+        "moreOptions": "Más opciones"
+      },
+      "status": {
+        "active": "Activo",
+        "taken": "Tomado",
+        "scheduled": "Programado",
+        "missed": "Omitido",
+        "discontinued": "Descontinuado"
+      }
     }
   },
+
+  "nudges": {
+    "empty": "¡Genial! No tienes recordatorios pendientes"
+  },
+
   "doctors": {
     "welcome": "Bienvenido, {{name}}",
     "exportPdf": "Exportar PDF",
@@ -115,7 +230,7 @@
     "noAppointmentsToday": "No hay citas programadas para hoy",
     "review": "Revisar",
     "allCaughtUp": "¡Todo al día!",
-    "noPendingRecords": "No hay registros pendientes para revisar",
+    "noPendingRecords": "No hay registros pendientes por revisar",
     "pending": "Pendiente",
     "reviewRecord": "Revisar registro",
     "weeklySummary": "Resumen semanal",
@@ -129,11 +244,230 @@
       "today": "Citas de hoy",
       "upcoming": "Próximas citas",
       "loading": "Cargando citas...",
-      "empty": { "title": "No hay citas", "subtitle": "No se encontraron citas para el filtro seleccionado" },
-      "status": { "scheduled": "📅 Programada", "confirmed": "✅ Confirmada", "inProgress": "⏳ En progreso", "completed": "✔️ Completada", "cancelled": "❌ Cancelada", "noShow": "🚫 No asistió" },
-      "actions": { "confirm": "Confirmar", "start": "Iniciar", "complete": "Completar", "cancel": "Cancelar", "todayBadge": "HOY", "scheduled": "Programada", "completed": "Completada" }
+      "empty": {
+        "title": "Sin citas",
+        "subtitle": "No se encontraron citas para el filtro seleccionado"
+      },
+      "status": {
+        "scheduled": "📅 Programada",
+        "confirmed": "✅ Confirmada",
+        "inProgress": "⏳ En curso",
+        "completed": "✔️ Completada",
+        "cancelled": "❌ Cancelada",
+        "noShow": "🚫 Inasistencia"
+      },
+      "actions": {
+        "confirm": "Confirmar",
+        "start": "Iniciar",
+        "complete": "Completar",
+        "cancel": "Cancelar",
+        "todayBadge": "HOY",
+        "scheduled": "Programada",
+        "completed": "Completada"
+      }
     }
   },
+
+  "appointments": {
+    "scheduler": {
+      "title": "Programar nueva cita",
+      "subtitle": "Reserva una cita con tu médico asignado",
+      "date": {
+        "label": "Fecha de la cita",
+        "hint": "Selecciona una fecha entre hoy y los próximos 3 meses"
+      },
+      "time": {
+        "label": "Hora de la cita",
+        "placeholder": "Selecciona una hora",
+        "hint": "Horario de atención: 8:00 a. m. - 6:00 p. m."
+      },
+      "type": {
+        "label": "Tipo de cita"
+      },
+      "types": {
+        "consultation": "Consulta de chequeo",
+        "followUp": "Control",
+        "emergency": "Emergencia",
+        "routineCheck": "Chequeo rutinario",
+        "labResults": "Revisión de resultados de laboratorio"
+      },
+      "notes": {
+        "label": "Notas adicionales (opcional)",
+        "placeholder": "Describe el motivo de tu visita o información relevante para tu médico...",
+        "hint": "Máximo 500 caracteres"
+      },
+      "info": {
+        "title": "Información importante:",
+        "items": {
+          "notify": "Tu médico recibirá una notificación inmediata.",
+          "status": "La cita permanecerá \"Programada\" hasta que el médico la confirme.",
+          "reminder": "Recibirás un recordatorio 24 horas antes de la cita."
+        }
+      },
+      "cancel": "Cancelar",
+      "submit": "Programar cita",
+      "submitting": "Programando..."
+    }
+  },
+
+  "navigation": {
+    "patient": {
+      "dashboard": "Panel",
+      "myHealth": "Mi salud",
+      "appointments": "Mis citas",
+      "medications": "Medicamentos",
+      "medicalRecord": "Historial médico",
+      "medicalRecords": "Historial médico",
+      "reminders": "Recordatorios",
+      "devices": "Mis dispositivos",
+      "messages": "Mensajes"
+    },
+    "doctor": {
+      "dashboard": "Panel",
+      "patients": "Mis pacientes",
+      "appointments": "Mis citas",
+      "records": "Historias clínicas"
+    }
+  },
+
+  "devices": {
+    "status": {
+      "connected": "Conectado",
+      "disconnected": "Desconectado"
+    },
+    "common": {
+      "lastReading": "Última lectura",
+      "deviceInfo": {
+        "title": "Información del dispositivo",
+        "manufacturer": "Fabricante:",
+        "model": "Modelo:",
+        "serialNumber": "Número de serie:",
+        "lastSync": "Última sincronización:"
+      }
+    },
+    "list": {
+      "title": "Dispositivos médicos IoT",
+      "subtitle": "Conecta y monitorea tus dispositivos de salud en tiempo real",
+      "connect": "Conectar",
+      "header": {
+        "title": "Dispositivos médicos IoT",
+        "subtitle": "Conecta y monitorea tus dispositivos de salud en tiempo real"
+      },
+      "actions": {
+        "connect": "Conectar"
+      },
+      "cards": {
+        "glucometer": {
+          "title": "Glucómetro",
+          "description": "Monitoreo de niveles de glucosa en sangre para control de diabetes"
+        },
+        "bloodPressure": {
+          "title": "Monitor de presión arterial",
+          "description": "Mide presión sistólica, diastólica y frecuencia cardíaca"
+        },
+        "pulseOximeter": {
+          "title": "Oxímetro de pulso",
+          "description": "Saturación de oxígeno (SpO2) y frecuencia cardíaca en tiempo real"
+        },
+        "ecg": {
+          "title": "Monitor ECG",
+          "description": "Electrocardiograma portátil para análisis del ritmo cardíaco"
+        },
+        "smartScale": {
+          "title": "Báscula inteligente",
+          "description": "Peso, IMC, composición corporal y análisis de masa"
+        }
+      },
+      "benefits": {
+        "title": "Beneficios del monitoreo IoT",
+        "realTime": {
+          "title": "Datos en tiempo real",
+          "description": "Visualiza tus métricas de salud actualizadas constantemente"
+        },
+        "alerts": {
+          "title": "Alertas automáticas",
+          "description": "Recibe notificaciones cuando tus valores estén fuera de rango"
+        },
+        "history": {
+          "title": "Historial completo",
+          "description": "Accede al histórico de todas tus mediciones"
+        },
+        "share": {
+          "title": "Compartir con médicos",
+          "description": "Tu médico puede ver tus datos de forma remota"
+        }
+      }
+    },
+    "options": {
+      "glucometer": {
+        "name": "Glucómetro",
+        "description": "Monitoreo de niveles de glucosa en sangre para control de diabetes"
+      },
+      "bloodPressure": {
+        "name": "Monitor de presión arterial",
+        "description": "Mide presión sistólica, diastólica y frecuencia cardíaca"
+      },
+      "pulseOximeter": {
+        "name": "Oxímetro de pulso",
+        "description": "Saturación de oxígeno (SpO2) y frecuencia cardíaca en tiempo real"
+      },
+      "ecg": {
+        "name": "Monitor ECG",
+        "description": "Electrocardiograma portátil para análisis del ritmo cardíaco"
+      },
+      "smartScale": {
+        "name": "Báscula inteligente",
+        "description": "Peso, IMC, composición corporal y análisis de masa"
+      }
+    },
+    "glucometer": {
+      "header": {
+        "title": "Glucómetro"
+      },
+      "reading": {
+        "label": "Nivel de glucosa en sangre"
+      },
+      "status": {
+        "low": "Bajo",
+        "normal": "Normal",
+        "high": "Alto",
+        "unknown": "No disponible"
+      },
+      "mealContext": {
+        "fasting": "En ayunas",
+        "beforeMeal": "Antes de comer",
+        "afterMeal": "Después de comer",
+        "random": "Aleatorio",
+        "unknown": "No especificado"
+      },
+      "actions": {
+        "refresh": "Actualizar lectura",
+        "registerSymptom": "Registrar síntoma"
+      },
+      "history": {
+        "title": "Historial de lecturas",
+        "columns": {
+          "date": "Fecha y hora",
+          "glucose": "Glucosa (mg/dL)",
+          "context": "Contexto",
+          "status": "Estado"
+        }
+      },
+      "tips": {
+        "title": "Consejos de salud",
+        "tip1": "Mide tu glucosa antes y después de las comidas para un mejor control.",
+        "tip2": "Mantén una buena hidratación para obtener lecturas más precisas.",
+        "tip3": "Registra siempre la hora y el contexto de cada medición."
+      }
+    }
+  },
+
+  "roles": {
+    "patient": "Paciente",
+    "doctor": "Médico",
+    "hospital_admin": "Administrador del hospital"
+  },
+
   "common": {
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -141,6 +475,66 @@
     "phone": "Teléfono",
     "address": "Dirección",
     "cancel": "Cancelar",
-    "saveChanges": "Guardar cambios"
+    "saveChanges": "Guardar cambios",
+    "logout": "Cerrar sesión",
+    "back": "Volver"
+  },
+
+  "diagnoses": {
+    "header": {
+      "title": "Mis diagnósticos médicos",
+      "subtitle": "Gestiona tus diagnósticos y monitorea su evolución"
+    },
+    "loading": "Cargando diagnósticos...",
+    "stats": {
+      "total": "Total",
+      "active": "Activos",
+      "controlled": "Controlados",
+      "resolved": "Resueltos"
+    },
+    "filters": {
+      "all": "Todos ({{count}})",
+      "active": "Activos ({{count}})",
+      "controlled": "Controlados ({{count}})",
+      "resolved": "Resueltos ({{count}})"
+    },
+    "empty": {
+      "title": "No hay diagnósticos en esta categoría",
+      "all": "Aún no se han registrado diagnósticos médicos",
+      "filtered": "No tienes diagnósticos en esta categoría"
+    },
+    "timeline": {
+      "diagnosed": "Diagnosticado:",
+      "since": "Hace {{days}} días",
+      "resolved": "Resuelto:",
+      "lastReview": "Última revisión:"
+    },
+    "treatment": {
+      "label": "Tratamiento:"
+    },
+    "notes": {
+      "label": "Notas:"
+    },
+    "followUp": {
+      "label": "Requiere seguimiento médico"
+    },
+    "actions": {
+      "viewDetails": "Ver detalles",
+      "update": "Actualizar"
+    },
+    "status": {
+      "active": "Activo",
+      "controlled": "Controlado",
+      "resolved": "Resuelto",
+      "monitoring": "En monitoreo",
+      "unknown": "Desconocido"
+    },
+    "severity": {
+      "low": "Leve",
+      "moderate": "Moderado",
+      "high": "Alto",
+      "critical": "Crítico",
+      "unknown": "Desconocido"
+    }
   }
 }

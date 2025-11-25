@@ -3,7 +3,7 @@
     <!-- Actions Section -->
     <div class="actions-section">
       <!-- Language Switcher -->
-      <app-language-switcher />
+      <app-language-switcher></app-language-switcher>
 
       <!-- User Menu -->
       <div class="action-item">
@@ -14,7 +14,9 @@
           <span class="user-avatar">{{ currentUser().avatar }}</span>
           <div class="user-info">
             <span class="user-name">{{ currentUser().name }}</span>
-            <span class="user-role">{{ currentUser().role }}</span>
+            <span class="user-role">
+              {{ ('roles.' + currentUser().role) | translate }}
+            </span>
           </div>
           <span class="chevron">▼</span>
         </button>
@@ -26,20 +28,42 @@
                 <span class="avatar-large">{{ currentUser().avatar }}</span>
                 <div>
                   <h4>{{ currentUser().name }}</h4>
-                  <p class="text-small">{{ currentUser().role }}</p>
+                  <p class="text-small">
+                    {{ ('roles.' + currentUser().role) | translate }}
+                  </p>
                 </div>
               </div>
             </div>
+
             <ul class="menu-list">
-              <li><a [routerLink]="getProfileRoute()" (click)="closeMenus()" class="menu-link">👤 Mi Perfil</a></li>
-              
+              <li>
+                <a
+                  [routerLink]="getProfileRoute()"
+                  (click)="closeMenus()"
+                  class="menu-link">
+                  👤 Mi Perfil
+                </a>
+              </li>
+
               <!-- Ayuda solo visible para pacientes -->
               <li *ngIf="isPatient()">
-                <a [routerLink]="'/tutorial'" (click)="closeMenus()" class="menu-link">❓ Ayuda</a>
+                <a
+                  [routerLink]="'/tutorial'"
+                  (click)="closeMenus()"
+                  class="menu-link">
+                  ❓ Ayuda
+                </a>
               </li>
 
               <li class="divider"></li>
-              <li><button (click)="logout()" class="menu-link logout">🚪 Cerrar Sesión</button></li>
+
+              <li>
+                <button
+                  (click)="logout()"
+                  class="menu-link logout">
+                  🚪 Cerrar Sesión
+                </button>
+              </li>
             </ul>
           </div>
         </ng-container>

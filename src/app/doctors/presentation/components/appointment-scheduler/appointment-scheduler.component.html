@@ -1,7 +1,11 @@
 <div class="scheduler-page">
   <div class="scheduler-header">
-    <h1 class="h2">📅 Agendar Nueva Cita</h1>
-    <p class="subtitle">Programa una cita con tu médico asignado</p>
+    <h1 class="h2">
+      📅 {{ 'appointments.scheduler.title' | translate }}
+    </h1>
+    <p class="subtitle">
+      {{ 'appointments.scheduler.subtitle' | translate }}
+    </p>
   </div>
 
   <div class="scheduler-card">
@@ -10,7 +14,7 @@
       <div class="form-group">
         <label for="date" class="form-label">
           <span class="label-icon">📆</span>
-          Fecha de la cita
+          {{ 'appointments.scheduler.date.label' | translate }}
         </label>
         <input
           id="date"
@@ -22,14 +26,16 @@
           (input)="selectedDate.set($any($event.target).value)"
           required
         />
-        <small class="form-hint">Selecciona una fecha entre hoy y los próximos 3 meses</small>
+        <small class="form-hint">
+          {{ 'appointments.scheduler.date.hint' | translate }}
+        </small>
       </div>
 
       <!-- Hora -->
       <div class="form-group">
         <label for="time" class="form-label">
           <span class="label-icon">🕐</span>
-          Hora de la cita
+          {{ 'appointments.scheduler.time.label' | translate }}
         </label>
         <select
           id="time"
@@ -38,19 +44,23 @@
           (change)="selectedTime.set($any($event.target).value)"
           required
         >
-          <option value="">Selecciona una hora</option>
+          <option value="">
+            {{ 'appointments.scheduler.time.placeholder' | translate }}
+          </option>
           <option *ngFor="let slot of timeSlots" [value]="slot">
             {{ slot }}
           </option>
         </select>
-        <small class="form-hint">Horario de atención: 8:00 AM - 6:00 PM</small>
+        <small class="form-hint">
+          {{ 'appointments.scheduler.time.hint' | translate }}
+        </small>
       </div>
 
       <!-- Tipo de cita -->
       <div class="form-group">
         <label for="type" class="form-label">
           <span class="label-icon">🏥</span>
-          Tipo de cita
+          {{ 'appointments.scheduler.type.label' | translate }}
         </label>
         <select
           id="type"
@@ -59,8 +69,11 @@
           (change)="appointmentType.set($any($event.target).value)"
           required
         >
-          <option *ngFor="let type of appointmentTypes" [value]="type.value">
-            {{ type.label }}
+          <option
+            *ngFor="let type of appointmentTypes"
+            [value]="type.value"
+          >
+            {{ type.labelKey | translate }}
           </option>
         </select>
       </div>
@@ -69,28 +82,32 @@
       <div class="form-group">
         <label for="notes" class="form-label">
           <span class="label-icon">📝</span>
-          Notas adicionales (opcional)
+          {{ 'appointments.scheduler.notes.label' | translate }}
         </label>
         <textarea
           id="notes"
           rows="4"
           class="form-textarea"
-          placeholder="Describe el motivo de tu cita o cualquier información relevante para tu médico..."
+          [placeholder]="'appointments.scheduler.notes.placeholder' | translate"
           [value]="notes()"
           (input)="notes.set($any($event.target).value)"
         ></textarea>
-        <small class="form-hint">Máximo 500 caracteres</small>
+        <small class="form-hint">
+          {{ 'appointments.scheduler.notes.hint' | translate }}
+        </small>
       </div>
 
       <!-- Info box -->
       <div class="info-box">
         <div class="info-icon">ℹ️</div>
         <div class="info-content">
-          <strong>Información importante:</strong>
+          <strong>
+            {{ 'appointments.scheduler.info.title' | translate }}
+          </strong>
           <ul>
-            <li>Tu médico recibirá una notificación inmediata</li>
-            <li>La cita quedará como "Programada" hasta que el médico la confirme</li>
-            <li>Recibirás un recordatorio 24 horas antes de la cita</li>
+            <li>{{ 'appointments.scheduler.info.items.notify'    | translate }}</li>
+            <li>{{ 'appointments.scheduler.info.items.status'    | translate }}</li>
+            <li>{{ 'appointments.scheduler.info.items.reminder' | translate }}</li>
           </ul>
         </div>
       </div>
@@ -98,22 +115,26 @@
 
     <!-- Actions -->
     <div class="card-actions">
-      <button 
-        type="button" 
-        class="btn btn-secondary" 
+      <button
+        type="button"
+        class="btn btn-secondary"
         (click)="cancel()"
         [disabled]="submitting()"
       >
-        Cancelar
+        {{ 'appointments.scheduler.cancel' | translate }}
       </button>
-      <button 
-        type="button" 
-        class="btn btn-primary" 
+      <button
+        type="button"
+        class="btn btn-primary"
         (click)="submit()"
         [disabled]="!canSubmit()"
       >
-        <span *ngIf="!submitting()">✓ Agendar Cita</span>
-        <span *ngIf="submitting()">Agendando...</span>
+        <span *ngIf="!submitting()">
+          ✓ {{ 'appointments.scheduler.submit' | translate }}
+        </span>
+        <span *ngIf="submitting()">
+          {{ 'appointments.scheduler.submitting' | translate }}
+        </span>
       </button>
     </div>
   </div>

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { MedicalRecordsStore } from '../../../../doctors/application/medical-rec
 import { Diagnosis, DiagnosisStatus, DiagnosisSeverity } from '../../../domain/model/diagnosis.entity';
 import { RecordType } from '../../../../doctors/domain/model/medical-record.entity';
 import { PatientStore } from '../../../../patients/application/patient.store';
+import { TranslateModule } from '@ngx-translate/core';
 
 /**
  * Medical Diagnoses View - US21: Gestión de diagnósticos médicos
@@ -26,7 +27,8 @@ import { PatientStore } from '../../../../patients/application/patient.store';
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslateModule
   ],
   templateUrl: './medical-diagnoses.html',
   styleUrl: './medical-diagnoses.css'
@@ -47,7 +49,7 @@ export class MedicalDiagnosesComponent implements OnInit {
   // Filtro activo
   selectedFilter = signal<'all' | 'active' | 'controlled' | 'resolved'>('all');
 
-  // Diagnósticos filtrados (ahora por paciente actual)
+  // Diagnósticos filtrados (incluye registros médicos cuando el filtro es "all")
   filteredDiagnoses = computed(() => {
     const currentUserStr = localStorage.getItem('currentUser');
     if (!currentUserStr) return [];
@@ -56,14 +58,16 @@ export class MedicalDiagnosesComponent implements OnInit {
     const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
     if (!currentPatient) return [];
 
-    // When filter is 'all' include both diagnoses and symptom records mapped to a diagnosis-like shape
+    // Cuando el filtro es "all" incluimos diagnósticos + registros médicos mapeados
     if (this.selectedFilter() === 'all') {
-      // Map medical records (symptoms) into a lightweight diagnosis-shaped object
       const records = this.medicalRecordsStore.records().filter(r => r.patientId === currentPatient.id);
+
       const mappedRecords = records.map((r) => ({
-        id: -(r.id || Math.floor(Math.random() * 1000000)), // negative id to avoid clashes
+        id: -(r.id || Math.floor(Math.random() * 1000000)), // id negativo para evitar colisiones
         patientId: r.patientId,
-        diagnosisName: r.type === undefined ? 'Registro Médico' : (r.type === RecordType.SYMPTOMS ? 'Registro de Síntomas' : 'Registro Médico'),
+        diagnosisName: r.type === undefined
+          ? 'Registro Médico'
+          : (r.type === RecordType.SYMPTOMS ? 'Registro de Síntomas' : 'Registro Médico'),
         icd10Code: '',
         diagnosedDate: (r as any).date || new Date().toISOString(),
         severity: DiagnosisSeverity.LOW,
@@ -76,7 +80,7 @@ export class MedicalDiagnosesComponent implements OnInit {
       return [...mappedRecords, ...diagnoses];
     }
 
-    // For other filters, only return diagnoses (keep existing behavior)
+    // Para otros filtros, solo diagnósticos (comportamiento original)
     const diagnoses = (() => {
       switch (this.selectedFilter()) {
         case 'active':
@@ -93,17 +97,16 @@ export class MedicalDiagnosesComponent implements OnInit {
     return diagnoses.filter(d => d.patientId === currentPatient.id);
   });
 
-  // Estadísticas (ahora filtradas por paciente actual)
+  // Estadísticas (ahora filtradas por paciente actual e incluyendo registros médicos en el total)
   stats = computed(() => {
     const currentUserStr = localStorage.getItem('currentUser');
     if (!currentUserStr) return { total: 0, active: 0, controlled: 0, resolved: 0 };
 
     const currentUser = JSON.parse(currentUserStr);
     const currentPatient = this.patientStore.patients$().find(p => p.userId === currentUser.id);
-    
+
     if (!currentPatient) return { total: 0, active: 0, controlled: 0, resolved: 0 };
 
-    // Include medical records count in the total so the patient sees symptom entries as part of history
     const patientDiagnoses = this.diagnoses().filter(d => d.patientId === currentPatient.id);
     const patientRecords = this.medicalRecordsStore.records().filter(r => r.patientId === currentPatient.id);
     const active = this.activeDiagnoses().filter(d => d.patientId === currentPatient.id);
@@ -141,7 +144,7 @@ export class MedicalDiagnosesComponent implements OnInit {
 
         if (patient) {
           console.log(`✅ Medical-Diagnoses: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
-          
+
           // Cargar diagnósticos (se filtrarán en el computed)
           this.diagnosisStore.loadAllDiagnoses().subscribe({
             next: () => console.log('✅ Diagnósticos cargados (se filtrarán por paciente)'),
@@ -165,18 +168,22 @@ export class MedicalDiagnosesComponent implements OnInit {
   }
 
   viewDiagnosisDetails(diagnosis: Diagnosis): void {
-    // Navigate to diagnosis details (to be implemented)
+    // Navegar a detalles del diagnóstico (pendiente implementar)
     console.log('View diagnosis details:', diagnosis);
   }
 
+  /**
+   * Devuelve la clave i18n del estado del diagnóstico
+   * (el template hace {{ getStatusLabel(status) | translate }})
+   */
   getStatusLabel(status: DiagnosisStatus): string {
-    const labels: Record<DiagnosisStatus, string> = {
-      [DiagnosisStatus.ACTIVE]: 'Activo',
-      [DiagnosisStatus.CONTROLLED]: 'Controlado',
-      [DiagnosisStatus.RESOLVED]: 'Resuelto',
-      [DiagnosisStatus.MONITORING]: 'En Monitoreo'
+    const keys: Record<DiagnosisStatus, string> = {
+      [DiagnosisStatus.ACTIVE]: 'diagnoses.status.active',
+      [DiagnosisStatus.CONTROLLED]: 'diagnoses.status.controlled',
+      [DiagnosisStatus.RESOLVED]: 'diagnoses.status.resolved',
+      [DiagnosisStatus.MONITORING]: 'diagnoses.status.monitoring'
     };
-    return labels[status] || status;
+    return keys[status] || 'diagnoses.status.unknown';
   }
 
   getStatusColor(status: DiagnosisStatus): string {
@@ -189,14 +196,18 @@ export class MedicalDiagnosesComponent implements OnInit {
     return colors[status] || '';
   }
 
+  /**
+   * Devuelve la clave i18n de la severidad
+   * (el template hace {{ getSeverityLabel(severity) | translate }})
+   */
   getSeverityLabel(severity: DiagnosisSeverity): string {
-    const labels: Record<DiagnosisSeverity, string> = {
-      [DiagnosisSeverity.LOW]: 'Leve',
-      [DiagnosisSeverity.MODERATE]: 'Moderado',
-      [DiagnosisSeverity.HIGH]: 'Alto',
-      [DiagnosisSeverity.CRITICAL]: 'Crítico'
+    const keys: Record<DiagnosisSeverity, string> = {
+      [DiagnosisSeverity.LOW]: 'diagnoses.severity.low',
+      [DiagnosisSeverity.MODERATE]: 'diagnoses.severity.moderate',
+      [DiagnosisSeverity.HIGH]: 'diagnoses.severity.high',
+      [DiagnosisSeverity.CRITICAL]: 'diagnoses.severity.critical'
     };
-    return labels[severity] || severity;
+    return keys[severity] || 'diagnoses.severity.unknown';
   }
 
   getSeverityColor(severity: DiagnosisSeverity): string {
@@ -221,10 +232,10 @@ export class MedicalDiagnosesComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   }
 

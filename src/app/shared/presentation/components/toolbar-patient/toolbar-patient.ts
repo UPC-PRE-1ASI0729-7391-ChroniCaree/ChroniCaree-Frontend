@@ -8,11 +8,17 @@ import { MedicationReminderFacade } from '../../../../medications/infrastructure
 import { PatientStore } from '../../../../patients/application/patient.store';
 import { MessagesStore } from '../../../../communication/application/messages.store';
 import { PatientService } from '../../../../patients/infrastructure/patient.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-toolbar-patient',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatBadgeModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    MatBadgeModule,
+    TranslateModule
+  ],
   templateUrl: './toolbar-patient.html',
   styleUrls: ['./toolbar-patient.css']
 })
@@ -37,30 +43,26 @@ export class ToolbarPatientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // ✅ Cargar nudges y mensajes filtrados por paciente actual
     const currentUser = this.userStore.currentUser$();
     if (!currentUser || !currentUser.id) {
       console.error('❌ Toolbar-Patient: Usuario no autenticado');
       return;
     }
-    // Obtener paciente por userId (más eficiente y robusto que cargar todos)
+
     try {
       this.patientService.getByUserId(currentUser.id).subscribe({
         next: (patient) => {
           if (patient) {
             console.log(`✅ Toolbar-Patient: Cargando datos para paciente ${patient.id}`);
 
-            // ✅ Cargar nudges usando el patientId
             this.nudgeStore.loadNudgesByPatient(String(patient.id)).subscribe({
               next: () => console.log('✅ Nudges cargados para toolbar'),
               error: (err) => console.error('❌ Error cargando nudges:', err)
             });
 
-            // ⭐ Cargar mensajes del paciente
             console.log(`✅ Toolbar-Patient: Cargando mensajes para paciente ID: ${patient.id}`);
             this.messagesStore.loadInbox('PATIENT', String(patient.id));
           } else {
-            // No hay paciente para este usuario: no es un error crítico, sólo no mostramos datos específicos
             console.info(`ℹ️ Toolbar-Patient: No existe paciente asociado para userId ${currentUser.id}`);
           }
         },
@@ -72,7 +74,6 @@ export class ToolbarPatientComponent implements OnInit {
       console.error('❌ Toolbar-Patient: Excepción al consultar paciente por userId', e);
     }
 
-    // Listen for user changes so toolbar reloads patient-specific data without page refresh
     try {
       window.addEventListener('userChanged', (ev: any) => {
         const detailUser = ev?.detail;
@@ -89,7 +90,7 @@ export class ToolbarPatientComponent implements OnInit {
           }
         });
       });
-    } catch (e) {
+    } catch {
       // ignore if window not available
     }
   }
@@ -99,10 +100,7 @@ export class ToolbarPatientComponent implements OnInit {
   }
 
   logout(): void {
-    // Clear user store and localStorage
     this.userStore.clearCurrentUser();
-    
-    // Navigate to login
     this.router.navigate(['/iam/login']);
   }
 }

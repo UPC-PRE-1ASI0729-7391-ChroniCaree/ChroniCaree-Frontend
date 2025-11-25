@@ -2,12 +2,13 @@ import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher';
+import { TranslateModule } from '@ngx-translate/core';
 import { UserStore } from '../../../../iam/application/user.store';
 
 @Component({
   selector: 'app-header-content',
   standalone: true,
-  imports: [CommonModule, LanguageSwitcherComponent, RouterLink],
+  imports: [CommonModule, LanguageSwitcherComponent, RouterLink, TranslateModule],
   templateUrl: './header-content.html',
   styleUrl: './header-content.css'
 })
@@ -19,11 +20,12 @@ export class HeaderContentComponent implements OnInit {
   currentUser = computed(() => {
     const userFromStore = this.userStore.currentUser$();
     const roleFromStore = localStorage.getItem('userRole') || undefined;
+
     if (userFromStore && userFromStore.id) {
-      const role = roleFromStore || userFromStore.role;
+      const role = (roleFromStore || userFromStore.role || 'patient') as string;
       return {
         name: userFromStore.name || 'Usuario',
-        role: this.getRoleLabel(role),
+        role: role,
         avatar: this.getRoleAvatar(role),
         email: userFromStore.email
       };
@@ -37,7 +39,7 @@ export class HeaderContentComponent implements OnInit {
       const user = JSON.parse(userStr);
       return {
         name: user.name || 'Usuario',
-        role: this.getRoleLabel(role),
+        role: role,
         avatar: this.getRoleAvatar(role),
         email: user.email
       };
@@ -45,7 +47,7 @@ export class HeaderContentComponent implements OnInit {
 
     return {
       name: 'Usuario',
-      role: 'Invitado',
+      role: 'guest',
       avatar: '👤',
       email: ''
     };
@@ -102,7 +104,7 @@ export class HeaderContentComponent implements OnInit {
   getProfileRoute(): string {
 
     const role = localStorage.getItem('userRole') || this.userStore.currentUser$()?.role;
-    
+
     switch (role) {
       case 'patient':
         return '/patient/edit-profile';

@@ -8,15 +8,15 @@
     } @else if (activeNudges().length === 0) {
       <div class="empty-state">
         <mat-icon>check_circle</mat-icon>
-        <p>¡Excelente! No tienes recordatorios pendientes</p>
+        <p>{{ 'nudges.empty' | translate }}</p>
       </div>
     } @else {
       <div class="nudges-list">
         @for (nudge of activeNudges(); track nudge.id) {
           <mat-card [class]="'nudge-card ' + getPriorityClass(nudge.priority)">
             <mat-card-header>
-              <mat-icon 
-                mat-card-avatar 
+              <mat-icon
+                mat-card-avatar
                 [color]="getIconColor(nudge.priority)"
                 class="nudge-icon">
                 {{ nudge.icon }}
@@ -30,16 +30,16 @@
 
             <mat-card-actions>
               @if (nudge.actionRoute && nudge.actionLabel) {
-                <button 
-                  mat-raised-button 
+                <button
+                  mat-raised-button
                   color="primary"
                   (click)="onNudgeAction(nudge)">
                   <mat-icon>{{ nudge.icon }}</mat-icon>
                   {{ nudge.actionLabel }}
                 </button>
               }
-              
-              <button 
+
+              <button
                 mat-button
                 (click)="snoozeNudge(nudge.id, $event)"
                 matTooltip="Posponer 1 hora">
@@ -47,7 +47,7 @@
                 Más tarde
               </button>
 
-              <button 
+              <button
                 mat-icon-button
                 (click)="dismissNudge(nudge.id)"
                 matTooltip="Descartar"
