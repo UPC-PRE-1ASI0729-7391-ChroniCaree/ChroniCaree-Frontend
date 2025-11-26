@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { PaymentEntity } from '../domain/model/payment.entity';
 import { PaymentResource } from './payment.resource';
@@ -31,14 +31,19 @@ export class PaymentService {
       updatedAt: new Date().toISOString()
     };
 
-    return this.http.post<PaymentResource>(this.paymentsUrl, {
-      ...resource,
-      createdAt: new Date().toISOString()
-    }).pipe(
-      map(res => PaymentAssembler.toDomain(res)),
-      catchError(error => {
-        console.error('❌ Error creating payment:', error);
-        throw error;
+    return this.getNextId('payments').pipe(
+      switchMap(nextId => {
+        return this.http.post<PaymentResource>(this.paymentsUrl, {
+          ...resource,
+          id: nextId,
+          createdAt: new Date().toISOString()
+        }).pipe(
+          map(res => PaymentAssembler.toDomain(res)),
+          catchError(error => {
+            console.error('❌ Error creating payment:', error);
+            throw error;
+          })
+        );
       })
     );
   }
@@ -88,6 +93,22 @@ export class PaymentService {
         console.error(`❌ Error updating payment ${id}:`, error);
         throw error;
       })
+    );
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map(items => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
     );
   }
 }

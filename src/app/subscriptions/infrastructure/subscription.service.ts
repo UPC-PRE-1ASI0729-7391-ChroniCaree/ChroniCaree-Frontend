@@ -5,7 +5,7 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 
 import { SubscriptionEntity } from '../domain/model/subscription.entity';
@@ -111,28 +111,34 @@ export class SubscriptionService {
         const endDate = new Date();
         endDate.setMonth(endDate.getMonth() + 1); // 1 mes por defecto
 
-        const subscriptionResource: Partial<SubscriptionResource> = {
-          payerType: request.payerType,
-          payerId: request.payerId,
-          patientId: request.patientId,
-          planId: request.planId,
-          status: 'active',
-          startDate,
-          endDate: endDate.toISOString(),
-          autoRenew: request.autoRenew ?? true,
-          paymentMethod: request.paymentMethod,
-          billingEmail: request.billingEmail,
-          nextBillingDate: endDate.toISOString(),
-          lastPaymentDate: startDate,
-          lastPaymentAmount: plan.price,
-        };
+        // Obtener siguiente ID
+        return this.getNextId('subscriptions').pipe(
+          switchMap((nextId) => {
+            const subscriptionResource: Partial<SubscriptionResource> = {
+              id: nextId,
+              payerType: request.payerType,
+              payerId: request.payerId,
+              patientId: request.patientId,
+              planId: request.planId,
+              status: 'active',
+              startDate,
+              endDate: endDate.toISOString(),
+              autoRenew: request.autoRenew ?? true,
+              paymentMethod: request.paymentMethod,
+              billingEmail: request.billingEmail,
+              nextBillingDate: endDate.toISOString(),
+              lastPaymentDate: startDate,
+              lastPaymentAmount: plan.price,
+            };
 
-        return this.http
-          .post<SubscriptionResource>(`${this.baseUrl}${SubscriptionApiEndpoint.create()}`, subscriptionResource)
-          .pipe(
-            map((resource) => SubscriptionAssembler.toEntity(resource)),
-            catchError((error) => throwError(() => new Error(`Error creating subscription: ${error.message}`)))
-          );
+            return this.http
+              .post<SubscriptionResource>(`${this.baseUrl}${SubscriptionApiEndpoint.create()}`, subscriptionResource)
+              .pipe(
+                map((resource) => SubscriptionAssembler.toEntity(resource)),
+                catchError((error) => throwError(() => new Error(`Error creating subscription: ${error.message}`)))
+              );
+          })
+        );
       })
     );
   }
@@ -202,5 +208,21 @@ export class SubscriptionService {
         map((resources) => SubscriptionAssembler.planToEntityList(resources)),
         catchError((error) => throwError(() => new Error(`Error fetching ${type} plans: ${error.message}`)))
       );
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${this.baseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map((items) => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
+    );
   }
 }

@@ -83,7 +83,7 @@ export class MessageComposeComponent implements OnInit {
     const patient = patients.find(p => p.userId === userId);
     
     if (patient) {
-      this.patientId.set(patient.id.toString());
+      this.patientId.set(patient.userId.toString());
       this.doctorId.set(patient.assignedDoctorId?.toString() || '');
 
       // If we have a doctor id, fetch doctor's name for display

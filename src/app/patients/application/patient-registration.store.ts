@@ -74,101 +74,129 @@ export class PatientRegistrationStore {
           return throwError(() => new Error(`Email ${request.email} is already registered`));
         }
 
-        // Paso 2: Crear user con role patient
-        const userPayload = {
-          email: request.email,
-          name: request.name,
-          password: request.password, // En producción debe hashearse
-          role: 'patient' as UserRole,
-          isVerified: false,
-          twoFactorEnabled: false,
-          createdAt: new Date().toISOString(),
-          tenantId: null, // Pacientes B2C no tienen tenant
-        };
-
-        return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
-          switchMap((createdUser) => {
-            // Paso 3: Crear patient
-            const bmi = this.calculateBMI(request.weight || 0, request.height || 0);
-
-            const patientPayload = {
-              userId: createdUser.id,
-              assignedDoctorId: null, // Sin doctor asignado inicialmente
-              tenantId: null, // B2C
-              subscriptionId: null, // Free plan (sin suscripción)
-              firstName: request.firstName,
-              lastName: request.lastName,
-              dni: request.dni,
-              birthDate: request.birthDate,
-              gender: request.gender,
-              phone: request.phone,
-              address: request.address,
-              weight: request.weight || 0,
-              height: request.height || 0,
-              bmi,
-              emergencyContact: request.emergencyContact || {
-                name: '',
-                relationship: '',
-                phone: '',
-              },
+        // Obtener siguiente ID para usuario
+        return this.getNextId('users').pipe(
+          switchMap(nextUserId => {
+            // Paso 2: Crear user con role patient
+            const userPayload = {
+              id: nextUserId,
+              email: request.email,
+              name: request.name,
+              password: request.password, // En producción debe hashearse
+              role: 'patient' as UserRole,
+              isVerified: false,
+              twoFactorEnabled: false,
+              createdAt: new Date().toISOString(),
+              tenantId: null, // Pacientes B2C no tienen tenant
             };
 
-            return this.http.post<any>(`${this.baseUrl}/patients`, patientPayload).pipe(
-              map((createdPatient) => {
-                const userEntity = new UserEntity(
-                  createdUser.id,
-                  createdUser.email,
-                  createdUser.role,
-                  createdUser.name,
-                  createdUser.password,
-                  createdUser.isVerified,
-                  createdUser.twoFactorEnabled,
-                  createdUser.createdAt,
-                  createdUser.tenantId
+            return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
+              switchMap((createdUser) => {
+                // Obtener siguiente ID para paciente
+                return this.getNextId('patients').pipe(
+                  switchMap(nextPatientId => {
+                    // Paso 3: Crear patient
+                    const bmi = this.calculateBMI(request.weight || 0, request.height || 0);
+
+                    const patientPayload = {
+                      id: nextPatientId,
+                      userId: createdUser.id,
+                      assignedDoctorId: null, // Sin doctor asignado inicialmente
+                      tenantId: null, // B2C
+                      subscriptionId: null, // Free plan (sin suscripción)
+                      firstName: request.firstName,
+                      lastName: request.lastName,
+                      dni: request.dni,
+                      birthDate: request.birthDate,
+                      gender: request.gender,
+                      phone: request.phone,
+                      address: request.address,
+                      weight: request.weight || 0,
+                      height: request.height || 0,
+                      bmi,
+                      emergencyContact: request.emergencyContact || {
+                        name: '',
+                        relationship: '',
+                        phone: '',
+                      },
+                    };
+
+                    return this.http.post<any>(`${this.baseUrl}/patients`, patientPayload).pipe(
+                      map((createdPatient) => {
+                        const userEntity = new UserEntity(
+                          createdUser.id,
+                          createdUser.email,
+                          createdUser.role,
+                          createdUser.name,
+                          createdUser.password,
+                          createdUser.isVerified,
+                          createdUser.twoFactorEnabled,
+                          createdUser.createdAt,
+                          createdUser.tenantId
+                        );
+
+                        const patientEntity = new PatientEntity(
+                          createdPatient.id,
+                          createdPatient.userId,
+                          createdPatient.assignedDoctorId,
+                          createdPatient.tenantId,
+                          createdPatient.subscriptionId,
+                          createdPatient.firstName,
+                          createdPatient.lastName,
+                          createdPatient.dni,
+                          createdPatient.birthDate,
+                          createdPatient.gender,
+                          createdPatient.phone,
+                          createdPatient.address,
+                          createdPatient.weight,
+                          createdPatient.height,
+                          createdPatient.bmi,
+                          createdPatient.emergencyContact
+                        );
+
+                        const result: PatientRegistrationResult = {
+                          user: userEntity,
+                          patient: patientEntity,
+                        };
+
+                        this._lastRegisteredPatient.set(result);
+                        return result;
+                      })
+                    );
+                  })
                 );
-
-                const patientEntity = new PatientEntity(
-                  createdPatient.id,
-                  createdPatient.userId,
-                  createdPatient.assignedDoctorId,
-                  createdPatient.tenantId,
-                  createdPatient.subscriptionId,
-                  createdPatient.firstName,
-                  createdPatient.lastName,
-                  createdPatient.dni,
-                  createdPatient.birthDate,
-                  createdPatient.gender,
-                  createdPatient.phone,
-                  createdPatient.address,
-                  createdPatient.weight,
-                  createdPatient.height,
-                  createdPatient.bmi,
-                  createdPatient.emergencyContact
-                );
-
-                const result: PatientRegistrationResult = {
-                  user: userEntity,
-                  patient: patientEntity,
-                };
-
-                this._lastRegisteredPatient.set(result);
-                return result;
+              }),
+              tap({
+                next: () => this._isRegistering.set(false),
+                error: (error) => {
+                  this._isRegistering.set(false);
+                  this._registrationError.set(error.message || 'Registration failed');
+                },
+              }),
+              catchError((error) => {
+                this._registrationError.set(error.message || 'Registration failed');
+                return throwError(() => error);
               })
             );
-          }),
-          tap({
-            next: () => this._isRegistering.set(false),
-            error: (error) => {
-              this._isRegistering.set(false);
-              this._registrationError.set(error.message || 'Registration failed');
-            },
-          }),
-          catchError((error) => {
-            this._registrationError.set(error.message || 'Registration failed');
-            return throwError(() => error);
           })
         );
       })
+    );
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${this.baseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map(items => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
     );
   }
 

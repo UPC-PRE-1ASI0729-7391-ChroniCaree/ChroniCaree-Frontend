@@ -139,6 +139,26 @@ export class InboxComponent implements OnInit {
     return undefined;
   }
 
+  getPatientName(t: ThreadVM): string {
+    // Para doctor: extraer nombre del paciente (puede requerir llamada a /users o /patients)
+    // Por ahora, usar ID del paciente o 'Paciente'
+    const patientId = this.getPatientId(t);
+    return patientId ? `Paciente #${patientId}` : 'Paciente';
+  }
+
+  getLastSender(t: ThreadVM): string {
+    if (!t.previews || t.previews.length === 0) return '';
+    
+    const lastMsg = t.previews.at(-1);
+    if (!lastMsg) return '';
+    
+    if (lastMsg.senderId === this.userId) {
+      return 'Tú:';
+    }
+    
+    return lastMsg.senderRole === 'PATIENT' ? 'Paciente:' : 'Doctor:';
+  }
+
   private resolveUserId(role: 'PATIENT' | 'DOCTOR'): string {
     return role === 'DOCTOR' ? 'DOCTOR-555' : 'PATIENT-123';
   }
