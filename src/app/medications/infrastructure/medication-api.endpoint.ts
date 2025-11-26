@@ -20,9 +20,20 @@ export class MedicationApiEndpoint extends BaseApi {
   private readonly resourcePath = '/medications';
 
   /**
+   * Get all medications (for ID generation)
+   */
+  getAll(): Observable<Medication[]> {
+    return this.http
+      .get<MedicationResource[]>(`${this.baseUrl}${this.resourcePath}`)
+      .pipe(
+        map(resources => MedicationAssembler.toDomainList(resources))
+      );
+  }
+
+  /**
    * Get all medications for a patient
    */
-  getByPatientId(patientId: string): Observable<Medication[]> {
+  getByPatientId(patientId: number): Observable<Medication[]> {
     return this.http
       .get<MedicationResource[]>(`${this.baseUrl}${this.resourcePath}?patientId=${patientId}`)
       .pipe(
@@ -33,7 +44,7 @@ export class MedicationApiEndpoint extends BaseApi {
   /**
    * Get active medications for a patient
    */
-  getActiveMedications(patientId: string): Observable<Medication[]> {
+  getActiveMedications(patientId: number): Observable<Medication[]> {
     return this.http
       .get<MedicationResource[]>(
         `${this.baseUrl}${this.resourcePath}?patientId=${patientId}&status=active`
@@ -46,7 +57,7 @@ export class MedicationApiEndpoint extends BaseApi {
   /**
    * Get a single medication by ID
    */
-  getById(id: string): Observable<Medication> {
+  getById(id: number): Observable<Medication> {
     return this.http
       .get<MedicationResource>(`${this.baseUrl}${this.resourcePath}/${id}`)
       .pipe(
@@ -69,7 +80,7 @@ export class MedicationApiEndpoint extends BaseApi {
   /**
    * Update an existing medication
    */
-  update(id: string, medication: Medication): Observable<Medication> {
+  update(id: number, medication: Medication): Observable<Medication> {
     const resource = MedicationAssembler.toResource(medication);
     return this.http
       .put<MedicationResource>(`${this.baseUrl}${this.resourcePath}/${id}`, resource)
@@ -81,14 +92,14 @@ export class MedicationApiEndpoint extends BaseApi {
   /**
    * Delete a medication
    */
-  delete(id: string): Observable<void> {
+  delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}${this.resourcePath}/${id}`);
   }
 
   /**
    * Log medication taken
    */
-  logMedication(medicationId: string, log: MedicationLog): Observable<Medication> {
+  logMedication(medicationId: number, log: MedicationLog): Observable<Medication> {
     return this.http
       .post<MedicationResource>(
         `${this.baseUrl}${this.resourcePath}/${medicationId}/logs`,
@@ -103,7 +114,7 @@ export class MedicationApiEndpoint extends BaseApi {
    * Get medication logs for a specific date range
    */
   getLogsByDateRange(
-    patientId: string,
+    patientId: number,
     startDate: Date,
     endDate: Date
   ): Observable<MedicationLog[]> {

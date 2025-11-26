@@ -89,7 +89,7 @@ export class MedicationEditDialogComponent {
       } else {
         // Create new medication
         const newMed = new Medication({
-          patientId: this.data?.medication?.patientId || '',
+          patientId: this.data?.medication?.patientId || 0,
           name: formValues.name!,
           dosage: formValues.dosage!,
           instructions: formValues.instructions || undefined,

@@ -434,7 +434,14 @@ export class MessagesStore extends BaseApi {
       // Recargar inbox para el remitente (siempre que tengamos senderRole/senderId)
       try {
         const senderRole = (params.message.senderRole || 'PATIENT').toUpperCase() as 'PATIENT' | 'DOCTOR';
-        const senderId = params.message.senderId?.toString();
+        let senderId = params.message.senderId?.toString();
+
+        // Fix: If we are a doctor, ensure we use the User ID (stored in currentUserId) 
+        // instead of the Doctor ID which might be passed in params.
+        if (senderRole === 'DOCTOR' && this.currentRole === 'DOCTOR' && this.currentUserId) {
+          senderId = this.currentUserId;
+        }
+
         if (senderId) {
           // reload inbox so UI updates immediately
           this.loadInbox(senderRole, senderId);
@@ -521,7 +528,11 @@ export class MessagesStore extends BaseApi {
       }).subscribe({});
 
       // Recargar inbox del doctor y del paciente para reflejar cambios
-      try { this.loadInbox('DOCTOR', params.senderDoctorId); } catch {}
+      try { 
+        // Fix: Use stored currentUserId if we are the doctor sending this, to avoid ID mismatch (DoctorID vs UserID)
+        const doctorUserId = (this.currentRole === 'DOCTOR' && this.currentUserId) ? this.currentUserId : params.senderDoctorId;
+        this.loadInbox('DOCTOR', doctorUserId); 
+      } catch {}
       try { this.loadInbox('PATIENT', params.receiverPatientId); } catch {}
 
       return res;

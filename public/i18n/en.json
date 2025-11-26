@@ -112,7 +112,7 @@
     "greeting": "Hello, {{name}}!",
     "years": "years",
     "registerSymptom": "Register Symptom",
-    "viewDiagnoses": "View Diagnoses ({{count}})",
+    "viewDiagnoses": "View Diagnoses",
     "messages": "Messages",
     "vitalSigns": "Vital Signs",
     "lastUpdate": "Last update",

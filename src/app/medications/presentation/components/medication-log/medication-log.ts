@@ -46,7 +46,7 @@ export class MedicationLogComponent implements OnInit {
   adherenceStats = this.medicationStore.adherenceStats;
   medicationCount = this.medicationStore.medicationCount;
 
-  processingMedId = signal<string | null>(null);
+  processingMedId = signal<number | null>(null);
 
   ngOnInit(): void {}
 

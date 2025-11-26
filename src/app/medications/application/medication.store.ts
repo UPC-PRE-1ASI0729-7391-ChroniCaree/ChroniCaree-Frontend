@@ -4,7 +4,7 @@
  */
 
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Observable, tap, finalize, catchError, of, shareReplay } from 'rxjs';
+import { Observable, tap, finalize, catchError, of, shareReplay, switchMap } from 'rxjs';
 import { MedicationApiEndpoint } from '../infrastructure/medication-api.endpoint';
 import { Medication, MedicationLog, MedicationStatus } from '../domain/model/medication.entity';
 
@@ -98,7 +98,7 @@ export class MedicationStore {
   /**
    * Load all medications for a patient
    */
-  loadMedicationsByPatient(patientId: string): Observable<Medication[]> {
+  loadMedicationsByPatient(patientId: number): Observable<Medication[]> {
     // 🛡️ Return existing request if in progress
     if (this.currentRequest) {
       return this.currentRequest;
@@ -138,7 +138,7 @@ export class MedicationStore {
   /**
    * Load active medications only
    */
-  loadActiveMedications(patientId: string): Observable<Medication[]> {
+  loadActiveMedications(patientId: number): Observable<Medication[]> {
     this._loading.set(true);
     this._error.set(null);
 
@@ -159,7 +159,7 @@ export class MedicationStore {
   /**
    * Get medication by ID
    */
-  getMedicationById(id: string): Observable<Medication> {
+  getMedicationById(id: number): Observable<Medication> {
     // Check if already in state
     const existing = this._medications().find(med => med.id === id);
     if (existing) {
@@ -189,7 +189,17 @@ export class MedicationStore {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.medicationApi.create(medication).pipe(
+    // Fetch all medications to determine the next ID
+    return this.medicationApi.getAll().pipe(
+      switchMap(allMedications => {
+        const maxId = allMedications.reduce((max, m) => Math.max(max, m.id || 0), 0);
+        const nextId = maxId + 1;
+        
+        // Create a new object with the new ID, preserving other properties
+        const newMedication = Object.assign(new Medication(), medication, { id: nextId });
+
+        return this.medicationApi.create(newMedication);
+      }),
       tap(created => {
         this._medications.update(meds => [...meds, created]);
         this._loading.set(false);
@@ -206,7 +216,7 @@ export class MedicationStore {
   /**
    * Update an existing medication
    */
-  updateMedication(id: string, medication: Medication): Observable<Medication> {
+  updateMedication(id: number, medication: Medication): Observable<Medication> {
     this._loading.set(true);
     this._error.set(null);
 
@@ -232,7 +242,7 @@ export class MedicationStore {
   /**
    * Delete a medication
    */
-  deleteMedication(id: string): Observable<void> {
+  deleteMedication(id: number): Observable<void> {
     this._loading.set(true);
     this._error.set(null);
 
@@ -256,7 +266,7 @@ export class MedicationStore {
   /**
    * Log medication as taken
    */
-  logMedicationTaken(medicationId: string, scheduledTime: Date, notes?: string): Observable<Medication> {
+  logMedicationTaken(medicationId: number, scheduledTime: Date, notes?: string): Observable<Medication> {
     const medication = this._medications().find(med => med.id === medicationId);
     if (!medication) {
       this._error.set('Medicamento no encontrado');
@@ -282,7 +292,7 @@ export class MedicationStore {
   /**
    * Log medication as missed
    */
-  logMedicationMissed(medicationId: string, scheduledTime: Date, reason?: string): Observable<Medication> {
+  logMedicationMissed(medicationId: number, scheduledTime: Date, reason?: string): Observable<Medication> {
     const medication = this._medications().find(med => med.id === medicationId);
     if (!medication) {
       this._error.set('Medicamento no encontrado');
@@ -322,7 +332,7 @@ export class MedicationStore {
   /**
    * Force reload medications
    */
-  forceReload(patientId: string): Observable<Medication[]> {
+  forceReload(patientId: number): Observable<Medication[]> {
     this._medications.set([]);
     this.currentRequest = null;
     return this.loadMedicationsByPatient(patientId);

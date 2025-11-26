@@ -58,8 +58,8 @@ export class MedicationHistoryComponent implements OnInit {
   private readonly userStore = inject(UserStore);
   private readonly translate = inject(TranslateService);
 
-  // ✅ Signal para almacenar el patientId actual (string porque así está en db.json)
-  private readonly currentPatientId = signal<string | null>(null);
+  // ✅ Signal para almacenar el patientId actual (number)
+  private readonly currentPatientId = signal<number | null>(null);
 
   // ✅ Computed signals que filtran por paciente actual
   medications = computed((): Medication[] => {
@@ -114,11 +114,11 @@ export class MedicationHistoryComponent implements OnInit {
           console.log(
             `✅ Medication-History: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`
           );
-          const patientIdStr = patient.id.toString();
-          this.currentPatientId.set(patientIdStr);
+          const patientId = Number(patient.id);
+          this.currentPatientId.set(patientId);
 
           // ✅ Cargar medicamentos del paciente actual (con force reload)
-          this.medicationStore.forceReload(patientIdStr).subscribe({
+          this.medicationStore.forceReload(patientId).subscribe({
             next: medications => {
               console.log(
                 `✅ Medication-History: ${medications.length} medicamentos cargados para paciente ${patient.id}`
@@ -152,9 +152,9 @@ export class MedicationHistoryComponent implements OnInit {
             next: patients => {
               const patient = patients.find(p => p.userId === userId);
               if (patient) {
-                const patientIdStr = patient.id.toString();
-                this.currentPatientId.set(patientIdStr);
-                this.medicationStore.forceReload(patientIdStr).subscribe();
+                const patientId = Number(patient.id);
+                this.currentPatientId.set(patientId);
+                this.medicationStore.forceReload(patientId).subscribe();
               }
             }
           });

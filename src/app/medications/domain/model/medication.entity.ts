@@ -44,7 +44,7 @@ export interface MedicationSchedule {
 
 export interface MedicationLog {
   id: string;
-  medicationId: string;
+  medicationId: number;
   scheduledTime: Date;
   actualTime?: Date;
   status: MedicationStatus;
@@ -55,8 +55,8 @@ export interface MedicationLog {
 }
 
 export class Medication {
-  id: string;
-  patientId: string;
+  id: number;
+  patientId: number;
   name: string;
   type: MedicationType;
   dosage: string; // e.g., "500mg", "2 pills", "5ml"
@@ -74,8 +74,8 @@ export class Medication {
   updatedAt: Date;
 
   constructor(data: Partial<Medication> = {}) {
-    this.id = data.id || '';
-    this.patientId = data.patientId || '';
+    this.id = data.id || 0;
+    this.patientId = data.patientId || 0;
     this.name = data.name || '';
     this.type = data.type || MedicationType.PILL;
     this.dosage = data.dosage || '';

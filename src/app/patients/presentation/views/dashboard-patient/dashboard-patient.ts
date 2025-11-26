@@ -123,7 +123,7 @@ export class DashboardPatient implements OnInit {
 
     // ✅ Filtrar solo medicamentos del paciente actual
     const allMedications = this.medicationStore.medications();
-    const patientMedications = allMedications.filter(m => m.patientId === patient.id.toString());
+    const patientMedications = allMedications.filter(m => m.patientId === patient.id);
     return patientMedications.length;
   });
 
@@ -133,7 +133,7 @@ export class DashboardPatient implements OnInit {
 
     // ✅ Filtrar solo medicamentos del paciente actual
     const schedule = this.medicationStore.todaySchedule();
-    const patientSchedule = schedule.filter(s => s.medication.patientId === patient.id.toString());
+    const patientSchedule = schedule.filter(s => s.medication.patientId === patient.id);
     return patientSchedule.slice(0, 3); // Mostrar solo primeros 3 en dashboard
   });
 
@@ -278,7 +278,7 @@ export class DashboardPatient implements OnInit {
           this.patientStore.loadPatientById(patient.id).subscribe();
 
           // ✅ Cargar medicamentos del paciente actual (con force reload para limpiar cache)
-          this.medicationStore.forceReload(patient.id.toString()).subscribe();
+          this.medicationStore.forceReload(patient.id).subscribe();
 
           // Cargar alertas del paciente actual
           this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe();
