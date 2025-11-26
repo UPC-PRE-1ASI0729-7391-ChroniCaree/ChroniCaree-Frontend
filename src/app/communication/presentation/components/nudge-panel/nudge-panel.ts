@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NudgeStore } from '../../../application/nudge.store';
 import { Nudge, NudgePriority } from '../../../domain/model/nudge.entity';
-import {TranslatePipe} from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 /**
  * Nudge Panel Component
@@ -28,7 +28,7 @@ import {TranslatePipe} from '@ngx-translate/core';
     MatBadgeModule,
     MatTooltipModule,
     MatSnackBarModule,
-    TranslatePipe
+    TranslateModule
   ],
   templateUrl: './nudge-panel.html',
   styleUrls: ['./nudge-panel.css']
