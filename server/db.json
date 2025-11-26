@@ -1420,7 +1420,7 @@
         "relationship": "214134",
         "phone": "3414134"
       },
-      "assignedDoctorId": null,
+      "assignedDoctorId": 6,
       "tenantId": 1764183449938,
       "subscriptionId": 3,
       "id": 1763240473346
