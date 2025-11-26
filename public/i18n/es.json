@@ -61,7 +61,48 @@
       "criticalValues": "Se detectaron valores críticos",
       "viewHistory": "Ver mi historial",
       "backToDashboard": "Volver al panel"
+    },
+    "subjective": {
+      "title": "Síntomas Subjetivos",
+      "subtitle": "Cómo te sientes hoy (escala 1-10)"
+    },
+    "notesSubtitle": "Describe cualquier otro síntoma o detalle importante",
+    "notesPlaceholder": "Ej: Dolor de cabeza desde esta mañana, aumenta con la luz...",
+    "scale": {
+      "veryLow": "Muy bajo",
+      "low": "Bajo",
+      "moderateLevel": "Moderado",
+      "high": "Alto",
+      "veryHigh": "Muy alto"
+    },
+    "vitals": {
+      "glucose": {
+        "label": "Glucosa (mg/dL)",
+        "placeholder": "Ej: 120",
+        "errorRange": "Valor debe estar entre 0 y 600 mg/dL"
+      },
+      "bloodPressure": {
+        "label": "Presión Arterial (mmHg)",
+        "placeholder": "Ej: 120/80",
+        "errorPattern": "Formato inválido. Use XXX/XX (ej: 120/80)"
+      },
+      "heartRate": {
+        "label": "Frecuencia Cardíaca (bpm)",
+        "placeholder": "Ej: 72",
+        "errorRange": "Valor debe estar entre 30 y 220 bpm"
+      },
+      "temperature": {
+        "label": "Temperatura (°C)",
+        "placeholder": "Ej: 36.5",
+        "errorRange": "Valor debe estar entre 34 y 42 °C"
+      },
+      "oxygenSaturation": {
+        "label": "Saturación de Oxígeno (%)",
+        "placeholder": "Ej: 98",
+        "errorRange": "Valor debe estar entre 0 y 100%"
+      }
     }
+
   },
 
   "patients": {

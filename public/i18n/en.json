@@ -38,7 +38,6 @@
       }
     }
   },
-
   "clinical": {
     "registerSymptoms": "Register Symptoms",
     "saving": "Saving symptoms...",
@@ -53,6 +52,7 @@
     "none": "None",
     "moderate": "Moderate",
     "severe": "Severe",
+
     "confirmation": {
       "title": "Symptoms Recorded!",
       "subtitle": "Your information has been saved successfully",
@@ -61,9 +61,52 @@
       "criticalValues": "Critical values detected",
       "viewHistory": "View my History",
       "backToDashboard": "Back to Dashboard"
+    },
+
+    "subjective": {
+      "title": "Subjective Symptoms",
+      "subtitle": "How do you feel today? (1–10 scale)"
+    },
+
+    "notesSubtitle": "Describe any other symptom or important detail",
+    "notesPlaceholder": "E.g., Headache since this morning, worse with light...",
+
+    "scale": {
+      "veryLow": "Very low",
+      "low": "Low",
+      "moderateLevel": "Moderate",
+      "high": "High",
+      "veryHigh": "Very high"
+    },
+
+    "vitals": {
+      "glucose": {
+        "label": "Glucose (mg/dL)",
+        "placeholder": "e.g., 120",
+        "errorRange": "Value must be between 0 and 600 mg/dL"
+      },
+      "bloodPressure": {
+        "label": "Blood Pressure (mmHg)",
+        "placeholder": "e.g., 120/80",
+        "errorPattern": "Invalid format. Use XXX/XX (e.g., 120/80)"
+      },
+      "heartRate": {
+        "label": "Heart Rate (bpm)",
+        "placeholder": "e.g., 72",
+        "errorRange": "Value must be between 30 and 220 bpm"
+      },
+      "temperature": {
+        "label": "Temperature (°C)",
+        "placeholder": "e.g., 36.5",
+        "errorRange": "Value must be between 34 and 42 °C"
+      },
+      "oxygenSaturation": {
+        "label": "Oxygen Saturation (%)",
+        "placeholder": "e.g., 98",
+        "errorRange": "Value must be between 0 and 100%"
+      }
     }
   },
-
   "patients": {
     "loading": "Loading your information...",
     "greeting": "Hello, {{name}}!",
