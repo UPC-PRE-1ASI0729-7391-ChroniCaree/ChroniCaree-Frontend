@@ -10,6 +10,10 @@ interface DoctorForm {
   email: string;
   phone: string;
   licenseNumber: string;
+
+  // ✅ NUEVO
+  password: string;
+  confirmPassword: string;
 }
 
 @Component({
@@ -28,12 +32,18 @@ export class AddDoctorView {
     specialty: '',
     email: '',
     phone: '',
-    licenseNumber: ''
+    licenseNumber: '',
+    password: '',
+    confirmPassword: ''
   });
 
   submitting = signal<boolean>(false);
   error = signal<string | null>(null);
   success = signal<boolean>(false);
+
+  // ✅ NUEVO: mostrar/ocultar
+  showPassword = signal<boolean>(false);
+  showConfirmPassword = signal<boolean>(false);
 
   specialties = [
     'Cardiología',
@@ -59,9 +69,58 @@ export class AddDoctorView {
     }));
   }
 
+  toggleShowPassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  toggleShowConfirmPassword(): void {
+    this.showConfirmPassword.update(v => !v);
+  }
+
+  generatePassword(): void {
+    const pwd = this.generateSecurePassword(12);
+    this.form.update(c => ({ ...c, password: pwd, confirmPassword: pwd }));
+  }
+
+  private generateSecurePassword(length = 12): string {
+    // sin caracteres ambiguos
+    const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lower = 'abcdefghijkmnopqrstuvwxyz';
+    const digits = '23456789';
+    const symbols = '!@#$%*?';
+
+    const all = upper + lower + digits + symbols;
+
+    const rand = (max: number) => {
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        const arr = new Uint32Array(1);
+        crypto.getRandomValues(arr);
+        return arr[0] % max;
+      }
+      return Math.floor(Math.random() * max);
+    };
+
+    const pick = (set: string) => set[rand(set.length)];
+
+    // asegura complejidad mínima
+    let pass = pick(upper) + pick(lower) + pick(digits) + pick(symbols);
+    while (pass.length < length) pass += pick(all);
+
+    // shuffle
+    return pass
+      .split('')
+      .sort(() => rand(1000) - 500)
+      .join('');
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
+
   validateForm(): boolean {
     const f = this.form();
-    
+
     if (!f.name.trim()) {
       this.error.set('El nombre es requerido');
       return false;
@@ -72,7 +131,7 @@ export class AddDoctorView {
       return false;
     }
 
-    if (!f.email.trim() || !f.email.includes('@')) {
+    if (!f.email.trim() || !this.isValidEmail(f.email)) {
       this.error.set('Email inválido');
       return false;
     }
@@ -87,14 +146,28 @@ export class AddDoctorView {
       return false;
     }
 
+    // ✅ NUEVO: password obligatorio
+    if (!f.password || !f.confirmPassword) {
+      this.error.set('La contraseña y su confirmación son requeridas');
+      return false;
+    }
+
+    if (f.password.length < 8) {
+      this.error.set('La contraseña debe tener al menos 8 caracteres');
+      return false;
+    }
+
+    if (f.password !== f.confirmPassword) {
+      this.error.set('Las contraseñas no coinciden');
+      return false;
+    }
+
     this.error.set(null);
     return true;
   }
 
   onSubmit(): void {
-    if (!this.validateForm()) {
-      return;
-    }
+    if (!this.validateForm()) return;
 
     this.submitting.set(true);
     this.error.set(null);
@@ -111,34 +184,33 @@ export class AddDoctorView {
     const f = this.form();
 
     // Separar nombre en firstName y lastName
-    const nameParts = f.name.trim().split(' ');
+    const nameParts = f.name.trim().replace(/\s+/g, ' ').split(' ');
     const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || nameParts[0] || '';
 
     const request = {
       tenantId,
-      email: f.email,
-      password: 'temp' + Math.random().toString(36).slice(-8), // Password temporal
+      email: f.email.trim(),
+      // ✅ ahora sale del formulario (NO default/temporal)
+      password: f.password,
       firstName,
       lastName,
-      licenseNumber: f.licenseNumber,
+      licenseNumber: f.licenseNumber.trim(),
       specialty: f.specialty,
-      phone: f.phone
+      phone: f.phone.trim()
     };
 
-    // Use admin flow that doesn't require tenant subscription
     this.dashboardStore.registerDoctorAsAdmin(request).subscribe({
       next: () => {
         this.success.set(true);
         this.submitting.set(false);
-        
-        // Mostrar mensaje de éxito y redirigir después de 2 segundos
+
         setTimeout(() => {
           this.router.navigate(['/hospital/doctors']);
         }, 2000);
       },
       error: (err) => {
-        this.error.set(err.message || 'Error al registrar el doctor');
+        this.error.set(err?.message || 'Error al registrar el doctor');
         this.submitting.set(false);
         console.error('Error registering doctor:', err);
       }
