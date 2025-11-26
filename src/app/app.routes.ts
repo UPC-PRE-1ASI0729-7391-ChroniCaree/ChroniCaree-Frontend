@@ -229,8 +229,8 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./tenants/presentation/views/hospital-profile/hospital-profile.view')
-            .then((m) => m.HospitalProfileView),
+          import('./tenants/presentation/views/hospital-profile-edit/hospital-profile-edit.view')
+            .then((m) => m.HospitalProfileEditView),
         title: `${baseTitle} - Perfil Hospital`,
         data: { role: 'hospital_admin' },
       },
