@@ -43,7 +43,7 @@
     <form class="doctor-form" (ngSubmit)="onSubmit()">
       <div class="form-section">
         <h2>Información Personal</h2>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="name">
@@ -118,7 +118,7 @@
 
       <div class="form-section">
         <h2>Información Profesional</h2>
-        
+
         <div class="form-group">
           <label for="licenseNumber">
             Número de Licencia Médica
@@ -137,11 +137,70 @@
         </div>
       </div>
 
+      <!-- ✅ NUEVO: Credenciales -->
+      <div class="form-section">
+        <h2>Credenciales de Acceso</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">
+              Contraseña
+              <span class="required">*</span>
+            </label>
+
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword() ? 'text' : 'password'"
+                id="password"
+                [value]="form().password"
+                (input)="updateForm('password', $any($event.target).value)"
+                placeholder="Mínimo 8 caracteres"
+                [disabled]="submitting()"
+                autocomplete="new-password"
+                required
+              />
+              <button type="button" class="btn-eye" (click)="toggleShowPassword()" [disabled]="submitting()">
+                {{ showPassword() ? 'Ocultar' : 'Ver' }}
+              </button>
+            </div>
+
+            <small class="form-hint">Recomendado: usar letras, números y símbolos.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">
+              Confirmar Contraseña
+              <span class="required">*</span>
+            </label>
+
+            <div class="password-wrapper">
+              <input
+                [type]="showConfirmPassword() ? 'text' : 'password'"
+                id="confirmPassword"
+                [value]="form().confirmPassword"
+                (input)="updateForm('confirmPassword', $any($event.target).value)"
+                placeholder="Repite la contraseña"
+                [disabled]="submitting()"
+                autocomplete="new-password"
+                required
+              />
+              <button type="button" class="btn-eye" (click)="toggleShowConfirmPassword()" [disabled]="submitting()">
+                {{ showConfirmPassword() ? 'Ocultar' : 'Ver' }}
+              </button>
+            </div>
+
+            <button type="button" class="btn-generate" (click)="generatePassword()" [disabled]="submitting()">
+              Generar contraseña segura
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Form Actions -->
       <div class="form-actions">
-        <button 
-          type="button" 
-          class="btn-secondary" 
+        <button
+          type="button"
+          class="btn-secondary"
           (click)="cancel()"
           [disabled]="submitting()"
         >
@@ -151,8 +210,9 @@
           </svg>
           Cancelar
         </button>
-        <button 
-          type="submit" 
+
+        <button
+          type="submit"
           class="btn-primary"
           [disabled]="submitting()"
         >

@@ -303,6 +303,127 @@
       "twoFactorEnabled": false,
       "createdAt": "2025-11-16T03:53:53.455Z",
       "tenantId": 1763265233506
+    },
+    {
+      "id": 1764115292081,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:01:32.081Z",
+      "tenantId": null
+    },
+    {
+      "id": 1764115317847,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:01:57.847Z",
+      "tenantId": 1764115317893
+    },
+    {
+      "id": 1764115388840,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:03:08.840Z",
+      "tenantId": 1764115388876
+    },
+    {
+      "id": 1764115493801,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:04:53.801Z",
+      "tenantId": 1764115493850
+    },
+    {
+      "id": 1764117867933,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:44:27.933Z",
+      "tenantId": null
+    },
+    {
+      "id": 1764118179693,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:49:39.693Z",
+      "tenantId": 1764118180058
+    },
+    {
+      "id": 1764118751513,
+      "email": "hola@gmail.com",
+      "role": "hospital_admin",
+      "name": "Schneider Delgado",
+      "password": "123456789",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T00:59:11.513Z",
+      "tenantId": 1764118751653
+    },
+    {
+      "id": 1764119640993,
+      "email": "123@gmail.com",
+      "role": "hospital_admin",
+      "name": "snay",
+      "password": "147258369",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T01:14:00.993Z",
+      "tenantId": 1764119641076
+    },
+    {
+      "id": 1764119640994,
+      "email": "snay@gmail.com",
+      "role": "doctor",
+      "name": "Dr. Snay",
+      "password": "Snay1234",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T01:46:39.695Z",
+      "tenantId": null
+    },
+    {
+      "id": 1764119640995,
+      "email": "carlos@gmail.com",
+      "role": "doctor",
+      "name": "Carlos Carlos",
+      "password": "Carlos1234",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T01:49:48.648Z",
+      "tenantId": null
+    },
+    {
+      "id": 1764119640996,
+      "email": "pepe@gmail.com",
+      "role": "patient",
+      "name": "Pepe Paz",
+      "password": "Pepe1234",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T02:05:19.002Z",
+      "tenantId": null
     }
   ],
   "tenants": [
@@ -531,6 +652,134 @@
       "status": "active",
       "subscriptionId": 12,
       "registrationDate": "2025-11-16T03:53:53.506Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764115292338,
+      "adminUserId": 1764115292081,
+      "name": "Clinica San Vicente",
+      "address": "Av. Tupac",
+      "phone": "963852741",
+      "email": "hola@gmail.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-26T00:01:32.338Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764115317893,
+      "adminUserId": 1764115317847,
+      "name": "Clinica San Vicente",
+      "address": "Av. Tupac",
+      "phone": "963852741",
+      "email": "hola@gmail.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-26T00:01:57.893Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764115388876,
+      "adminUserId": 1764115388840,
+      "name": "Clinica San Vicente",
+      "address": "Av. Tupac",
+      "phone": "963852741",
+      "email": "hola@gmail.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-26T00:03:08.876Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764115493850,
+      "adminUserId": 1764115493801,
+      "name": "Clinica San Vicente",
+      "address": "Av. Tupac",
+      "phone": "963852741",
+      "email": "hola@gmail.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-26T00:04:53.850Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764117868071,
+      "adminUserId": 1764117867933,
+      "name": "Clinica San Vicente",
+      "address": "Av. tupac, Lima",
+      "phone": "+51 963852741",
+      "email": "hola@gmail.com",
+      "status": "pending",
+      "subscriptionId": null,
+      "registrationDate": "2025-11-26T00:44:28.071Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764118180058,
+      "adminUserId": 1764118179693,
+      "name": "Clinica San Vicente",
+      "address": "Av. tupac, Lima",
+      "phone": "+51 963852741",
+      "email": "hola@gmail.com",
+      "status": "active",
+      "subscriptionId": 13,
+      "registrationDate": "2025-11-26T00:49:40.058Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764118751653,
+      "adminUserId": 1764118751513,
+      "name": "Clinica San Vicente",
+      "address": "Av. tupac, Lima",
+      "phone": "+51 963852741",
+      "email": "hola@gmail.com",
+      "status": "active",
+      "subscriptionId": 14,
+      "registrationDate": "2025-11-26T00:59:11.653Z",
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    {
+      "id": 1764119641076,
+      "adminUserId": 1764119640993,
+      "name": "Clinica vida",
+      "address": "Av. Grau",
+      "phone": "+51 987654321",
+      "email": "123@gmail.com",
+      "status": "active",
+      "subscriptionId": 15,
+      "registrationDate": "2025-11-26T01:14:01.076Z",
       "settings": {
         "allowIndependentDoctors": false,
         "requirePatientApproval": true,
@@ -844,6 +1093,51 @@
       "lastPaymentDate": "2025-11-16T03:54:05.958Z",
       "lastPaymentAmount": 999,
       "id": 12
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1764118180058,
+      "planId": "tenant_basic",
+      "status": "active",
+      "startDate": "2025-11-26T00:51:00.839Z",
+      "endDate": "2025-12-26T00:51:00.839Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "hola@gmail.com",
+      "nextBillingDate": "2025-12-26T00:51:00.839Z",
+      "lastPaymentDate": "2025-11-26T00:51:00.839Z",
+      "lastPaymentAmount": 299,
+      "id": 13
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1764118751653,
+      "planId": "tenant_basic",
+      "status": "active",
+      "startDate": "2025-11-26T01:00:05.534Z",
+      "endDate": "2025-12-26T01:00:05.534Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "hola@gmail.com",
+      "nextBillingDate": "2025-12-26T01:00:05.534Z",
+      "lastPaymentDate": "2025-11-26T01:00:05.534Z",
+      "lastPaymentAmount": 299,
+      "id": 14
+    },
+    {
+      "payerType": "tenant",
+      "payerId": 1764119641076,
+      "planId": "tenant_professional",
+      "status": "active",
+      "startDate": "2025-11-26T01:14:53.124Z",
+      "endDate": "2025-12-26T01:14:53.124Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "123@gmail.com",
+      "nextBillingDate": "2025-12-26T01:14:53.124Z",
+      "lastPaymentDate": "2025-11-26T01:14:53.124Z",
+      "lastPaymentAmount": 599,
+      "id": 15
     }
   ],
   "patients": [
@@ -1022,6 +1316,28 @@
         "relationship": "",
         "phone": ""
       }
+    },
+    {
+      "userId": 1764119640996,
+      "firstName": "Pepe",
+      "lastName": "Paz",
+      "dni": "74185296",
+      "birthDate": "1999-01-25",
+      "gender": "male",
+      "phone": "+51951753852",
+      "address": "Av. Brazil",
+      "weight": 80,
+      "height": 1.8,
+      "bmi": 246913.6,
+      "emergencyContact": {
+        "name": "Teresa ",
+        "relationship": "Hermana",
+        "phone": "+51987321654"
+      },
+      "assignedDoctorId": 4,
+      "tenantId": 1764119641076,
+      "subscriptionId": 3,
+      "id": 1763240473345
     }
   ],
   "doctors": [
@@ -1083,6 +1399,46 @@
       ],
       "education": [],
       "joinedAt": "2025-11-15T19:32:44.580Z"
+    },
+    {
+      "id": 4,
+      "userId": 1764119640994,
+      "tenantId": 1764119641076,
+      "isIndependent": true,
+      "firstName": "Dr.",
+      "lastName": "Snay",
+      "dni": "N/A",
+      "specialty": "Cardiología",
+      "licenseNumber": "CMP-12347",
+      "phone": "+51987654321",
+      "isVerified": false,
+      "acceptingPatients": false,
+      "consultationFee": 0,
+      "languages": [
+        "es"
+      ],
+      "education": [],
+      "joinedAt": "2025-11-26T01:46:39.797Z"
+    },
+    {
+      "id": 5,
+      "userId": 1764119640995,
+      "tenantId": 1764119641076,
+      "isIndependent": true,
+      "firstName": "Carlos",
+      "lastName": "Carlos",
+      "dni": "N/A",
+      "specialty": "Endocrinología",
+      "licenseNumber": "CMP-741",
+      "phone": "+51963852741",
+      "isVerified": false,
+      "acceptingPatients": false,
+      "consultationFee": 0,
+      "languages": [
+        "es"
+      ],
+      "education": [],
+      "joinedAt": "2025-11-26T01:49:48.688Z"
     }
   ],
   "appointments": [
@@ -1663,6 +2019,26 @@
       "notes": "Auto-reportado durante el registro del paciente (hospital)",
       "lastReviewDate": "2025-11-15T20:22:34.210Z",
       "id": 13
+    },
+    {
+      "patientId": 1763240473345,
+      "diagnosisName": "diabetes_type_1",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-26T02:05:19.119Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-26T02:05:19.119Z",
+      "id": 14
+    },
+    {
+      "patientId": 1763240473345,
+      "diagnosisName": "depression",
+      "status": "pending_confirmation",
+      "source": "patient_reported",
+      "diagnosisDate": "2025-11-26T02:05:19.119Z",
+      "notes": "Auto-reportado durante el registro del paciente (hospital)",
+      "lastReviewDate": "2025-11-26T02:05:19.119Z",
+      "id": 15
     }
   ],
   "payments": [
@@ -1829,6 +2205,48 @@
       "updatedAt": "2025-11-16T03:54:05.888Z",
       "createdAt": "2025-11-16T03:54:05.888Z",
       "id": 12
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1764118180058,
+      "amount": 299,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SXWwiBJEHGVCWjriroWG52F",
+      "stripePaymentIntentId": "tok_1SXWwiBJEHGVCWjriroWG52F",
+      "updatedAt": "2025-11-26T00:51:00.581Z",
+      "createdAt": "2025-11-26T00:51:00.581Z",
+      "id": 13
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1764118751653,
+      "amount": 299,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SXX5VBJEHGVCWjr9gp0MfSB",
+      "stripePaymentIntentId": "tok_1SXX5VBJEHGVCWjr9gp0MfSB",
+      "updatedAt": "2025-11-26T01:00:05.373Z",
+      "createdAt": "2025-11-26T01:00:05.373Z",
+      "id": 14
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "tenant",
+      "payerId": 1764119641076,
+      "amount": 599,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SXXJoBJEHGVCWjrFoF3S5ne",
+      "stripePaymentIntentId": "tok_1SXXJoBJEHGVCWjrFoF3S5ne",
+      "updatedAt": "2025-11-26T01:14:52.677Z",
+      "createdAt": "2025-11-26T01:14:52.678Z",
+      "id": 15
     }
   ],
   "nudges": [
