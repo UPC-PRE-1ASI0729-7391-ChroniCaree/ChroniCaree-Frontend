@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, interval, Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { Message } from '../domain/model/message.entity';
 import { Thread } from '../domain/model/thread.entity';
@@ -15,6 +16,11 @@ export class MessagesStore extends BaseApi {
   currentThread = signal<(Thread & { messages: Message[] }) | null>(null);
   sending = signal(false);
   closing = signal(false);
+
+  // Polling para actualización en tiempo real
+  private pollingSubscription?: Subscription;
+  private currentRole?: 'PATIENT' | 'DOCTOR';
+  private currentUserId?: string;
 
   // Computed: Total threads (can be enhanced to count unread when backend supports it)
   totalThreads = computed(() => this.inbox().length);
@@ -61,94 +67,221 @@ export class MessagesStore extends BaseApi {
 
   // ===== QUERIES =====
 
+  /**
+   * Carga el inbox y actualiza los threads desde los mensajes del servidor
+   */
+  private processMessages(messages: any[], role: 'PATIENT' | 'DOCTOR', userId: string): Thread[] {
+    // Filtrar sólo mensajes en los que el usuario participa
+    const participantMessages = messages.filter((msg: any) => {
+      const senderId = msg.senderId?.toString() || '';
+      const receiverId = msg.receiverId?.toString() || '';
+      return senderId === userId || receiverId === userId;
+    });
+
+    // Agrupar mensajes por conversación (thread) asegurando que la thread
+    // corresponda a pair patient<->doctor y que el paciente/doctor se asignen bien.
+    const threadsMap = new Map<string, Thread>();
+
+    participantMessages.forEach((msg: any) => {
+      const senderId = msg.senderId?.toString() || '';
+      const receiverId = msg.receiverId?.toString() || '';
+
+      // Determinar patientId y doctorId en el thread (dependiendo de senderRole si existe)
+      const isSenderPatient = (msg.senderRole || '').toUpperCase() === 'PATIENT';
+      const patientId = isSenderPatient ? senderId : receiverId;
+      const doctorId = isSenderPatient ? receiverId : senderId;
+
+      const key = `patient-${patientId}-doctor-${doctorId}`;
+
+      if (!threadsMap.has(key)) {
+        threadsMap.set(key, {
+          id: key,
+          patientId: patientId,
+          doctorId: doctorId,
+          subject: msg.subject || 'Sin asunto',
+          messages: [],
+          status: 'OPEN',
+          createdAt: msg.timestamp || new Date().toISOString(),
+          updatedAt: msg.timestamp || new Date().toISOString(),
+          hasUrgentMessages: false,
+          unreadCount: 0
+        });
+      }
+
+      // Asegurarnos de que TS sepa que el thread tiene messages y timestamps
+      const thread = threadsMap.get(key)! as Thread & { messages: Message[]; createdAt: string; updatedAt: string };
+
+      // Normalizar createdAt como string seguro
+      const createdAt = msg.timestamp || new Date().toISOString();
+
+      const message: Message = {
+        id: msg.id?.toString() || '',
+        senderRole: (msg.senderRole || 'PATIENT') as Message['senderRole'],
+        senderId: senderId,
+        receiverId: receiverId,
+        subject: msg.subject || '',
+        body: msg.content || msg.body || '',
+        attachments: msg.attachments || [],
+        isRead: !!msg.read,
+        isUrgent: !!msg.isUrgent,
+        createdAt: createdAt
+      };
+
+      // Garantizar array de mensajes antes de push
+      thread.messages = thread.messages || [];
+      thread.messages.push(message);
+
+      if (message.isUrgent) {
+        thread.hasUrgentMessages = true;
+      }
+      // contar sólo mensajes no leídos dirigidos al usuario actual
+      if (!message.isRead && message.receiverId === userId) {
+        thread.unreadCount = (thread.unreadCount || 0) + 1;
+      }
+      // mantener updatedAt con la fecha más reciente
+      thread.updatedAt = (createdAt > (thread.updatedAt || '')) ? createdAt : (thread.updatedAt || createdAt);
+    });
+
+    // Ordenar mensajes dentro de cada thread por fecha
+    threadsMap.forEach(thread => {
+      if (thread.messages && Array.isArray(thread.messages)) {
+        thread.messages.sort((a, b) => {
+          const dateA = a.createdAt || '';
+          const dateB = b.createdAt || '';
+          return dateA.localeCompare(dateB);
+        });
+      }
+    });
+
+    return Array.from(threadsMap.values()).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+  }
+
   loadInbox(role: 'PATIENT' | 'DOCTOR', userId: string) {
+    // Guardar role y userId para el polling
+    this.currentRole = role;
+    this.currentUserId = userId;
+
     // Para JSON Server simple, obtenemos todos los messages y los filtramos
     this.http
       .get<any[]>(this.messagesUrl)
       .subscribe({
         next: (messages) => {
           console.log('📨 Mensajes recibidos del servidor:', messages);
-
-          // Filtrar sólo mensajes en los que el usuario participa
-          const participantMessages = messages.filter((msg: any) => {
-            const senderId = msg.senderId?.toString() || '';
-            const receiverId = msg.receiverId?.toString() || '';
-            return senderId === userId || receiverId === userId;
-          });
-
-          // Agrupar mensajes por conversación (thread) asegurando que la thread
-          // corresponda a pair patient<->doctor y que el paciente/doctor se asignen bien.
-          const threadsMap = new Map<string, Thread>();
-
-          participantMessages.forEach((msg: any) => {
-            const senderId = msg.senderId?.toString() || '';
-            const receiverId = msg.receiverId?.toString() || '';
-
-            // Determinar patientId y doctorId en el thread (dependiendo de senderRole si existe)
-            const isSenderPatient = (msg.senderRole || '').toUpperCase() === 'PATIENT';
-            const patientId = isSenderPatient ? senderId : receiverId;
-            const doctorId = isSenderPatient ? receiverId : senderId;
-
-            const key = `patient-${patientId}-doctor-${doctorId}`;
-
-            if (!threadsMap.has(key)) {
-              threadsMap.set(key, {
-                id: key,
-                patientId: patientId,
-                doctorId: doctorId,
-                subject: msg.subject || 'Sin asunto',
-                messages: [],
-                status: 'OPEN',
-                createdAt: msg.timestamp || new Date().toISOString(),
-                updatedAt: msg.timestamp || new Date().toISOString(),
-                hasUrgentMessages: false,
-                unreadCount: 0
-              });
-            }
-
-            // Asegurarnos de que TS sepa que el thread tiene messages y timestamps
-            const thread = threadsMap.get(key)! as Thread & { messages: Message[]; createdAt: string; updatedAt: string };
-
-            // Normalizar createdAt como string seguro
-            const createdAt = msg.timestamp || new Date().toISOString();
-
-            const message: Message = {
-              id: msg.id?.toString() || '',
-              senderRole: (msg.senderRole || 'PATIENT') as Message['senderRole'],
-              senderId: senderId,
-              receiverId: receiverId,
-              subject: msg.subject || '',
-              body: msg.content || msg.body || '',
-              attachments: msg.attachments || [],
-              isRead: !!msg.read,
-              isUrgent: !!msg.isUrgent,
-              createdAt: createdAt
-            };
-
-            // Garantizar array de mensajes antes de push
-            thread.messages = thread.messages || [];
-            thread.messages.push(message);
-
-            if (message.isUrgent) {
-              thread.hasUrgentMessages = true;
-            }
-            // contar sólo mensajes no leídos dirigidos al usuario actual
-            if (!message.isRead && message.receiverId === userId) {
-              thread.unreadCount = (thread.unreadCount || 0) + 1;
-            }
-            // mantener updatedAt con la fecha más reciente
-            thread.updatedAt = (createdAt > (thread.updatedAt || '')) ? createdAt : (thread.updatedAt || createdAt);
-          });
-
-          const threads = Array.from(threadsMap.values()).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+          const threads = this.processMessages(messages, role, userId);
           console.log(`✅ ${threads.length} threads cargados para ${role} ${userId}`);
           this.inbox.set(threads);
+
+          // Actualizar thread actual si está abierto
+          this.updateCurrentThreadIfOpen(threads);
         },
         error: (err) => {
           console.error('❌ Error cargando mensajes:', err);
           this.inbox.set([]);
         }
       });
+
+    // Iniciar polling automático cada 5 segundos
+    this.startPolling();
+  }
+
+  /**
+   * Actualiza el thread actual si está abierto y hay cambios
+   */
+  private updateCurrentThreadIfOpen(threads: Thread[]) {
+    const current = this.currentThread();
+    if (!current) return;
+
+    const updatedThread = threads.find(t => t.id === current.id);
+    if (updatedThread) {
+      // Comparar cantidad de mensajes para detectar nuevos
+      const currentMsgCount = (current.messages || []).length;
+      const updatedMsgCount = ((updatedThread as any).messages || []).length;
+
+      if (updatedMsgCount > currentMsgCount) {
+        // Hay nuevos mensajes, actualizar el thread actual
+        const updatedThreadWithMessages = {
+          ...updatedThread,
+          messages: (updatedThread as any).messages || []
+        } as Thread & { messages: Message[] };
+        this.currentThread.set(updatedThreadWithMessages);
+        console.log('🔄 Thread actualizado con nuevos mensajes');
+      } else {
+        // Actualizar otros campos (unreadCount, status, etc.) sin cambiar mensajes
+        this.currentThread.set({
+          ...current,
+          unreadCount: updatedThread.unreadCount,
+          hasUrgentMessages: updatedThread.hasUrgentMessages,
+          status: updatedThread.status,
+          updatedAt: updatedThread.updatedAt
+        });
+      }
+    }
+  }
+
+  /**
+   * Inicia el polling automático para actualizar mensajes cada 5 segundos
+   */
+  private startPolling() {
+    // Detener polling anterior si existe
+    this.stopPolling();
+
+    if (!this.currentRole || !this.currentUserId) return;
+
+    // Polling cada 5 segundos
+    this.pollingSubscription = interval(5000)
+      .pipe(
+        switchMap(() => this.http.get<any[]>(this.messagesUrl))
+      )
+      .subscribe({
+        next: (messages) => {
+          const threads = this.processMessages(messages, this.currentRole!, this.currentUserId!);
+          const previousThreads = this.inbox();
+          
+          // Solo actualizar si hay cambios (comparar cantidad de threads o mensajes)
+          const hasChanges = this.hasInboxChanges(previousThreads, threads);
+          if (hasChanges) {
+            console.log('🔄 Actualizando inbox por polling...');
+            this.inbox.set(threads);
+            this.updateCurrentThreadIfOpen(threads);
+          }
+        },
+        error: (err) => {
+          // Silenciar errores de polling para no spamear la consola
+          console.debug('⚠️ Error en polling (ignorado):', err);
+        }
+      });
+  }
+
+  /**
+   * Detiene el polling automático
+   */
+  stopPolling() {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = undefined;
+    }
+  }
+
+  /**
+   * Compara si hay cambios entre dos listas de threads
+   */
+  private hasInboxChanges(previous: Thread[], current: Thread[]): boolean {
+    if (previous.length !== current.length) return true;
+
+    // Comparar por ID de thread y cantidad de mensajes
+    for (const currentThread of current) {
+      const prevThread = previous.find(t => t.id === currentThread.id);
+      if (!prevThread) return true;
+
+      const prevMsgCount = ((prevThread as any).messages || []).length;
+      const currMsgCount = ((currentThread as any).messages || []).length;
+      if (prevMsgCount !== currMsgCount) return true;
+
+      // Comparar updatedAt
+      if (prevThread.updatedAt !== currentThread.updatedAt) return true;
+    }
+
+    return false;
   }
 
   async openThread(threadId: string) {
@@ -168,6 +301,13 @@ export class MessagesStore extends BaseApi {
       // rethrow to let caller handle
       throw e;
     }
+  }
+
+  /**
+   * Limpia recursos cuando el store se destruye (opcional, pero buena práctica)
+   */
+  ngOnDestroy() {
+    this.stopPolling();
   }
 
   /**

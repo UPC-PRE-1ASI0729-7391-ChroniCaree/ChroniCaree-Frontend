@@ -1,4 +1,4 @@
-import { Component, inject, computed, Signal, WritableSignal, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, Signal, WritableSignal, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -32,6 +32,9 @@ export class MessageThreadComponent implements AfterViewInit {
   // Entrada de respuesta (solo usada cuando el doctor contesta)
   replyText = signal<string>('');
 
+  // Trackear cantidad de mensajes para detectar nuevos
+  private previousMessageCount = 0;
+
   // ViewModel derivado del store
   vm: Signal<{
     thread: ThreadVM;
@@ -48,6 +51,33 @@ export class MessageThreadComponent implements AfterViewInit {
     const canClose = !!t && t.status === 'OPEN';
     return { thread: t, sending, closing, canReply, canClose };
   });
+
+  constructor() {
+    // Efecto para detectar nuevos mensajes y hacer scroll automático
+    effect(() => {
+      const thread = this.store.currentThread();
+      if (thread && thread.messages) {
+        const currentCount = thread.messages.length;
+        
+        // Si hay nuevos mensajes (más que antes), hacer scroll y actualizar nombres
+        if (currentCount > this.previousMessageCount && this.previousMessageCount > 0) {
+          // Nuevos mensajes detectados
+          const newMessages = thread.messages.slice(this.previousMessageCount);
+          newMessages.forEach(m => this.fetchSenderName(m.senderId));
+          
+          // Scroll automático solo si el usuario está cerca del final
+          this.scrollToBottomIfNearEnd();
+        } else if (this.previousMessageCount === 0 && currentCount > 0) {
+          // Primera carga, hacer scroll completo
+          this.scrollToBottom();
+        }
+        
+        this.previousMessageCount = currentCount;
+      } else {
+        this.previousMessageCount = 0;
+      }
+    });
+  }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -212,5 +242,27 @@ export class MessageThreadComponent implements AfterViewInit {
         // ignore
       }
     }, 80);
+  }
+
+  /**
+   * Hace scroll solo si el usuario está cerca del final del chat
+   * (para no interrumpir si está leyendo mensajes anteriores)
+   */
+  private scrollToBottomIfNearEnd() {
+    setTimeout(() => {
+      try {
+        const el = document.querySelector('.chat-container') as HTMLElement;
+        if (el) {
+          const threshold = 100; // píxeles desde el final
+          const isNearEnd = el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+          
+          if (isNearEnd) {
+            el.scrollTop = el.scrollHeight;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, 100);
   }
 }

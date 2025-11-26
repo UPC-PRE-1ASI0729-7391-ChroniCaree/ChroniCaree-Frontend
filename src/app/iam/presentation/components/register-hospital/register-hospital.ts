@@ -17,12 +17,12 @@ interface HospitalRegistrationForm {
   password: string;
   confirmPassword: string;
   adminName: string;
-  
+
   // Hospital/Tenant data
   hospitalName: string;
   address: string;
   phone: string;
-  
+
   // Payment
   selectedPlanId: string | null;
 }
@@ -63,7 +63,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
   cardholderName = signal<string>('');
   acceptTerms = signal<boolean>(false);
   stripeBlocked = signal(false);
-  
+
   private cardMounted = false;
   private createdUserId: number | null = null;
   private createdTenantId: number | null = null;
@@ -255,7 +255,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
           next: (tenant: any) => {
             // Actualizar el usuario con el tenantId
             const updatedUser = { ...user, tenantId: tenant.id };
-            
+
             // Actualizar el usuario en la base de datos
             this.userStore.updateUser(updatedUser).subscribe({
               next: () => {
@@ -323,7 +323,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
 
     try {
   const selectedPlan = this.availablePlans().find(p => String(p.id) === this.form().selectedPlanId);
-      
+
       if (!selectedPlan) {
         throw new Error('Plan no encontrado');
       }
@@ -357,7 +357,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
               subscriptionId: subscription.id,
               status: 'active' as any
             };
-            
+
             this.tenantStore.updateTenant(updatedTenant).subscribe({
               next: () => {
                 this.submitting.set(false);
@@ -371,7 +371,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
                   isVerified: true
                 };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
+
                 // Add small delay to ensure localStorage is written
                 setTimeout(() => {
                   window.location.href = '/hospital/dashboard';
@@ -390,7 +390,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
                   isVerified: true
                 };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
+
                 setTimeout(() => {
                   window.location.href = '/hospital/dashboard';
                 }, 100);
@@ -410,7 +410,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
               isVerified: true
             };
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
+
             setTimeout(() => {
               window.location.href = '/hospital/dashboard';
             }, 100);
@@ -427,7 +427,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
           isVerified: true
         };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
+
         setTimeout(() => {
           window.location.href = '/hospital/dashboard';
         }, 100);

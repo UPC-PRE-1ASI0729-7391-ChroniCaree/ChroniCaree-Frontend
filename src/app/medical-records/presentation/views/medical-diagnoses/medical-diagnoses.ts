@@ -82,9 +82,10 @@ export class MedicalDiagnosesComponent implements OnInit {
         } as unknown as Diagnosis;
       });
 
-      const diagnoses = this.diagnoses().filter(d =>
-        d.patientId === patientId &&
-        d.icd10Code &&
+
+      const diagnoses = this.diagnoses().filter(d => 
+        d.patientId === patientId && 
+        d.icd10Code && 
         d.severity
       );
       console.log('🔍 Diagnósticos filtrados para paciente', patientId, ':', diagnoses);
@@ -105,9 +106,9 @@ export class MedicalDiagnosesComponent implements OnInit {
       }
     })();
 
-    return diagnoses.filter(d =>
-      d.patientId === patientId &&
-      d.icd10Code &&
+    return diagnoses.filter(d => 
+      d.patientId === patientId && 
+      d.icd10Code && 
       d.severity
     );
   });
@@ -207,8 +208,8 @@ export class MedicalDiagnosesComponent implements OnInit {
 
     // Navegar a la vista de detalle con modo edición
     console.log('✏️ Navegando a edición de diagnóstico:', diagnosis.id);
-    this.router.navigate(['/medical-records/diagnoses', diagnosis.id], {
-      queryParams: { mode: 'edit' }
+    this.router.navigate(['/medical-records/diagnoses', diagnosis.id], { 
+      queryParams: { mode: 'edit' } 
     });
   }
 
