@@ -10,118 +10,114 @@
 
   @if (loading()) {
     <div class="loading-overlay">
-  <mat-spinner></mat-spinner>
-  <p>{{ 'clinical.saving' | translate }}</p>
+      <mat-spinner></mat-spinner>
+      <p>{{ 'clinical.saving' | translate }}</p>
     </div>
   }
 
   <form [formGroup]="symptomForm" (ngSubmit)="onSubmit()" class="symptom-form">
-    <!-- Signos Vitales -->
+    <!-- Vital Signs -->
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon vital-icon">favorite</mat-icon>
-  <mat-card-title>{{ 'clinical.vitalSigns' | translate }}</mat-card-title>
-  <mat-card-subtitle>{{ 'clinical.vitalSubtitle' | translate }}</mat-card-subtitle>
+        <mat-card-title>{{ 'clinical.vitalSigns' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'clinical.vitalSubtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
+
       <mat-card-content>
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Glucosa (mg/dL)</mat-label>
-            <input matInput type="number" formControlName="glucose" placeholder="Ej: 120">
+            <mat-label>{{ 'clinical.vitals.glucose.label' | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="glucose"
+              [placeholder]="'clinical.vitals.glucose.placeholder' | translate">
             <mat-icon matPrefix>bloodtype</mat-icon>
             @if (symptomForm.get('glucose')?.hasError('min') || symptomForm.get('glucose')?.hasError('max')) {
-              <mat-error>Valor debe estar entre 0 y 600 mg/dL</mat-error>
+              <mat-error>{{ 'clinical.vitals.glucose.errorRange' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Presión Arterial (mmHg)</mat-label>
-            <input matInput type="text" formControlName="bloodPressure" placeholder="Ej: 120/80">
+            <mat-label>{{ 'clinical.vitals.bloodPressure.label' | translate }}</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="bloodPressure"
+              [placeholder]="'clinical.vitals.bloodPressure.placeholder' | translate">
             <mat-icon matPrefix>monitor_heart</mat-icon>
             @if (symptomForm.get('bloodPressure')?.hasError('pattern')) {
-              <mat-error>Formato inválido. Use XXX/XX (ej: 120/80)</mat-error>
+              <mat-error>{{ 'clinical.vitals.bloodPressure.errorPattern' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Frecuencia Cardíaca (bpm)</mat-label>
-            <input matInput type="number" formControlName="heartRate" placeholder="Ej: 72">
+            <mat-label>{{ 'clinical.vitals.heartRate.label' | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="heartRate"
+              [placeholder]="'clinical.vitals.heartRate.placeholder' | translate">
             <mat-icon matPrefix>favorite</mat-icon>
             @if (symptomForm.get('heartRate')?.hasError('min') || symptomForm.get('heartRate')?.hasError('max')) {
-              <mat-error>Valor debe estar entre 30 y 220 bpm</mat-error>
+              <mat-error>{{ 'clinical.vitals.heartRate.errorRange' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Temperatura (°C)</mat-label>
-            <input matInput type="number" step="0.1" formControlName="temperature" placeholder="Ej: 36.5">
+            <mat-label>{{ 'clinical.vitals.temperature.label' | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              step="0.1"
+              formControlName="temperature"
+              [placeholder]="'clinical.vitals.temperature.placeholder' | translate">
             <mat-icon matPrefix>thermostat</mat-icon>
             @if (symptomForm.get('temperature')?.hasError('min') || symptomForm.get('temperature')?.hasError('max')) {
-              <mat-error>Valor debe estar entre 34 y 42 °C</mat-error>
+              <mat-error>{{ 'clinical.vitals.temperature.errorRange' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Saturación de Oxígeno (%)</mat-label>
-            <input matInput type="number" formControlName="oxygenSaturation" placeholder="Ej: 98">
+            <mat-label>{{ 'clinical.vitals.oxygenSaturation.label' | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="oxygenSaturation"
+              [placeholder]="'clinical.vitals.oxygenSaturation.placeholder' | translate">
             <mat-icon matPrefix>air</mat-icon>
             @if (symptomForm.get('oxygenSaturation')?.hasError('min') || symptomForm.get('oxygenSaturation')?.hasError('max')) {
-              <mat-error>Valor debe estar entre 0 y 100%</mat-error>
+              <mat-error>{{ 'clinical.vitals.oxygenSaturation.errorRange' | translate }}</mat-error>
             }
           </mat-form-field>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Síntomas Subjetivos -->
+    <!-- Subjective Symptoms -->
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon symptom-icon">sentiment_satisfied</mat-icon>
-        <mat-card-title>Síntomas Subjetivos</mat-card-title>
-        <mat-card-subtitle>Cómo te sientes hoy (escala 1-10)</mat-card-subtitle>
+        <mat-card-title>{{ 'clinical.subjective.title' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'clinical.subjective.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
+
       <mat-card-content>
-        <!-- Fatiga -->
+        <!-- Fatigue -->
         <div class="slider-container">
           <div class="slider-header">
             <label class="slider-label">
               <mat-icon class="slider-icon">bedtime</mat-icon>
               {{ 'clinical.fatigue' | translate }}
             </label>
-            <span class="slider-value">{{ fatigueValue() }} - {{ formatLabel(fatigueValue()) }}</span>
+            <span class="slider-value">
+              {{ fatigueValue() }} - {{ formatLabelKey(fatigueValue()) | translate }}
+            </span>
           </div>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            [value]="fatigueValue()" 
-            (input)="onFatigueChange($event)"
-            class="custom-slider"
-          >
-            <div class="slider-labels">
-            <span>{{ 'clinical.none' | translate }}</span>
-            <span>{{ 'clinical.moderate' | translate }}</span>
-            <span>{{ 'clinical.severe' | translate }}</span>
-          </div>
-        </div>
 
-        <!-- Dolor -->
-        <div class="slider-container">
-          <div class="slider-header">
-            <label class="slider-label">
-              <mat-icon class="slider-icon">healing</mat-icon>
-              {{ 'clinical.pain' | translate }}
-            </label>
-            <span class="slider-value">{{ painValue() }} - {{ formatLabel(painValue()) }}</span>
-          </div>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            [value]="painValue()" 
-            (input)="onPainChange($event)"
-            class="custom-slider"
-          >
+          <input type="range" min="1" max="10" [value]="fatigueValue()" (input)="onFatigueChange($event)" class="custom-slider">
+
           <div class="slider-labels">
             <span>{{ 'clinical.none' | translate }}</span>
             <span>{{ 'clinical.moderate' | translate }}</span>
@@ -129,23 +125,41 @@
           </div>
         </div>
 
-        <!-- Mareo -->
+        <!-- Pain -->
+        <div class="slider-container">
+          <div class="slider-header">
+            <label class="slider-label">
+              <mat-icon class="slider-icon">healing</mat-icon>
+              {{ 'clinical.pain' | translate }}
+            </label>
+            <span class="slider-value">
+              {{ painValue() }} - {{ formatLabelKey(painValue()) | translate }}
+            </span>
+          </div>
+
+          <input type="range" min="1" max="10" [value]="painValue()" (input)="onPainChange($event)" class="custom-slider">
+
+          <div class="slider-labels">
+            <span>{{ 'clinical.none' | translate }}</span>
+            <span>{{ 'clinical.moderate' | translate }}</span>
+            <span>{{ 'clinical.severe' | translate }}</span>
+          </div>
+        </div>
+
+        <!-- Dizziness -->
         <div class="slider-container">
           <div class="slider-header">
             <label class="slider-label">
               <mat-icon class="slider-icon">rotate_right</mat-icon>
               {{ 'clinical.dizziness' | translate }}
             </label>
-            <span class="slider-value">{{ dizzinessValue() }} - {{ formatLabel(dizzinessValue()) }}</span>
+            <span class="slider-value">
+              {{ dizzinessValue() }} - {{ formatLabelKey(dizzinessValue()) | translate }}
+            </span>
           </div>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            [value]="dizzinessValue()" 
-            (input)="onDizzinessChange($event)"
-            class="custom-slider"
-          >
+
+          <input type="range" min="1" max="10" [value]="dizzinessValue()" (input)="onDizzinessChange($event)" class="custom-slider">
+
           <div class="slider-labels">
             <span>{{ 'clinical.none' | translate }}</span>
             <span>{{ 'clinical.moderate' | translate }}</span>
@@ -155,23 +169,23 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Notas Adicionales -->
+    <!-- Notes -->
     <mat-card class="section-card">
       <mat-card-header>
         <mat-icon mat-card-avatar class="section-icon notes-icon">note</mat-icon>
-  <mat-card-title>{{ 'clinical.notes' | translate }}</mat-card-title>
-  <mat-card-subtitle>Describe cualquier otro síntoma o detalle importante</mat-card-subtitle>
+        <mat-card-title>{{ 'clinical.notes' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'clinical.notesSubtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
+
       <mat-card-content>
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'clinical.notes' | translate }}</mat-label>
-          <textarea 
-            matInput 
-            formControlName="notes" 
-            rows="4" 
-            placeholder="Ej: Dolor de cabeza desde esta mañana, aumenta con la luz..."
-            maxlength="500"
-          ></textarea>
+          <textarea
+            matInput
+            formControlName="notes"
+            rows="4"
+            [placeholder]="'clinical.notesPlaceholder' | translate"
+            maxlength="500"></textarea>
           <mat-hint align="end">{{ symptomForm.get('notes')?.value?.length || 0 }}/500</mat-hint>
         </mat-form-field>
       </mat-card-content>
@@ -179,22 +193,12 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button 
-        mat-raised-button 
-        type="button" 
-        (click)="onCancel()"
-        class="btn-cancel"
-      >
+      <button mat-raised-button type="button" (click)="onCancel()" class="btn-cancel">
         <mat-icon>close</mat-icon>
         {{ 'clinical.cancel' | translate }}
       </button>
-      <button 
-        mat-raised-button 
-        color="primary" 
-        type="submit"
-        [disabled]="symptomForm.invalid || loading()"
-        class="btn-submit"
-      >
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="symptomForm.invalid || loading()" class="btn-submit">
         <mat-icon>check</mat-icon>
         {{ 'clinical.submit' | translate }}
       </button>

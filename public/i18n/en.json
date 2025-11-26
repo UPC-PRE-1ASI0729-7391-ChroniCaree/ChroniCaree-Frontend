@@ -11,7 +11,7 @@
       "acknowledge": "Acknowledge",
       "resolve": "Resolve",
       "dismiss": "Dismiss",
-      "seeAll": "See all alerts →"
+      "seeAll": "See all alerts"
     },
     "stats": {
       "critical": "Critical",
@@ -52,6 +52,7 @@
     "none": "None",
     "moderate": "Moderate",
     "severe": "Severe",
+
     "confirmation": {
       "title": "Symptoms Recorded!",
       "subtitle": "Your information has been saved successfully",
@@ -60,6 +61,50 @@
       "criticalValues": "Critical values detected",
       "viewHistory": "View my History",
       "backToDashboard": "Back to Dashboard"
+    },
+
+    "subjective": {
+      "title": "Subjective Symptoms",
+      "subtitle": "How do you feel today? (1–10 scale)"
+    },
+
+    "notesSubtitle": "Describe any other symptom or important detail",
+    "notesPlaceholder": "E.g., Headache since this morning, worse with light...",
+
+    "scale": {
+      "veryLow": "Very low",
+      "low": "Low",
+      "moderateLevel": "Moderate",
+      "high": "High",
+      "veryHigh": "Very high"
+    },
+
+    "vitals": {
+      "glucose": {
+        "label": "Glucose (mg/dL)",
+        "placeholder": "e.g., 120",
+        "errorRange": "Value must be between 0 and 600 mg/dL"
+      },
+      "bloodPressure": {
+        "label": "Blood Pressure (mmHg)",
+        "placeholder": "e.g., 120/80",
+        "errorPattern": "Invalid format. Use XXX/XX (e.g., 120/80)"
+      },
+      "heartRate": {
+        "label": "Heart Rate (bpm)",
+        "placeholder": "e.g., 72",
+        "errorRange": "Value must be between 30 and 220 bpm"
+      },
+      "temperature": {
+        "label": "Temperature (°C)",
+        "placeholder": "e.g., 36.5",
+        "errorRange": "Value must be between 34 and 42 °C"
+      },
+      "oxygenSaturation": {
+        "label": "Oxygen Saturation (%)",
+        "placeholder": "e.g., 98",
+        "errorRange": "Value must be between 0 and 100%"
+      }
     }
   },
   "patients": {
@@ -97,21 +142,127 @@
         "subtitle": "Basic details of your profile"
       },
       "errors": {
-        "firstName": { "required": "First name is required", "minlength": "Minimum 2 characters" },
-        "lastName": { "required": "Last name is required", "minlength": "Minimum 2 characters" },
-        "birthDate": { "required": "Birth date is required" },
-        "phone": { "required": "Phone is required", "pattern": "Must be a 9-digit number" },
-        "address": { "required": "Address is required", "minlength": "Minimum 5 characters" },
-        "weight": { "required": "Weight is required", "min": "Minimum weight is 20 kg", "max": "Maximum weight is 300 kg" },
-        "height": { "required": "Height is required", "min": "Minimum height is 50 cm", "max": "Maximum height is 250 cm" }
+        "firstName": {
+          "required": "First name is required",
+          "minlength": "Minimum 2 characters"
+        },
+        "lastName": {
+          "required": "Last name is required",
+          "minlength": "Minimum 2 characters"
+        },
+        "birthDate": {
+          "required": "Birth date is required"
+        },
+        "phone": {
+          "required": "Phone is required",
+          "pattern": "Must be a 9-digit number"
+        },
+        "address": {
+          "required": "Address is required",
+          "minlength": "Minimum 5 characters"
+        },
+        "weight": {
+          "required": "Weight is required",
+          "min": "Minimum weight is 20 kg",
+          "max": "Maximum weight is 300 kg"
+        },
+        "height": {
+          "required": "Height is required",
+          "min": "Minimum height is 50 cm",
+          "max": "Maximum height is 250 cm"
+        }
       },
       "ageLabel": "Age: {{age}} years",
-      "measurements": { "title": "Body Measurements", "subtitle": "Weight and height for BMI calculation" },
+      "measurements": {
+        "title": "Body Measurements",
+        "subtitle": "Weight and height for BMI calculation"
+      },
       "weight": "Weight (kg)",
       "height": "Height (cm)",
-      "bmi": { "title": "Body Mass Index (BMI)", "labels": { "underweight": "Underweight", "normal": "Normal", "overweight": "Overweight", "obesity": "Obesity" } }
+      "bmi": {
+        "title": "Body Mass Index (BMI)",
+        "labels": {
+          "underweight": "Underweight",
+          "normal": "Normal",
+          "overweight": "Overweight",
+          "obesity": "Obesity"
+        }
+      }
+    },
+    "bmiLabel": "BMI",
+    "noActiveDiagnoses": "No active diagnoses"
+  },
+
+  "medications": {
+    "todayTitle": "Today's medications",
+    "viewAll": "View all",
+    "adherence": "Adherence",
+    "loading": "Loading medications...",
+    "emptyToday": "You have no medications scheduled for today",
+    "status": {
+      "taken": "Taken",
+      "missed": "Missed",
+      "completed": "Completed",
+      "pastDue": "Past due"
+    },
+    "actions": {
+      "taken": "Taken",
+      "missed": "Skip",
+      "markTaken": "Mark as taken",
+      "markMissed": "Skip medication"
+    },
+    "footer": {
+      "active": "{{count}} active",
+      "needRefill": "{{count}} need refill"
+    },
+    "history": {
+      "title": "💊 My Medications",
+      "subtitle": "Medication history and tracking",
+      "addMedication": "Add Medication",
+      "stats": {
+        "adherence": "Adherence",
+        "taken": "Taken",
+        "missed": "Missed"
+      },
+      "loading": "Loading medications...",
+      "tabs": {
+        "active": "Active ({{count}})",
+        "all": "All ({{count}})"
+      },
+      "emptyActive": "You have no active medications",
+      "emptyAll": "No medications found",
+      "prescribedBy": "Prescribed by:",
+      "prescribed": "Prescribed:",
+      "date": "Date:",
+      "lastTaken": "Last:",
+      "schedules": "Schedules",
+      "instructions": "Instructions",
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "quickAdd": {
+        "title": "Quick add medication",
+        "description": "Use this panel to quickly add a medication.",
+        "name": "Name",
+        "dosage": "Dosage",
+        "add": "Add",
+        "moreOptions": "More options"
+      },
+      "status": {
+        "active": "Active",
+        "taken": "Taken",
+        "scheduled": "Scheduled",
+        "missed": "Missed",
+        "discontinued": "Discontinued"
+      }
     }
   },
+
+  "nudges": {
+    "empty": "Great! You have no pending reminders"
+  },
+
   "doctors": {
     "welcome": "Welcome, {{name}}",
     "exportPdf": "Export PDF",
@@ -136,11 +287,230 @@
       "today": "Today's Appointments",
       "upcoming": "Upcoming Appointments",
       "loading": "Loading appointments...",
-      "empty": { "title": "No appointments", "subtitle": "No appointments found for the selected filter" },
-      "status": { "scheduled": "📅 Scheduled", "confirmed": "✅ Confirmed", "inProgress": "⏳ In Progress", "completed": "✔️ Completed", "cancelled": "❌ Cancelled", "noShow": "🚫 No-show" },
-      "actions": { "confirm": "Confirm", "start": "Start", "complete": "Complete", "cancel": "Cancel", "todayBadge": "TODAY", "scheduled": "Scheduled", "completed": "Completed" }
+      "empty": {
+        "title": "No appointments",
+        "subtitle": "No appointments found for the selected filter"
+      },
+      "status": {
+        "scheduled": "📅 Scheduled",
+        "confirmed": "✅ Confirmed",
+        "inProgress": "⏳ In Progress",
+        "completed": "✔️ Completed",
+        "cancelled": "❌ Cancelled",
+        "noShow": "🚫 No-show"
+      },
+      "actions": {
+        "confirm": "Confirm",
+        "start": "Start",
+        "complete": "Complete",
+        "cancel": "Cancel",
+        "todayBadge": "TODAY",
+        "scheduled": "Scheduled",
+        "completed": "Completed"
+      }
     }
   },
+
+  "appointments": {
+    "scheduler": {
+      "title": "Schedule New Appointment",
+      "subtitle": "Book an appointment with your assigned doctor",
+      "date": {
+        "label": "Appointment date",
+        "hint": "Select a date between today and the next 3 months"
+      },
+      "time": {
+        "label": "Appointment time",
+        "placeholder": "Select a time",
+        "hint": "Office hours: 8:00 AM - 6:00 PM"
+      },
+      "type": {
+        "label": "Appointment type"
+      },
+      "types": {
+        "consultation": "Check-up consultation",
+        "followUp": "Follow-up",
+        "emergency": "Emergency",
+        "routineCheck": "Routine check-up",
+        "labResults": "Lab results review"
+      },
+      "notes": {
+        "label": "Additional notes (optional)",
+        "placeholder": "Describe the reason for your visit or any relevant information for your doctor...",
+        "hint": "Maximum 500 characters"
+      },
+      "info": {
+        "title": "Important information:",
+        "items": {
+          "notify": "Your doctor will receive an immediate notification.",
+          "status": "The appointment will remain \"Scheduled\" until the doctor confirms it.",
+          "reminder": "You will receive a reminder 24 hours before the appointment."
+        }
+      },
+      "cancel": "Cancel",
+      "submit": "Schedule Appointment",
+      "submitting": "Scheduling..."
+    }
+  },
+
+  "navigation": {
+    "patient": {
+      "dashboard": "Dashboard",
+      "myHealth": "My Health",
+      "appointments": "My Appointments",
+      "medications": "Medications",
+      "medicalRecord": "Medical Record",
+      "medicalRecords": "Medical Record",
+      "reminders": "Reminders",
+      "devices": "My Devices",
+      "messages": "Messages"
+    },
+    "doctor": {
+      "dashboard": "Dashboard",
+      "patients": "My Patients",
+      "appointments": "My Appointments",
+      "records": "Medical Records"
+    }
+  },
+
+  "devices": {
+    "status": {
+      "connected": "Connected",
+      "disconnected": "Disconnected"
+    },
+    "common": {
+      "lastReading": "Last reading",
+      "deviceInfo": {
+        "title": "Device Information",
+        "manufacturer": "Manufacturer:",
+        "model": "Model:",
+        "serialNumber": "Serial number:",
+        "lastSync": "Last sync:"
+      }
+    },
+    "list": {
+      "title": "IoT Medical Devices",
+      "subtitle": "Connect and monitor your health devices in real time",
+      "connect": "Connect",
+      "header": {
+        "title": "IoT Medical Devices",
+        "subtitle": "Connect and monitor your health devices in real time"
+      },
+      "actions": {
+        "connect": "Connect"
+      },
+      "cards": {
+        "glucometer": {
+          "title": "Glucometer",
+          "description": "Monitors blood glucose levels for diabetes control"
+        },
+        "bloodPressure": {
+          "title": "Blood Pressure Monitor",
+          "description": "Measures systolic, diastolic pressure and heart rate"
+        },
+        "pulseOximeter": {
+          "title": "Pulse Oximeter",
+          "description": "Real-time oxygen saturation (SpO2) and heart rate"
+        },
+        "ecg": {
+          "title": "ECG Monitor",
+          "description": "Portable electrocardiogram for heart rhythm analysis"
+        },
+        "smartScale": {
+          "title": "Smart Scale",
+          "description": "Weight, BMI, body composition and mass analysis"
+        }
+      },
+      "benefits": {
+        "title": "Benefits of IoT Monitoring",
+        "realTime": {
+          "title": "Real-time data",
+          "description": "View your health metrics constantly updated"
+        },
+        "alerts": {
+          "title": "Automatic alerts",
+          "description": "Receive notifications when your values are out of range"
+        },
+        "history": {
+          "title": "Complete history",
+          "description": "Access the full history of all your measurements"
+        },
+        "share": {
+          "title": "Share with doctors",
+          "description": "Your doctor can remotely see your data"
+        }
+      }
+    },
+    "options": {
+      "glucometer": {
+        "name": "Glucometer",
+        "description": "Monitors blood glucose levels for diabetes control"
+      },
+      "bloodPressure": {
+        "name": "Blood Pressure Monitor",
+        "description": "Measures systolic, diastolic pressure and heart rate"
+      },
+      "pulseOximeter": {
+        "name": "Pulse Oximeter",
+        "description": "Real-time oxygen saturation (SpO2) and heart rate"
+      },
+      "ecg": {
+        "name": "ECG Monitor",
+        "description": "Portable electrocardiogram for heart rhythm analysis"
+      },
+      "smartScale": {
+        "name": "Smart Scale",
+        "description": "Weight, BMI, body composition and mass analysis"
+      }
+    },
+    "glucometer": {
+      "header": {
+        "title": "Glucometer"
+      },
+      "reading": {
+        "label": "Blood Glucose Level"
+      },
+      "status": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "unknown": "Not available"
+      },
+      "mealContext": {
+        "fasting": "Fasting",
+        "beforeMeal": "Before meal",
+        "afterMeal": "After meal",
+        "random": "Random",
+        "unknown": "Not specified"
+      },
+      "actions": {
+        "refresh": "Refresh Reading",
+        "registerSymptom": "Register Symptom"
+      },
+      "history": {
+        "title": "Reading History",
+        "columns": {
+          "date": "Date & Time",
+          "glucose": "Glucose (mg/dL)",
+          "context": "Context",
+          "status": "Status"
+        }
+      },
+      "tips": {
+        "title": "Health Tips",
+        "tip1": "Measure your glucose before and after meals for better control.",
+        "tip2": "Stay well hydrated to obtain more accurate readings.",
+        "tip3": "Always record the time and context of each measurement."
+      }
+    }
+  },
+
+  "roles": {
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "hospital_admin": "Hospital Admin"
+  },
+
   "common": {
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -148,6 +518,66 @@
     "phone": "Phone",
     "address": "Address",
     "cancel": "Cancel",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "logout": "Log out",
+    "back": "Back"
+  },
+
+  "diagnoses": {
+    "header": {
+      "title": "My Medical Diagnoses",
+      "subtitle": "Manage your diagnoses and monitor their evolution"
+    },
+    "loading": "Loading diagnoses...",
+    "stats": {
+      "total": "Total",
+      "active": "Active",
+      "controlled": "Controlled",
+      "resolved": "Resolved"
+    },
+    "filters": {
+      "all": "All ({{count}})",
+      "active": "Active ({{count}})",
+      "controlled": "Controlled ({{count}})",
+      "resolved": "Resolved ({{count}})"
+    },
+    "empty": {
+      "title": "No diagnoses in this category",
+      "all": "No medical diagnoses have been recorded yet",
+      "filtered": "You have no diagnoses in this category"
+    },
+    "timeline": {
+      "diagnosed": "Diagnosed:",
+      "since": "{{days}} days ago",
+      "resolved": "Resolved:",
+      "lastReview": "Last review:"
+    },
+    "treatment": {
+      "label": "Treatment:"
+    },
+    "notes": {
+      "label": "Notes:"
+    },
+    "followUp": {
+      "label": "Requires medical follow-up"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "update": "Update"
+    },
+    "status": {
+      "active": "Active",
+      "controlled": "Controlled",
+      "resolved": "Resolved",
+      "monitoring": "Under monitoring",
+      "unknown": "Unknown"
+    },
+    "severity": {
+      "low": "Mild",
+      "moderate": "Moderate",
+      "high": "High",
+      "critical": "Critical",
+      "unknown": "Unknown"
+    }
   }
 }

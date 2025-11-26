@@ -38,16 +38,16 @@ export class DashboardPatient implements OnInit {
   protected readonly age = computed(() => {
     const patient = this.currentPatient();
     if (!patient?.birthDate) return 0;
-    
+
     const birthDate = new Date(patient.birthDate);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
-    
+
     return age;
   });
 
@@ -58,21 +58,20 @@ export class DashboardPatient implements OnInit {
 
   protected readonly primaryCondition = computed(() => {
     const patient = this.currentPatient();
-    if (!patient) return 'Sin diagnósticos activos';
+    if (!patient) return '';
 
-    // Filtrar solo diagnósticos activos del paciente actual
     const allDiagnoses = this.diagnosisStore.activeDiagnoses();
     const diagnoses = allDiagnoses.filter(d => d.patientId === patient.id);
-    
-    if (diagnoses.length === 0) return 'Sin diagnósticos activos';
-    
-    // Retornar el diagnóstico más severo o el primero
+
+    if (diagnoses.length === 0) return '';
+
     const criticalDiag = diagnoses.find(d => d.severity === 'critical');
     const highDiag = diagnoses.find(d => d.severity === 'high');
     const primaryDiag = criticalDiag || highDiag || diagnoses[0];
-    
+
     return primaryDiag.diagnosisName;
   });
+
 
   // Signos vitales (últimos registrados)
   protected readonly vitalSigns = computed(() => {
@@ -90,7 +89,7 @@ export class DashboardPatient implements OnInit {
     // Filtrar solo síntomas del paciente actual
     const allSymptoms = this.symptomStore.symptoms$();
     const patientSymptoms = allSymptoms.filter(s => s.patientId === patient.id);
-    
+
     if (patientSymptoms.length === 0) {
       return {
         heartRate: '--',
@@ -103,9 +102,9 @@ export class DashboardPatient implements OnInit {
 
     // Obtener el síntoma más reciente del paciente
     const latest = patientSymptoms[0];
-    const updateTime = new Date(latest.timestamp).toLocaleTimeString('es-PE', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const updateTime = new Date(latest.timestamp).toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
 
     return {
@@ -185,7 +184,7 @@ export class DashboardPatient implements OnInit {
     // Filtrar solo síntomas del paciente actual
     const allSymptoms = this.symptomStore.symptoms$();
     const patientSymptoms = allSymptoms.filter(s => s.patientId === patient.id);
-    
+
     return patientSymptoms.slice(0, 3).map(s => ({
       id: s.id,
       symptom: this.getSymptomDescription(s),
@@ -203,7 +202,7 @@ export class DashboardPatient implements OnInit {
     // Filtrar solo diagnósticos del paciente actual
     const allDiagnoses = this.diagnosisStore.activeDiagnoses();
     const patientDiagnoses = allDiagnoses.filter(d => d.patientId === patient.id);
-    
+
     return patientDiagnoses.length;
   });
 
@@ -221,7 +220,7 @@ export class DashboardPatient implements OnInit {
 
   ngOnInit(): void {
     console.log('Dashboard Patient inicializado');
-    
+
     // Verificar autenticación usando UserStore (preferred) con fallback a localStorage
     let user = this.currentUser();
     if (!user) {
@@ -244,7 +243,7 @@ export class DashboardPatient implements OnInit {
         return;
       }
     }
-    
+
     // Cargar datos del paciente autenticado
     if (user) {
       this.loadPatientData(user.id);
@@ -277,13 +276,13 @@ export class DashboardPatient implements OnInit {
         if (patient) {
           console.log('✅ Dashboard-Patient: Paciente encontrado:', patient.firstName, patient.lastName, 'ID:', patient.id);
           this.patientStore.loadPatientById(patient.id).subscribe();
-          
+
           // ✅ Cargar medicamentos del paciente actual (con force reload para limpiar cache)
           this.medicationStore.forceReload(patient.id.toString()).subscribe();
 
           // Cargar alertas del paciente actual
           this.alertStore.loadAlertsByPatient(patient.id.toString()).subscribe();
-          
+
           // Cargar síntomas del paciente actual (filtrados)
           this.symptomStore.loadAllSymptoms().subscribe({
             next: (allSymptoms) => {
@@ -326,7 +325,7 @@ export class DashboardPatient implements OnInit {
     if (symptom.pain && symptom.pain > 5) symptoms.push('Dolor');
     if (symptom.dizziness && symptom.dizziness > 5) symptoms.push('Mareo');
     if (symptom.glucose && symptom.glucose > 140) symptoms.push('Glucosa elevada');
-    
+
     return symptoms.length > 0 ? symptoms.join(', ') : 'Síntomas generales';
   }
 
@@ -351,18 +350,18 @@ export class DashboardPatient implements OnInit {
   private formatDate(timestamp: string): string {
     const date = new Date(timestamp);
     const today = new Date();
-    
+
     if (date.toDateString() === today.toDateString()) {
       return 'Hoy';
     }
-    
+
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-    
+
     if (date.toDateString() === yesterday.toDateString()) {
       return 'Ayer';
     }
-    
+
     return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' });
   }
 
@@ -371,9 +370,9 @@ export class DashboardPatient implements OnInit {
    */
   private formatTime(timestamp: string): string {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString('es-PE', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 

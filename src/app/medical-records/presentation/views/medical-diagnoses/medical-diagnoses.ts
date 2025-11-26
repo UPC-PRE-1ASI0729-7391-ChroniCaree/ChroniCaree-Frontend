@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+
 import { DiagnosisStore } from '../../../application/diagnosis.store';
 import { MedicalRecordsStore } from '../../../../doctors/application/medical-records.store';
 import { Diagnosis, DiagnosisStatus, DiagnosisSeverity } from '../../../domain/model/diagnosis.entity';
@@ -26,7 +28,8 @@ import { PatientStore } from '../../../../patients/application/patient.store';
     MatIconModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslateModule
   ],
   templateUrl: './medical-diagnoses.html',
   styleUrl: './medical-diagnoses.css'
@@ -78,6 +81,7 @@ export class MedicalDiagnosesComponent implements OnInit {
           isFromMedicalRecord: true
         } as unknown as Diagnosis;
       });
+
 
       const diagnoses = this.diagnoses().filter(d => 
         d.patientId === patientId && 
@@ -153,7 +157,7 @@ export class MedicalDiagnosesComponent implements OnInit {
         if (patient) {
           console.log(`✅ Medical-Diagnoses: Paciente encontrado: ${patient.firstName} ${patient.lastName}, ID: ${patient.id}`);
           this.currentPatientId.set(patient.id);
-          
+
           // Cargar diagnósticos (se filtrarán en el computed)
           this.diagnosisStore.loadAllDiagnoses().subscribe({
             next: () => console.log('✅ Diagnósticos cargados (se filtrarán por paciente)'),
@@ -261,10 +265,10 @@ export class MedicalDiagnosesComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   }
 

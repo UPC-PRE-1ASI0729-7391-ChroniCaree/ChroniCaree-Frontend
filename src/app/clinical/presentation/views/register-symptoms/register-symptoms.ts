@@ -142,13 +142,14 @@ export class RegisterSymptomsComponent implements OnInit {
     this.dizzinessValue.set(Number(value));
   }
 
-  formatLabel(value: number): string {
-    if (value === 1) return 'Muy bajo';
-    if (value <= 3) return 'Bajo';
-    if (value <= 5) return 'Moderado';
-    if (value <= 7) return 'Alto';
-    return 'Muy alto';
+  formatLabelKey(value: number): string {
+    if (value === 1) return 'clinical.scale.veryLow';
+    if (value <= 3) return 'clinical.scale.low';
+    if (value <= 5) return 'clinical.scale.moderateLevel';
+    if (value <= 7) return 'clinical.scale.high';
+    return 'clinical.scale.veryHigh';
   }
+
 
   onSubmit(): void {
     if (this.symptomForm.valid) {
@@ -164,7 +165,7 @@ export class RegisterSymptomsComponent implements OnInit {
       }
 
       const formValue = this.symptomForm.value;
-      
+
       const newSymptom: Symptom = {
         id: 0, // Will be assigned by backend
         patientId: patientId, // ✅ Usando el ID del paciente actual
@@ -187,7 +188,7 @@ export class RegisterSymptomsComponent implements OnInit {
         next: (createdSymptom) => {
           // Detectar valores críticos
           const hasCriticalValues = this.detectCriticalValues(newSymptom);
-          
+
           // Abrir diálogo de confirmación
           this.dialog.open(SymptomConfirmationDialogComponent, {
             width: '600px',
@@ -246,7 +247,7 @@ export class RegisterSymptomsComponent implements OnInit {
                 this.medicalRecordsStore.createRecord(mr);
               }
             });
-          
+
           // If critical values detected, create an alert for the patient so it shows in 'Mi Salud'
           if (hasCriticalValues) {
             try {
@@ -314,7 +315,7 @@ export class RegisterSymptomsComponent implements OnInit {
     if (symptom.glucose && (symptom.glucose < 70 || symptom.glucose > 250)) {
       return true;
     }
-    
+
     // Presión arterial crítica: sistólica > 180 o diastólica > 120
     if (symptom.bloodPressure) {
       const [systolic, diastolic] = symptom.bloodPressure.split('/').map(Number);
@@ -322,22 +323,22 @@ export class RegisterSymptomsComponent implements OnInit {
         return true;
       }
     }
-    
+
     // Frecuencia cardíaca crítica: < 50 o > 120
     if (symptom.heartRate && (symptom.heartRate < 50 || symptom.heartRate > 120)) {
       return true;
     }
-    
+
     // Temperatura crítica: < 35 o > 38.5
     if (symptom.temperature && (symptom.temperature < 35 || symptom.temperature > 38.5)) {
       return true;
     }
-    
+
     // Saturación de oxígeno crítica: < 92
     if (symptom.oxygenSaturation && symptom.oxygenSaturation < 92) {
       return true;
     }
-    
+
     // Síntomas severos: dolor, fatiga o mareo > 8
     if (symptom.pain && symptom.pain > 8) {
       return true;
@@ -362,7 +363,7 @@ export class RegisterSymptomsComponent implements OnInit {
     } catch (e) {
       // ignore any unexpected structure
     }
-    
+
     return false;
   }
 

@@ -1,14 +1,17 @@
 <div class="glucometer-container">
   <!-- Header -->
   <header class="device-header">
-    <button class="btn-back" (click)="goBack()">← Volver</button>
+    <button class="btn-back" (click)="goBack()">← {{ 'common.back' | translate }}</button>
+
     <div class="header-info">
-      <h1>🩸 Glucómetro</h1>
+      <h1>🩸 {{ 'devices.glucometer.header.title' | translate }}</h1>
+
       <div class="connection-status" [class.connected]="isConnected()">
         <span class="status-dot"></span>
-        {{ isConnected() ? 'Conectado' : 'Desconectado' }}
+        {{ isConnected() ? ('devices.status.connected' | translate) : ('devices.status.disconnected' | translate) }}
       </div>
     </div>
+
     <div class="battery-indicator">
       <span class="battery-icon">🔋</span>
       {{ batteryLevel() }}%
@@ -20,19 +23,32 @@
     <section class="main-reading">
       <div class="reading-card" [class]="glucoseStatus().class">
         <div class="reading-value-container">
-          <div class="reading-label">Nivel de Glucosa</div>
+          <div class="reading-label">
+            {{ 'devices.glucometer.reading.label' | translate }}
+          </div>
+
           <div class="reading-value">
             {{ reading.glucoseLevel }}
             <span class="unit">mg/dL</span>
           </div>
-          <div class="reading-status">{{ glucoseStatus().label }}</div>
-          <div class="reading-context">{{ getMealContextLabel(reading.mealContext) }}</div>
+
+          <div class="reading-status">
+            {{ glucoseStatus().labelKey | translate }}
+          </div>
+
+          <div class="reading-context">
+            {{ getMealContextLabel(reading.mealContext) | translate }}
+          </div>
         </div>
-        
+
         <div class="reading-meta">
           <div class="meta-item">
-            <span class="meta-label">Última lectura:</span>
-            <span class="meta-value">{{ reading.timestamp | date:'dd/MM/yy, h:mm a' }}</span>
+            <span class="meta-label">
+              {{ 'devices.common.lastReading' | translate }}
+            </span>
+            <span class="meta-value">
+              {{ reading.timestamp | date:'dd/MM/yy, h:mm a' }}
+            </span>
           </div>
         </div>
 
@@ -41,11 +57,14 @@
             <div class="range-segment low"></div>
             <div class="range-segment normal"></div>
             <div class="range-segment high"></div>
-            <div class="range-marker" [style.left]="(reading.glucoseLevel / 200 * 100) + '%'"></div>
+            <div
+              class="range-marker"
+              [style.left]="(reading.glucoseLevel / 200 * 100) + '%'"
+            ></div>
           </div>
           <div class="range-labels">
             <span>&lt; 70</span>
-            <span>70-140</span>
+            <span>70–140</span>
             <span>&gt; 140</span>
           </div>
         </div>
@@ -54,10 +73,10 @@
       <!-- Action Buttons -->
       <div class="action-buttons">
         <button class="btn-primary" (click)="refreshData()">
-          🔄 Actualizar Lectura
+          🔄 {{ 'devices.glucometer.actions.refresh' | translate }}
         </button>
         <button class="btn-secondary" (click)="registerSymptom()">
-          📝 Registrar Síntoma
+          📝 {{ 'devices.glucometer.actions.registerSymptom' | translate }}
         </button>
       </div>
     </section>
@@ -66,22 +85,30 @@
   <!-- Device Info -->
   @if (device(); as dev) {
     <section class="device-info-section">
-      <h2>Información del Dispositivo</h2>
+      <h2>{{ 'devices.common.deviceInfo.title' | translate }}</h2>
       <div class="info-grid">
         <div class="info-item">
-          <span class="info-label">Fabricante:</span>
+          <span class="info-label">
+            {{ 'devices.common.deviceInfo.manufacturer' | translate }}
+          </span>
           <span class="info-value">{{ dev.manufacturer }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Modelo:</span>
+          <span class="info-label">
+            {{ 'devices.common.deviceInfo.model' | translate }}
+          </span>
           <span class="info-value">{{ dev.model }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Número de Serie:</span>
+          <span class="info-label">
+            {{ 'devices.common.deviceInfo.serialNumber' | translate }}
+          </span>
           <span class="info-value">{{ dev.serialNumber }}</span>
         </div>
         <div class="info-item">
-          <span class="info-label">Última Sincronización:</span>
+          <span class="info-label">
+            {{ 'devices.common.deviceInfo.lastSync' | translate }}
+          </span>
           <span class="info-value">{{ dev.lastSync | date:'short' }}</span>
         </div>
       </div>
@@ -90,30 +117,41 @@
 
   <!-- Reading History -->
   <section class="history-section">
-    <h2>📊 Historial de Lecturas</h2>
+    <h2>📊 {{ 'devices.glucometer.history.title' | translate }}</h2>
     <div class="history-table-container">
       <table class="history-table">
         <thead>
-          <tr>
-            <th>Fecha y Hora</th>
-            <th>Glucosa (mg/dL)</th>
-            <th>Contexto</th>
-            <th>Estado</th>
-          </tr>
+        <tr>
+          <th>{{ 'devices.glucometer.history.columns.date' | translate }}</th>
+          <th>{{ 'devices.glucometer.history.columns.glucose' | translate }}</th>
+          <th>{{ 'devices.glucometer.history.columns.context' | translate }}</th>
+          <th>{{ 'devices.glucometer.history.columns.status' | translate }}</th>
+        </tr>
         </thead>
         <tbody>
           @for (reading of recentReadings(); track reading.id) {
             <tr>
               <td>{{ reading.timestamp | date:'dd/MM/yy, h:mm a' }}</td>
               <td class="value-cell">{{ reading.glucoseLevel }}</td>
-              <td>{{ getMealContextLabel(reading.mealContext) }}</td>
+              <td>{{ getMealContextLabel(reading.mealContext) | translate }}</td>
               <td>
-                <span class="status-badge" [class]="
-                  reading.glucoseLevel < 70 ? 'low' : 
-                  reading.glucoseLevel > 140 ? 'high' : 'normal'
-                ">
-                  {{ reading.glucoseLevel < 70 ? 'Bajo' : 
-                     reading.glucoseLevel > 140 ? 'Alto' : 'Normal' }}
+                <span
+                  class="status-badge"
+                  [class]="
+                    reading.glucoseLevel < 70
+                      ? 'low'
+                      : reading.glucoseLevel > 140
+                        ? 'high'
+                        : 'normal'
+                  "
+                >
+                  {{
+                    reading.glucoseLevel < 70
+                      ? ('devices.glucometer.status.low' | translate)
+                      : reading.glucoseLevel > 140
+                        ? ('devices.glucometer.status.high' | translate)
+                        : ('devices.glucometer.status.normal' | translate)
+                  }}
                 </span>
               </td>
             </tr>
@@ -125,19 +163,19 @@
 
   <!-- Health Tips -->
   <section class="tips-section">
-    <h2>💡 Consejos de Salud</h2>
+    <h2>💡 {{ 'devices.glucometer.tips.title' | translate }}</h2>
     <div class="tips-grid">
       <div class="tip-card">
         <span class="tip-icon">🍎</span>
-        <p>Mide tu glucosa antes y después de las comidas para un mejor control</p>
+        <p>{{ 'devices.glucometer.tips.tip1' | translate }}</p>
       </div>
       <div class="tip-card">
         <span class="tip-icon">💧</span>
-        <p>Mantén una hidratación adecuada para lecturas más precisas</p>
+        <p>{{ 'devices.glucometer.tips.tip2' | translate }}</p>
       </div>
       <div class="tip-card">
         <span class="tip-icon">⏰</span>
-        <p>Registra la hora y contexto de cada medición</p>
+        <p>{{ 'devices.glucometer.tips.tip3' | translate }}</p>
       </div>
     </div>
   </section>

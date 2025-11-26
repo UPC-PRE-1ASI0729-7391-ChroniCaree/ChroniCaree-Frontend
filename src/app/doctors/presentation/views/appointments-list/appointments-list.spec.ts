@@ -47,26 +47,31 @@ describe('AppointmentsListComponent', () => {
   ];
 
   beforeEach(async () => {
-    mockAppointmentsStore = jasmine.createSpyObj('AppointmentsStore', [
-      'loadAppointmentsByDoctor',
-      'updateAppointmentStatus',
-      'refresh',
-      'clear'
-    ], {
-      appointments: signal(mockAppointments),
-      loading: signal(false),
-      error: signal(null),
-      todayAppointments: signal([]),
-      upcomingAppointments: signal(mockAppointments),
-      scheduledAppointments: signal(mockAppointments),
-      completedAppointments: signal([]),
-      todayCount: signal(0),
-      upcomingCount: signal(1),
-      totalAppointments: signal(1)
-    });
+    // Store mockeado con signals
+    mockAppointmentsStore = jasmine.createSpyObj<AppointmentsStore>(
+      'AppointmentsStore',
+      ['loadAppointmentsByDoctor', 'updateAppointmentStatus', 'refresh', 'clear'],
+      {
+        appointments: signal(mockAppointments),
+        loading: signal(false),
+        error: signal(null),
+        todayAppointments: signal([]),
+        upcomingAppointments: signal(mockAppointments),
+        scheduledAppointments: signal(mockAppointments),
+        completedAppointments: signal([]),
+        todayCount: signal(0),
+        upcomingCount: signal(1),
+        totalAppointments: signal(1)
+      }
+    );
 
-    mockDoctorApi = jasmine.createSpyObj('DoctorApiEndpoint', ['getAll']);
-    mockDoctorApi.getAll.and.returnValue(of(mockDoctors));
+    // Endpoint de doctor mockeado
+    mockDoctorApi = jasmine.createSpyObj<DoctorApiEndpoint>(
+      'DoctorApiEndpoint',
+      ['getAll']
+    );
+
+    (mockDoctorApi.getAll as jasmine.Spy).and.returnValue(of(mockDoctors));
 
     await TestBed.configureTestingModule({
       imports: [AppointmentsListComponent],
@@ -108,10 +113,10 @@ describe('AppointmentsListComponent', () => {
 
   it('should change selected tab', () => {
     expect(component.selectedTab()).toBe('upcoming');
-    
+
     component.setTab('today');
     expect(component.selectedTab()).toBe('today');
-    
+
     component.setTab('completed');
     expect(component.selectedTab()).toBe('completed');
   });
@@ -128,7 +133,8 @@ describe('AppointmentsListComponent', () => {
 
   it('should update appointment status', () => {
     component.updateStatus(1, 'confirmed');
-    expect(mockAppointmentsStore.updateAppointmentStatus).toHaveBeenCalledWith(1, 'confirmed');
+    expect(mockAppointmentsStore.updateAppointmentStatus)
+      .toHaveBeenCalledWith(1, 'confirmed');
   });
 
   it('should format date correctly', () => {
@@ -169,12 +175,12 @@ describe('AppointmentsListComponent', () => {
   it('should refresh appointments list', () => {
     const mockUser = { id: 3, email: 'dr.juan@chronicaree.com', role: 'doctor' };
     spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(mockUser));
-    
+
     fixture.detectChanges();
     mockAppointmentsStore.refresh.calls.reset();
-    
+
     component.refresh();
-    
+
     expect(mockAppointmentsStore.refresh).toHaveBeenCalledWith(2);
   });
 

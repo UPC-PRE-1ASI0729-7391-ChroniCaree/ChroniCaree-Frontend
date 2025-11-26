@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { GlucometerStore } from '../../../application/glucometer.store';
 import { UserStore } from '../../../../iam/application/user.store';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
   selector: 'cc-glucometer',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './glucometer.component.html',
   styleUrls: ['./glucometer.component.css']
 })
@@ -21,16 +22,31 @@ export class GlucometerComponent implements OnInit, OnDestroy {
   isConnected = this.store.isConnected;
   batteryLevel = this.store.batteryLevel;
 
+  /**
+   * Estado de la glucosa (devuelve clave de traducción + clase CSS)
+   */
   glucoseStatus = computed(() => {
     const reading = this.latestReading();
-    if (!reading) return { label: '—', class: 'unknown' };
+    if (!reading) {
+      return { labelKey: 'devices.glucometer.status.unknown', class: 'unknown' };
+    }
 
     const level = reading.glucoseLevel;
-    if (level < 70) return { label: 'Bajo', class: 'low' };
-    if (level <= 140) return { label: 'Normal', class: 'normal' };
-    return { label: 'Alto', class: 'high' };
+
+    if (level < 70) {
+      return { labelKey: 'devices.glucometer.status.low', class: 'low' };
+    }
+
+    if (level <= 140) {
+      return { labelKey: 'devices.glucometer.status.normal', class: 'normal' };
+    }
+
+    return { labelKey: 'devices.glucometer.status.high', class: 'high' };
   });
 
+  /**
+   * Últimas lecturas (máximo 10) en orden descendente
+   */
   recentReadings = computed(() => {
     const device = this.device();
     if (!device) return [];
@@ -57,29 +73,33 @@ export class GlucometerComponent implements OnInit, OnDestroy {
     const reading = this.latestReading();
     if (!reading) return;
 
-    // Navigate to symptoms registration with glucose context
-    alert(`Registrar síntoma con glucosa: ${reading.glucoseLevel} mg/dL\n\nEsta funcionalidad se integrará con el módulo de síntomas.`);
-    
-    // TODO: Integrate with symptoms module
-    // this.router.navigate(['/clinical/symptoms/new'], {
-    //   queryParams: {
-    //     glucose: reading.glucoseLevel,
-    //     timestamp: reading.timestamp.toISOString()
-    //   }
-    // });
+    // TODO: Integrar con módulo de síntomas
+    alert(
+      `Registrar síntoma con glucosa: ${reading.glucoseLevel} mg/dL\n\n` +
+      'Esta funcionalidad se integrará con el módulo de síntomas.'
+    );
   }
 
   goBack(): void {
     this.router.navigate(['/devices']);
   }
 
+  /**
+   * Devuelve la clave de traducción para el contexto de la comida
+   * (el pipe translate se aplica en el template)
+   */
   getMealContextLabel(context?: string): string {
-    const labels: Record<string, string> = {
-      'fasting': 'En ayunas',
-      'before-meal': 'Antes de comer',
-      'after-meal': 'Después de comer',
-      'random': 'Aleatorio'
+    const map: Record<string, string> = {
+      'fasting': 'devices.glucometer.mealContext.fasting',
+      'before-meal': 'devices.glucometer.mealContext.beforeMeal',
+      'after-meal': 'devices.glucometer.mealContext.afterMeal',
+      'random': 'devices.glucometer.mealContext.random'
     };
-    return context ? labels[context] || context : '—';
+
+    if (!context) {
+      return 'devices.glucometer.mealContext.unknown';
+    }
+
+    return map[context] || 'devices.glucometer.mealContext.unknown';
   }
 }

@@ -1318,6 +1318,7 @@
       }
     },
     {
+
       "userId": 1764119640996,
       "firstName": "Pepe",
       "lastName": "Paz",
@@ -1775,6 +1776,11 @@
       "createdAt": "2024-02-10T00:00:00Z"
     },
     {
+      "id": "g1qF2M_",
+      "patientId": "2",
+      "name": "Paracetamol",
+      "type": "pill",
+      "dosage": "1 tableta",
       "id": "3ZNVchy",
       "patientId": "1763240159417",
       "name": "AAA",
@@ -1785,17 +1791,39 @@
         "times": [
           "09:00"
         ],
-        "startDate": "2025-11-25T09:36:03.478Z"
+        "startDate": "2025-11-24T21:32:50.602Z"
       },
       "prescribedBy": "",
-      "prescribedDate": "2025-11-25T09:36:03.478Z",
+      "prescribedDate": "2025-11-24T21:32:50.602Z",
       "status": "active",
-      "instructions": "aa",
+      "instructions": "Cada 10 horas\n",
       "sideEffects": [],
       "contraindications": [],
       "logs": [],
-      "createdAt": "2025-11-25T09:36:03.478Z",
-      "updatedAt": "2025-11-25T09:36:03.478Z"
+      "createdAt": "2025-11-24T21:32:50.602Z",
+      "updatedAt": "2025-11-24T21:32:50.602Z"
+    },
+    {
+      "id": "PrcpMJO",
+      "patientId": "2",
+      "name": "Paracetamos",
+      "type": "pill",
+      "dosage": "1 hora",
+      "schedule": {
+        "frequency": "once_daily",
+        "times": [
+          "09:00"
+        ],
+        "startDate": "2025-11-24T21:33:12.117Z"
+      },
+      "prescribedBy": "",
+      "prescribedDate": "2025-11-24T21:33:12.117Z",
+      "status": "active",
+      "sideEffects": [],
+      "contraindications": [],
+      "logs": [],
+      "createdAt": "2025-11-24T21:33:12.117Z",
+      "updatedAt": "2025-11-24T21:33:12.117Z"
     }
   ],
   "devices": [
@@ -2343,6 +2371,81 @@
       },
       "createdAt": "2025-11-25T10:36:36.140Z",
       "id": "5ce3ffb4-5513-4def-90ba-cf9e273b8662"
+    }
+  ],
+  "nudges": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "type": "medication_reminder",
+      "priority": "high",
+      "title": "Tomar medicamento",
+      "message": "Es hora de tomar tu medicamento de la mañana",
+      "actionLabel": "Marcar como tomado",
+      "actionRoute": "/patient/medicamentos",
+      "icon": "medication",
+      "createdAt": "2025-11-25T08:00:00Z",
+      "dismissedAt": null,
+      "snoozedUntil": null
+    },
+    {
+      "id": 2,
+      "patientId": 1,
+      "type": "appointment_reminder",
+      "priority": "medium",
+      "title": "Cita médica próxima",
+      "message": "Tienes una cita con el Dr. Pérez mañana a las 10:00",
+      "actionLabel": "Ver detalles",
+      "actionRoute": "/patient/appointments/new",
+      "icon": "calendar",
+      "createdAt": "2025-11-24T18:00:00Z",
+      "dismissedAt": null,
+      "snoozedUntil": null
+    },
+    {
+      "patientId": 1763240159417,
+      "type": "medication_reminder",
+      "priority": "medium",
+      "title": "12321",
+      "message": "xdxfsdf",
+      "actionLabel": "Ver",
+      "actionRoute": "/patient/dashboard",
+      "icon": "notifications",
+      "id": 3
+    }
+  ],
+  "alerts": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "type": "vital_signs",
+      "severity": "high",
+      "title": "Presión arterial elevada",
+      "message": "Tu presión arterial está por encima de lo normal: 145/90 mmHg",
+      "source": "blood_pressure_monitor",
+      "status": "active",
+      "createdAt": "2025-11-25T07:30:00Z",
+      "acknowledgedAt": null,
+      "acknowledgedBy": null,
+      "resolvedAt": null,
+      "resolution": null,
+      "timeSinceCreated": "2h"
+    },
+    {
+      "id": 2,
+      "patientId": 1,
+      "type": "medication",
+      "severity": "medium",
+      "title": "Medicamento pendiente",
+      "message": "No has registrado tu medicamento de la mañana",
+      "source": "medication_tracker",
+      "status": "active",
+      "createdAt": "2025-11-25T09:00:00Z",
+      "acknowledgedAt": null,
+      "acknowledgedBy": null,
+      "resolvedAt": null,
+      "resolution": null,
+      "timeSinceCreated": "30min"
     }
   ],
   "auditLogs": [

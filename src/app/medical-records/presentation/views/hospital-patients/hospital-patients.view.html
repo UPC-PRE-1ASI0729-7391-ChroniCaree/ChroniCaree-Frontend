@@ -9,10 +9,10 @@
         </h1>
         <p class="subtitle">Visualiza y administra todos los pacientes del hospital</p>
       </div>
-      <a 
-        routerLink="/hospital/patient-onboarding" 
-        mat-raised-button 
-        color="primary" 
+      <a
+        routerLink="/hospital/patient-onboarding"
+        mat-raised-button
+        color="primary"
         class="add-patient-btn">
         <mat-icon>person_add</mat-icon>
         Registrar Paciente
@@ -49,8 +49,8 @@
       <mat-form-field appearance="outline" class="search-field">
         <mat-icon matPrefix>search</mat-icon>
         <mat-label>Buscar paciente, condición o doctor...</mat-label>
-        <input 
-          matInput 
+        <input
+          matInput
           [(ngModel)]="searchTerm"
           placeholder="Ej: María, Diabetes, Dr. Pérez">
       </mat-form-field>
@@ -60,7 +60,7 @@
   <!-- Patients List -->
   <div class="patients-list">
     @for (patient of filteredPatients(); track patient.id) {
-      <div 
+      <div
         class="patient-card"
         (click)="viewPatientDetails(patient.id)">
         <div class="patient-header">
@@ -80,7 +80,7 @@
               </span>
             </div>
           </div>
-          <mat-chip 
+          <mat-chip
             class="status-chip"
             [style.background-color]="getStatusColor(patient.status) + '20'"
             [style.color]="getStatusColor(patient.status)">
@@ -116,8 +116,8 @@
               </div>
             </div>
             <div class="detail-actions">
-              <button 
-                mat-button 
+              <button
+                mat-button
                 color="primary"
                 (click)="$event.stopPropagation(); viewPatientDetails(patient.id)">
                 <mat-icon>visibility</mat-icon>
@@ -133,8 +133,8 @@
           <mat-icon>search_off</mat-icon>
           <h3>No se encontraron pacientes</h3>
           <p>No hay pacientes que coincidan con "{{ searchTerm() }}"</p>
-          <button 
-            mat-button 
+          <button
+            mat-button
             color="primary"
             (click)="searchTerm.set('')">
             <mat-icon>clear</mat-icon>
@@ -146,9 +146,9 @@
           <mat-icon>people</mat-icon>
           <h3>No hay pacientes registrados</h3>
           <p>Comienza registrando el primer paciente del hospital</p>
-          <a 
+          <a
             routerLink="/hospital/patient-onboarding"
-            mat-raised-button 
+            mat-raised-button
             color="primary">
             <mat-icon>person_add</mat-icon>
             Registrar Primer Paciente
