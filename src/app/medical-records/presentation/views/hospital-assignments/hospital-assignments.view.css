@@ -238,10 +238,24 @@
   font-weight: 600;
 }
 
+/* Ensure doctor name and specialty show as white, normal weight (400) */
+.doctor-group-header .doctor-info h3,
+.doctor-group-header .doctor-info .doctor-specialty {
+  color: #ffffff !important;
+  font-weight: 400 !important;
+}
+
 .doctor-specialty {
   margin: 0;
   font-size: 0.875rem;
   opacity: 0.9;
+}
+
+/* Make the patient count chip in the doctor header white and readable */
+.doctor-group-header .patient-count-chip {
+  color: #ffffff !important;
+  font-weight: 400 !important;
+  background: rgba(255,255,255,0.12) !important;
 }
 
 .assigned-patients-list {
@@ -367,4 +381,17 @@
   .quick-actions a {
     width: 100%;
   }
+}
+
+/* Ensure doctor option text in mat-select dropdown is white (normal weight)
+   The select panel is rendered in the overlay container, so target it explicitly. */
+.cdk-overlay-container .mat-select-panel .doctor-option .doctor-name,
+.cdk-overlay-container .mat-select-panel .doctor-option .doctor-specialty,
+.cdk-overlay-container .mat-select-panel .doctor-option .patient-count-chip {
+  color: #ffffff !important;
+  font-weight: 400 !important;
+}
+
+.cdk-overlay-container .mat-select-panel .doctor-option .patient-count-chip {
+  background: rgba(255,255,255,0.12) !important;
 }

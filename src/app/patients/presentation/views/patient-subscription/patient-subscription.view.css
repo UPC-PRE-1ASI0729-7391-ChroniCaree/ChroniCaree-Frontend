@@ -477,8 +477,11 @@
 
 .btn-full {
   width: 100%;
-  padding: 1rem;
-  font-size: 1.1rem;
+  padding: 1rem; /* base padding */
+  padding-left: calc(1rem + 5px); /* +5px left space requested */
+  padding-right: calc(1rem + 5px); /* +5px right space requested */
+  font-size: 1.05rem; /* slightly reduced to improve proportion */
+  box-sizing: border-box;
 }
 
 .processing {

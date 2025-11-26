@@ -1,0 +1,301 @@
+<div class="hospital-patient-detail">
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-overlay">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Cargando información del paciente...</p>
+    </div>
+  } @else if (patient()) {
+    <!-- Header Section -->
+    <div class="detail-header">
+      <button mat-icon-button class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      
+      <div class="header-content">
+        <div class="patient-avatar-large">
+          <mat-icon>person</mat-icon>
+        </div>
+        
+        <div class="patient-main-info">
+          <h1>{{ patient()!.fullName }}</h1>
+          <div class="patient-meta">
+            <span class="meta-chip">
+              <mat-icon>cake</mat-icon>
+              {{ patientAge() }} años
+            </span>
+            <span class="meta-chip">
+              <mat-icon>{{ patient()!.gender === 'male' ? 'male' : 'female' }}</mat-icon>
+              {{ patient()!.gender === 'male' ? 'Masculino' : 'Femenino' }}
+            </span>
+            <span class="meta-chip">
+              <mat-icon>badge</mat-icon>
+              DNI: {{ patient()!.dni }}
+            </span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button mat-raised-button color="primary" (click)="scheduleAppointment()">
+            <mat-icon>event</mat-icon>
+            Nueva Cita
+          </button>
+          <button mat-stroked-button color="primary" (click)="editPatient()">
+            <mat-icon>edit</mat-icon>
+            Editar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="detail-content">
+      <!-- Left Column: Personal Info & Doctor -->
+      <div class="left-column">
+        <!-- Personal Information Card -->
+        <mat-card class="info-card">
+          <div class="card-header">
+            <mat-icon>person</mat-icon>
+            <h2>Información Personal</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-item">
+                <mat-icon class="info-icon">phone</mat-icon>
+                <div>
+                  <span class="info-label">Teléfono</span>
+                  <span class="info-value">{{ patient()!.phone }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">location_on</mat-icon>
+                <div>
+                  <span class="info-label">Dirección</span>
+                  <span class="info-value">{{ patient()!.address }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-item">
+                <mat-icon class="info-icon">calendar_today</mat-icon>
+                <div>
+                  <span class="info-label">Fecha de Nacimiento</span>
+                  <span class="info-value">{{ patient()!.birthDate | date: 'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Emergency Contact Card -->
+        <mat-card class="info-card emergency-card">
+          <div class="card-header">
+            <mat-icon>emergency</mat-icon>
+            <h2>Contacto de Emergencia</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <div class="info-row">
+              <div class="info-item full-width">
+                <mat-icon class="info-icon">person</mat-icon>
+                <div>
+                  <span class="info-label">Nombre</span>
+                  <span class="info-value">{{ patient()!.emergencyContact.name }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-item">
+                <mat-icon class="info-icon">family_restroom</mat-icon>
+                <div>
+                  <span class="info-label">Relación</span>
+                  <span class="info-value">{{ patient()!.emergencyContact.relationship }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon class="info-icon">phone</mat-icon>
+                <div>
+                  <span class="info-label">Teléfono</span>
+                  <span class="info-value">{{ patient()!.emergencyContact.phone }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Assigned Doctor Card -->
+        <mat-card class="info-card doctor-card">
+          <div class="card-header">
+            <mat-icon>medical_services</mat-icon>
+            <h2>Doctor Asignado</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            @if (assignedDoctor()) {
+              <div class="doctor-info">
+                <div class="doctor-avatar">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div class="doctor-details">
+                  <h3>{{ assignedDoctor()!.fullName }}</h3>
+                  <p class="doctor-specialty">{{ assignedDoctor()!.specialty }}</p>
+                  <div class="doctor-contact">
+                    <span class="contact-item">
+                      <mat-icon>phone</mat-icon>
+                      {{ assignedDoctor()!.phone }}
+                    </span>
+                    <span class="contact-item">
+                      <mat-icon>badge</mat-icon>
+                      Lic: {{ assignedDoctor()!.licenseNumber }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="no-doctor">
+                <mat-icon>person_off</mat-icon>
+                <p>Sin doctor asignado</p>
+                <button mat-button color="primary">
+                  <mat-icon>add</mat-icon>
+                  Asignar Doctor
+                </button>
+              </div>
+            }
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Right Column: Medical Data -->
+      <div class="right-column">
+        <!-- Vital Signs Card -->
+        <mat-card class="info-card vitals-card">
+          <div class="card-header">
+            <mat-icon>monitor_heart</mat-icon>
+            <h2>Signos Vitales</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            <!-- BMI Highlight -->
+            <div class="bmi-section">
+              <div class="bmi-display">
+                <div class="bmi-value" [style.color]="bmiColor()">
+                  {{ patient()!.bmi }}
+                </div>
+                <div class="bmi-info">
+                  <span class="bmi-label">Índice de Masa Corporal</span>
+                  <div class="body-metrics">
+                    <span>Peso: {{ patient()!.weight }} kg</span>
+                    <span>Altura: {{ (patient()!.height * 100).toFixed(0) }} cm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Vital Signs Grid -->
+            <div class="vitals-grid">
+              @for (vital of vitalSigns(); track vital.type) {
+                <div class="vital-item" [style.border-left-color]="getVitalSignColor(vital.status)">
+                  <mat-icon [style.color]="getVitalSignColor(vital.status)">{{ vital.icon }}</mat-icon>
+                  <div class="vital-details">
+                    <span class="vital-type">{{ vital.type }}</span>
+                    <span class="vital-value">{{ vital.value }} <span class="vital-unit">{{ vital.unit }}</span></span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </mat-card>
+
+        <!-- Medications Card -->
+        <mat-card class="info-card medications-card">
+          <div class="card-header">
+            <mat-icon>medication</mat-icon>
+            <h2>Medicamentos Actuales</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            @if (medications().length > 0) {
+              <div class="medications-list">
+                @for (med of medications(); track med.name) {
+                  <div class="medication-item">
+                    <div class="medication-icon">
+                      <mat-icon>medication</mat-icon>
+                    </div>
+                    <div class="medication-info">
+                      <h4>{{ med.name }}</h4>
+                      <p class="dosage">{{ med.dosage }} - {{ med.frequency }}</p>
+                      <p class="prescribed-info">
+                        Prescrito por {{ med.prescribedBy }} el {{ med.prescribedDate | date: 'dd/MM/yyyy' }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>medication_liquid</mat-icon>
+                <p>No hay medicamentos registrados</p>
+              </div>
+            }
+          </div>
+        </mat-card>
+
+        <!-- Recent Appointments Card -->
+        <mat-card class="info-card appointments-card">
+          <div class="card-header">
+            <mat-icon>event_note</mat-icon>
+            <h2>Historial de Citas</h2>
+          </div>
+          <mat-divider></mat-divider>
+          <div class="card-content">
+            @if (appointments().length > 0) {
+              <div class="appointments-timeline">
+                @for (appointment of appointments(); track appointment.date) {
+                  <div class="appointment-item">
+                    <div class="appointment-date">
+                      <span class="date-day">{{ appointment.date | date: 'dd' }}</span>
+                      <span class="date-month">{{ appointment.date | date: 'MMM' }}</span>
+                    </div>
+                    <div class="appointment-details">
+                      <div class="appointment-header">
+                        <h4>{{ appointment.type }}</h4>
+                        <mat-chip
+                          [style.background-color]="getAppointmentStatusColor(appointment.status) + '20'"
+                          [style.color]="getAppointmentStatusColor(appointment.status)">
+                          {{ getAppointmentStatusLabel(appointment.status) }}
+                        </mat-chip>
+                      </div>
+                      <p class="appointment-doctor">
+                        <mat-icon>person</mat-icon>
+                        {{ appointment.doctor }}
+                      </p>
+                      <p class="appointment-notes">{{ appointment.notes }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>event_busy</mat-icon>
+                <p>No hay citas registradas</p>
+              </div>
+            }
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  } @else {
+    <!-- Error State -->
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <h2>No se pudo cargar la información del paciente</h2>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver a Pacientes
+      </button>
+    </div>
+  }
+</div>

@@ -187,11 +187,27 @@ export const routes: Routes = [
         data: { role: 'hospital_admin' },
       },
       {
+        path: 'doctors/:id/edit',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/hospital-doctor-edit/hospital-doctor-edit.view')
+            .then((m) => m.HospitalDoctorEditView),
+        title: `${baseTitle} - Editar Doctor`,
+        data: { role: 'hospital_admin' },
+      },
+      {
         path: 'patients',
         loadComponent: () =>
           import('./medical-records/presentation/views/hospital-patients/hospital-patients.view')
             .then((m) => m.HospitalPatientsView),
         title: `${baseTitle} - Gestión de Pacientes`,
+        data: { role: 'hospital_admin' },
+      },
+      {
+        path: 'patients/:id',
+        loadComponent: () =>
+          import('./medical-records/presentation/views/hospital-patient-detail/hospital-patient-detail.view')
+            .then((m) => m.HospitalPatientDetailView),
+        title: `${baseTitle} - Detalle del Paciente`,
         data: { role: 'hospital_admin' },
       },
       {
@@ -229,8 +245,8 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./tenants/presentation/views/hospital-profile/hospital-profile.view')
-            .then((m) => m.HospitalProfileView),
+          import('./tenants/presentation/views/hospital-profile-edit/hospital-profile-edit.view')
+            .then((m) => m.HospitalProfileEditView),
         title: `${baseTitle} - Perfil Hospital`,
         data: { role: 'hospital_admin' },
       },

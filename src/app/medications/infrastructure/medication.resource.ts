@@ -14,7 +14,7 @@ export interface MedicationScheduleResource {
 
 export interface MedicationLogResource {
   id: string;
-  medicationId: string;
+  medicationId: number;
   scheduledTime: string;
   actualTime?: string;
   status: MedicationStatus;
@@ -25,8 +25,8 @@ export interface MedicationLogResource {
 }
 
 export interface MedicationResource {
-  id: string;
-  patientId: string;
+  id: number;
+  patientId: number;
   name: string;
   type: MedicationType;
   dosage: string;

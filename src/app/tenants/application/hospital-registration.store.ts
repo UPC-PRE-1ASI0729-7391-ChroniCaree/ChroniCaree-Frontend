@@ -65,80 +65,92 @@ export class HospitalRegistrationStore {
           return throwError(() => new Error(`Email ${request.email} is already registered`));
         }
 
-        // Paso 2: Crear user con role hospital_admin
-        const userPayload = {
-          email: request.email,
-          name: request.name,
-          password: request.password, // En producción debe hashearse
-          role: 'hospital_admin' as UserRole,
-          isVerified: false,
-          twoFactorEnabled: false,
-          createdAt: new Date().toISOString(),
-          tenantId: null, // Se actualizará después
-        };
-
-        return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
-          switchMap((createdUser) => {
-            // Paso 3: Crear tenant con status pending_subscription
-            const tenantPayload = {
-              adminUserId: createdUser.id,
-              name: request.hospitalName,
-              address: request.address || '',
-              phone: request.phone || '',
+        // Obtener siguiente ID para usuario
+        return this.getNextId('users').pipe(
+          switchMap(nextUserId => {
+            // Paso 2: Crear user con role hospital_admin
+            const userPayload = {
+              id: nextUserId,
               email: request.email,
-              status: 'pending_subscription' as TenantStatus,
-              subscriptionId: null,
-              registrationDate: new Date().toISOString(),
-              settings: {
-                allowIndependentDoctors: false,
-                requirePatientApproval: true,
-                maxDoctors: 5, // Límite por defecto hasta que se suscriba
-              },
+              name: request.name,
+              password: request.password, // En producción debe hashearse
+              role: 'hospital_admin' as UserRole,
+              isVerified: false,
+              twoFactorEnabled: false,
+              createdAt: new Date().toISOString(),
+              tenantId: null, // Se actualizará después
             };
 
-            return this.http.post<any>(`${this.baseUrl}/tenants`, tenantPayload).pipe(
-              switchMap((createdTenant) => {
-                // Paso 4: Actualizar user.tenantId
-                return this.http
-                  .patch<any>(`${this.baseUrl}/users/${createdUser.id}`, {
-                    tenantId: createdTenant.id,
+            return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
+              switchMap((createdUser) => {
+                // Obtener siguiente ID para tenant
+                return this.getNextId('tenants').pipe(
+                  switchMap(nextTenantId => {
+                    // Paso 3: Crear tenant con status pending_subscription
+                    const tenantPayload = {
+                      id: nextTenantId,
+                      adminUserId: createdUser.id,
+                      name: request.hospitalName,
+                      address: request.address || '',
+                      phone: request.phone || '',
+                      email: request.email,
+                      status: 'pending_subscription' as TenantStatus,
+                      subscriptionId: null,
+                      registrationDate: new Date().toISOString(),
+                      settings: {
+                        allowIndependentDoctors: false,
+                        requirePatientApproval: true,
+                        maxDoctors: 5, // Límite por defecto hasta que se suscriba
+                      },
+                    };
+
+                    return this.http.post<any>(`${this.baseUrl}/tenants`, tenantPayload).pipe(
+                      switchMap((createdTenant) => {
+                        // Paso 4: Actualizar user.tenantId
+                        return this.http
+                          .patch<any>(`${this.baseUrl}/users/${createdUser.id}`, {
+                            tenantId: createdTenant.id,
+                          })
+                          .pipe(
+                            map((updatedUser) => {
+                              const userEntity = new UserEntity(
+                                updatedUser.id,
+                                updatedUser.email,
+                                updatedUser.role,
+                                updatedUser.name,
+                                updatedUser.password,
+                                updatedUser.isVerified,
+                                updatedUser.twoFactorEnabled,
+                                updatedUser.createdAt,
+                                updatedUser.tenantId
+                              );
+
+                              const tenantEntity = new TenantEntity(
+                                createdTenant.id,
+                                createdTenant.adminUserId,
+                                createdTenant.name,
+                                createdTenant.address,
+                                createdTenant.phone,
+                                createdTenant.email,
+                                createdTenant.status,
+                                createdTenant.subscriptionId,
+                                createdTenant.registrationDate,
+                                createdTenant.settings
+                              );
+
+                              const result: HospitalRegistrationResult = {
+                                user: userEntity,
+                                tenant: tenantEntity,
+                              };
+
+                              this._lastRegisteredHospital.set(result);
+                              return result;
+                            })
+                          );
+                      })
+                    );
                   })
-                  .pipe(
-                    map((updatedUser) => {
-                      const userEntity = new UserEntity(
-                        updatedUser.id,
-                        updatedUser.email,
-                        updatedUser.role,
-                        updatedUser.name,
-                        updatedUser.password,
-                        updatedUser.isVerified,
-                        updatedUser.twoFactorEnabled,
-                        updatedUser.createdAt,
-                        updatedUser.tenantId
-                      );
-
-                      const tenantEntity = new TenantEntity(
-                        createdTenant.id,
-                        createdTenant.adminUserId,
-                        createdTenant.name,
-                        createdTenant.address,
-                        createdTenant.phone,
-                        createdTenant.email,
-                        createdTenant.status,
-                        createdTenant.subscriptionId,
-                        createdTenant.registrationDate,
-                        createdTenant.settings
-                      );
-
-                      const result: HospitalRegistrationResult = {
-                        user: userEntity,
-                        tenant: tenantEntity,
-                      };
-
-                      this._lastRegisteredHospital.set(result);
-                      return result;
-                    })
-                  );
+                );
               })
             );
           }),
@@ -155,6 +167,22 @@ export class HospitalRegistrationStore {
           })
         );
       })
+    );
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${this.baseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map(items => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
     );
   }
 

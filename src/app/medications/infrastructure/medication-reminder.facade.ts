@@ -165,7 +165,7 @@ export class MedicationReminderFacade {
   /**
    * Generate unique nudge ID based on medication and time
    */
-  private generateNudgeId(medicationId: string, time: string): number {
+  private generateNudgeId(medicationId: number, time: string): number {
     const hash = `${medicationId}_${time}_${new Date().toDateString()}`;
     return Math.abs(hash.split('').reduce((acc, char) => {
       return ((acc << 5) - acc) + char.charCodeAt(0);

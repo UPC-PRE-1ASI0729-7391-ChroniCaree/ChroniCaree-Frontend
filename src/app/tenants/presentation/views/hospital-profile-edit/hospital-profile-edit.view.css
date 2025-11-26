@@ -1,0 +1,475 @@
+.hospital-profile-edit {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0;
+  position: relative;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.back-button {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-3px);
+}
+
+.back-button mat-icon {
+  color: white !important;
+}
+
+.header-content h1 {
+  color: white;
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-content h1 mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  color: white;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  margin: 8px 0 0 0;
+  font-weight: 400;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 80px 20px;
+  color: white;
+}
+
+.loading-overlay p {
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.loading-overlay mat-spinner {
+  color: white;
+}
+
+/* Profile Content */
+.profile-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 32px;
+  padding: 40px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Info Cards */
+.info-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  padding: 0;
+  transition: all 0.3s ease;
+  height: fit-content;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.info-card:hover {
+  box-shadow: 0 12px 48px rgba(31, 38, 135, 0.25);
+  transform: translateY(-4px);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px 16px 0 0;
+}
+
+.header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.header-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.card-header h2 {
+  color: white;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  margin: 4px 0 0 0;
+  font-weight: 400;
+}
+
+/* Form Sections */
+.form-section {
+  padding: 32px;
+}
+
+.section-title {
+  color: #667eea;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.section-divider {
+  margin: 0 32px;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Material Form Fields */
+.info-card ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+.info-card ::ng-deep .mat-mdc-text-field-wrapper {
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.info-card ::ng-deep .mdc-text-field--outlined:hover .mat-mdc-text-field-wrapper {
+  background: #f0f1f5;
+}
+
+.info-card ::ng-deep .mdc-text-field--focused .mat-mdc-text-field-wrapper {
+  background: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.info-card ::ng-deep .mat-mdc-form-field-icon-prefix {
+  padding-right: 12px;
+  color: #667eea;
+}
+
+.info-card ::ng-deep .mat-mdc-input-element {
+  color: #2d3748;
+  font-size: 15px;
+}
+
+.info-card ::ng-deep .mat-mdc-form-field-label {
+  color: #718096 !important;
+  font-weight: 500;
+}
+
+.info-card ::ng-deep .mat-mdc-form-field-error {
+  color: #e53e3e;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.info-card ::ng-deep .mdc-notched-outline__leading,
+.info-card ::ng-deep .mdc-notched-outline__notch,
+.info-card ::ng-deep .mdc-notched-outline__trailing {
+  border-color: rgba(102, 126, 234, 0.2) !important;
+}
+
+.info-card ::ng-deep .mdc-text-field--focused .mdc-notched-outline__leading,
+.info-card ::ng-deep .mdc-text-field--focused .mdc-notched-outline__notch,
+.info-card ::ng-deep .mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: #667eea !important;
+  border-width: 2px !important;
+}
+
+.info-card ::ng-deep .mdc-text-field--invalid .mdc-notched-outline__leading,
+.info-card ::ng-deep .mdc-text-field--invalid .mdc-notched-outline__notch,
+.info-card ::ng-deep .mdc-text-field--invalid .mdc-notched-outline__trailing {
+  border-color: #e53e3e !important;
+}
+
+/* Card Actions */
+.card-actions {
+  padding: 24px 32px 32px 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.card-actions button {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 32px;
+  border-radius: 8px;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.card-actions button mat-icon {
+  margin-right: 8px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Hospital Card Button */
+.hospital-card .card-actions button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white !important;
+  font-weight: 400 !important;
+}
+
+.hospital-card .card-actions button:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.hospital-card .card-actions button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.hospital-card .card-actions button:disabled {
+  background: #cbd5e0;
+  color: #a0aec0 !important;
+}
+
+/* Admin Card Button */
+.admin-card .card-actions button {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white !important;
+  font-weight: 400 !important;
+}
+
+.admin-card .card-actions button:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+  transform: translateY(-2px);
+}
+
+.admin-card .card-actions button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.admin-card .card-actions button:disabled {
+  background: #cbd5e0;
+  color: #a0aec0 !important;
+}
+
+/* Spinner inside button */
+.card-actions button mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.card-actions button mat-spinner ::ng-deep circle {
+  stroke: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 24px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-content h1 {
+    font-size: 24px;
+  }
+
+  .header-content h1 mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .profile-content {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header {
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-section {
+    padding: 24px;
+  }
+
+  .section-divider {
+    margin: 0 24px;
+  }
+
+  .card-actions {
+    padding: 20px 24px 24px 24px;
+    flex-direction: column;
+  }
+
+  .card-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: 16px;
+  }
+
+  .header-content h1 {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .profile-content {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .card-header {
+    padding: 20px;
+  }
+
+  .card-header h2 {
+    font-size: 20px;
+  }
+
+  .form-section {
+    padding: 20px;
+  }
+
+  .section-divider {
+    margin: 0 20px;
+  }
+
+  .card-actions {
+    padding: 16px 20px 20px 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+}
+
+/* Accessibility */
+.info-card ::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+  color: #667eea !important;
+}
+
+.info-card ::ng-deep .mat-mdc-input-element:focus {
+  outline: none;
+}
+
+/* Animation for cards entering viewport */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hospital-card {
+  animation-delay: 0.1s;
+}
+
+.admin-card {
+  animation-delay: 0.2s;
+}
+
+/* Print styles */
+@media print {
+  .page-header,
+  .back-button,
+  .card-actions {
+    display: none;
+  }
+
+  .info-card {
+    box-shadow: none;
+    border: 1px solid #e2e8f0;
+    page-break-inside: avoid;
+  }
+
+  .hospital-profile-edit {
+    background: white;
+  }
+}

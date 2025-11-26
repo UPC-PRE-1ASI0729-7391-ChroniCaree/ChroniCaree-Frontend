@@ -69,27 +69,72 @@ export class MessagesStore extends BaseApi {
 
   /**
    * Carga el inbox y actualiza los threads desde los mensajes del servidor
+   * Ahora verifica assignedDoctorId del paciente para asociación correcta
    */
-  private processMessages(messages: any[], role: 'PATIENT' | 'DOCTOR', userId: string): Thread[] {
-    // Filtrar sólo mensajes en los que el usuario participa
+  private async processMessages(messages: any[], role: 'PATIENT' | 'DOCTOR', userId: string): Promise<Thread[]> {
+    // Cargar datos de pacientes y doctores para verificar relaciones
+    let patients: any[] = [];
+    let doctors: any[] = [];
+    try {
+      const [patientsData, doctorsData] = await Promise.all([
+        firstValueFrom(this.http.get<any[]>(`${this.baseUrl}/patients`)),
+        firstValueFrom(this.http.get<any[]>(`${this.baseUrl}/doctors`))
+      ]);
+      patients = patientsData;
+      doctors = doctorsData;
+    } catch (e) {
+      console.warn('No se pudieron cargar datos auxiliares:', e);
+    }
+
+    // Resolver ID de doctor si el usuario actual es doctor
+    let currentDoctorId = '';
+    if (role === 'DOCTOR') {
+      const doc = doctors.find(d => d.userId?.toString() === userId);
+      if (doc) currentDoctorId = doc.id.toString();
+    }
+
+    // Filtrar mensajes según el rol
     const participantMessages = messages.filter((msg: any) => {
       const senderId = msg.senderId?.toString() || '';
       const receiverId = msg.receiverId?.toString() || '';
-      return senderId === userId || receiverId === userId;
+      
+      if (role === 'PATIENT') {
+        // Paciente: ve sus mensajes enviados y recibidos
+        return senderId === userId || receiverId === userId;
+      } else {
+        // Doctor: ve mensajes de sus pacientes asignados
+        const senderPatient = patients.find(p => p.userId?.toString() === senderId);
+        const receiverPatient = patients.find(p => p.userId?.toString() === receiverId);
+        
+        // Comparar con el ID de doctor real (currentDoctorId)
+        const isSenderMyPatient = senderPatient?.assignedDoctorId?.toString() === currentDoctorId;
+        const isReceiverMyPatient = receiverPatient?.assignedDoctorId?.toString() === currentDoctorId;
+        
+        // El doctor está involucrado si el mensaje va dirigido a su userId O a su doctorId
+        const isDoctorInvolved = senderId === userId || receiverId === userId ||
+                                 (currentDoctorId && (senderId === currentDoctorId || receiverId === currentDoctorId));
+        
+        return isDoctorInvolved || isSenderMyPatient || isReceiverMyPatient;
+      }
     });
 
-    // Agrupar mensajes por conversación (thread) asegurando que la thread
-    // corresponda a pair patient<->doctor y que el paciente/doctor se asignen bien.
+    // Agrupar mensajes por conversación (thread)
     const threadsMap = new Map<string, Thread>();
 
     participantMessages.forEach((msg: any) => {
       const senderId = msg.senderId?.toString() || '';
       const receiverId = msg.receiverId?.toString() || '';
 
-      // Determinar patientId y doctorId en el thread (dependiendo de senderRole si existe)
+      // Determinar patientId y doctorId en el thread
       const isSenderPatient = (msg.senderRole || '').toUpperCase() === 'PATIENT';
-      const patientId = isSenderPatient ? senderId : receiverId;
-      const doctorId = isSenderPatient ? receiverId : senderId;
+      let patientId = isSenderPatient ? senderId : receiverId;
+      let doctorId = isSenderPatient ? receiverId : senderId;
+
+      // Verificar y corregir con assignedDoctorId si existe
+      const patientData = patients.find(p => p.userId?.toString() === patientId);
+      if (patientData?.assignedDoctorId) {
+        doctorId = patientData.assignedDoctorId.toString();
+      }
 
       const key = `patient-${patientId}-doctor-${doctorId}`;
 
@@ -134,8 +179,9 @@ export class MessagesStore extends BaseApi {
       if (message.isUrgent) {
         thread.hasUrgentMessages = true;
       }
-      // contar sólo mensajes no leídos dirigidos al usuario actual
-      if (!message.isRead && message.receiverId === userId) {
+      // contar sólo mensajes no leídos dirigidos al usuario actual (o su doctorId)
+      const isRecipient = message.receiverId === userId || (currentDoctorId && message.receiverId === currentDoctorId);
+      if (!message.isRead && isRecipient) {
         thread.unreadCount = (thread.unreadCount || 0) + 1;
       }
       // mantener updatedAt con la fecha más reciente
@@ -156,32 +202,27 @@ export class MessagesStore extends BaseApi {
     return Array.from(threadsMap.values()).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
   }
 
-  loadInbox(role: 'PATIENT' | 'DOCTOR', userId: string) {
+  async loadInbox(role: 'PATIENT' | 'DOCTOR', userId: string) {
     // Guardar role y userId para el polling
     this.currentRole = role;
     this.currentUserId = userId;
 
-    // Para JSON Server simple, obtenemos todos los messages y los filtramos
-    this.http
-      .get<any[]>(this.messagesUrl)
-      .subscribe({
-        next: (messages) => {
-          console.log('📨 Mensajes recibidos del servidor:', messages);
-          const threads = this.processMessages(messages, role, userId);
-          console.log(`✅ ${threads.length} threads cargados para ${role} ${userId}`);
-          this.inbox.set(threads);
+    try {
+      const messages = await firstValueFrom(this.http.get<any[]>(this.messagesUrl));
+      console.log('📨 Mensajes recibidos del servidor:', messages);
+      const threads = await this.processMessages(messages, role, userId);
+      console.log(`✅ ${threads.length} threads cargados para ${role} ${userId}`);
+      this.inbox.set(threads);
 
-          // Actualizar thread actual si está abierto
-          this.updateCurrentThreadIfOpen(threads);
-        },
-        error: (err) => {
-          console.error('❌ Error cargando mensajes:', err);
-          this.inbox.set([]);
-        }
-      });
-
-    // Iniciar polling automático cada 5 segundos
-    this.startPolling();
+      // Actualizar thread actual si está abierto
+      this.updateCurrentThreadIfOpen(threads);
+      
+      // Iniciar polling automático cada 5 segundos
+      this.startPolling();
+    } catch (err) {
+      console.error('❌ Error cargando mensajes:', err);
+      this.inbox.set([]);
+    }
   }
 
   /**
@@ -233,8 +274,8 @@ export class MessagesStore extends BaseApi {
         switchMap(() => this.http.get<any[]>(this.messagesUrl))
       )
       .subscribe({
-        next: (messages) => {
-          const threads = this.processMessages(messages, this.currentRole!, this.currentUserId!);
+        next: async (messages) => {
+          const threads = await this.processMessages(messages, this.currentRole!, this.currentUserId!);
           const previousThreads = this.inbox();
           
           // Solo actualizar si hay cambios (comparar cantidad de threads o mensajes)
@@ -393,7 +434,14 @@ export class MessagesStore extends BaseApi {
       // Recargar inbox para el remitente (siempre que tengamos senderRole/senderId)
       try {
         const senderRole = (params.message.senderRole || 'PATIENT').toUpperCase() as 'PATIENT' | 'DOCTOR';
-        const senderId = params.message.senderId?.toString();
+        let senderId = params.message.senderId?.toString();
+
+        // Fix: If we are a doctor, ensure we use the User ID (stored in currentUserId) 
+        // instead of the Doctor ID which might be passed in params.
+        if (senderRole === 'DOCTOR' && this.currentRole === 'DOCTOR' && this.currentUserId) {
+          senderId = this.currentUserId;
+        }
+
         if (senderId) {
           // reload inbox so UI updates immediately
           this.loadInbox(senderRole, senderId);
@@ -480,7 +528,11 @@ export class MessagesStore extends BaseApi {
       }).subscribe({});
 
       // Recargar inbox del doctor y del paciente para reflejar cambios
-      try { this.loadInbox('DOCTOR', params.senderDoctorId); } catch {}
+      try { 
+        // Fix: Use stored currentUserId if we are the doctor sending this, to avoid ID mismatch (DoctorID vs UserID)
+        const doctorUserId = (this.currentRole === 'DOCTOR' && this.currentUserId) ? this.currentUserId : params.senderDoctorId;
+        this.loadInbox('DOCTOR', doctorUserId); 
+      } catch {}
       try { this.loadInbox('PATIENT', params.receiverPatientId); } catch {}
 
       return res;

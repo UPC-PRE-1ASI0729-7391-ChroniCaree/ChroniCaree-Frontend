@@ -41,13 +41,18 @@
 
 .add-patient-btn {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-weight: 600;
+  color: white !important;
+  font-weight: 400;
   padding: 0 1.5rem;
   height: 48px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
   transition: all 0.3s ease;
+}
+
+.add-patient-btn mat-icon {
+  color: white !important;
+  margin-right: 8px;
 }
 
 .add-patient-btn:hover {

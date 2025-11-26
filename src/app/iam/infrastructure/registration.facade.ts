@@ -71,81 +71,97 @@ export class RegistrationFacade {
    * Register patient with complete flow: User → Patient → Subscription
    */
   registerPatient(data: PatientRegistrationData): Observable<RegistrationResult> {
-    // Step 1: Create user
-    const newUser = {
-      id: Date.now(),
-      email: data.email,
-      role: 'patient' as const,
-      name: `${data.firstName} ${data.lastName}`,
-      password: data.password,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
-    };
+    // Step 0: Get all users to determine next ID
+    return this.userStore.loadAllUsers().pipe(
+      switchMap(users => {
+        const maxUserId = users.reduce((max, u) => Math.max(max, u.id || 0), 0);
+        const nextUserId = maxUserId + 1;
 
-    return this.userStore.createUser(newUser).pipe(
-      // After creating the user, fetch doctors and pick the most recently joined
-      switchMap((user) => this.doctorService.getAll().pipe(
-        map((doctors) => ({ user, lastDoctor: (doctors && doctors.length) ? doctors.reduce((a, b) => new Date(a.joinedAt) > new Date(b.joinedAt) ? a : b) : null }))
-      )),
-      switchMap(({ user, lastDoctor }) => {
-        // Step 2: Create patient profile, assigning the last registered doctor when available
-        const newPatient = {
-          id: Date.now(),
-          userId: user.id,
-          assignedDoctorId: lastDoctor ? lastDoctor.id : null,
-          tenantId: null,
-          subscriptionId: null,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          dni: data.dni,
-          birthDate: data.birthDate,
-          gender: data.gender,
-          phone: data.phone,
-          address: data.address,
-          weight: 0,
-          height: 0,
-          bmi: 0,
-          emergencyContact: {
-            name: '',
-            relationship: '',
-            phone: ''
-          }
+        // Step 1: Create user
+        const newUser = {
+          id: nextUserId,
+          email: data.email,
+          role: 'patient' as const,
+          name: `${data.firstName} ${data.lastName}`,
+          password: data.password,
+          isVerified: false,
+          twoFactorEnabled: false,
+          createdAt: new Date().toISOString(),
+          tenantId: null
         };
 
-        return this.patientStore.createPatient(newPatient).pipe(
-          switchMap((patient) => {
-            // Step 3: If a planId was provided, get plan details; otherwise skip and return result
-            if (data.planId) {
-              return this.subscriptionService.getPlanById(data.planId).pipe(
-                switchMap((plan) => {
-                  if (!plan) {
-                    throw new Error('Plan no encontrado');
+        return this.userStore.createUser(newUser).pipe(
+          // After creating the user, fetch doctors and pick the most recently joined
+          switchMap((user) => this.doctorService.getAll().pipe(
+            map((doctors) => ({ user, lastDoctor: (doctors && doctors.length) ? doctors.reduce((a, b) => new Date(a.joinedAt) > new Date(b.joinedAt) ? a : b) : null }))
+          )),
+          switchMap(({ user, lastDoctor }) => {
+            // Step 1.5: Get all patients to determine next Patient ID
+            return this.patientStore.loadAllPatients().pipe(
+              switchMap(patients => {
+                const maxPatientId = patients.reduce((max, p) => Math.max(max, p.id || 0), 0);
+                const nextPatientId = maxPatientId + 1;
+
+                // Step 2: Create patient profile
+                const newPatient = {
+                  id: nextPatientId,
+                  userId: user.id,
+                  assignedDoctorId: lastDoctor ? lastDoctor.id : null,
+                  tenantId: null,
+                  subscriptionId: null,
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  dni: data.dni,
+                  birthDate: data.birthDate,
+                  gender: data.gender,
+                  phone: data.phone,
+                  address: data.address,
+                  weight: 0,
+                  height: 0,
+                  bmi: 0,
+                  emergencyContact: {
+                    name: '',
+                    relationship: '',
+                    phone: ''
                   }
+                };
 
-                  // Do NOT create the subscription here if the plan requires payment.
-                  // Instead, return the created user and patient and indicate whether payment is required.
-                  return this.patientStore.updatePatient(patient).pipe(
-                    map(() => ({
-                      user,
-                      profile: patient,
-                      requiresPayment: plan.price > 0,
-                      dashboardRoute: '/patient/dashboard'
-                    }))
-                  );
-                })
-              );
-            }
+                return this.patientStore.createPatient(newPatient).pipe(
+                  switchMap((patient) => {
+                    // Step 3: If a planId was provided, get plan details; otherwise skip and return result
+                    if (data.planId) {
+                      return this.subscriptionService.getPlanById(data.planId).pipe(
+                        switchMap((plan) => {
+                          if (!plan) {
+                            throw new Error('Plan no encontrado');
+                          }
 
-            // No plan selected during registration: update patient and return success without payment requirement
-            return this.patientStore.updatePatient(patient).pipe(
-              map(() => ({
-                user,
-                profile: patient,
-                requiresPayment: false,
-                dashboardRoute: '/patient/dashboard'
-              }))
+                          // Do NOT create the subscription here if the plan requires payment.
+                          // Instead, return the created user and patient and indicate whether payment is required.
+                          return this.patientStore.updatePatient(patient).pipe(
+                            map(() => ({
+                              user,
+                              profile: patient,
+                              requiresPayment: plan.price > 0,
+                              dashboardRoute: '/patient/dashboard'
+                            }))
+                          );
+                        })
+                      );
+                    }
+
+                    // No plan selected during registration: update patient and return success without payment requirement
+                    return this.patientStore.updatePatient(patient).pipe(
+                      map(() => ({
+                        user,
+                        profile: patient,
+                        requiresPayment: false,
+                        dashboardRoute: '/patient/dashboard'
+                      }))
+                    );
+                  })
+                );
+              })
             );
           })
         );
@@ -161,84 +177,100 @@ export class RegistrationFacade {
    * Register hospital with complete flow: User → Tenant → Subscription
    */
   registerHospital(data: HospitalRegistrationData): Observable<RegistrationResult> {
-    // Step 1: Create user
-    const newUser = {
-      id: Date.now(),
-      email: data.email,
-      role: 'hospital_admin' as const,
-      name: data.adminName,
-      password: data.password,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
-    };
+    // Step 0: Get all users to determine next ID
+    return this.userStore.loadAllUsers().pipe(
+      switchMap(users => {
+        const maxUserId = users.reduce((max, u) => Math.max(max, u.id || 0), 0);
+        const nextUserId = maxUserId + 1;
 
-    return this.userStore.createUser(newUser).pipe(
-      switchMap((user) => {
-        // Step 2: Create tenant
-        const newTenant = {
-          id: Date.now(),
-          adminUserId: user.id,
-          name: data.hospitalName,
+        // Step 1: Create user
+        const newUser = {
+          id: nextUserId,
           email: data.email,
-          address: data.address,
-          phone: data.phone,
-          plan: 'basic' as const, // Will be updated with subscription
-          status: 'pending_subscription' as const,
-          registrationDate: new Date().toISOString(),
-          subscriptionId: null,
-          settings: {
-            allowIndependentDoctors: false,
-            requirePatientApproval: true,
-            maxDoctors: 10
-          }
+          role: 'hospital_admin' as const,
+          name: data.adminName,
+          password: data.password,
+          isVerified: false,
+          twoFactorEnabled: false,
+          createdAt: new Date().toISOString(),
+          tenantId: null
         };
 
-        return this.tenantStore.createTenant(newTenant).pipe(
-          switchMap((tenant) => {
-            // Step 3: Get plan details
-            return this.subscriptionService.getPlanById(data.planId).pipe(
-              switchMap((plan) => {
-                if (!plan) {
-                  throw new Error('Plan no encontrado');
-                }
+        return this.userStore.createUser(newUser).pipe(
+          switchMap((user) => {
+            // Step 1.5: Get all tenants to determine next Tenant ID
+            return this.tenantStore.loadAllTenants().pipe(
+              switchMap(tenants => {
+                const maxTenantId = tenants.reduce((max, t) => Math.max(max, t.id || 0), 0);
+                const nextTenantId = maxTenantId + 1;
 
-                // Step 4: Create subscription
-                const subscriptionRequest = {
-                  planId: plan.id,
-                  payerType: 'tenant' as const,
-                  payerId: tenant.id,
-                  paymentMethod: 'credit_card' as const,
-                  billingEmail: data.email,
-                  autoRenew: true
+                // Step 2: Create tenant
+                const newTenant = {
+                  id: nextTenantId,
+                  adminUserId: user.id,
+                  name: data.hospitalName,
+                  email: data.email,
+                  address: data.address,
+                  phone: data.phone,
+                  plan: 'basic' as const, // Will be updated with subscription
+                  status: 'pending_subscription' as const,
+                  registrationDate: new Date().toISOString(),
+                  subscriptionId: null,
+                  settings: {
+                    allowIndependentDoctors: false,
+                    requirePatientApproval: true,
+                    maxDoctors: 10
+                  }
                 };
 
-                return this.subscriptionService.create(subscriptionRequest).pipe(
-                  switchMap((subscription) => {
-                    // Step 5: Update tenant with subscription ID
-                    const updatedTenant = {
-                      ...tenant,
-                      subscriptionId: subscription.id,
-                      status: 'active' as const
-                    };
-                    
-                    return this.tenantStore.updateTenant(updatedTenant).pipe(
-                      switchMap((finalTenant) => {
-                        // Step 6: Update user with tenant ID
-                        const updatedUser = {
-                          ...user,
-                          tenantId: tenant.id
+                return this.tenantStore.createTenant(newTenant).pipe(
+                  switchMap((tenant) => {
+                    // Step 3: Get plan details
+                    return this.subscriptionService.getPlanById(data.planId).pipe(
+                      switchMap((plan) => {
+                        if (!plan) {
+                          throw new Error('Plan no encontrado');
+                        }
+
+                        // Step 4: Create subscription
+                        const subscriptionRequest = {
+                          planId: plan.id,
+                          payerType: 'tenant' as const,
+                          payerId: tenant.id,
+                          paymentMethod: 'credit_card' as const,
+                          billingEmail: data.email,
+                          autoRenew: true
                         };
-                        
-                        return this.userStore.updateUser(updatedUser).pipe(
-                          map(() => ({
-                            user: updatedUser,
-                            profile: finalTenant,
-                            subscriptionId: subscription.id,
-                            requiresPayment: true, // Hospitals always pay
-                            dashboardRoute: '/hospital/dashboard'
-                          }))
+
+                        return this.subscriptionService.create(subscriptionRequest).pipe(
+                          switchMap((subscription) => {
+                            // Step 5: Update tenant with subscription ID
+                            const updatedTenant = {
+                              ...tenant,
+                              subscriptionId: subscription.id,
+                              status: 'active' as const
+                            };
+                            
+                            return this.tenantStore.updateTenant(updatedTenant).pipe(
+                              switchMap((finalTenant) => {
+                                // Step 6: Update user with tenant ID
+                                const updatedUser = {
+                                  ...user,
+                                  tenantId: tenant.id
+                                };
+                                
+                                return this.userStore.updateUser(updatedUser).pipe(
+                                  map(() => ({
+                                    user: updatedUser,
+                                    profile: finalTenant,
+                                    subscriptionId: subscription.id,
+                                    requiresPayment: true, // Hospitals always pay
+                                    dashboardRoute: '/hospital/dashboard'
+                                  }))
+                                );
+                              })
+                            );
+                          })
                         );
                       })
                     );

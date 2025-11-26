@@ -6,7 +6,7 @@
 
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError, forkJoin } from 'rxjs';
+import { Observable, throwError, forkJoin, of } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../../iam/domain/model/user.entity';
@@ -146,82 +146,94 @@ export class DoctorRegistrationByHospitalStore {
                       );
                     }
 
-                    // Paso 7: Crear user con role: 'doctor'
-                    const userPayload = {
-                      email: request.email,
-                      name: request.name,
-                      password: request.password, // En producción debe hashearse
-                      role: 'doctor' as UserRole,
-                      isVerified: false, // Debe ser verificado por el admin
-                      twoFactorEnabled: false,
-                      tenantId: tenant.id,
-                      createdAt: new Date().toISOString(),
-                    };
-
-                    return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
-                      switchMap((createdUser) => {
-                        // Paso 8: Crear doctor
-                        const doctorPayload = {
-                          userId: createdUser.id,
+                    // Obtener siguiente ID para usuario
+                    return this.getNextId('users').pipe(
+                      switchMap(nextUserId => {
+                        // Paso 7: Crear user con role: 'doctor'
+                        const userPayload = {
+                          id: nextUserId,
+                          email: request.email,
+                          name: request.name,
+                          password: request.password, // En producción debe hashearse
+                          role: 'doctor' as UserRole,
+                          isVerified: false, // Debe ser verificado por el admin
+                          twoFactorEnabled: false,
                           tenantId: tenant.id,
-                          isIndependent: false,
-                          firstName: request.firstName,
-                          lastName: request.lastName,
-                          dni: request.dni,
-                          specialty: request.specialty,
-                          licenseNumber: request.licenseNumber,
-                          phone: request.phone,
-                          isVerified: false,
-                          acceptingPatients: false, // Por defecto no acepta hasta que sea verificado
-                          consultationFee: request.consultationFee || 0,
-                          languages: request.languages || ['es'],
-                          education: request.education || [],
-                          joinedAt: new Date().toISOString(),
+                          createdAt: new Date().toISOString(),
                         };
 
-                        return this.http.post<any>(`${this.baseUrl}/doctors`, doctorPayload).pipe(
-                          map((createdDoctor) => {
-                            const userEntity = new UserEntity(
-                              createdUser.id,
-                              createdUser.email,
-                              createdUser.role,
-                              createdUser.name,
-                              createdUser.password,
-                              createdUser.isVerified,
-                              createdUser.twoFactorEnabled,
-                              createdUser.createdAt,
-                              createdUser.tenantId
+                        return this.http.post<any>(`${this.baseUrl}/users`, userPayload).pipe(
+                          switchMap((createdUser) => {
+                            // Obtener siguiente ID para doctor
+                            return this.getNextId('doctors').pipe(
+                              switchMap(nextDoctorId => {
+                                // Paso 8: Crear doctor
+                                const doctorPayload = {
+                                  id: nextDoctorId,
+                                  userId: createdUser.id,
+                                  tenantId: tenant.id,
+                                  isIndependent: false,
+                                  firstName: request.firstName,
+                                  lastName: request.lastName,
+                                  dni: request.dni,
+                                  specialty: request.specialty,
+                                  licenseNumber: request.licenseNumber,
+                                  phone: request.phone,
+                                  isVerified: false,
+                                  acceptingPatients: false, // Por defecto no acepta hasta que sea verificado
+                                  consultationFee: request.consultationFee || 0,
+                                  languages: request.languages || ['es'],
+                                  education: request.education || [],
+                                  joinedAt: new Date().toISOString(),
+                                };
+
+                                return this.http.post<any>(`${this.baseUrl}/doctors`, doctorPayload).pipe(
+                                  map((createdDoctor) => {
+                                    const userEntity = new UserEntity(
+                                      createdUser.id,
+                                      createdUser.email,
+                                      createdUser.role,
+                                      createdUser.name,
+                                      createdUser.password,
+                                      createdUser.isVerified,
+                                      createdUser.twoFactorEnabled,
+                                      createdUser.createdAt,
+                                      createdUser.tenantId
+                                    );
+
+                                    const doctorEntity = new DoctorEntity(
+                                      createdDoctor.id,
+                                      createdDoctor.userId,
+                                      createdDoctor.tenantId,
+                                      createdDoctor.isIndependent,
+                                      createdDoctor.firstName,
+                                      createdDoctor.lastName,
+                                      createdDoctor.dni,
+                                      createdDoctor.specialty,
+                                      createdDoctor.licenseNumber,
+                                      createdDoctor.phone,
+                                      createdDoctor.isVerified,
+                                      createdDoctor.acceptingPatients,
+                                      createdDoctor.consultationFee,
+                                      createdDoctor.languages,
+                                      createdDoctor.education,
+                                      createdDoctor.joinedAt
+                                    );
+
+                                    const result: DoctorRegistrationResult = {
+                                      user: userEntity,
+                                      doctor: doctorEntity,
+                                      tenant,
+                                      currentDoctorCount: currentDoctorCount + 1, // Incluye el recién creado
+                                      maxDoctorsLimit,
+                                    };
+
+                                    this._lastRegisteredDoctor.set(result);
+                                    return result;
+                                  })
+                                );
+                              })
                             );
-
-                            const doctorEntity = new DoctorEntity(
-                              createdDoctor.id,
-                              createdDoctor.userId,
-                              createdDoctor.tenantId,
-                              createdDoctor.isIndependent,
-                              createdDoctor.firstName,
-                              createdDoctor.lastName,
-                              createdDoctor.dni,
-                              createdDoctor.specialty,
-                              createdDoctor.licenseNumber,
-                              createdDoctor.phone,
-                              createdDoctor.isVerified,
-                              createdDoctor.acceptingPatients,
-                              createdDoctor.consultationFee,
-                              createdDoctor.languages,
-                              createdDoctor.education,
-                              createdDoctor.joinedAt
-                            );
-
-                            const result: DoctorRegistrationResult = {
-                              user: userEntity,
-                              doctor: doctorEntity,
-                              tenant,
-                              currentDoctorCount: currentDoctorCount + 1, // Incluye el recién creado
-                              maxDoctorsLimit,
-                            };
-
-                            this._lastRegisteredDoctor.set(result);
-                            return result;
                           })
                         );
                       })
@@ -349,5 +361,21 @@ export class DoctorRegistrationByHospitalStore {
   clearRegistrationState(): void {
     this._isRegistering.set(false);
     this._registrationError.set(null);
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${this.baseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map(items => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
+    );
   }
 }

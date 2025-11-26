@@ -1,71 +1,101 @@
-<section class="card thread-card chat-root" *ngIf="vm().thread as data">
-  <header class="thread-header">
-    <div class="thread-left">
-      <h2 class="subject">{{ data.subject || 'Sin asunto' }}</h2>
-      <div class="meta-row">
-        <span class="participants">Paciente: {{ data.patientId }} • Médico: {{ data.doctorId }}</span>
+<div class="chat-root" *ngIf="vm().thread as data">
+  <!-- Header Professional -->
+  <header class="chat-header">
+    <div class="header-left">
+      <div class="avatar" [class.avatar-doctor]="!isPatientView()" [class.avatar-patient]="isPatientView()">
+        <span class="avatar-icon">{{ getAvatarInitial(data) }}</span>
+      </div>
+      <div class="header-info">
+        <h2 class="chat-title">{{ getChatTitle(data) }}</h2>
+        <p class="chat-subtitle">{{ data.subject || 'Consulta médica' }}</p>
       </div>
     </div>
-    <div class="thread-right">
-      <div class="unread" *ngIf="data.unreadCount">{{ data.unreadCount }} sin leer</div>
-      <div class="last-at">{{ (data.updatedAt || data.createdAt) | date:'dd/MM/yy, h:mm a' }}</div>
+    <div class="header-right">
+      <div class="status-badge" [class.status-open]="data.status === 'OPEN'" [class.status-closed]="data.status === 'CLOSED'">
+        {{ data.status === 'OPEN' ? 'Activa' : 'Resuelta' }}
+      </div>
     </div>
   </header>
 
-  <!-- Chat messages scrollable area -->
+  <!-- Chat Messages Container -->
   <div #chatContainer class="chat-container" role="log" aria-live="polite">
-    <ul class="msgs">
-      <li *ngFor="let m of (data.messages || []); trackBy: trackByMsgId"
-          class="msg"
-          [class.mine]="isMine(m)"
-          [class.from-patient]="m.senderRole === 'PATIENT'"
-          [class.from-doctor]="m.senderRole === 'DOCTOR'">
-        <div class="bubble">
-          <div class="bubble-header">
-            <div class="sender">
-              {{ isMine(m) ? 'Tú' : (senderDisplayName(m) || (m.senderRole === 'PATIENT' ? 'Paciente' : 'Médico')) }}
-              <small *ngIf="!isMine(m) && !senderDisplayName(m) && m.senderId" class="sender-id">{{ '(' + (m.senderId | slice:0:6) + ')' }}</small>
+    <div class="messages-wrapper">
+      <div *ngFor="let m of (data.messages || []); trackBy: trackByMsgId"
+           class="message-item"
+           [class.message-mine]="isMine(m)"
+           [class.message-other]="!isMine(m)">
+        <div class="message-content">
+          <div class="message-bubble">
+            <div class="message-header" *ngIf="!isMine(m)">
+              <span class="sender-name">
+                {{ senderDisplayName(m) || (m.senderRole === 'PATIENT' ? 'Paciente' : 'Doctor') }}
+              </span>
             </div>
-            <div class="time">{{ m.createdAt | date:'dd/MM/yy, h:mm a' }}</div>
-          </div>
-
-          <div class="subject" *ngIf="m.subject">{{ m.subject }}</div>
-          <div class="body">{{ m.body }}</div>
-
-          <div class="files" *ngIf="m.attachments?.length">
-            <a *ngFor="let a of m.attachments" class="file" [href]="a.url" target="_blank" rel="noopener">
-              {{ a.fileName }}
-            </a>
+            <div class="message-header" *ngIf="isMine(m)">
+              <span class="sender-name">Tú</span>
+            </div>
+            <div class="message-body">{{ m.body }}</div>
+            <div class="message-footer">
+              <span class="message-time">{{ m.createdAt | date:'shortTime' }}</span>
+              <span class="message-status" *ngIf="isMine(m)">
+                <span *ngIf="m.isRead" class="status-read">✓✓</span>
+                <span *ngIf="!m.isRead" class="status-sent">✓</span>
+              </span>
+            </div>
           </div>
         </div>
-      </li>
-    </ul>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-messages" *ngIf="!(data.messages?.length)">
+        <div class="empty-icon">💬</div>
+        <p>No hay mensajes aún</p>
+        <small>Inicia la conversación escribiendo un mensaje</small>
+      </div>
+    </div>
   </div>
 
-  <!-- Compose bar (sticky at bottom) -->
-  <footer class="compose-bar" *ngIf="vm() as vmx">
-    <form class="compose-form" (ngSubmit)="$event.preventDefault(); sendReply()">
-      <input
-        class="compose-input"
-        type="text"
-        aria-label="Escribe un mensaje"
-        [ngModel]="replyText()"
-        (ngModelChange)="replyText.set($event)"
-        placeholder="Escribe un mensaje..."
-        name="replyInput"
-        autocomplete="off"
-        [disabled]="vmx.sending" />
-
-      <button class="btn btn-send" type="button" (click)="sendReply()" [disabled]="vmx.sending || !replyText().trim()">
-        <span *ngIf="!vmx.sending">Enviar</span>
-        <span *ngIf="vmx.sending">Enviando…</span>
-      </button>
-    </form>
-
-    <div class="close-thread" *ngIf="vmx.canClose">
-      <button class="btn btn-danger" (click)="closeThread()" [disabled]="vmx.closing">
-        {{ vmx.closing ? 'Cerrando…' : 'Marcar como resuelta' }}
-      </button>
+  <!-- Compose Bar -->
+  <footer class="chat-footer" *ngIf="vm() as vmx">
+    <div class="compose-container">
+      <form class="compose-form" (ngSubmit)="$event.preventDefault(); sendReply()">
+        <div class="input-wrapper">
+          <input
+            class="message-input"
+            type="text"
+            [(ngModel)]="replyText"
+            name="replyInput"
+            placeholder="Escribe un mensaje..."
+            autocomplete="off"
+            [disabled]="vmx.sending || data.status === 'CLOSED'"
+            (keypress)="handleKeyPress($event)" />
+          <button 
+            type="submit" 
+            class="btn-send" 
+            [disabled]="vmx.sending || !replyText().trim() || data.status === 'CLOSED'"
+            [class.btn-sending]="vmx.sending">
+            <span *ngIf="!vmx.sending" class="send-icon">➤</span>
+            <span *ngIf="vmx.sending" class="sending-spinner">⟳</span>
+          </button>
+        </div>
+      </form>
+      
+      <!-- Close Thread Button (only for doctors and open threads) -->
+      <div class="action-bar" *ngIf="vmx.canClose && data.status === 'OPEN'">
+        <button 
+          class="btn-resolve" 
+          (click)="closeThread()" 
+          [disabled]="vmx.closing">
+          <span *ngIf="!vmx.closing">✓ Marcar como Resuelta</span>
+          <span *ngIf="vmx.closing">Cerrando...</span>
+        </button>
+      </div>
     </div>
   </footer>
-</section>
+</div>
+
+<!-- Loading State -->
+<div class="chat-loading" *ngIf="!vm().thread">
+  <div class="loading-spinner"></div>
+  <p>Cargando conversación...</p>
+</div>

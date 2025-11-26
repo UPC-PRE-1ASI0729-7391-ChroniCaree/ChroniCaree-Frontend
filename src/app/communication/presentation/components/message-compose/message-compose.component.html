@@ -32,7 +32,7 @@
         <div *ngIf="currentRole === 'DOCTOR'; else patientRecipient">
           <select class="input" [ngModel]="patientId()" (ngModelChange)="patientId.set($event)">
             <option value="">Selecciona un paciente...</option>
-            <option *ngFor="let p of patientsList()" [value]="p.id">{{ p.firstName }} {{ p.lastName }}</option>
+            <option *ngFor="let p of patientsList()" [value]="p.userId">{{ p.firstName }} {{ p.lastName }}</option>
           </select>
         </div>
         <ng-template #patientRecipient>

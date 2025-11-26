@@ -10,6 +10,7 @@ import { Message } from '../../../domain/model/message.entity';
 import { Thread } from '../../../domain/model/thread.entity';
 import { UserStore } from '../../../../iam/application/user.store';
 import { AfterViewInit } from '@angular/core';
+import { DoctorApiEndpoint } from '../../../../doctors/infrastructure/doctor-api.endpoint';
 
 type ThreadVM = (Thread & { messages: Message[] }) | null;
 
@@ -25,15 +26,67 @@ export class MessageThreadComponent implements AfterViewInit {
   private store = inject(MessagesStore);
   private userStore = inject(UserStore);
   private http = inject(HttpClient);
+  private doctorApi = inject(DoctorApiEndpoint);
 
   /** Cache local de nombres de usuarios por id (para mostrar nombres en las burbujas) */
   senderNames: WritableSignal<Record<string, string>> = signal({});
+  /** Cache local de nombres de doctores por id */
+  doctorNames: WritableSignal<Record<string, string>> = signal({});
 
   // Entrada de respuesta (solo usada cuando el doctor contesta)
   replyText = signal<string>('');
+  
+  // ID del doctor actual (si el usuario es doctor)
+  doctorId = signal<string | null>(null);
 
   // Trackear cantidad de mensajes para detectar nuevos
   private previousMessageCount = 0;
+
+  /**
+   * Determina si la vista actual es del paciente
+   */
+  isPatientView(): boolean {
+    try {
+      const current = this.userStore.currentUser$() as any;
+      const role = current ? (current.role || '').toUpperCase() : (localStorage.getItem('userRole') || '').toUpperCase();
+      return role === 'PATIENT';
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Obtiene la inicial para el avatar
+   */
+  getAvatarInitial(thread: ThreadVM): string {
+    if (!thread) return '?';
+    const isPatient = this.isPatientView();
+    // Si soy paciente, mostrar inicial del doctor, y viceversa
+    return isPatient ? 'Dr' : 'P';
+  }
+
+  /**
+   * Obtiene el título del chat (nombre del interlocutor)
+   */
+  getChatTitle(thread: ThreadVM): string {
+    if (!thread) return 'Chat';
+    const isPatient = this.isPatientView();
+    if (isPatient) {
+      return this.doctorNames()[thread.doctorId] || 'Doctor Asignado';
+    } else {
+      return this.senderNames()[thread.patientId] || 'Paciente';
+    }
+  }
+
+  /**
+   * Maneja el evento de tecla Enter para enviar mensaje
+   */
+  handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendReply();
+    }
+  }
 
   // ViewModel derivado del store
   vm: Signal<{
@@ -63,7 +116,7 @@ export class MessageThreadComponent implements AfterViewInit {
         if (currentCount > this.previousMessageCount && this.previousMessageCount > 0) {
           // Nuevos mensajes detectados
           const newMessages = thread.messages.slice(this.previousMessageCount);
-          newMessages.forEach(m => this.fetchSenderName(m.senderId));
+          newMessages.forEach(m => this.fetchSenderName(m.senderId, m.senderRole));
           
           // Scroll automático solo si el usuario está cerca del final
           this.scrollToBottomIfNearEnd();
@@ -84,15 +137,46 @@ export class MessageThreadComponent implements AfterViewInit {
     if (!id) return; // nothing to load
 
     try {
-      await this.store.openThread(id);
+      // 1. Cargar datos del usuario actual y determinar si es doctor
       const currentUser = this.userStore.currentUser$() as any;
-      const viewerId = currentUser ? currentUser.id.toString() : this.resolveUserId();
-      // mark messages as read for the viewer
-      try { await this.store.markThreadAsRead(id, viewerId); } catch (e) { /* ignore */ }
-      // Pre-fetch sender display names for messages in the thread
+      const role = currentUser ? (currentUser.role || '').toUpperCase() : (localStorage.getItem('userRole') || '').toUpperCase();
+      const userId = currentUser ? currentUser.id.toString() : this.resolveUserId();
+
+      if (role === 'DOCTOR') {
+        // Buscar el perfil de doctor para obtener su ID de dominio (doctorId)
+        this.doctorApi.getAll().subscribe({
+          next: (doctors) => {
+            const doc = doctors.find((d: any) => d.userId?.toString() === userId);
+            if (doc) {
+              this.doctorId.set(doc.id.toString());
+            }
+          }
+        });
+      }
+
+      // 2. Abrir el hilo
+      await this.store.openThread(id);
+      
+      // 3. Marcar como leído
+      // El viewerId para marcar como leído es el userId (identidad) o el doctorId (dominio)
+      // El store maneja la lógica, pero aquí pasamos el userId principal por ahora
+      try { await this.store.markThreadAsRead(id, userId); } catch (e) { /* ignore */ }
+      
+      // 4. Pre-fetch nombres
       const t = this.store.currentThread();
-      (t?.messages || []).forEach(m => this.fetchSenderName(m.senderId));
-      // ensure we scroll to the bottom after initial load
+      if (t) {
+        // Fetch interlocutor name for title
+        if (this.isPatientView()) {
+          this.fetchSenderName(t.doctorId, 'DOCTOR');
+        } else {
+          this.fetchSenderName(t.patientId, 'PATIENT');
+        }
+        
+        // Fetch names for messages
+        (t.messages || []).forEach(m => this.fetchSenderName(m.senderId, m.senderRole));
+      }
+      
+      // 5. Scroll al final
       this.scrollToBottom();
     } catch (e) {
       // ignore load errors
@@ -119,9 +203,12 @@ export class MessageThreadComponent implements AfterViewInit {
 
     if (role === 'DOCTOR') {
       // existing doctor reply flow (keeps server-side doctor-specific endpoints/notifications)
+      // Usar el doctorId resuelto si está disponible, sino intentar usar el userId (fallback)
+      const senderId = this.doctorId() || currentUser?.id?.toString() || this.resolveUserId();
+      
       await this.store.replyToThread({
         threadId: t.id,
-        senderDoctorId: t.doctorId,
+        senderDoctorId: senderId,
         receiverPatientId: t.patientId,
         body,
       });
@@ -192,7 +279,10 @@ export class MessageThreadComponent implements AfterViewInit {
     try {
       const current = this.userStore.currentUser$() as any;
       const myId = current ? current.id?.toString() : this.resolveUserId();
-      return !!m.senderId && m.senderId.toString() === myId;
+      const myDoctorId = this.doctorId();
+      
+      const senderId = m.senderId?.toString();
+      return !!senderId && (senderId === myId || (!!myDoctorId && senderId === myDoctorId));
     } catch {
       return false;
     }
@@ -201,29 +291,50 @@ export class MessageThreadComponent implements AfterViewInit {
   /** Devuelve el nombre mostrado para un mensaje (cacheado). */
   senderDisplayName(m: Message): string | null {
     if (!m?.senderId) return null;
-    const map = this.senderNames();
-    return map[m.senderId?.toString()] || null;
+    const id = m.senderId.toString();
+    
+    if (m.senderRole === 'DOCTOR') {
+      return this.doctorNames()[id] || null;
+    } else {
+      return this.senderNames()[id] || null;
+    }
   }
 
-  private fetchSenderName(senderId?: string) {
+  private fetchSenderName(senderId?: string, role: 'PATIENT' | 'DOCTOR' = 'PATIENT') {
     if (!senderId) return;
     const id = senderId.toString();
-    const map = this.senderNames();
-    if (map[id] !== undefined) return; // ya cacheado (incluye empty string)
+    
+    if (role === 'DOCTOR') {
+      const map = this.doctorNames();
+      if (map[id] !== undefined) return;
+      
+      this.doctorApi.getById(Number(id)).subscribe({
+        next: (d: any) => {
+          const name = d ? `${d.firstName || ''} ${d.lastName || ''}`.trim() : 'Doctor';
+          this.doctorNames.set({ ...this.doctorNames(), [id]: name });
+        },
+        error: () => {
+          this.doctorNames.set({ ...this.doctorNames(), [id]: 'Doctor' });
+        }
+      });
+    } else {
+      const map = this.senderNames();
+      if (map[id] !== undefined) return; // ya cacheado (incluye empty string)
 
-    // GET /users/:id usando endpoint centralizado
-    this.http.get<any>(`${environment.apiBaseUrl}${environment.usersEndpointPath}/${id}`).subscribe({
-      next: (u) => {
-        const name = u?.name || (u?.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : '') || '';
-        const cur = this.senderNames();
-        this.senderNames.set({ ...cur, [id]: name });
-      },
-      error: () => {
-        // fallback: cache vacío para evitar reintentos continuos
-        const cur = this.senderNames();
-        this.senderNames.set({ ...cur, [id]: '' });
-      }
-    });
+      // GET /users/:id usando endpoint centralizado
+      this.http.get<any>(`${environment.apiBaseUrl}${environment.usersEndpointPath}/${id}`).subscribe({
+        next: (u) => {
+          const name = u?.name || (u?.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : '') || '';
+          const cur = this.senderNames();
+          this.senderNames.set({ ...cur, [id]: name });
+        },
+        error: () => {
+          // fallback: cache vacío para evitar reintentos continuos
+          const cur = this.senderNames();
+          this.senderNames.set({ ...cur, [id]: '' });
+        }
+      });
+    }
   }
 
   trackByMsgId(_: number, m: Message) {

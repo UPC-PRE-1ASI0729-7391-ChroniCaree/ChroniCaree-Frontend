@@ -110,7 +110,7 @@
     "greeting": "Hola, {{name}}!",
     "years": "años",
     "registerSymptom": "Registrar síntoma",
-    "viewDiagnoses": "Ver diagnósticos ({{count}})",
+    "viewDiagnoses": "Ver diagnósticos",
     "messages": "Mensajes",
     "vitalSigns": "Signos vitales",
     "lastUpdate": "Última actualización",

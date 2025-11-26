@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, catchError, of, switchMap } from 'rxjs';
 import { InvitationEntity, InvitationStatus, InvitationRole } from '../domain/model/invitation.entity';
 import { environment } from '../../../environments/environment';
 
@@ -108,19 +108,24 @@ export class InvitationService {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + expiresInDays);
 
-    const resource: Partial<InvitationResource> = {
-      tenantId: request.tenantId,
-      invitedBy: request.invitedBy,
-      email: request.email,
-      role: request.role,
-      status: 'pending',
-      token: this.generateToken(),
-      expiresAt: expiryDate.toISOString(),
-      createdAt: new Date().toISOString()
-    };
+    return this.getNextId('invitations').pipe(
+      switchMap(nextId => {
+        const resource: Partial<InvitationResource> = {
+          id: nextId,
+          tenantId: request.tenantId,
+          invitedBy: request.invitedBy,
+          email: request.email,
+          role: request.role,
+          status: 'pending',
+          token: this.generateToken(),
+          expiresAt: expiryDate.toISOString(),
+          createdAt: new Date().toISOString()
+        };
 
-    return this.http.post<InvitationResource>(INVITATION_API, resource)
-      .pipe(map(r => this.toEntity(r)));
+        return this.http.post<InvitationResource>(INVITATION_API, resource)
+          .pipe(map(r => this.toEntity(r)));
+      })
+    );
   }
 
   /**
@@ -198,6 +203,22 @@ export class InvitationService {
       resource.createdAt,
       resource.acceptedAt,
       resource.rejectedAt
+    );
+  }
+
+  /**
+   * Obtiene el siguiente ID secuencial para una colección
+   */
+  private getNextId(collection: string): Observable<number> {
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/${collection}?_sort=id&_order=desc&_limit=1`).pipe(
+      map(items => {
+        if (items && items.length > 0) {
+          const maxId = Number(items[0].id);
+          return Number.isNaN(maxId) ? 1 : maxId + 1;
+        }
+        return 1;
+      }),
+      catchError(() => of(1))
     );
   }
 }

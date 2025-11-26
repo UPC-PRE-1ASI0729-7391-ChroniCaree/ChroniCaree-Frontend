@@ -111,7 +111,7 @@ export class HeaderContentComponent implements OnInit {
       case 'doctor':
         return '/doctor/edit-profile';
       case 'hospital_admin':
-        return '/settings'; // Placeholder para admin
+        return '/hospital/profile';
       default:
         return '/patient/edit-profile';
     }
