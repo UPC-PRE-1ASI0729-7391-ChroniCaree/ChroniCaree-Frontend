@@ -6,6 +6,8 @@
   /* Fondo con sutil degradado violeta para romper el blanco */
   background: linear-gradient(180deg, rgba(124, 58, 237, 0.06) 0%, rgba(124, 58, 237, 0) 180px);
   border-radius: 20px;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
 /* ===== Migas ===== */

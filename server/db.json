@@ -32,6 +32,17 @@
       "twoFactorEnabled": false,
       "createdAt": "2025-11-26T21:28:43.037Z",
       "tenantId": null
+    },
+    {
+      "id": 1764193573929,
+      "email": "mathias@mathias.com",
+      "role": "patient",
+      "name": "mathias santiago",
+      "password": "12345678",
+      "isVerified": false,
+      "twoFactorEnabled": false,
+      "createdAt": "2025-11-26T21:46:13.929Z",
+      "tenantId": null
     }
   ],
   "tenants": [
@@ -189,6 +200,22 @@
       "lastPaymentDate": "2025-11-26T21:10:41.809Z",
       "lastPaymentAmount": 599,
       "id": 1
+    },
+    {
+      "id": 2,
+      "payerType": "patient",
+      "payerId": 1764193574012,
+      "patientId": 1764193574012,
+      "planId": "patient_standard",
+      "status": "active",
+      "startDate": "2025-11-26T21:49:10.890Z",
+      "endDate": "2025-12-26T21:49:10.890Z",
+      "autoRenew": true,
+      "paymentMethod": "credit_card",
+      "billingEmail": "mathias@mathias.com",
+      "nextBillingDate": "2025-12-26T21:49:10.890Z",
+      "lastPaymentDate": "2025-11-26T21:49:10.890Z",
+      "lastPaymentAmount": 19.99
     }
   ],
   "patients": [
@@ -213,6 +240,28 @@
       "tenantId": 1,
       "subscriptionId": 3,
       "id": 1
+    },
+    {
+      "id": 1764193574012,
+      "userId": 1764193573929,
+      "assignedDoctorId": 1,
+      "tenantId": null,
+      "subscriptionId": null,
+      "firstName": "mathias",
+      "lastName": "santiago",
+      "dni": "123123123",
+      "birthDate": "2025-11-06",
+      "gender": "male",
+      "phone": "12312312312",
+      "address": "av no se",
+      "weight": 0,
+      "height": 0,
+      "bmi": 0,
+      "emergencyContact": {
+        "name": "",
+        "relationship": "",
+        "phone": ""
+      }
     }
   ],
   "doctors": [
@@ -307,6 +356,71 @@
       "isUrgent": false,
       "attachments": [],
       "id": 5
+    },
+    {
+      "senderId": "1764193573929",
+      "receiverId": "1",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "hola",
+      "content": "como estas",
+      "timestamp": "2025-11-26T21:49:54.887Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 6
+    },
+    {
+      "senderId": "1764193573929",
+      "receiverId": "1",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "hola",
+      "content": "contesta ps",
+      "timestamp": "2025-11-26T21:50:00.393Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 7
+    },
+    {
+      "threadId": "patient-1764193573929-doctor-1",
+      "senderRole": "DOCTOR",
+      "senderId": "1",
+      "receiverId": "1764193573929",
+      "subject": "Respuesta del médico",
+      "content": "estas bien?",
+      "timestamp": "2025-11-26T21:50:20.934Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 8
+    },
+    {
+      "threadId": "patient-1764193573929-doctor-1",
+      "senderRole": "DOCTOR",
+      "senderId": "1",
+      "receiverId": "1764193573929",
+      "subject": "Respuesta del médico",
+      "content": "xd",
+      "timestamp": "2025-11-26T21:50:34.187Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 9
+    },
+    {
+      "threadId": "patient-3-doctor-1",
+      "senderRole": "DOCTOR",
+      "senderId": "1",
+      "receiverId": "3",
+      "subject": "Respuesta del médico",
+      "content": "uwu",
+      "timestamp": "2025-11-26T21:50:41.004Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 10
     }
   ],
   "diagnoses": [
@@ -345,6 +459,20 @@
       "updatedAt": "2025-11-26T21:10:41.728Z",
       "createdAt": "2025-11-26T21:10:41.728Z",
       "id": 1
+    },
+    {
+      "subscriptionId": 0,
+      "payerType": "patient",
+      "payerId": 1764193574012,
+      "amount": 19.99,
+      "currency": "USD",
+      "status": "completed",
+      "paymentMethod": "credit_card",
+      "transactionId": "tok_1SXqaIBJEHGVCWjrmvOLMD9C",
+      "stripePaymentIntentId": "tok_1SXqaIBJEHGVCWjrmvOLMD9C",
+      "updatedAt": "2025-11-26T21:49:10.751Z",
+      "id": 2,
+      "createdAt": "2025-11-26T21:49:10.803Z"
     }
   ],
   "nudges": [],
