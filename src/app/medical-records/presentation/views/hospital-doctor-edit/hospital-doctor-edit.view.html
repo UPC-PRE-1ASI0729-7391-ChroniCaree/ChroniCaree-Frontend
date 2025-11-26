@@ -1,0 +1,131 @@
+<div class="doctor-edit-container">
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="64"></mat-spinner>
+      <p>Cargando información del doctor...</p>
+    </div>
+  } @else {
+    <div class="edit-content">
+      <!-- Header -->
+      <div class="edit-header">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-info">
+          <h1>
+            <mat-icon>edit</mat-icon>
+            Editar Doctor
+          </h1>
+          <p class="subtitle">Actualiza la información del doctor {{ doctor()?.fullName }}</p>
+        </div>
+      </div>
+
+      <!-- Form Card -->
+      <div class="form-card">
+        <form [formGroup]="doctorForm" (ngSubmit)="onSubmit()">
+          <!-- Personal Info Section -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <mat-icon>person</mat-icon>
+              Información Personal
+            </h2>
+            <div class="info-grid">
+              <div class="info-item">
+                <span><mat-icon>person</mat-icon> Nombre Completo</span>
+                <p>{{ doctor()?.fullName }}</p>
+              </div>
+
+              <div class="info-item">
+                <span><mat-icon>badge</mat-icon> DNI</span>
+                <p>{{ doctor()?.dni }}</p>
+              </div>
+
+              <div class="info-item">
+                <span><mat-icon>local_hospital</mat-icon> Especialidad</span>
+                <p>{{ doctor()?.specialty }}</p>
+              </div>
+
+              <div class="info-item">
+                <span><mat-icon>card_membership</mat-icon> Número de Licencia</span>
+                <p>{{ doctor()?.licenseNumber }}</p>
+              </div>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Teléfono</mat-label>
+              <input 
+                matInput 
+                formControlName="phone" 
+                placeholder="987654321"
+                type="tel">
+              <mat-icon matPrefix>phone</mat-icon>
+              @if (doctorForm.get('phone')?.invalid && doctorForm.get('phone')?.touched) {
+                <mat-error>{{ getErrorMessage('phone') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <!-- Professional Info Section -->
+          <div class="form-section">
+            <h2 class="section-title">
+              <mat-icon>medical_services</mat-icon>
+              Configuración Profesional
+            </h2>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Tarifa de Consulta (S/)</mat-label>
+                <input 
+                  matInput 
+                  formControlName="consultationFee" 
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  step="0.01">
+                <mat-icon matPrefix>attach_money</mat-icon>
+                @if (doctorForm.get('consultationFee')?.invalid && doctorForm.get('consultationFee')?.touched) {
+                  <mat-error>{{ getErrorMessage('consultationFee') }}</mat-error>
+                }
+              </mat-form-field>
+
+              <div class="checkbox-field">
+                <mat-icon>how_to_reg</mat-icon>
+                <label>
+                  <input type="checkbox" formControlName="acceptingPatients" />
+                  <span>Aceptando nuevos pacientes</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="form-actions">
+            <button 
+              mat-stroked-button 
+              type="button" 
+              class="cancel-btn"
+              (click)="goBack()"
+              [disabled]="saving()">
+              <mat-icon>close</mat-icon>
+              Cancelar
+            </button>
+            <button 
+              mat-raised-button 
+              type="submit" 
+              class="save-btn"
+              [disabled]="doctorForm.invalid || saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                <span>Guardando...</span>
+              } @else {
+                <ng-container>
+                  <mat-icon>save</mat-icon>
+                  <span>Guardar Cambios</span>
+                </ng-container>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1539,7 +1539,7 @@
       "phone": "123214142",
       "isVerified": false,
       "acceptingPatients": false,
-      "consultationFee": 0,
+      "consultationFee": 32,
       "languages": [
         "es"
       ],
@@ -2009,6 +2009,71 @@
       "isUrgent": false,
       "attachments": [],
       "id": 5
+    },
+    {
+      "senderId": "1763240473346",
+      "receiverId": "6",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "me siento mal",
+      "content": "hola",
+      "timestamp": "2025-11-26T20:01:32.563Z",
+      "read": false,
+      "isUrgent": true,
+      "attachments": [],
+      "id": 6
+    },
+    {
+      "senderId": "1764183449828",
+      "receiverId": "6",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "me siento mal",
+      "content": "hola",
+      "timestamp": "2025-11-26T20:01:37.330Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 7
+    },
+    {
+      "senderId": "1764183449828",
+      "receiverId": "6",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "me siento mal",
+      "content": "hola",
+      "timestamp": "2025-11-26T20:01:40.068Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 8
+    },
+    {
+      "senderId": "1764183449828",
+      "receiverId": "6",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "me siento mal",
+      "content": "xd",
+      "timestamp": "2025-11-26T20:01:41.868Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 9
+    },
+    {
+      "senderId": "1764183449828",
+      "receiverId": "6",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "me siento mal",
+      "content": "sadas",
+      "timestamp": "2025-11-26T20:07:30.985Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 10
     }
   ],
   "diagnoses": [

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -42,6 +42,7 @@ interface Patient {
   styleUrls: ['./hospital-patients.view.css']
 })
 export class HospitalPatientsView implements OnInit {
+  private router = inject(Router);
   private hospitalStore = inject(HospitalDashboardStore);
   private patientService = inject(PatientService);
   private doctorService = inject(DoctorService);
@@ -165,8 +166,7 @@ export class HospitalPatientsView implements OnInit {
   }
 
   viewPatientDetails(patientId: number) {
-    console.log('View patient details:', patientId);
-    // TODO: Navigate to patient details view
+    this.router.navigate(['/hospital/patients', patientId]);
   }
 
   getStatusColor(status: string): string {

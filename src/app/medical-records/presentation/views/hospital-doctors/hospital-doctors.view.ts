@@ -9,8 +9,6 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { HospitalDashboardStore } from '../../../../tenants/application/hospital-dashboard.store';
 import { DoctorService } from '../../../../doctors/infrastructure/doctor.service';
 import { PatientService } from '../../../../patients/infrastructure/patient.service';
-import { DoctorEntity } from '../../../../doctors/domain/model/doctor.entity';
-import { PatientEntity } from '../../../../patients/domain/model/patient.entity';
 
 interface Doctor {
   id: number;
@@ -44,11 +42,11 @@ interface Patient {
   styleUrls: ['./hospital-doctors.view.css']
 })
 export class HospitalDoctorsView implements OnInit {
-  private hospitalStore = inject(HospitalDashboardStore);
-  private dialog = inject(MatDialog);
-  private router = inject(Router);
-  private doctorService = inject(DoctorService);
-  private patientService = inject(PatientService);
+  private readonly hospitalStore = inject(HospitalDashboardStore);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly doctorService = inject(DoctorService);
+  private readonly patientService = inject(PatientService);
 
   doctors = signal<Doctor[]>([]);
   loading = signal<boolean>(false);
@@ -136,17 +134,37 @@ export class HospitalDoctorsView implements OnInit {
   }
 
   viewPatient(patientId: number) {
-    console.log('View patient:', patientId);
-    // TODO: Navigate to patient details
+    this.router.navigate(['/hospital/patients', patientId]);
   }
 
   editDoctor(doctorId: number) {
-    console.log('Edit doctor:', doctorId);
-    // TODO: Open edit dialog
+    this.router.navigate(['/hospital/doctors', doctorId, 'edit']);
   }
 
   deleteDoctor(doctorId: number) {
-    console.log('Delete doctor:', doctorId);
-    // TODO: Confirm and delete
+    const doctor = this.doctors().find(d => d.id === doctorId);
+    if (!doctor) return;
+
+    const confirmed = confirm(
+      `¿Está seguro que desea eliminar al doctor ${doctor.name}?\n\n` +
+      `Esta acción no se puede deshacer. El doctor será eliminado permanentemente del sistema.`
+    );
+
+    if (!confirmed) return;
+
+    this.loading.set(true);
+    this.doctorService.delete(doctorId).subscribe({
+      next: () => {
+        // Remover doctor de la lista
+        this.doctors.set(this.doctors().filter(d => d.id !== doctorId));
+        this.loading.set(false);
+        alert(`Doctor ${doctor.name} eliminado exitosamente`);
+      },
+      error: (err) => {
+        console.error('Error deleting doctor:', err);
+        this.loading.set(false);
+        alert('Error al eliminar el doctor. Por favor, intente nuevamente.');
+      }
+    });
   }
 }
