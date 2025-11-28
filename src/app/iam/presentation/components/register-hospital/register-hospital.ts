@@ -361,38 +361,16 @@ export class RegisterHospitalComponent implements AfterViewInit {
             this.tenantStore.updateTenant(updatedTenant).subscribe({
               next: () => {
                 this.submitting.set(false);
-                // Ensure currentUser is properly set with all required fields
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                // Add small delay to ensure localStorage is written
                 setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
+                  this.router.navigate(['/iam/login']);
                 }, 100);
               },
               error: (err: any) => {
                 console.error('Error updating tenant subscription:', err);
                 // Continuar de todos modos
                 this.submitting.set(false);
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
                 setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
+                  this.router.navigate(['/iam/login']);
                 }, 100);
               }
             });
@@ -401,35 +379,15 @@ export class RegisterHospitalComponent implements AfterViewInit {
             console.error('Error loading tenant:', err);
             // Continuar de todos modos
             this.submitting.set(false);
-            const currentUser = {
-              id: this.createdUserId!,
-              email: this.form().email,
-              role: 'hospital_admin',
-              name: this.form().adminName,
-              tenantId: this.createdTenantId,
-              isVerified: true
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
             setTimeout(() => {
-              window.location.href = '/hospital/dashboard';
+              this.router.navigate(['/iam/login']);
             }, 100);
           }
         });
       } else {
         this.submitting.set(false);
-        const currentUser = {
-          id: this.createdUserId!,
-          email: this.form().email,
-          role: 'hospital_admin',
-          name: this.form().adminName,
-          tenantId: this.createdTenantId,
-          isVerified: true
-        };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
         setTimeout(() => {
-          window.location.href = '/hospital/dashboard';
+          this.router.navigate(['/iam/login']);
         }, 100);
       }
 
