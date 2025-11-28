@@ -1,5 +1,6 @@
 import { Component, signal, inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { switchMap, map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -225,13 +226,17 @@ export class RegisterHospitalComponent implements AfterViewInit {
       role: 'hospital_admin'
     };
 
-    this.authService.signUp(signUpRequest).subscribe({
-      next: (response: any) => {
+    this.authService.signUp(signUpRequest).pipe(
+      switchMap((response: any) => {
         const user = response.user || response;
         
+        // Auto-login to get the token immediately
+        return this.authService.signIn({ email: f.email, password: f.password }).pipe(
+          map(() => user) // Pass the user object down the chain
+        );
+      }),
+      switchMap((user: any) => {
         // Crear el tenant (hospital) con todos los datos
-        // Note: ID generation should be handled by backend, but TenantStore might still expect it or generate it.
-        // We'll let TenantStore handle it (it calls TenantApi).
         const newTenant: any = {
           adminUserId: user.id,
           name: f.hospitalName,
@@ -248,34 +253,37 @@ export class RegisterHospitalComponent implements AfterViewInit {
           }
         };
 
-        this.tenantStore.createTenant(newTenant).subscribe({
-          next: (tenant: any) => {
-            // Actualizar el usuario con el tenantId (if needed, backend usually handles this)
-            // We'll skip updating user manually for now as we don't have a direct update method in AuthService
-            // and we assume backend links them.
-            
-            // Guardar datos en el componente
-            this.createdUserId = user.id;
-            this.createdTenantId = tenant.id;
+        return this.tenantStore.createTenant(newTenant).pipe(
+          map((tenant) => ({ user, tenant }))
+        );
+      })
+    ).subscribe({
+      next: ({ user, tenant }: any) => {
+        // Guardar datos en el componente
+        this.createdUserId = user.id;
+        this.createdTenantId = tenant.id;
 
-            // Cargar planes disponibles
-            this.loadPlans();
+        // Cargar planes disponibles (ahora funcionará porque tenemos token)
+        this.loadPlans();
 
-            // Pasar al paso 3 (selección de plan)
-            this.submitting.set(false);
-            this.nextStep();
-          },
-          error: (err: any) => {
-            this.submitting.set(false);
-            this.errorMessage.set('Error al crear el hospital: ' + (err.message || 'Error desconocido'));
-            console.error('Error creating tenant:', err);
-          }
-        });
+        // Pasar al paso 3 (selección de plan)
+        this.submitting.set(false);
+        this.nextStep();
       },
       error: (err: any) => {
         this.submitting.set(false);
-        this.errorMessage.set('Error al crear el usuario: ' + (err.message || 'Error desconocido'));
-        console.error('Error creating user:', err);
+        
+        // Manejo de errores específicos
+        const errorMsg = err.error?.error || err.error?.message || err.message || '';
+        
+        if (errorMsg.includes('Email already exists')) {
+          this.errorMessage.set('⚠️ Este correo electrónico ya está registrado. Por favor inicia sesión.');
+        } else if (err.message === 'Correo electrónico o contraseña incorrectos.') {
+           this.errorMessage.set('⚠️ Usuario creado, pero falló el inicio de sesión automático. Por favor intenta ingresar manualmente.');
+        } else {
+           this.errorMessage.set('Error en el registro: ' + errorMsg);
+        }
+        console.error('Error in registration flow:', err);
       }
     });
   }

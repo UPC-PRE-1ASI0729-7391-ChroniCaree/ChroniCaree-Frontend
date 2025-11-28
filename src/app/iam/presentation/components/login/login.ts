@@ -98,8 +98,13 @@ export class LoginComponent implements OnInit {
       error: (err) => {
         console.error('Login error:', err);
         this.submitting.set(false);
-        if (err.status === 401) {
-          this.errorMessage.set('❌ Email o contraseña incorrectos');
+        
+        // Handle specific error messages thrown by AuthService
+        if (err.message === 'Correo electrónico o contraseña incorrectos.') {
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
+        } else if (err.status === 401 || err.status === 404) {
+          // Fallback for status codes if message doesn't match
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
         } else {
           this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
         }

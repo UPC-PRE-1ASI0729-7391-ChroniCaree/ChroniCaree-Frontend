@@ -54,6 +54,13 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.API_URL}/sign-in`, signInRequest).pipe(
       tap(response => {
         this.setSession(response);
+      }),
+      catchError(error => {
+        if (error.status === 404) {
+          // Backend returns 404 for invalid credentials
+          return throwError(() => new Error('Correo electrónico o contraseña incorrectos.'));
+        }
+        return throwError(() => error);
       })
     );
   }
@@ -161,6 +168,7 @@ export class AuthService {
    * Helper to set session data
    */
   private setSession(authResult: AuthResponse): void {
+    console.log('Access Token:', authResult.accessToken); // Log token for debugging
     localStorage.setItem(this.ACCESS_TOKEN_KEY, authResult.accessToken);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, authResult.refreshToken);
     
