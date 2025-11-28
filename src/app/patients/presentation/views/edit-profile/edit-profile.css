@@ -104,6 +104,348 @@
   background: rgba(255, 193, 7, 0.2);
 }
 
+.security-icon {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+/* Security Section - Two Factor Authentication */
+.security-card {
+  margin-top: 24px;
+}
+
+.security-card mat-card-header {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+}
+
+.two-factor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.two-factor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.two-factor-description {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border-left: 4px solid var(--color-primary);
+}
+
+.two-factor-description .info-icon {
+  color: var(--color-primary);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.two-factor-description p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.two-factor-benefits {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+}
+
+.two-factor-benefits h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.two-factor-benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.two-factor-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.two-factor-benefits li mat-icon {
+  color: var(--color-success);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.two-factor-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Two Factor Setup Section */
+.two-factor-setup {
+  margin-top: 24px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 2px solid var(--color-primary);
+}
+
+.setup-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.setup-header mat-icon {
+  color: var(--color-primary);
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.setup-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.setup-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1565c0 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.step-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* QR Code Container */
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed var(--color-border);
+  margin: 24px 0;
+}
+
+.qr-code-wrapper {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.qr-code-image {
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+
+.qr-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.secret-code-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.secret-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--color-text-primary);
+  padding: 0;
+  background: transparent;
+}
+
+.copy-button {
+  color: var(--color-primary);
+}
+
+/* Verification Form */
+.verification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.verification-input {
+  width: 100%;
+}
+
+.verification-input input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 8px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel-setup,
+.btn-verify {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+}
+
+.btn-cancel-setup {
+  background: white;
+  border: 2px solid var(--color-border);
+}
+
+.btn-verify {
+  background: var(--color-success);
+  color: white;
+}
+
+.btn-verify:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.toggle-wrapper {
+  padding: 20px;
+  background-color: #ffffff;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.toggle-wrapper:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+}
+
+.toggle-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.toggle-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.toggle-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.two-factor-active-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 8px;
+  border-left: 4px solid var(--color-success);
+}
+
+.two-factor-active-banner mat-icon {
+  color: var(--color-success);
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.banner-content {
+  flex: 1;
+}
+
+.banner-title {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.banner-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #1b5e20;
+}
+
 /* Subscription Section */
 .subscription-card {
   margin-top: 24px;
@@ -449,6 +791,39 @@
 
   .bmi-category {
     font-size: 1rem;
+  }
+
+  /* Two Factor Setup Responsive */
+  .two-factor-setup {
+    padding: 16px;
+  }
+
+  .setup-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .qr-code-image {
+    width: 180px;
+    height: 180px;
+  }
+
+  .secret-code {
+    font-size: 0.875rem;
+    letter-spacing: 1px;
+  }
+
+  .verification-input input {
+    font-size: 1.25rem;
+    letter-spacing: 4px;
+  }
+
+  .verification-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel-setup,
+  .btn-verify {
+    width: 100%;
   }
 }
 

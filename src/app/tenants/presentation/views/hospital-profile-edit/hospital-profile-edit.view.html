@@ -216,6 +216,170 @@
             </div>
           </div>
 
+          <mat-divider class="section-divider"></mat-divider>
+
+          <div class="form-section">
+            <h3 class="section-title">
+              <mat-icon>security</mat-icon>
+              Autenticación en Dos Pasos
+            </h3>
+            <div class="two-factor-section">
+              <div class="two-factor-info">
+                <div class="two-factor-description">
+                  <mat-icon class="info-icon">info</mat-icon>
+                  <p>
+                    La autenticación en dos pasos añade una capa adicional de seguridad a tu cuenta. 
+                    Cuando esté activada, necesitarás ingresar un código de verificación además de tu contraseña al iniciar sesión.
+                  </p>
+                </div>
+                
+                <div class="two-factor-benefits">
+                  <h4>Beneficios:</h4>
+                  <ul>
+                    <li>
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Protección contra accesos no autorizados</span>
+                    </li>
+                    <li>
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Mayor seguridad de los datos del hospital</span>
+                    </li>
+                    <li>
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Notificaciones de inicio de sesión</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="two-factor-toggle">
+                <div class="toggle-wrapper">
+                  <mat-slide-toggle 
+                    formControlName="twoFactorEnabled"
+                    color="primary"
+                    [disabled]="twoFactorVerified()"
+                    (change)="onTwoFactorToggle()">
+                    <div class="toggle-label">
+                      <span class="toggle-title">Activar Autenticación en Dos Pasos</span>
+                      @if (twoFactorVerified()) {
+                        <span class="toggle-subtitle">
+                          La autenticación en dos pasos está activa y configurada
+                        </span>
+                      } @else if (adminForm.get('twoFactorEnabled')?.value) {
+                        <span class="toggle-subtitle">
+                          Configura tu aplicación de autenticación
+                        </span>
+                      } @else {
+                        <span class="toggle-subtitle">
+                          La autenticación en dos pasos está desactivada
+                        </span>
+                      }
+                    </div>
+                  </mat-slide-toggle>
+                </div>
+                
+                @if (showTwoFactorSetup()) {
+                  <div class="two-factor-setup">
+                    <div class="setup-header">
+                      <mat-icon>qr_code_scanner</mat-icon>
+                      <h3>Configura Google Authenticator</h3>
+                    </div>
+                    
+                    <div class="setup-steps">
+                      <div class="setup-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                          <p class="step-title">Instala Google Authenticator</p>
+                          <p class="step-description">Descarga Google Authenticator en tu dispositivo móvil desde la App Store o Google Play.</p>
+                        </div>
+                      </div>
+
+                      <div class="setup-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                          <p class="step-title">Escanea el código QR</p>
+                          <p class="step-description">Abre Google Authenticator y escanea el siguiente código QR:</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="qr-code-container">
+                      <div class="qr-code-wrapper">
+                        <img [src]="twoFactorQRCode()" alt="QR Code para Google Authenticator" class="qr-code-image" />
+                      </div>
+                      <p class="qr-hint">O ingresa manualmente este código:</p>
+                      <div class="secret-code-container">
+                        <code class="secret-code">{{ twoFactorSecret() }}</code>
+                        <button mat-icon-button 
+                                type="button"
+                                (click)="onCopySecret()" 
+                                class="copy-button"
+                                matTooltip="Copiar código secreto">
+                          <mat-icon>content_copy</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="setup-step">
+                      <div class="step-number">3</div>
+                      <div class="step-content">
+                        <p class="step-title">Verifica el código</p>
+                        <p class="step-description">Ingresa el código de 6 dígitos que aparece en Google Authenticator:</p>
+                      </div>
+                    </div>
+
+                    <form [formGroup]="verificationForm" (ngSubmit)="onVerifyCode()" class="verification-form">
+                      <mat-form-field appearance="outline" class="verification-input">
+                        <mat-label>Código de verificación</mat-label>
+                        <input matInput 
+                               formControlName="verificationCode" 
+                               type="text" 
+                               maxlength="6"
+                               placeholder="000000"
+                               (input)="onVerificationCodeInput($event)" />
+                        <mat-icon matPrefix>vpn_key</mat-icon>
+                        @if (verificationForm.get('verificationCode')?.hasError('required')) {
+                          <mat-error>El código es requerido</mat-error>
+                        }
+                        @if (verificationForm.get('verificationCode')?.hasError('pattern')) {
+                          <mat-error>El código debe tener 6 dígitos</mat-error>
+                        }
+                      </mat-form-field>
+
+                      <div class="verification-actions">
+                        <button mat-stroked-button 
+                                type="button"
+                                (click)="onCancelTwoFactorSetup()"
+                                class="btn-cancel-setup">
+                          <mat-icon>close</mat-icon>
+                          Cancelar
+                        </button>
+                        <button mat-raised-button 
+                                color="primary"
+                                type="submit"
+                                [disabled]="verificationForm.invalid"
+                                class="btn-verify">
+                          <mat-icon>check_circle</mat-icon>
+                          Verificar y Activar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                }
+                
+                @if (twoFactorVerified() && !showTwoFactorSetup()) {
+                  <div class="two-factor-active-banner">
+                    <mat-icon>verified_user</mat-icon>
+                    <div class="banner-content">
+                      <p class="banner-title">Autenticación en dos pasos activada</p>
+                      <p class="banner-text">Tu cuenta está protegida con Google Authenticator</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
           <div class="card-actions">
             <button
               mat-raised-button
