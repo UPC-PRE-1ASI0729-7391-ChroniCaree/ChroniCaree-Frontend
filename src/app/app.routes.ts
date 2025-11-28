@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './iam/presentation/guards/auth.guard';
+import { roleGuard } from './iam/presentation/guards/role.guard';
 
 const baseTitle = 'ChroniCaree';
 
@@ -57,6 +59,8 @@ export const routes: Routes = [
   // Patient routes
   {
     path: 'patient',
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'patient' },
     children: [
       {
         path: 'dashboard',
@@ -64,7 +68,6 @@ export const routes: Routes = [
           import('./patients/presentation/views/dashboard-patient/dashboard-patient')
             .then((m) => m.DashboardPatient),
         title: `${baseTitle} - Dashboard Paciente`,
-        data: { role: 'patient' },
       },
       {
         path: 'edit-profile',
@@ -72,7 +75,6 @@ export const routes: Routes = [
           import('./patients/presentation/views/edit-profile/edit-profile')
             .then((m) => m.EditProfileComponent),
         title: `${baseTitle} - Editar Perfil`,
-        data: { role: 'patient' },
       },
       {
         path: 'recordatorios',
@@ -80,31 +82,26 @@ export const routes: Routes = [
           import('./communication/presentation/views/nudges-page/nudges-page')
             .then((m) => m.NudgesPageComponent),
         title: `${baseTitle} - Recordatorios`,
-        data: { role: 'patient' },
       },
       {
         path: 'medicamentos',
         loadComponent: () => import('./medications/presentation/views/medication-history/medication-history').then(m => m.MedicationHistoryComponent),
         title: `${baseTitle} - Mis Medicamentos`,
-        data: { role: 'patient' }
       },
       {
         path: 'salud',
         loadComponent: () => import('./alerts/presentation/views/health-alerts/health-alerts').then(m => m.HealthAlertsComponent),
         title: `${baseTitle} - Mi Salud`,
-        data: { role: 'patient' }
       },
       {
         path: 'appointments/new',
         loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
         title: `${baseTitle} - Agendar Cita`,
-        data: { role: 'patient' }
       },
       {
         path: 'subscription',
         loadComponent: () => import('./patients/presentation/views/patient-subscription/patient-subscription.view').then(m => m.PatientSubscriptionView),
         title: `${baseTitle} - Mi Suscripción`,
-        data: { role: 'patient' }
       }
     ]
   },
@@ -112,6 +109,8 @@ export const routes: Routes = [
   // Clinical routes (Symptoms & Medical Records)
   {
     path: 'clinical',
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'patient' },
     children: [
       {
         path: 'symptoms/register',
@@ -119,7 +118,6 @@ export const routes: Routes = [
           import('./clinical/presentation/views/register-symptoms/register-symptoms')
             .then((m) => m.RegisterSymptomsComponent),
         title: `${baseTitle} - Registrar Síntomas`,
-        data: { role: 'patient' },
       },
     ],
   },
@@ -127,6 +125,7 @@ export const routes: Routes = [
   // Medical Records
   {
     path: 'medical-records',
+    canActivate: [authGuard],
     children: [
       {
         path: 'diagnoses',
@@ -134,6 +133,7 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/medical-diagnoses/medical-diagnoses')
             .then((m) => m.MedicalDiagnosesComponent),
         title: `${baseTitle} - Diagnósticos Médicos`,
+        canActivate: [roleGuard],
         data: { role: 'patient' },
       },
       {
@@ -142,6 +142,7 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/diagnosis-detail/diagnosis-detail')
             .then((m) => m.DiagnosisDetailComponent),
         title: `${baseTitle} - Detalle de Diagnóstico`,
+        canActivate: [roleGuard],
         data: { role: 'patient' },
       },
       {
@@ -156,6 +157,8 @@ export const routes: Routes = [
   // Hospital Admin routes
   {
     path: 'hospital',
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'hospital_admin' },
     children: [
       {
         path: '',
@@ -168,7 +171,6 @@ export const routes: Routes = [
           import('./tenants/presentation/views/hospital-dashboard/hospital-dashboard.view')
             .then((m) => m.HospitalDashboardView),
         title: `${baseTitle} - Dashboard Hospital`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'doctors',
@@ -176,7 +178,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/hospital-doctors/hospital-doctors.view')
             .then((m) => m.HospitalDoctorsView),
         title: `${baseTitle} - Gestión de Doctores`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'doctors/add',
@@ -184,7 +185,6 @@ export const routes: Routes = [
           import('./doctors/presentation/views/add-doctor/add-doctor.view')
             .then((m) => m.AddDoctorView),
         title: `${baseTitle} - Agregar Doctor`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'doctors/:id/edit',
@@ -192,7 +192,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/hospital-doctor-edit/hospital-doctor-edit.view')
             .then((m) => m.HospitalDoctorEditView),
         title: `${baseTitle} - Editar Doctor`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'patients',
@@ -200,7 +199,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/hospital-patients/hospital-patients.view')
             .then((m) => m.HospitalPatientsView),
         title: `${baseTitle} - Gestión de Pacientes`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'patients/:id',
@@ -208,7 +206,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/hospital-patient-detail/hospital-patient-detail.view')
             .then((m) => m.HospitalPatientDetailView),
         title: `${baseTitle} - Detalle del Paciente`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'patient-onboarding',
@@ -216,7 +213,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/patient-onboarding/patient-onboarding.view')
             .then((m) => m.PatientOnboardingView),
         title: `${baseTitle} - Registro de Paciente`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'assignments',
@@ -224,7 +220,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/hospital-assignments/hospital-assignments.view')
             .then((m) => m.HospitalAssignmentsView),
         title: `${baseTitle} - Asignaciones Doctor-Paciente`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'patient-devices',
@@ -232,7 +227,6 @@ export const routes: Routes = [
           import('./medical-records/presentation/views/patient-devices/patient-devices.view')
             .then((m) => m.PatientDevicesView),
         title: `${baseTitle} - Gestión de Dispositivos`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'subscription',
@@ -240,7 +234,6 @@ export const routes: Routes = [
           import('./tenants/presentation/views/hospital-subscription/hospital-subscription.view')
             .then((m) => m.HospitalSubscriptionView),
         title: `${baseTitle} - Suscripción`,
-        data: { role: 'hospital_admin' },
       },
       {
         path: 'profile',
@@ -248,7 +241,6 @@ export const routes: Routes = [
           import('./tenants/presentation/views/hospital-profile-edit/hospital-profile-edit.view')
             .then((m) => m.HospitalProfileEditView),
         title: `${baseTitle} - Perfil Hospital`,
-        data: { role: 'hospital_admin' },
       },
     ],
   },
@@ -256,6 +248,8 @@ export const routes: Routes = [
   // Doctor routes
   {
     path: 'doctor',
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'doctor' },
     children: [
       {
         path: 'dashboard',
@@ -263,7 +257,6 @@ export const routes: Routes = [
           import('./doctors/presentation/views/dashboard-doctor/dashboard-doctor')
             .then((m) => m.DashboardDoctor),
         title: `${baseTitle} - Dashboard Doctor`,
-        data: { role: 'doctor' },
       },
       {
         path: 'edit-profile',
@@ -271,31 +264,26 @@ export const routes: Routes = [
           import('./doctors/presentation/views/edit-profile/edit-profile')
             .then((m) => m.EditProfileDoctorComponent),
         title: `${baseTitle} - Editar Perfil Doctor`,
-        data: { role: 'doctor' }
       },
       {
         path: 'patients',
         loadComponent: () => import('./doctors/presentation/views/patients-list/patients-list').then(m => m.PatientsListComponent),
         title: `${baseTitle} - Mis Pacientes`,
-        data: { role: 'doctor' }
       },
       {
         path: 'patients/:id',
         loadComponent: () => import('./doctors/presentation/views/patient-detail/patient-detail').then(m => m.DoctorsPatientDetailComponent),
         title: `${baseTitle} - Detalle Paciente`,
-        data: { role: 'doctor' }
       },
       {
         path: 'appointments',
         loadComponent: () => import('./doctors/presentation/views/appointments-list/appointments-list').then(m => m.AppointmentsListComponent),
         title: `${baseTitle} - Mis Citas`,
-        data: { role: 'doctor' }
       },
       {
         path: 'records',
         loadComponent: () => import('./doctors/presentation/views/medical-records-list/medical-records-list').then(m => m.MedicalRecordsListComponent),
         title: `${baseTitle} - Historiales Médicos`,
-        data: { role: 'doctor' }
       }
     ]
   },
@@ -304,6 +292,7 @@ export const routes: Routes = [
   // Communication - Messages (shared by patient and doctor)
   {
     path: 'communication/messages',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./communication/presentation/components/inbox/inbox.component')
         .then((m) => m.InboxComponent),
@@ -329,6 +318,7 @@ export const routes: Routes = [
   // IoT Devices routes
   {
     path: 'devices',
+    canActivate: [authGuard],
     children: [
       {
         path: '',

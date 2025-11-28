@@ -2,7 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
+import { AuthService } from '../../../application/auth.service';
 
 interface LoginForm {
   email: string;
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   constructor(
-    private userStore: UserStore,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -69,50 +69,40 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // Load users from store and authenticate
-    this.userStore.loadAllUsers().subscribe({
-      next: (users) => {
-        // Find user with matching email and password
-        const user = users.find(u => u.email === email && u.password === password);
-
-        if (user) {
-          // Store user in UserStore (this will persist + emit userChanged)
-          this.userStore.setCurrentUser(user);
-
-          // Remember me functionality (only rememberedEmail remains in localStorage)
-          if (rememberMe) {
-            localStorage.setItem('rememberedEmail', email);
-          } else {
-            localStorage.removeItem('rememberedEmail');
-          }
-
-          // Navigate based on role
-          setTimeout(() => {
-            this.submitting.set(false);
-            
-            switch(user.role) {
-              case 'patient':
-                this.router.navigate(['/patient/dashboard']);
-                break;
-              case 'doctor':
-                this.router.navigate(['/doctor/dashboard']);
-                break;
-              case 'hospital_admin':
-                this.router.navigate(['/hospital/dashboard']);
-                break;
-              default:
-                this.router.navigate(['/home']);
-            }
-          }, 800);
+    this.authService.signIn(email, password).subscribe({
+      next: () => {
+        // Remember me functionality
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
         } else {
-          this.errorMessage.set('❌ Email o contraseña incorrectos');
-          this.submitting.set(false);
+          localStorage.removeItem('rememberedEmail');
+        }
+
+        const role = this.authService.getUserRole();
+        this.submitting.set(false);
+
+        switch(role) {
+          case 'patient':
+            this.router.navigate(['/patient/dashboard']);
+            break;
+          case 'doctor':
+            this.router.navigate(['/doctor/dashboard']);
+            break;
+          case 'hospital_admin':
+            this.router.navigate(['/hospital/dashboard']);
+            break;
+          default:
+            this.router.navigate(['/home']);
         }
       },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
+      error: (err) => {
+        console.error('Login error:', err);
         this.submitting.set(false);
+        if (err.status === 401) {
+          this.errorMessage.set('❌ Email o contraseña incorrectos');
+        } else {
+          this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
+        }
       }
     });
   }
