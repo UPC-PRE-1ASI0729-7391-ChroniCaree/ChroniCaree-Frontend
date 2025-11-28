@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HospitalDashboardStore } from '../../../../tenants/application/hospital-dashboard.store';
 import { DoctorService } from '../../../../doctors/infrastructure/doctor.service';
 import { PatientService } from '../../../../patients/infrastructure/patient.service';
@@ -35,32 +37,35 @@ interface Patient {
   imports: [
     CommonModule,
     RouterLink,
+    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatSelectModule,
     MatFormFieldModule,
     MatChipsModule,
     MatCardModule,
-    FormsModule,
+    MatTooltipModule,
+    TranslateModule,
   ],
   templateUrl: './hospital-assignments.view.html',
   styleUrls: ['./hospital-assignments.view.css']
 })
 export class HospitalAssignmentsView implements OnInit {
-  private hospitalStore = inject(HospitalDashboardStore);
-  private doctorService = inject(DoctorService);
-  private patientService = inject(PatientService);
+  private readonly hospitalStore = inject(HospitalDashboardStore);
+  private readonly doctorService = inject(DoctorService);
+  private readonly patientService = inject(PatientService);
+  private readonly translate = inject(TranslateService);
 
   doctors = signal<Doctor[]>([]);
   patients = signal<Patient[]>([]);
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  unassignedPatients = computed(() => 
+  unassignedPatients = computed(() =>
     this.patients().filter(p => p.doctorId === null)
   );
 
-  assignedPatients = computed(() => 
+  assignedPatients = computed(() =>
     this.patients().filter(p => p.doctorId !== null)
   );
 
@@ -68,27 +73,29 @@ export class HospitalAssignmentsView implements OnInit {
     this.loadData();
   }
 
+  private setErrorKey(key: string): void {
+    this.error.set(this.translate.instant(key));
+  }
+
   private loadData(): void {
     const currentUserStr = localStorage.getItem('currentUser');
     if (!currentUserStr) {
-      this.error.set('No se encontró usuario autenticado');
+      this.setErrorKey('hospitalAssignments.errors.noAuthUser');
       return;
     }
 
     const currentUser = JSON.parse(currentUserStr);
     if (!currentUser.tenantId) {
-      this.error.set('Usuario sin hospital asignado');
+      this.setErrorKey('hospitalAssignments.errors.noTenant');
       return;
     }
 
     this.loading.set(true);
     this.error.set(null);
 
-    // Cargar doctores y pacientes del hospital en paralelo
     this.doctorService.getByTenantId(currentUser.tenantId).subscribe({
       next: (doctorEntities: DoctorEntity[]) => {
-        // Procesar doctores
-        const doctorPromises = doctorEntities.map(doc => 
+        const doctorPromises = doctorEntities.map(doc =>
           new Promise<Doctor>((resolve) => {
             this.patientService.getByAssignedDoctorId(doc.id).subscribe({
               next: (patients: PatientEntity[]) => {
@@ -115,59 +122,50 @@ export class HospitalAssignmentsView implements OnInit {
           this.doctors.set(doctors);
         });
 
-        // Cargar pacientes del hospital
         this.patientService.getByTenantId(currentUser.tenantId).subscribe({
           next: (patientEntities: PatientEntity[]) => {
             const patients: Patient[] = patientEntities.map(p => ({
               id: p.id,
               name: p.fullName,
               age: p.age,
-              condition: 'Ver diagnósticos', // TODO: obtener de diagnoses
+              condition: this.translate.instant('hospitalAssignments.patient.conditionFallback'),
               doctorId: p.assignedDoctorId
             }));
             this.patients.set(patients);
             this.loading.set(false);
           },
-          error: (err: any) => {
-            this.error.set('Error al cargar pacientes');
+          error: () => {
+            this.setErrorKey('hospitalAssignments.errors.loadPatients');
             this.loading.set(false);
-            console.error('Error loading patients:', err);
           }
         });
       },
-      error: (err: any) => {
-        this.error.set('Error al cargar doctores del hospital');
+      error: () => {
+        this.setErrorKey('hospitalAssignments.errors.loadDoctors');
         this.loading.set(false);
-        console.error('Error loading doctors:', err);
       }
     });
   }
 
   assignPatientToDoctor(patientId: number, doctorId: number) {
-    // Actualizar en el backend
     this.patientService.updateAssignedDoctor(patientId, doctorId).subscribe({
       next: () => {
-        // Update local state
-        this.patients.update(patients => 
-          patients.map(p => 
+        this.patients.update(patients =>
+          patients.map(p =>
             p.id === patientId ? { ...p, doctorId } : p
           )
         );
 
-        // Update doctor patient count
-        this.doctors.update(doctors => 
-          doctors.map(d => 
-            d.id === doctorId 
+        this.doctors.update(doctors =>
+          doctors.map(d =>
+            d.id === doctorId
               ? { ...d, patientCount: d.patientCount + 1 }
               : d
           )
         );
-
-        console.log(`✅ Paciente ${patientId} asignado al doctor ${doctorId}`);
       },
-      error: (err: any) => {
-        console.error('Error asignando paciente:', err);
-        this.error.set('Error al asignar paciente al doctor');
+      error: () => {
+        this.setErrorKey('hospitalAssignments.errors.assign');
       }
     });
   }
@@ -178,36 +176,30 @@ export class HospitalAssignmentsView implements OnInit {
 
     const oldDoctorId = patient.doctorId;
 
-    // Actualizar en el backend
     this.patientService.updateAssignedDoctor(patientId, null).subscribe({
       next: () => {
-        // Update local state
-        this.patients.update(patients => 
-          patients.map(p => 
+        this.patients.update(patients =>
+          patients.map(p =>
             p.id === patientId ? { ...p, doctorId: null } : p
           )
         );
 
-        // Update doctor patient count
-        this.doctors.update(doctors => 
-          doctors.map(d => 
-            d.id === oldDoctorId 
+        this.doctors.update(doctors =>
+          doctors.map(d =>
+            d.id === oldDoctorId
               ? { ...d, patientCount: Math.max(0, d.patientCount - 1) }
               : d
           )
         );
-
-        console.log(`✅ Paciente ${patientId} desasignado del doctor ${oldDoctorId}`);
       },
-      error: (err: any) => {
-        console.error('Error desasignando paciente:', err);
-        this.error.set('Error al desasignar paciente');
+      error: () => {
+        this.setErrorKey('hospitalAssignments.errors.unassign');
       }
     });
   }
 
   getDoctorName(doctorId: number): string {
-    return this.doctors().find(d => d.id === doctorId)?.name || 'Sin asignar';
+    return this.doctors().find(d => d.id === doctorId)?.name || '';
   }
 
   getDoctorSpecialty(doctorId: number): string {

@@ -6,6 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 import { HospitalDashboardStore } from '../../../../tenants/application/hospital-dashboard.store';
 import { DoctorService } from '../../../../doctors/infrastructure/doctor.service';
 import { PatientService } from '../../../../patients/infrastructure/patient.service';
@@ -37,6 +40,8 @@ interface Patient {
     MatExpansionModule,
     MatChipsModule,
     MatDialogModule,
+    MatTooltipModule,
+    TranslateModule,
   ],
   templateUrl: './hospital-doctors.view.html',
   styleUrls: ['./hospital-doctors.view.css']
@@ -47,13 +52,14 @@ export class HospitalDoctorsView implements OnInit {
   private readonly router = inject(Router);
   private readonly doctorService = inject(DoctorService);
   private readonly patientService = inject(PatientService);
+  private readonly translate = inject(TranslateService);
 
   doctors = signal<Doctor[]>([]);
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
   totalDoctors = computed(() => this.doctors().length);
-  totalPatients = computed(() => 
+  totalPatients = computed(() =>
     this.doctors().reduce((sum, doctor) => sum + doctor.patients.length, 0)
   );
 
@@ -64,53 +70,48 @@ export class HospitalDoctorsView implements OnInit {
   private loadDoctors(): void {
     const currentUserStr = localStorage.getItem('currentUser');
     if (!currentUserStr) {
-      this.error.set('No se encontró usuario autenticado');
+      this.error.set(this.translate.instant('hospital.doctors.errors.noAuthUser'));
       return;
     }
 
     const currentUser = JSON.parse(currentUserStr);
     if (!currentUser.tenantId) {
-      this.error.set('Usuario sin hospital asignado');
+      this.error.set(this.translate.instant('hospital.doctors.errors.noTenant'));
       return;
     }
 
     this.loading.set(true);
     this.error.set(null);
 
-    // Cargar doctores del hospital (por tenantId)
     this.doctorService.getByTenantId(currentUser.tenantId).subscribe({
       next: (doctorEntities) => {
-        // Para cada doctor, cargar sus pacientes
-        const doctorPromises = doctorEntities.map(doc => 
+        const doctorPromises = doctorEntities.map(doc =>
           new Promise<Doctor>((resolve) => {
             this.patientService.getByAssignedDoctorId(doc.id).subscribe({
               next: (patientEntities) => {
-                const doctor: Doctor = {
+                resolve({
                   id: doc.id,
                   name: doc.fullName,
-                  email: `${doc.firstName.toLowerCase()}.${doc.lastName.toLowerCase()}@hospital.com`, // Simulado
+                  email: `${doc.firstName.toLowerCase()}.${doc.lastName.toLowerCase()}@hospital.com`,
                   specialty: doc.specialty,
                   licenseNumber: doc.licenseNumber,
                   patients: patientEntities.map(p => ({
                     id: p.id,
                     name: p.fullName,
                     age: p.age,
-                    condition: 'Ver historial' // TODO: obtener de diagnoses
+                    condition: this.translate.instant('hospital.doctors.patient.conditionFallback')
                   }))
-                };
-                resolve(doctor);
+                });
               },
               error: () => {
-                // Si falla cargar pacientes, doctor sin pacientes
-                const doctor: Doctor = {
+                resolve({
                   id: doc.id,
                   name: doc.fullName,
                   email: `${doc.firstName.toLowerCase()}.${doc.lastName.toLowerCase()}@hospital.com`,
                   specialty: doc.specialty,
                   licenseNumber: doc.licenseNumber,
                   patients: []
-                };
-                resolve(doctor);
+                });
               }
             });
           })
@@ -122,7 +123,7 @@ export class HospitalDoctorsView implements OnInit {
         });
       },
       error: (err) => {
-        this.error.set('Error al cargar doctores del hospital');
+        this.error.set(this.translate.instant('hospital.doctors.errors.loadDoctors'));
         this.loading.set(false);
         console.error('Error loading doctors:', err);
       }
@@ -146,24 +147,23 @@ export class HospitalDoctorsView implements OnInit {
     if (!doctor) return;
 
     const confirmed = confirm(
-      `¿Está seguro que desea eliminar al doctor ${doctor.name}?\n\n` +
-      `Esta acción no se puede deshacer. El doctor será eliminado permanentemente del sistema.`
+      this.translate.instant('hospital.doctors.confirm.delete', { name: doctor.name })
     );
 
     if (!confirmed) return;
 
     this.loading.set(true);
+
     this.doctorService.delete(doctorId).subscribe({
       next: () => {
-        // Remover doctor de la lista
         this.doctors.set(this.doctors().filter(d => d.id !== doctorId));
         this.loading.set(false);
-        alert(`Doctor ${doctor.name} eliminado exitosamente`);
+        alert(this.translate.instant('hospital.doctors.snack.deleted', { name: doctor.name }));
       },
       error: (err) => {
         console.error('Error deleting doctor:', err);
         this.loading.set(false);
-        alert('Error al eliminar el doctor. Por favor, intente nuevamente.');
+        alert(this.translate.instant('hospital.doctors.snack.deleteError'));
       }
     });
   }

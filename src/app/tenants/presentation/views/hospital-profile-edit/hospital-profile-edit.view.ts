@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
 import { TenantStore } from '../../../application/tenant.store';
 import { UserStore } from '../../../../iam/application/user.store';
 
@@ -23,6 +25,7 @@ import { UserStore } from '../../../../iam/application/user.store';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -30,7 +33,9 @@ import { UserStore } from '../../../../iam/application/user.store';
     MatIconModule,
     MatDividerModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+
+    TranslateModule
   ],
   templateUrl: './hospital-profile-edit.view.html',
   styleUrls: ['./hospital-profile-edit.view.css']
@@ -39,11 +44,13 @@ export class HospitalProfileEditView implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly tenantStore = inject(TenantStore);
   private readonly userStore = inject(UserStore);
 
   loading = signal(false);
-  saving = signal(false);
+  savingHospital = signal(false);
+  savingAdmin = signal(false);
 
   hospitalForm!: FormGroup;
   adminForm!: FormGroup;
@@ -52,40 +59,11 @@ export class HospitalProfileEditView implements OnInit {
   currentTenant: any = null;
 
   ngOnInit(): void {
-    this.loadCurrentUserAndTenant();
     this.initForms();
-  }
-
-  private loadCurrentUserAndTenant(): void {
-    this.loading.set(true);
-    
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (!currentUserStr) {
-      this.router.navigate(['/iam/login']);
-      return;
-    }
-
-    this.currentUser = JSON.parse(currentUserStr);
-
-    // Cargar tenant del usuario
-    this.tenantStore.loadAllTenants().subscribe({
-      next: (tenants) => {
-        this.currentTenant = tenants.find(t => t.adminUserId === this.currentUser.id);
-        if (this.currentTenant) {
-          this.populateForms();
-        }
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading tenant:', err);
-        this.loading.set(false);
-        this.snackBar.open('Error al cargar datos del hospital', 'Cerrar', { duration: 3000 });
-      }
-    });
+    this.loadCurrentUserAndTenant();
   }
 
   private initForms(): void {
-    // Formulario del hospital
     this.hospitalForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       address: ['', Validators.required],
@@ -97,7 +75,6 @@ export class HospitalProfileEditView implements OnInit {
       website: ['']
     });
 
-    // Formulario del administrador
     this.adminForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
@@ -106,84 +83,169 @@ export class HospitalProfileEditView implements OnInit {
     });
   }
 
+  private loadCurrentUserAndTenant(): void {
+    this.loading.set(true);
+
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) {
+      this.loading.set(false);
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+
+    this.currentUser = JSON.parse(currentUserStr);
+
+    this.tenantStore.loadAllTenants().subscribe({
+      next: (tenants) => {
+
+        const tenantId = this.currentUser?.tenantId;
+        if (tenantId) {
+          this.currentTenant = tenants.find(t => t.id === tenantId) ?? null;
+        }
+        if (!this.currentTenant) {
+          this.currentTenant = tenants.find(t => t.adminUserId === this.currentUser.id) ?? null;
+        }
+
+        if (this.currentTenant) {
+          this.populateForms();
+        } else {
+          this.snackBar.open(
+            this.translate.instant('hospital.profileEdit.snack.noTenant'),
+            this.translate.instant('common.close'),
+            { duration: 3000 }
+          );
+        }
+
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading tenant:', err);
+        this.loading.set(false);
+        this.snackBar.open(
+          this.translate.instant('hospital.profileEdit.snack.loadError'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
+      }
+    });
+  }
+
   private populateForms(): void {
     if (this.currentTenant) {
       this.hospitalForm.patchValue({
-        name: this.currentTenant.name || '',
-        address: this.currentTenant.address || '',
-        city: this.currentTenant.city || '',
-        state: this.currentTenant.state || '',
-        zipCode: this.currentTenant.zipCode || '',
-        phone: this.currentTenant.phone || '',
-        email: this.currentTenant.email || '',
-        website: this.currentTenant.website || ''
+        name: this.currentTenant.name ?? '',
+        address: this.currentTenant.address ?? '',
+        city: this.currentTenant.city ?? '',
+        state: this.currentTenant.state ?? '',
+        zipCode: this.currentTenant.zipCode ?? '',
+        phone: this.currentTenant.phone ?? '',
+        email: this.currentTenant.email ?? '',
+        website: this.currentTenant.website ?? ''
       });
     }
 
     if (this.currentUser) {
       this.adminForm.patchValue({
-        fullName: this.currentUser.name || '',
-        email: this.currentUser.email || '',
-        phone: this.currentUser.phone || '',
-        position: 'Administrador del Hospital'
+        fullName: this.currentUser.name ?? '',
+        email: this.currentUser.email ?? '',
+        phone: this.currentUser.phone ?? '',
+        position: this.currentUser.position ?? this.translate.instant('hospital.profileEdit.defaults.position')
       });
     }
   }
 
   saveHospitalInfo(): void {
     if (this.hospitalForm.invalid) {
-      this.snackBar.open('Por favor, completa todos los campos requeridos del hospital', 'Cerrar', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('hospital.profileEdit.snack.hospitalInvalid'),
+        this.translate.instant('common.close'),
+        { duration: 3000 }
+      );
       return;
     }
 
-    this.saving.set(true);
+    if (!this.currentTenant?.id) {
+      this.snackBar.open(
+        this.translate.instant('hospital.profileEdit.snack.noTenant'),
+        this.translate.instant('common.close'),
+        { duration: 3000 }
+      );
+      return;
+    }
+
+    this.savingHospital.set(true);
+
     const hospitalData = {
       ...this.currentTenant,
-      name: this.hospitalForm.value.name,
-      address: this.hospitalForm.value.address,
-      phone: this.hospitalForm.value.phone,
-      email: this.hospitalForm.value.email
+      ...this.hospitalForm.value
     };
 
     this.tenantStore.updateTenant(hospitalData).subscribe({
       next: () => {
-        this.saving.set(false);
-        this.snackBar.open('✅ Información del hospital actualizada correctamente', 'Cerrar', { duration: 3000 });
+        this.savingHospital.set(false);
+        this.snackBar.open(
+          this.translate.instant('hospital.profileEdit.snack.hospitalSaved'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       },
       error: (err) => {
         console.error('Error updating hospital:', err);
-        this.saving.set(false);
-        this.snackBar.open('❌ Error al actualizar información del hospital', 'Cerrar', { duration: 3000 });
+        this.savingHospital.set(false);
+        this.snackBar.open(
+          this.translate.instant('hospital.profileEdit.snack.hospitalSaveError'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       }
     });
   }
 
   saveAdminProfile(): void {
     if (this.adminForm.invalid) {
-      this.snackBar.open('Por favor, completa todos los campos requeridos del perfil', 'Cerrar', { duration: 3000 });
+      this.snackBar.open(
+        this.translate.instant('hospital.profileEdit.snack.adminInvalid'),
+        this.translate.instant('common.close'),
+        { duration: 3000 }
+      );
       return;
     }
 
-    this.saving.set(true);
+    if (!this.currentUser?.id) {
+      this.router.navigate(['/iam/login']);
+      return;
+    }
+
+    this.savingAdmin.set(true);
+
     const userData = {
       ...this.currentUser,
       name: this.adminForm.value.fullName,
-      email: this.adminForm.value.email
+      email: this.adminForm.value.email,
+      phone: this.adminForm.value.phone,
+      position: this.adminForm.value.position
     };
 
     this.userStore.updateUser(userData).subscribe({
       next: (updatedUser) => {
-        // Actualizar localStorage
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         this.currentUser = updatedUser;
-        
-        this.saving.set(false);
-        this.snackBar.open('✅ Perfil actualizado correctamente', 'Cerrar', { duration: 3000 });
+
+        this.savingAdmin.set(false);
+        this.snackBar.open(
+          this.translate.instant('hospital.profileEdit.snack.adminSaved'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       },
       error: (err) => {
         console.error('Error updating user:', err);
-        this.saving.set(false);
-        this.snackBar.open('❌ Error al actualizar perfil', 'Cerrar', { duration: 3000 });
+        this.savingAdmin.set(false);
+        this.snackBar.open(
+          this.translate.instant('hospital.profileEdit.snack.adminSaveError'),
+          this.translate.instant('common.close'),
+          { duration: 3000 }
+        );
       }
     });
   }

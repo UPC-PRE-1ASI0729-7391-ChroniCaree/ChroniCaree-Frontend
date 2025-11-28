@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>Dashboard del Hospital</h1>
-      <p class="subtitle">Resumen de métricas y estadísticas</p>
+      <h1>{{ 'hospitalDashboard.header.title' | translate }}</h1>
+      <p class="subtitle">{{ 'hospitalDashboard.header.subtitle' | translate }}</p>
     </div>
   </div>
 
@@ -11,7 +11,7 @@
   @if (loading()) {
     <div class="loading-container">
       <div class="spinner"></div>
-      <p>Cargando dashboard...</p>
+      <p>{{ 'hospitalDashboard.states.loading' | translate }}</p>
     </div>
   }
 
@@ -30,7 +30,7 @@
   <!-- Dashboard Content -->
   @if (!loading() && !error()) {
     <div class="dashboard-content">
-      
+
       <!-- Top Row: Subscription Status -->
       <div class="subscription-card">
         <div class="card-header">
@@ -40,33 +40,46 @@
               <path d="M12 6v6l4 2"></path>
             </svg>
             <div>
-              <h2>Suscripción Activa</h2>
-              <p class="plan-name">{{ metrics().subscriptionPlan?.name || 'Sin plan' }}</p>
+              <h2>{{ 'hospitalDashboard.subscription.title' | translate }}</h2>
+              <p class="plan-name">
+                {{ metrics().subscriptionPlan?.name || ('hospitalDashboard.subscription.noPlan' | translate) }}
+              </p>
             </div>
           </div>
+
           <button class="btn btn-outline" (click)="goToSubscription()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-            Gestionar
+            {{ 'hospitalDashboard.subscription.manage' | translate }}
           </button>
         </div>
+
         <div class="subscription-details">
           <div class="detail-item">
-            <span class="label">Estado</span>
+            <span class="label">{{ 'hospitalDashboard.subscription.statusLabel' | translate }}</span>
             <span class="badge badge-success">
-              {{ metrics().activeSubscription?.status || 'Inactiva' }}
+              {{
+                ('hospitalDashboard.subscription.statuses.' + normalizeSubscriptionStatus(metrics().activeSubscription?.status))
+                  | translate
+              }}
             </span>
           </div>
+
           <div class="detail-item">
-            <span class="label">Precio Mensual</span>
+            <span class="label">{{ 'hospitalDashboard.subscription.monthlyPrice' | translate }}</span>
             <span class="value">{{ formatCurrency(metrics().subscriptionPlan?.price || 0) }}</span>
           </div>
+
           <div class="detail-item">
-            <span class="label">Próxima Renovación</span>
+            <span class="label">{{ 'hospitalDashboard.subscription.nextRenewal' | translate }}</span>
             <span class="value">
-              {{ metrics().activeSubscription?.endDate ? (metrics().activeSubscription!.endDate | date: 'dd/MM/yyyy') : 'N/A' }}
+              {{
+                metrics().activeSubscription?.endDate
+                  ? (metrics().activeSubscription!.endDate | date: 'dd/MM/yyyy')
+                  : ('hospitalDashboard.common.na' | translate)
+              }}
             </span>
           </div>
         </div>
@@ -74,6 +87,7 @@
 
       <!-- Second Row: Key Metrics -->
       <div class="metrics-grid">
+
         <!-- Doctors Metric -->
         <div class="metric-card" (click)="goToDoctors()">
           <div class="metric-icon doctors">
@@ -84,17 +98,21 @@
               <line x1="23" y1="11" x2="17" y2="11"></line>
             </svg>
           </div>
+
           <div class="metric-content">
-            <h3>Doctores</h3>
+            <h3>{{ 'hospitalDashboard.metrics.doctors' | translate }}</h3>
             <p class="metric-value">{{ metrics().totalDoctors }}</p>
+
             <div class="metric-footer">
               @if (!isMaxDoctorsUnlimited()) {
-                <span class="limit-text">de {{ maxDoctorsAllowed() }} disponibles</span>
+                <span class="limit-text">
+                  {{ 'hospitalDashboard.metrics.ofAvailable' | translate:{ max: maxDoctorsAllowed() } }}
+                </span>
                 <div class="progress-bar">
                   <div class="progress-fill doctors-fill" [style.width.%]="doctorsPercentage()"></div>
                 </div>
               } @else {
-                <span class="unlimited-badge">Ilimitado</span>
+                <span class="unlimited-badge">{{ 'hospitalDashboard.metrics.unlimited' | translate }}</span>
               }
             </div>
           </div>
@@ -110,15 +128,17 @@
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
           </div>
+
           <div class="metric-content">
-            <h3>Pacientes</h3>
+            <h3>{{ 'hospitalDashboard.metrics.patients' | translate }}</h3>
             <p class="metric-value">{{ metrics().totalPatients }}</p>
+
             <div class="metric-footer">
               <span class="info-text">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                 </svg>
-                ~{{ metrics().averagePatientsPerDoctor }} por doctor
+                {{ 'hospitalDashboard.metrics.avgPatientsPerDoctor' | translate:{ avg: metrics().averagePatientsPerDoctor } }}
               </span>
             </div>
           </div>
@@ -132,14 +152,18 @@
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
           </div>
+
           <div class="metric-content">
-            <h3>Inversión Mensual</h3>
+            <h3>{{ 'hospitalDashboard.metrics.monthlyInvestment' | translate }}</h3>
             <p class="metric-value">{{ formatCurrency(metrics().monthlyRevenue) }}</p>
             <div class="metric-footer">
-              <span class="info-text">Plan {{ metrics().subscriptionPlan?.name || 'N/A' }}</span>
+              <span class="info-text">
+                {{ 'hospitalDashboard.metrics.plan' | translate:{ name: (metrics().subscriptionPlan?.name || ('hospitalDashboard.common.na' | translate)) } }}
+              </span>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- Third Row: Charts -->
@@ -148,11 +172,12 @@
         <div class="chart-card">
           <div class="chart-header">
             <div>
-              <h3>Pacientes por Mes</h3>
-              <p class="chart-subtitle">Distribución anual</p>
+              <h3>{{ 'hospitalDashboard.charts.patientsPerMonth' | translate }}</h3>
+              <p class="chart-subtitle">{{ 'hospitalDashboard.charts.yearDistribution' | translate }}</p>
             </div>
-            <select 
-              class="year-selector" 
+
+            <select
+              class="year-selector"
               [value]="selectedYear()"
               (change)="onYearChange(+$any($event.target).value)">
               @for (year of availableYears(); track year) {
@@ -160,19 +185,22 @@
               }
             </select>
           </div>
+
           <div class="chart-body">
             <div class="bar-chart">
               @for (data of metrics().monthlyPatients; track data.month) {
                 <div class="bar-container">
                   <div class="bar-wrapper">
-                    <div 
-                      class="bar" 
+                    <div
+                      class="bar"
                       [style.height]="getBarHeight(data.count)"
-                      [title]="data.count + ' pacientes'">
+                      [title]="('hospitalDashboard.charts.tooltipPatients' | translate:{ count: data.count })">
                       <span class="bar-value">{{ data.count }}</span>
                     </div>
                   </div>
-                  <span class="bar-label">{{ data.month }}</span>
+                  <span class="bar-label">
+                    {{ ('hospitalDashboard.charts.months.' + data.month) | translate }}
+                  </span>
                 </div>
               }
             </div>
@@ -181,7 +209,8 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions-card">
-          <h3>Acciones Rápidas</h3>
+          <h3>{{ 'hospitalDashboard.quickActions.title' | translate }}</h3>
+
           <div class="actions-list">
             <button class="action-btn" (click)="goToDoctors()">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -191,8 +220,8 @@
                 <line x1="23" y1="11" x2="17" y2="11"></line>
               </svg>
               <div>
-                <span class="action-title">Registrar Doctor</span>
-                <span class="action-subtitle">Agregar nuevo médico</span>
+                <span class="action-title">{{ 'hospitalDashboard.quickActions.registerDoctor.title' | translate }}</span>
+                <span class="action-subtitle">{{ 'hospitalDashboard.quickActions.registerDoctor.subtitle' | translate }}</span>
               </div>
             </button>
 
@@ -203,8 +232,8 @@
                 <polyline points="17 11 19 13 23 9"></polyline>
               </svg>
               <div>
-                <span class="action-title">Registrar Paciente</span>
-                <span class="action-subtitle">Agregar nuevo paciente</span>
+                <span class="action-title">{{ 'hospitalDashboard.quickActions.registerPatient.title' | translate }}</span>
+                <span class="action-subtitle">{{ 'hospitalDashboard.quickActions.registerPatient.subtitle' | translate }}</span>
               </div>
             </button>
 
@@ -215,8 +244,8 @@
                 <path d="M20 8v6M23 11h-6"></path>
               </svg>
               <div>
-                <span class="action-title">Asignar Doctor</span>
-                <span class="action-subtitle">Doctor → Paciente</span>
+                <span class="action-title">{{ 'hospitalDashboard.quickActions.assignDoctor.title' | translate }}</span>
+                <span class="action-subtitle">{{ 'hospitalDashboard.quickActions.assignDoctor.subtitle' | translate }}</span>
               </div>
             </button>
 
@@ -226,13 +255,15 @@
                 <path d="M3 9h18M9 21V9"></path>
               </svg>
               <div>
-                <span class="action-title">Mejorar Plan</span>
-                <span class="action-subtitle">Actualizar suscripción</span>
+                <span class="action-title">{{ 'hospitalDashboard.quickActions.upgradePlan.title' | translate }}</span>
+                <span class="action-subtitle">{{ 'hospitalDashboard.quickActions.upgradePlan.subtitle' | translate }}</span>
               </div>
             </button>
+
           </div>
         </div>
       </div>
+
     </div>
   }
 </div>

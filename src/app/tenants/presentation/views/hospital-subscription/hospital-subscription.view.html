@@ -1,14 +1,14 @@
 <div class="subscription-container">
   <!-- Header -->
   <div class="page-header">
-    <h1>Gestión de Suscripción</h1>
-    <p class="subtitle">Administra el plan de suscripción de tu hospital</p>
+    <h1>{{ 'hospital.subscription.header.title' | translate }}</h1>
+    <p class="subtitle">{{ 'hospital.subscription.header.subtitle' | translate }}</p>
   </div>
 
   <!-- Loading State -->
   <div *ngIf="loading()" class="loading-container">
     <div class="spinner"></div>
-    <p>Cargando información...</p>
+    <p>{{ 'hospital.subscription.loading' | translate }}</p>
   </div>
 
   <!-- Error Message -->
@@ -33,27 +33,27 @@
   <!-- Current Subscription -->
   <div *ngIf="!loading() && currentSubscription()" class="subscription-card current">
     <div class="card-header">
-      <h2>Suscripción Actual</h2>
+      <h2>{{ 'hospital.subscription.current.title' | translate }}</h2>
       <span class="badge" [ngClass]="getStatusClass(currentSubscription()!.status)">
         {{ getStatusLabel(currentSubscription()!.status) }}
       </span>
     </div>
-    
+
     <div class="subscription-details">
       <div class="detail-row">
-        <span class="label">Plan:</span>
+        <span class="label">{{ 'hospital.subscription.current.plan' | translate }}</span>
         <span class="value">{{ currentSubscription()!.planId }}</span>
       </div>
       <div class="detail-row">
-        <span class="label">Inicio:</span>
+        <span class="label">{{ 'hospital.subscription.current.start' | translate }}</span>
         <span class="value">{{ formatDate(currentSubscription()!.startDate) }}</span>
       </div>
       <div class="detail-row">
-        <span class="label">Renovación:</span>
+        <span class="label">{{ 'hospital.subscription.current.renewal' | translate }}</span>
         <span class="value">{{ formatDate(currentSubscription()!.endDate) }}</span>
       </div>
       <div class="detail-row">
-        <span class="label">Último pago:</span>
+        <span class="label">{{ 'hospital.subscription.current.lastPayment' | translate }}</span>
         <span class="value">${{ currentSubscription()!.lastPaymentAmount }} USD</span>
       </div>
     </div>
@@ -61,14 +61,19 @@
 
   <!-- Available Plans -->
   <div *ngIf="!loading() && !showPaymentForm()" class="plans-section">
-    <h2>Planes Disponibles</h2>
+    <h2>{{ 'hospital.subscription.plans.title' | translate }}</h2>
+
     <div class="plans-grid">
       <div *ngFor="let plan of availablePlans()" class="plan-card">
         <div class="plan-header">
           <h3>{{ plan.name }}</h3>
           <div class="price">
             <span class="amount">${{ plan.price }}</span>
-            <span class="period">/ {{ plan.billingPeriod === 'monthly' ? 'mes' : 'año' }}</span>
+            <span class="period">
+              / {{ plan.billingPeriod === 'monthly'
+              ? ('hospital.subscription.billing.month' | translate)
+              : ('hospital.subscription.billing.year' | translate) }}
+            </span>
           </div>
         </div>
 
@@ -77,33 +82,59 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>{{ getTenantFeatures(plan.features)!.maxDoctors === -1 ? 'Doctores ilimitados' : getTenantFeatures(plan.features)!.maxDoctors + ' doctores' }}</span>
+
+            <span>
+              {{
+                getTenantFeatures(plan.features)!.maxDoctors === -1
+                  ? ('hospital.subscription.features.doctorsUnlimited' | translate)
+                  : ('hospital.subscription.features.doctorsCount' | translate:{ count: getTenantFeatures(plan.features)!.maxDoctors })
+              }}
+            </span>
           </div>
+
           <div class="feature" *ngIf="getTenantFeatures(plan.features)?.maxPatients !== undefined">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>{{ getTenantFeatures(plan.features)!.maxPatients === -1 ? 'Pacientes ilimitados' : getTenantFeatures(plan.features)!.maxPatients + ' pacientes' }}</span>
+
+            <span>
+              {{
+                getTenantFeatures(plan.features)!.maxPatients === -1
+                  ? ('hospital.subscription.features.patientsUnlimited' | translate)
+                  : ('hospital.subscription.features.patientsCount' | translate:{ count: getTenantFeatures(plan.features)!.maxPatients })
+              }}
+            </span>
           </div>
+
           <div class="feature" *ngIf="getTenantFeatures(plan.features)?.advancedAnalytics">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>Analíticas avanzadas</span>
+            <span>{{ 'hospital.subscription.features.advancedAnalytics' | translate }}</span>
           </div>
+
           <div class="feature" *ngIf="getTenantFeatures(plan.features)?.support">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>Soporte {{ getTenantFeatures(plan.features)!.support === 'dedicated' ? 'dedicado' : 'estándar' }}</span>
+            <span>
+              {{ 'hospital.subscription.features.supportPrefix' | translate }}
+              {{
+                getTenantFeatures(plan.features)!.support === 'dedicated'
+                  ? ('hospital.subscription.support.dedicated' | translate)
+                  : ('hospital.subscription.support.standard' | translate)
+              }}
+            </span>
           </div>
         </div>
 
-        <button 
-          class="btn btn-primary" 
+        <button
+          class="btn btn-primary"
           (click)="selectPlan(plan)"
           [disabled]="processing()">
-          {{ currentSubscription() ? 'Renovar Plan' : 'Seleccionar Plan' }}
+          {{ currentSubscription()
+          ? ('hospital.subscription.actions.renew' | translate)
+          : ('hospital.subscription.actions.select' | translate) }}
         </button>
       </div>
     </div>
@@ -113,7 +144,7 @@
   <div *ngIf="showPaymentForm() && selectedPlan()" class="payment-form-container">
     <div class="payment-card">
       <div class="card-header">
-        <h2>Pago Seguro con Stripe</h2>
+        <h2>{{ 'hospital.subscription.payment.title' | translate }}</h2>
         <button class="btn-close" (click)="cancelPayment()" [disabled]="processing()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -123,38 +154,36 @@
       </div>
 
       <div class="plan-summary">
-        <h3>Plan: {{ selectedPlan()!.name }}</h3>
+        <h3>{{ 'hospital.subscription.payment.planPrefix' | translate }} {{ selectedPlan()!.name }}</h3>
         <p class="amount">${{ selectedPlan()!.price }} {{ selectedPlan()!.currency }}</p>
       </div>
 
       <form class="payment-form" (ngSubmit)="processPayment()">
-        <!-- Cardholder Name -->
         <div class="form-group">
-          <label for="cardholderName">Nombre del titular</label>
+          <label for="cardholderName">{{ 'hospital.subscription.payment.cardholder.label' | translate }}</label>
           <input
             type="text"
             id="cardholderName"
             [value]="cardholderName()"
             (input)="cardholderName.set($any($event.target).value)"
-            placeholder="Nombre completo"
+            [placeholder]="'hospital.subscription.payment.cardholder.placeholder' | translate"
             [disabled]="processing()"
             required>
         </div>
 
-        <!-- Stripe Card Element -->
         <div class="form-group">
-          <label>Información de la tarjeta</label>
+          <label>{{ 'hospital.subscription.payment.card.label' | translate }}</label>
           <div #cardElement class="stripe-card-element"></div>
+
           <p class="helper-text">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
               <line x1="1" y1="10" x2="23" y2="10"></line>
             </svg>
-            Tus datos están protegidos por Stripe
+            {{ 'hospital.subscription.payment.card.helper' | translate }}
           </p>
         </div>
 
-        <!-- Terms and Conditions -->
         <div class="form-group checkbox-group">
           <input
             type="checkbox"
@@ -163,29 +192,30 @@
             (change)="acceptTerms.set($any($event.target).checked)"
             [disabled]="processing()">
           <label for="acceptTerms">
-            Acepto los términos y condiciones de suscripción
+            {{ 'hospital.subscription.payment.terms' | translate }}
           </label>
         </div>
 
-        <!-- Submit Button -->
         <button
           type="submit"
           class="btn btn-primary btn-full"
           [disabled]="!canProceed() || processing()">
+
           <span *ngIf="!processing()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
-            Pagar ${{ selectedPlan()!.price }}
+            {{ 'hospital.subscription.payment.pay' | translate:{ amount: selectedPlan()!.price } }}
           </span>
+
           <span *ngIf="processing()" class="processing">
             <div class="spinner-small"></div>
-            Procesando pago...
+            {{ 'hospital.subscription.payment.processing' | translate }}
           </span>
         </button>
 
         <p class="security-note">
-          🔒 Conexión segura - Tus datos no se almacenan en nuestros servidores
+          {{ 'hospital.subscription.payment.security' | translate }}
         </p>
       </form>
     </div>

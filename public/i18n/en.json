@@ -52,7 +52,6 @@
     "none": "None",
     "moderate": "Moderate",
     "severe": "Severe",
-
     "confirmation": {
       "title": "Symptoms Recorded!",
       "subtitle": "Your information has been saved successfully",
@@ -62,15 +61,12 @@
       "viewHistory": "View my History",
       "backToDashboard": "Back to Dashboard"
     },
-
     "subjective": {
       "title": "Subjective Symptoms",
       "subtitle": "How do you feel today? (1–10 scale)"
     },
-
     "notesSubtitle": "Describe any other symptom or important detail",
     "notesPlaceholder": "E.g., Headache since this morning, worse with light...",
-
     "scale": {
       "veryLow": "Very low",
       "low": "Low",
@@ -78,7 +74,6 @@
       "high": "High",
       "veryHigh": "Very high"
     },
-
     "vitals": {
       "glucose": {
         "label": "Glucose (mg/dL)",
@@ -192,7 +187,6 @@
     "bmiLabel": "BMI",
     "noActiveDiagnoses": "No active diagnoses"
   },
-
   "medications": {
     "todayTitle": "Today's medications",
     "viewAll": "View all",
@@ -258,11 +252,42 @@
       }
     }
   },
-
   "nudges": {
-    "empty": "Great! You have no pending reminders"
+    "empty": "Great! You have no pending reminders",
+    "loading": "Loading reminders...",
+    "later": "Later",
+    "snooze1h": "Snooze 1 hour",
+    "dismiss": "Dismiss",
+    "snack": {
+      "dismissed": "Reminder dismissed",
+      "dismissError": "Error dismissing reminder",
+      "snoozed1h": "Reminder snoozed for 1 hour",
+      "snoozeError": "Error snoozing reminder"
+    }
   },
-
+  "nudgesPage": {
+    "title": "Reminders",
+    "subtitle": "Manage your important notifications and reminders",
+    "active": "Active",
+    "createReminder": "Create reminder",
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g., Take medication",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Reminder details",
+      "priorityLabel": "Priority",
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      }
+    },
+    "defaults": {
+      "quickTitle": "Quick reminder",
+      "quickMessage": "Reminder created from UI"
+    }
+  },
   "doctors": {
     "welcome": "Welcome, {{name}}",
     "exportPdf": "Export PDF",
@@ -310,7 +335,6 @@
       }
     }
   },
-
   "appointments": {
     "scheduler": {
       "title": "Schedule New Appointment",
@@ -352,7 +376,6 @@
       "submitting": "Scheduling..."
     }
   },
-
   "navigation": {
     "patient": {
       "dashboard": "Dashboard",
@@ -372,11 +395,51 @@
       "records": "Medical Records"
     }
   },
-
   "devices": {
     "status": {
       "connected": "Connected",
       "disconnected": "Disconnected"
+    },
+    "benefits": {
+      "title": "Benefits of IoT Monitoring",
+      "realTime": {
+        "title": "Real-time data",
+        "description": "View your health metrics constantly updated"
+      },
+      "alerts": {
+        "title": "Automatic alerts",
+        "description": "Receive notifications when your values are out of range"
+      },
+      "history": {
+        "title": "Complete history",
+        "description": "Access the full history of all your measurements"
+      },
+      "share": {
+        "title": "Share with doctors",
+        "description": "Your doctor can remotely see your data"
+      }
+    },
+    "cards": {
+      "glucometer": {
+        "name": "Glucometer",
+        "description": "Monitors blood glucose levels for diabetes control"
+      },
+      "bloodPressure": {
+        "name": "Blood Pressure Monitor",
+        "description": "Measures systolic, diastolic pressure and heart rate"
+      },
+      "pulseOximeter": {
+        "name": "Pulse Oximeter",
+        "description": "Real-time oxygen saturation (SpO2) and heart rate"
+      },
+      "ecg": {
+        "name": "ECG Monitor",
+        "description": "Portable electrocardiogram for heart rhythm analysis"
+      },
+      "smartScale": {
+        "name": "Smart Scale",
+        "description": "Weight, BMI, body composition and mass analysis"
+      }
     },
     "common": {
       "lastReading": "Last reading",
@@ -385,7 +448,9 @@
         "manufacturer": "Manufacturer:",
         "model": "Model:",
         "serialNumber": "Serial number:",
-        "lastSync": "Last sync:"
+        "lastSync": "Last sync:",
+        "save": "Save",
+        "view": "View"
       }
     },
     "list": {
@@ -504,13 +569,86 @@
       }
     }
   },
-
-  "roles": {
-    "patient": "Patient",
-    "doctor": "Doctor",
-    "hospital_admin": "Hospital Admin"
+  "messages": {
+    "inbox": {
+      "title": "Messages",
+      "assignedDoctor": "Assigned doctor",
+      "noMessages": "No messages",
+      "noSubject": "(No subject)",
+      "patient": "Patient",
+      "patientId": "Patient #{{id}}",
+      "actions": {
+        "search": "Search",
+        "newMessage": "New message"
+      },
+      "search": {
+        "placeholder": "Search conversations...",
+        "aria": "Search conversations"
+      },
+      "empty": {
+        "title": "No conversations",
+        "patientText": "Start a conversation with your doctor",
+        "doctorText": "Your patients haven't sent messages yet"
+      }
+    },
+    "detailEmpty": {
+      "title": "Select a conversation to start chatting",
+      "subtitle": "You'll see the chat here when you select a conversation. You can reply from the right panel."
+    },
+    "sender": {
+      "you": "You:",
+      "patient": "Patient:",
+      "doctor": "Doctor:"
+    },
+    "compose": {
+      "breadcrumbs": {
+        "messages": "Messages",
+        "new": "New"
+      },
+      "title": "New message to the doctor",
+      "backToInbox": "Back to inbox",
+      "noDoctor": {
+        "title": "You don't have an assigned doctor",
+        "subtitle": "You must have an assigned doctor to send messages. Please contact the administrator."
+      },
+      "to": {
+        "label": "To",
+        "selectPatient": "Select a patient...",
+        "yourDoctorWithId": "Your doctor (ID: {{id}})",
+        "noDoctorAssigned": "No assigned doctor"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "e.g. Headache consultation"
+      },
+      "body": {
+        "label": "Message",
+        "placeholder": "Describe your clinical concern with as much detail as possible…",
+        "hint": "Avoid sharing unnecessary sensitive data."
+      },
+      "urgent": {
+        "label": "Mark as urgent",
+        "hint": "This message will be marked as priority for your doctor."
+      },
+      "attachments": {
+        "label": "Attachments",
+        "select": "Select files",
+        "dropTitle": "Drag and drop here",
+        "dropSub": "or click “Select files”",
+        "removeAria": "Remove file"
+      },
+      "actions": {
+        "send": "Send message",
+        "sending": "Sending…"
+      },
+      "alerts": {
+        "fillAll": "Please complete all fields and make sure you have an assigned doctor.",
+        "missingRecipient": "Missing sender or recipient.",
+        "sentOk": "Message sent successfully.",
+        "sendError": "Error sending message. Please try again."
+      }
+    }
   },
-
   "common": {
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -520,9 +658,16 @@
     "cancel": "Cancel",
     "saveChanges": "Save Changes",
     "logout": "Log out",
-    "back": "Back"
+    "back": "Back",
+    "na": "N/A",
+    "edit": "Edit",
+    "years": "years"
   },
-
+  "roles": {
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "hospital_admin": "Hospital Admin"
+  },
   "diagnoses": {
     "header": {
       "title": "My Medical Diagnoses",
@@ -579,5 +724,630 @@
       "critical": "Critical",
       "unknown": "Unknown"
     }
+  },
+  "hospitalDashboard": {
+    "header": {
+      "title": "Hospital Dashboard",
+      "subtitle": "Summary of key metrics and statistics"
+    },
+    "states": {
+      "loading": "Loading dashboard..."
+    },
+    "errors": {
+      "noHospital": "No associated hospital was found",
+      "loadError": "Error loading dashboard"
+    },
+    "subscription": {
+      "title": "Active Subscription",
+      "noPlan": "No plan",
+      "manage": "Manage",
+      "statusLabel": "Status",
+      "monthlyPrice": "Monthly Price",
+      "nextRenewal": "Next Renewal",
+      "statuses": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "cancelled": "Cancelled",
+        "paused": "Paused",
+        "expired": "Expired",
+        "unknown": "Unknown"
+      }
+    },
+    "metrics": {
+      "doctors": "Doctors",
+      "patients": "Patients",
+      "monthlyInvestment": "Monthly Investment",
+      "unlimited": "Unlimited",
+      "ofAvailable": "of {{max}} available",
+      "avgPatientsPerDoctor": "~{{avg}} per doctor",
+      "plan": "Plan {{name}}"
+    },
+    "charts": {
+      "patientsPerMonth": "Patients per Month",
+      "yearDistribution": "Annual distribution",
+      "tooltipPatients": "{{count}} patients",
+      "months": {
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
+      }
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "registerDoctor": {
+        "title": "Register Doctor",
+        "subtitle": "Add a new doctor"
+      },
+      "registerPatient": {
+        "title": "Register Patient",
+        "subtitle": "Add a new patient"
+      },
+      "assignDoctor": {
+        "title": "Assign Doctor",
+        "subtitle": "Doctor → Patient"
+      },
+      "upgradePlan": {
+        "title": "Upgrade Plan",
+        "subtitle": "Update subscription"
+      }
+    }
+  },
+  "hospital": {
+    "profileEdit": {
+      "header": {
+        "title": "Hospital Settings",
+        "subtitle": "Manage your hospital information and your personal admin profile"
+      },
+      "loading": "Loading information...",
+      "hospitalCard": {
+        "title": "Hospital Information",
+        "subtitle": "General and contact details of the institution"
+      },
+      "adminCard": {
+        "title": "My Personal Profile",
+        "subtitle": "Your administrator account information"
+      },
+      "sections": {
+        "general": {
+          "title": "General Details"
+        },
+        "contact": {
+          "title": "Contact Information"
+        },
+        "personal": {
+          "title": "Personal Details"
+        }
+      },
+      "fields": {
+        "hospitalName": {
+          "label": "Hospital name",
+          "placeholder": "Central General Hospital"
+        },
+        "address": {
+          "label": "Address",
+          "placeholder": "Main Avenue 123"
+        },
+        "city": {
+          "label": "City",
+          "placeholder": "Lima"
+        },
+        "state": {
+          "label": "State/Region",
+          "placeholder": "Lima"
+        },
+        "zipCode": {
+          "label": "Postal code",
+          "placeholder": "15001"
+        },
+        "phone": {
+          "label": "Main phone",
+          "placeholder": "987654321"
+        },
+        "institutionalEmail": {
+          "label": "Institutional email",
+          "placeholder": "contact@hospital.com"
+        },
+        "website": {
+          "label": "Website (optional)",
+          "placeholder": "https://www.hospital.com"
+        },
+        "fullName": {
+          "label": "Full name",
+          "placeholder": "Dr. Juan Pérez"
+        },
+        "personalEmail": {
+          "label": "Personal email",
+          "placeholder": "admin@hospital.com"
+        },
+        "personalPhone": {
+          "label": "Personal phone",
+          "placeholder": "987654321"
+        },
+        "position": {
+          "placeholder": "Hospital Administrator"
+        }
+      },
+      "errors": {
+        "name": {
+          "required": "Name is required",
+          "minlength": "Minimum 3 characters"
+        },
+        "fullName": {
+          "required": "Full name is required",
+          "minlength": "Minimum 3 characters"
+        },
+        "address": {
+          "required": "Address is required"
+        },
+        "city": {
+          "required": "City is required"
+        },
+        "state": {
+          "required": "State/Region is required"
+        },
+        "zipCode": {
+          "required": "Postal code is required",
+          "pattern": "Must be 5 digits"
+        },
+        "phone": {
+          "required": "Phone is required",
+          "pattern": "Invalid format (9–10 digits)"
+        },
+        "email": {
+          "required": "Email is required",
+          "email": "Invalid email"
+        },
+        "position": {
+          "required": "Role/Position is required"
+        }
+      },
+      "actions": {
+        "saveHospital": "Save hospital information",
+        "saveAdmin": "Save my profile"
+      },
+      "defaults": {
+        "position": "Hospital Administrator"
+      },
+      "snack": {
+        "noTenant": "No hospital found for this account.",
+        "loadError": "Error loading hospital data.",
+        "hospitalInvalid": "Please complete all required hospital fields.",
+        "hospitalSaved": "✅ Hospital information updated successfully.",
+        "hospitalSaveError": "❌ Error updating hospital information.",
+        "adminInvalid": "Please complete all required profile fields.",
+        "adminSaved": "✅ Profile updated successfully.",
+        "adminSaveError": "❌ Error updating profile."
+      }
+    },
+    "subscription": {
+      "header": {
+        "title": "Subscription Management",
+        "subtitle": "Manage your hospital subscription plan"
+      },
+      "loading": "Loading information...",
+      "current": {
+        "title": "Current Subscription",
+        "plan": "Plan",
+        "start": "Start",
+        "renewal": "Renewal",
+        "lastPayment": "Last payment"
+      },
+      "plans": {
+        "title": "Available Plans"
+      },
+      "billing": {
+        "month": "month",
+        "year": "year"
+      },
+      "features": {
+        "doctorsCount": "{{count}} doctors",
+        "patientsCount": "{{count}} patients",
+        "doctorsUnlimited": "Unlimited doctors",
+        "patientsUnlimited": "Unlimited patients",
+        "advancedAnalytics": "Advanced analytics",
+        "customBranding": "Custom branding",
+        "supportPrefix": "Support"
+      },
+      "support": {
+        "standard": "standard",
+        "dedicated": "dedicated"
+      },
+      "actions": {
+        "select": "Select plan",
+        "renew": "Renew plan",
+        "manage": "Manage"
+      },
+      "status": {
+        "active": "Active",
+        "cancelled": "Cancelled",
+        "expired": "Expired",
+        "pending": "Pending",
+        "unknown": "Unknown"
+      }
+    },
+    "adminSidebar": {
+      "ariaLabel": "Admin menu",
+      "brand": {
+        "ariaDashboard": "Go to dashboard",
+        "alt": "ChroniCaree",
+        "name": "ChroniCaree"
+      },
+      "menu": {
+        "dashboard": "Dashboard",
+        "doctors": "Doctors",
+        "patients": "Patients",
+        "registerPatient": "Register patient",
+        "assignments": "Assignments",
+        "subscription": "Subscription"
+      },
+      "footer": {
+        "logout": "Log out"
+      }
+    },
+    "doctors": {
+      "header": {
+        "title": "Doctors Management",
+        "subtitle": "Manage doctors and their assigned patients"
+      },
+      "actions": {
+        "addDoctor": "Add Doctor",
+        "editTooltip": "Edit doctor",
+        "deleteTooltip": "Delete doctor"
+      },
+      "stats": {
+        "activeDoctors": "Active Doctors",
+        "assignedPatients": "Assigned Patients"
+      },
+      "card": {
+        "patientsCount": "{{count}} patients"
+      },
+      "contact": {
+        "title": "Contact information",
+        "license": "License: {{license}}"
+      },
+      "patients": {
+        "title": "Assigned Patients ({{count}})",
+        "empty": "This doctor has no assigned patients yet",
+        "assignCta": "Assign patients"
+      },
+      "patient": {
+        "age": "{{age}} years",
+        "conditionFallback": "View history"
+      },
+      "empty": {
+        "title": "No doctors registered",
+        "subtitle": "Start by adding the first doctor of your hospital",
+        "cta": "Add first doctor"
+      },
+      "errors": {
+        "noAuthUser": "No authenticated user was found",
+        "noTenant": "User has no assigned hospital",
+        "loadDoctors": "Error loading hospital doctors"
+      },
+      "confirm": {
+        "delete": "Are you sure you want to delete Dr. {{name}}?\n\nThis action cannot be undone. The doctor will be permanently removed from the system."
+      },
+      "snack": {
+        "deleted": "Doctor {{name}} deleted successfully",
+        "deleteError": "Error deleting doctor. Please try again."
+      }
+    },
+    "patients": {
+      "header": {
+        "title": "Patients Management",
+        "subtitle": "View and manage all hospital patients"
+      },
+      "actions": {
+        "registerPatient": "Register Patient",
+        "viewDetails": "View details"
+      },
+      "stats": {
+        "total": "Total Patients",
+        "active": "Active",
+        "critical": "Critical"
+      },
+      "search": {
+        "label": "Search patient, condition or doctor...",
+        "placeholder": "e.g., Maria, Diabetes, Dr. Perez"
+      },
+      "card": {
+        "age": "{{age}} years",
+        "conditionLabel": "Condition",
+        "assignedDoctorLabel": "Assigned doctor",
+        "lastVisitLabel": "Last visit"
+      },
+      "statuses": {
+        "active": "Active",
+        "monitoring": "Under monitoring",
+        "critical": "Critical"
+      },
+      "genders": {
+        "male": "Male",
+        "female": "Female"
+      },
+      "defaults": {
+        "condition": "View diagnoses",
+        "unassigned": "Unassigned"
+      },
+      "empty": {
+        "search": {
+          "title": "No patients found",
+          "subtitle": "No patients match \"{{term}}\"",
+          "clear": "Clear search"
+        },
+        "initial": {
+          "title": "No patients registered",
+          "subtitle": "Start by registering the first patient of your hospital",
+          "cta": "Register first patient"
+        }
+      },
+      "quickActions": {
+        "assignments": "View assignments",
+        "doctors": "View doctors"
+      },
+      "errors": {
+        "noAuthUser": "No authenticated user was found",
+        "noTenant": "User has no assigned hospital",
+        "loadPatients": "Error loading hospital patients"
+      }
+    },
+    "patientDetail": {
+      "loadingPatientInfo": "Loading patient information...",
+      "dni": "DNI",
+      "licenseShort": "Lic",
+      "noDoctorAssigned": "No assigned doctor",
+      "errorTitle": "Could not load patient information",
+      "actions": {
+        "newAppointment": "New Appointment",
+        "assignDoctor": "Assign Doctor",
+        "backToPatients": "Back to Patients"
+      },
+      "sections": {
+        "personalInfo": "Personal Information",
+        "emergencyContact": "Emergency Contact",
+        "assignedDoctor": "Assigned Doctor",
+        "vitalSigns": "Vital Signs",
+        "currentMedications": "Current Medications",
+        "appointmentsHistory": "Appointments History"
+      },
+      "fields": {
+        "phone": "Phone",
+        "address": "Address",
+        "birthDate": "Birth date",
+        "name": "Name",
+        "relationship": "Relationship"
+      },
+      "bmi": {
+        "label": "Body Mass Index",
+        "weight": "Weight",
+        "height": "Height"
+      },
+      "vitals": {
+        "types": {
+          "bloodPressure": "Blood Pressure",
+          "heartRate": "Heart Rate",
+          "temperature": "Temperature",
+          "glucose": "Glucose"
+        }
+      },
+      "medications": {
+        "empty": "No medications recorded",
+        "prescribedBy": "Prescribed by",
+        "on": "on",
+        "frequencies": {
+          "once_daily": "Once daily",
+          "twice_daily": "Twice daily",
+          "three_times_daily": "Three times daily",
+          "four_times_daily": "Four times daily",
+          "every_8_hours": "Every 8 hours",
+          "every_12_hours": "Every 12 hours",
+          "unknown": "Frequency"
+        }
+      },
+      "appointments": {
+        "empty": "No appointments recorded",
+        "types": {
+          "consultation": "General consultation",
+          "followUp": "Follow-up",
+          "emergency": "Emergency",
+          "routineCheck": "Routine check-up"
+        },
+        "status": {
+          "completed": "Completed",
+          "scheduled": "Scheduled",
+          "cancelled": "Cancelled"
+        }
+      }
+    }
+  },
+  "patientOnboarding": {
+    "title": "Patient Registration",
+    "subtitle": "Complete the patient information and their medical conditions",
+    "steps": {
+      "personal": "Personal Information",
+      "medical": "Medical Information",
+      "conditions": "Conditions"
+    },
+    "personal": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "dni": "National ID (DNI)",
+      "birthDate": "Date of Birth",
+      "gender": {
+        "label": "Gender",
+        "select": "Select...",
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      },
+      "phone": "Phone",
+      "address": "Address"
+    },
+    "medical": {
+      "weight": "Weight (kg)",
+      "height": "Height (m)",
+      "emergency": {
+        "title": "Emergency Contact",
+        "name": "Name",
+        "relationship": "Relationship",
+        "phone": "Phone"
+      }
+    },
+    "placeholders": {
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "email": "juan@example.com",
+      "password": "Minimum 8 characters",
+      "dni": "12345678",
+      "phone": "+51 999 888 777",
+      "address": "Main Ave 123",
+      "weight": "70",
+      "height": "1.75",
+      "emergencyName": "María Pérez",
+      "emergencyRelationship": "Spouse",
+      "emergencyPhone": "+51 999 777 666"
+    },
+    "conditions": {
+      "title": "Select the patient's medical conditions",
+      "items": {
+        "diabetesType1": "Type 1 Diabetes",
+        "diabetesType2": "Type 2 Diabetes",
+        "hypertension": "Hypertension",
+        "hyperlipidemia": "Hyperlipidemia",
+        "asthma": "Asthma",
+        "copd": "COPD",
+        "heartDisease": "Heart Disease",
+        "kidneyDisease": "Kidney Disease",
+        "thyroidDisorder": "Thyroid Disorder",
+        "arthritis": "Arthritis",
+        "depression": "Depression",
+        "anxiety": "Anxiety"
+      }
+    },
+    "actions": {
+      "prev": "Previous",
+      "next": "Next",
+      "submit": "Register Patient",
+      "submitting": "Registering..."
+    },
+    "messages": {
+      "completePersonalRequired": "Please complete all required fields in personal information",
+      "registerSuccess": "Patient registered successfully!"
+    }
+  },
+  "hospitalAssignments": {
+    "header": {
+      "title": "Doctor-Patient Assignments",
+      "subtitle": "Manage patient assignments to doctors"
+    },
+    "stats": {
+      "unassigned": "Unassigned",
+      "assigned": "Assigned"
+    },
+    "sections": {
+      "unassignedTitle": "Unassigned Patients",
+      "assignedTitle": "Current Assignments"
+    },
+    "patient": {
+      "years": "years",
+      "conditionFallback": "View diagnoses"
+    },
+    "assign": {
+      "label": "Assign to doctor",
+      "placeholder": "Select a doctor",
+      "patientsCount": "{{count}} patients"
+    },
+    "empty": {
+      "allAssigned": "Excellent! All patients are assigned",
+      "noAssignmentsTitle": "No assignments yet",
+      "noAssignmentsSubtitle": "Start by assigning patients to doctors"
+    },
+    "tooltips": {
+      "unassign": "Unassign patient"
+    },
+    "actions": {
+      "viewDoctors": "View Doctors",
+      "viewPatients": "View Patients",
+      "registerNewPatient": "Register New Patient"
+    },
+    "errors": {
+      "noAuthUser": "No authenticated user was found",
+      "noTenant": "User has no assigned hospital",
+      "loadDoctors": "Error loading hospital doctors",
+      "loadPatients": "Error loading patients",
+      "assign": "Error assigning patient to doctor",
+      "unassign": "Error unassigning patient"
+    }
+  },
+  "hospitalDoctors": {
+    "edit": {
+      "states": {
+        "loading": "Loading doctor information..."
+      },
+      "header": {
+        "title": "Edit Doctor",
+        "subtitle": "Update the information for Dr. {{name}}"
+      },
+      "sections": {
+        "personal": {
+          "title": "Personal Information"
+        },
+        "professional": {
+          "title": "Professional Settings"
+        }
+      },
+      "personal": {
+        "fullName": "Full Name",
+        "dni": "DNI",
+        "specialty": "Specialty",
+        "licenseNumber": "License Number"
+      },
+      "fields": {
+        "phone": {
+          "label": "Phone",
+          "placeholder": "987654321"
+        },
+        "consultationFee": {
+          "label": "Consultation Fee (S/)",
+          "placeholder": "0"
+        },
+        "acceptingPatients": {
+          "label": "Accepting new patients"
+        }
+      },
+      "errors": {
+        "phonePattern": "Invalid phone format (minimum 9 digits)"
+      },
+      "snack": {
+        "loadError": "Error loading doctor data",
+        "updatedOk": "Doctor updated successfully",
+        "updateError": "Error updating the doctor. Some fields may not be editable."
+      }
+    },
+    "common": {
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "saveChanges": "Guardar Cambios",
+      "errors": {
+        "required": "Este campo es requerido",
+        "minlength": "Mínimo {{min}} caracteres",
+        "min": "El valor debe ser mayor o igual a 0"
+      }
+    }
   }
 }
+
+
+
+

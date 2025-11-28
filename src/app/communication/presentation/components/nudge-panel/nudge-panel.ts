@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NudgeStore } from '../../../application/nudge.store';
 import { Nudge, NudgePriority } from '../../../domain/model/nudge.entity';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 /**
  * Nudge Panel Component
@@ -46,17 +46,14 @@ export class NudgePanelComponent implements OnInit {
   constructor(
     private nudgeStore: NudgeStore,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
-    // NO cargar aquí - el store ya tiene los datos cargados desde el toolbar
-    // El panel solo muestra los datos que ya existen en el store
+
   }
 
-  /**
-   * Maneja el click en un nudge con acción
-   */
   onNudgeAction(nudge: Nudge): void {
     if (nudge.actionRoute) {
       this.router.navigate([nudge.actionRoute]);
@@ -64,39 +61,32 @@ export class NudgePanelComponent implements OnInit {
     }
   }
 
-  /**
-   * Descarta un nudge
-   */
   dismissNudge(nudgeId: number): void {
     this.nudgeStore.dismissNudge(nudgeId).subscribe({
       next: () => {
-        this.snackBar.open('Nudge descartado', 'OK', { duration: 2000 });
+        this.snackBar.open(this.translate.instant('nudges.snack.dismissed'), 'OK', { duration: 2000 });
       },
       error: () => {
-        this.snackBar.open('Error al descartar nudge', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('nudges.snack.dismissError'), 'OK', { duration: 3000 });
       }
     });
   }
 
-  /**
-   * Pospone un nudge por 1 hora
-   */
+
   snoozeNudge(nudgeId: number, event: Event): void {
     event.stopPropagation(); // Evita que se active la acción principal
 
     this.nudgeStore.snoozeNudge(nudgeId, 1).subscribe({
       next: () => {
-        this.snackBar.open('Recordatorio pospuesto por 1 hora', 'OK', { duration: 2000 });
+        this.snackBar.open(this.translate.instant('nudges.snack.snoozed1h'), 'OK', { duration: 2000 });
       },
       error: () => {
-        this.snackBar.open('Error al posponer nudge', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('nudges.snack.snoozeError'), 'OK', { duration: 3000 });
       }
     });
   }
 
-  /**
-   * Obtiene la clase CSS según la prioridad
-   */
+
   getPriorityClass(priority: NudgePriority): string {
     switch (priority) {
       case NudgePriority.URGENT:

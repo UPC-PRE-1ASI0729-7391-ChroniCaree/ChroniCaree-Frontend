@@ -12,7 +12,7 @@
       <div class="device-icon" [class]="'icon-' + device.type">
         <span class="material-icons">{{ getDeviceIcon(device.type) }}</span>
       </div>
-      
+
       <div class="device-info">
         <h3>{{ getDeviceLabel(device.type) }}</h3>
         <p class="device-model">{{ device.brand }} - {{ device.model }}</p>
@@ -36,7 +36,7 @@
         <button class="btn-icon" (click)="syncDevice(device)" title="Sincronizar">
           <span class="material-icons">refresh</span>
         </button>
-        <button class="btn-icon" (click)="toggleDeviceStatus(device)" 
+        <button class="btn-icon" (click)="toggleDeviceStatus(device)"
                 [title]="device.isActive ? 'Desactivar' : 'Activar'">
           <span class="material-icons">{{ device.isActive ? 'toggle_on' : 'toggle_off' }}</span>
         </button>

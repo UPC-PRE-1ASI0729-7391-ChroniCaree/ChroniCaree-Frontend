@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DoctorService } from '../../../../doctors/infrastructure/doctor.service';
 import { DoctorEntity } from '../../../../doctors/domain/model/doctor.entity';
 
@@ -18,6 +19,7 @@ import { DoctorEntity } from '../../../../doctors/domain/model/doctor.entity';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    TranslateModule,
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -35,6 +37,7 @@ export class HospitalDoctorEditView implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly doctorService = inject(DoctorService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
 
   doctorForm!: FormGroup;
   loading = signal<boolean>(true);
@@ -44,7 +47,7 @@ export class HospitalDoctorEditView implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.doctorId = Number(id);
@@ -76,7 +79,7 @@ export class HospitalDoctorEditView implements OnInit {
       },
       error: (err) => {
         console.error('Error loading doctor:', err);
-        this.snackBar.open('Error al cargar los datos del doctor', 'Cerrar', {
+        this.snackBar.open(this.translate.instant('hospitalDoctors.edit.snack.loadError'), 'OK', {
           duration: 3000,
           panelClass: ['error-snackbar']
         });
@@ -103,7 +106,7 @@ export class HospitalDoctorEditView implements OnInit {
 
     this.doctorService.update(this.doctorId, updateRequest).subscribe({
       next: () => {
-        this.snackBar.open('Doctor actualizado exitosamente', 'Cerrar', {
+        this.snackBar.open(this.translate.instant('hospitalDoctors.edit.snack.updatedOk'), 'OK', {
           duration: 3000,
           panelClass: ['success-snackbar']
         });
@@ -112,7 +115,7 @@ export class HospitalDoctorEditView implements OnInit {
       },
       error: (err) => {
         console.error('Error updating doctor:', err);
-        this.snackBar.open('Error al actualizar el doctor. Es posible que algunos campos no puedan ser modificados.', 'Cerrar', {
+        this.snackBar.open(this.translate.instant('hospitalDoctors.edit.snack.updateError'), 'OK', {
           duration: 4000,
           panelClass: ['error-snackbar']
         });
@@ -137,18 +140,17 @@ export class HospitalDoctorEditView implements OnInit {
     if (!field) return '';
 
     if (field.hasError('required')) {
-      return 'Este campo es requerido';
+      return this.translate.instant('common.errors.required');
     }
     if (field.hasError('minlength')) {
       const minLength = field.errors?.['minlength'].requiredLength;
-      return `Mínimo ${minLength} caracteres`;
+      return this.translate.instant('common.errors.minlength', { min: minLength });
     }
     if (field.hasError('min')) {
-      return 'El valor debe ser mayor o igual a 0';
+      return this.translate.instant('common.errors.min');
     }
     if (field.hasError('pattern')) {
-      if (fieldName === 'phone') return 'Formato de teléfono inválido (mínimo 9 dígitos)';
-      if (fieldName === 'dni') return 'El DNI debe tener 8 dígitos';
+      if (fieldName === 'phone') return this.translate.instant('hospitalDoctors.edit.errors.phonePattern');
     }
     return '';
   }

@@ -1,9 +1,13 @@
 <div class="compose-page">
   <!-- Migas -->
   <nav class="breadcrumbs">
-    <a routerLink="/communication/messages" class="crumb">Mensajes</a>
+    <a routerLink="/communication/messages" class="crumb">
+      {{ 'messages.compose.breadcrumbs.messages' | translate }}
+    </a>
     <span class="sep">/</span>
-    <span class="crumb current">Nuevo</span>
+    <span class="crumb current">
+      {{ 'messages.compose.breadcrumbs.new' | translate }}
+    </span>
   </nav>
 
   <!-- Card -->
@@ -11,96 +15,117 @@
     <div class="card-header">
       <h2 class="h3">
         <span class="icon-mail" aria-hidden="true">✉️</span>
-        Nuevo mensaje al médico
+        {{ 'messages.compose.title' | translate }}
       </h2>
-      <a class="link-primary" routerLink="/communication/messages">Volver a la bandeja</a>
+
+      <a class="link-primary" routerLink="/communication/messages">
+        {{ 'messages.compose.backToInbox' | translate }}
+      </a>
     </div>
 
     <div class="card-body">
       <!-- Alerta de doctor no asignado -->
-      <div class="alert alert-warning" *ngIf="!doctorId()">
+      <div class="alert alert-warning" *ngIf="!doctorId() && currentRole === 'PATIENT'">
         <span class="alert-icon">⚠️</span>
         <div>
-          <strong>No tienes un médico asignado</strong>
-          <p>Debes tener un médico asignado para poder enviar mensajes. Contacta con el administrador.</p>
+          <strong>{{ 'messages.compose.noDoctor.title' | translate }}</strong>
+          <p>{{ 'messages.compose.noDoctor.subtitle' | translate }}</p>
         </div>
       </div>
 
       <!-- Para -->
       <div class="row">
-        <label class="label">Para</label>
+        <label class="label">{{ 'messages.compose.to.label' | translate }}</label>
+
         <div *ngIf="currentRole === 'DOCTOR'; else patientRecipient">
           <select class="input" [ngModel]="patientId()" (ngModelChange)="patientId.set($event)">
-            <option value="">Selecciona un paciente...</option>
-            <option *ngFor="let p of patientsList()" [value]="p.userId">{{ p.firstName }} {{ p.lastName }}</option>
+            <option value="">{{ 'messages.compose.to.selectPatient' | translate }}</option>
+            <option *ngFor="let p of patientsList()" [value]="p.userId">
+              {{ p.firstName }} {{ p.lastName }}
+            </option>
           </select>
         </div>
+
         <ng-template #patientRecipient>
           <div class="pill">
             <div class="avatar" aria-hidden="true">👨‍⚕️</div>
+
             <span *ngIf="doctorName(); else showDoctorId">{{ doctorName() }}</span>
-            <ng-template #showDoctorId><span>{{ doctorId() ? 'Tu médico (ID: ' + doctorId() + ')' : 'Sin médico asignado' }}</span></ng-template>
+
+            <ng-template #showDoctorId>
+              <span *ngIf="doctorId(); else noDoctorAssigned">
+                {{ 'messages.compose.to.yourDoctorWithId' | translate:{ id: doctorId() } }}
+              </span>
+              <ng-template #noDoctorAssigned>
+                {{ 'messages.compose.to.noDoctorAssigned' | translate }}
+              </ng-template>
+            </ng-template>
           </div>
         </ng-template>
       </div>
 
       <!-- Título -->
       <div class="row">
-        <label class="label" for="subject">Título</label>
+        <label class="label" for="subject">{{ 'messages.compose.subject.label' | translate }}</label>
         <input
           id="subject"
           type="text"
           [ngModel]="subject()"
           (ngModelChange)="subject.set($event)"
-          placeholder="Ej. Consulta por dolor de cabeza"
+          [placeholder]="'messages.compose.subject.placeholder' | translate"
           class="input"
         />
       </div>
 
       <!-- Mensaje -->
       <div class="row">
-        <label class="label" for="body">Mensaje</label>
+        <label class="label" for="body">{{ 'messages.compose.body.label' | translate }}</label>
         <textarea
           id="body"
           rows="8"
           [ngModel]="body()"
           (ngModelChange)="body.set($event)"
           class="textarea"
-          placeholder="Describe tu consulta clínica con el mayor detalle posible…"
+          [placeholder]="'messages.compose.body.placeholder' | translate"
         ></textarea>
-        <div class="hint">Evita compartir datos sensibles innecesarios.</div>
+        <div class="hint">{{ 'messages.compose.body.hint' | translate }}</div>
       </div>
 
       <!-- ⭐ Checkbox de Urgencia -->
       <div class="row">
         <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            [checked]="isUrgent()" 
+          <input
+            type="checkbox"
+            [checked]="isUrgent()"
             (change)="isUrgent.set($any($event.target).checked)"
             class="checkbox-input"
           />
           <span class="checkbox-text">
             <span class="urgent-icon" [class.active]="isUrgent()">🚨</span>
-            Marcar como urgente
+            {{ 'messages.compose.urgent.label' | translate }}
           </span>
         </label>
+
         <div class="hint" *ngIf="isUrgent()" style="color: #d32f2f; font-weight: 500;">
-          Este mensaje será marcado como prioritario para tu médico.
+          {{ 'messages.compose.urgent.hint' | translate }}
         </div>
       </div>
 
       <!-- Adjuntos -->
       <div class="row">
-        <label class="label">Adjuntos</label>
+        <label class="label">{{ 'messages.compose.attachments.label' | translate }}</label>
+
         <div class="uploader">
           <input type="file" multiple (change)="onFiles($event)" id="file-input" hidden />
-          <label for="file-input" class="btn btn-secondary">Seleccionar archivos</label>
-          <div class="dropzone" title="Selecciona archivos">
+          <label for="file-input" class="btn btn-secondary">
+            {{ 'messages.compose.attachments.select' | translate }}
+          </label>
+
+          <div class="dropzone" [attr.title]="'messages.compose.attachments.select' | translate">
             <div class="dz-icon" aria-hidden="true">📎</div>
             <div>
-              <div class="dz-title">Arrastra y suelta aquí</div>
-              <div class="dz-sub">o haz clic en “Seleccionar archivos”</div>
+              <div class="dz-title">{{ 'messages.compose.attachments.dropTitle' | translate }}</div>
+              <div class="dz-sub">{{ 'messages.compose.attachments.dropSub' | translate }}</div>
             </div>
           </div>
         </div>
@@ -109,7 +134,13 @@
         <div class="files" *ngIf="files().length">
           <div class="file-chip" *ngFor="let f of files(); let i = index">
             <span class="file-name">{{ f.name }}</span>
-            <button type="button" class="chip-remove" (click)="removeFile(i)" aria-label="Quitar archivo">✕</button>
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="removeFile(i)"
+              [attr.aria-label]="'messages.compose.attachments.removeAria' | translate">
+              ✕
+            </button>
           </div>
         </div>
       </div>
@@ -117,9 +148,16 @@
 
     <!-- Acciones -->
     <div class="card-actions">
-      <a routerLink="/communication/messages" class="btn btn-secondary">Cancelar</a>
+      <a routerLink="/communication/messages" class="btn btn-secondary">
+        {{ 'common.cancel' | translate }}
+      </a>
+
       <button class="btn btn-primary" [disabled]="!canSend()" (click)="send()">
-        {{ sending() ? 'Enviando…' : 'Enviar mensaje' }}
+        {{
+          sending()
+            ? ('messages.compose.actions.sending' | translate)
+            : ('messages.compose.actions.send' | translate)
+        }}
       </button>
     </div>
   </div>

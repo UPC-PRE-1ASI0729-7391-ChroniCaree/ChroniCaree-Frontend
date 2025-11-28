@@ -1,11 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { ActivatedRoute, RouterLink, RouterModule, Router } from '@angular/router';
-
 import { MessagesStore } from '../../../application/messages.store';
 import { Thread } from '../../../domain/model/thread.entity';
 import { UserStore } from '../../../../iam/application/user.store';
-import { computed } from '@angular/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type ThreadVM = {
   id: string;
@@ -22,7 +21,7 @@ type ThreadVM = {
 @Component({
   standalone: true,
   selector: 'cc-inbox',
-  imports: [CommonModule, NgIf, NgFor, RouterModule, RouterLink],
+  imports: [CommonModule, NgIf, NgFor, RouterModule, RouterLink, TranslateModule],
   templateUrl: './inbox.component.html',
   styleUrls: ['./inbox.component.css'],
 })
@@ -31,10 +30,11 @@ export class InboxComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly userStore = inject(UserStore);
   private readonly router = inject(Router);
-  // Track expanded threads to show full previews
+  private readonly i18n = inject(TranslateService);
+
   expanded = new Set<string>();
+
   hasDetail = computed(() => {
-    // consider currentThread or if route has a thread id param (detail view active)
     const ct = !!this.store.currentThread();
     const rid = !!this.route.snapshot.paramMap.get('id') || !!this.route.snapshot.firstChild?.paramMap.get('id');
     return ct || rid;
@@ -66,15 +66,23 @@ export class InboxComponent implements OnInit {
   }
 
   get threadsVM(): ThreadVM[] {
-    // Prefer using store inbox (full threads) to render previews (with up to 4 messages)
     const threads = this.store.inbox() || [];
     return threads.map((t: any) => {
       const messages = Array.isArray(t.messages) ? t.messages : [];
-      const previews = messages.slice(-4).map((m: any) => ({ body: m.body || m.content || '', senderRole: m.senderRole, createdAt: m.createdAt, senderId: m.senderId }));
+      const previews = messages
+        .slice(-4)
+        .map((m: any) => ({
+          body: m.body || m.content || '',
+          senderRole: m.senderRole,
+          createdAt: m.createdAt,
+          senderId: m.senderId
+        }));
+
       const lastMsg = messages.length ? messages[messages.length - 1] : null;
+
       return {
         id: t.id || t.threadId || 'unknown',
-        subject: t.subject || '(Sin asunto)',
+        subject: t.subject || this.i18n.instant('messages.inbox.noSubject'),
         participantsCount: 2,
         lastSnippet: lastMsg?.body ?? lastMsg?.content ?? '',
         lastMessageAt: t.updatedAt || t.createdAt || lastMsg?.createdAt || null,
@@ -88,27 +96,23 @@ export class InboxComponent implements OnInit {
 
   trackByVmId = (_: number, t: ThreadVM) => t.id;
 
-  // Exponer helper para plantilla que abre/precarga un thread
   openThread(id: string) {
-    try { this.store.openThread(id); } catch (e) { /* no-blocking */ }
+    try { this.store.openThread(id); } catch { /* noop */ }
   }
 
   navigateToThread(id: string) {
-    // navigate first (so URL updates), then ensure thread is loaded and marked
     this.router.navigate(['/communication/messages', 'thread', id]);
-    // fire-and-forget: open thread and mark as read for current user
-    // don't await to avoid blocking navigation
-    try { this.openAndMark(id); } catch (e) { /* noop */ }
+    try { void this.openAndMark(id); } catch { /* noop */ }
   }
 
-  // Abre y marca como leídos los mensajes del hilo para el usuario actual
   async openAndMark(id: string) {
-    try { await this.store.openThread(id); } catch (e) { /* ignore */ }
-    try { await this.store.markThreadAsRead(id, this.userId); } catch (e) { /* ignore */ }
+    try { await this.store.openThread(id); } catch { /* ignore */ }
+    try { await this.store.markThreadAsRead(id, this.userId); } catch { /* ignore */ }
   }
 
   toggleExpand(id: string) {
-    if (this.expanded.has(id)) this.expanded.delete(id); else this.expanded.add(id);
+    if (this.expanded.has(id)) this.expanded.delete(id);
+    else this.expanded.add(id);
   }
 
   getVisiblePreviews(t: ThreadVM) {
@@ -117,20 +121,13 @@ export class InboxComponent implements OnInit {
   }
 
   getPatientId(t: ThreadVM): string | undefined {
-    // Try common shapes: direct patientId, participants array, or parse from thread id
-    // 1) direct
-    // @ts-ignore - permissive read if exists
     if ((t as any).patientId) return (t as any).patientId;
 
-    // 2) participants
-    // @ts-ignore
     if ((t as any).participants && Array.isArray((t as any).participants)) {
-      // participant shape { id, role }
       const p = (t as any).participants.find((x: any) => x.role === 'PATIENT');
       if (p) return p.id;
     }
 
-    // 3) try parse key like 'patient-<id>-doctor-<id>'
     if (t.id && typeof t.id === 'string' && t.id.startsWith('patient-')) {
       const parts = t.id.split('-');
       if (parts.length >= 2) return parts[1];
@@ -140,34 +137,28 @@ export class InboxComponent implements OnInit {
   }
 
   getPatientName(t: ThreadVM): string {
-    // Para doctor: extraer nombre del paciente (puede requerir llamada a /users o /patients)
-    // Por ahora, usar ID del paciente o 'Paciente'
     const patientId = this.getPatientId(t);
-    return patientId ? `Paciente #${patientId}` : 'Paciente';
+    return patientId
+      ? this.i18n.instant('messages.inbox.patientId', { id: patientId })
+      : this.i18n.instant('messages.inbox.patient');
   }
 
   getLastSender(t: ThreadVM): string {
     if (!t.previews || t.previews.length === 0) return '';
-    
+
     const lastMsg = t.previews.at(-1);
     if (!lastMsg) return '';
-    
+
     if (lastMsg.senderId === this.userId) {
-      return 'Tú:';
+      return this.i18n.instant('messages.sender.you');
     }
-    
-    return lastMsg.senderRole === 'PATIENT' ? 'Paciente:' : 'Doctor:';
+
+    return lastMsg.senderRole === 'PATIENT'
+      ? this.i18n.instant('messages.sender.patient')
+      : this.i18n.instant('messages.sender.doctor');
   }
 
   private resolveUserId(role: 'PATIENT' | 'DOCTOR'): string {
     return role === 'DOCTOR' ? 'DOCTOR-555' : 'PATIENT-123';
-  }
-}
-
-function cryptoRandomId(): string {
-  try {
-    return crypto.randomUUID();
-  } catch {
-    return 'tmp-' + Math.random().toString(36).slice(2, 10);
   }
 }

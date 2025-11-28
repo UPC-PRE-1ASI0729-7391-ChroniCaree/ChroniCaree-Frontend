@@ -1,64 +1,70 @@
 <div class="patient-onboarding">
-    <div class="onboarding-container">
-      <!-- Header -->
-      <div class="header">
-        <h1>Registro de Paciente</h1>
-        <p>Complete la información del paciente y sus condiciones médicas</p>
-      </div>
+  <div class="onboarding-container">
+    <!-- Header -->
+    <div class="header">
+      <h1>{{ 'patientOnboarding.title' | translate }}</h1>
+      <p>{{ 'patientOnboarding.subtitle' | translate }}</p>
+    </div>
 
     <!-- Progress Bar -->
     <div class="progress-bar">
       <div class="progress-fill" [style.width.%]="progressPercentage()"></div>
     </div>
     <div class="steps-indicator">
-      <span [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">1. Información Personal</span>
-      <span [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">2. Información Médica</span>
-      <span [class.active]="currentStep() >= 3">3. Condiciones</span>
+      <span [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
+        1. {{ 'patientOnboarding.steps.personal' | translate }}
+      </span>
+      <span [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+        2. {{ 'patientOnboarding.steps.medical' | translate }}
+      </span>
+      <span [class.active]="currentStep() >= 3">
+        3. {{ 'patientOnboarding.steps.conditions' | translate }}
+      </span>
     </div>
 
     <!-- Step 1: Personal Information -->
     <form [formGroup]="personalInfoForm" *ngIf="currentStep() === 1" class="step-form">
       <div class="form-grid">
         <div class="form-group">
-          <label>Nombre *</label>
-          <input type="text" formControlName="firstName" placeholder="Juan">
+          <label>{{ 'patientOnboarding.personal.firstName' | translate }} *</label>
+          <input type="text" formControlName="firstName" [placeholder]="'patientOnboarding.placeholders.firstName' | translate">
         </div>
         <div class="form-group">
-          <label>Apellido *</label>
-          <input type="text" formControlName="lastName" placeholder="Pérez">
+          <label>{{ 'patientOnboarding.personal.lastName' | translate }} *</label>
+          <input type="text" formControlName="lastName" [placeholder]="'patientOnboarding.placeholders.lastName' | translate">
         </div>
         <div class="form-group">
-          <label>Email *</label>
-          <input type="email" formControlName="email" placeholder="juan@example.com">
+          <label>{{ 'patientOnboarding.personal.email' | translate }} *</label>
+          <input type="email" formControlName="email" [placeholder]="'patientOnboarding.placeholders.email' | translate">
         </div>
         <div class="form-group">
-          <label>Contraseña *</label>
-          <input type="password" formControlName="password" placeholder="Mínimo 8 caracteres">
+          <label>{{ 'patientOnboarding.personal.password' | translate }} *</label>
+          <input type="password" formControlName="password" [placeholder]="'patientOnboarding.placeholders.password' | translate">
         </div>
         <div class="form-group">
-          <label>DNI *</label>
-          <input type="text" formControlName="dni" placeholder="12345678">
+          <label>{{ 'patientOnboarding.personal.dni' | translate }} *</label>
+          <input type="text" formControlName="dni" [placeholder]="'patientOnboarding.placeholders.dni' | translate">
         </div>
         <div class="form-group">
-          <label>Fecha de Nacimiento *</label>
+          <label>{{ 'patientOnboarding.personal.birthDate' | translate }} *</label>
           <input type="date" formControlName="birthDate">
         </div>
         <div class="form-group">
-          <label>Género *</label>
+          <label>{{ 'patientOnboarding.personal.gender.label' | translate }} *</label>
           <select formControlName="gender">
-            <option value="">Seleccione...</option>
-            <option value="male">Masculino</option>
-            <option value="female">Femenino</option>
-            <option value="other">Otro</option>
+            <option value="">{{ 'patientOnboarding.personal.gender.select' | translate }}</option>
+            <option value="male">{{ 'patientOnboarding.personal.gender.male' | translate }}</option>
+            <option value="female">{{ 'patientOnboarding.personal.gender.female' | translate }}</option>
+            <option value="other">{{ 'patientOnboarding.personal.gender.other' | translate }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Teléfono *</label>
-          <input type="tel" formControlName="phone" placeholder="+51 999 888 777">
+          <label>{{ 'patientOnboarding.personal.phone' | translate }} *</label>
+          <input type="tel" formControlName="phone" [placeholder]="'patientOnboarding.placeholders.phone' | translate">
         </div>
         <div class="form-group full-width">
-          <label>Dirección</label>
-          <input type="text" formControlName="address" placeholder="Av. Principal 123">
+          <label>{{ 'patientOnboarding.personal.address' | translate }}</label>
+          <input type="text" formControlName="address" [placeholder]="'patientOnboarding.placeholders.address' | translate">
         </div>
       </div>
     </form>
@@ -67,43 +73,43 @@
     <form [formGroup]="medicalInfoForm" *ngIf="currentStep() === 2" class="step-form">
       <div class="form-grid">
         <div class="form-group">
-          <label>Peso (kg)</label>
-          <input type="number" formControlName="weight" placeholder="70">
+          <label>{{ 'patientOnboarding.medical.weight' | translate }}</label>
+          <input type="number" formControlName="weight" [placeholder]="'patientOnboarding.placeholders.weight' | translate">
         </div>
         <div class="form-group">
-          <label>Altura (m)</label>
-          <input type="number" step="0.01" formControlName="height" placeholder="1.75">
+          <label>{{ 'patientOnboarding.medical.height' | translate }}</label>
+          <input type="number" step="0.01" formControlName="height" [placeholder]="'patientOnboarding.placeholders.height' | translate">
         </div>
         <div class="form-group full-width">
-          <h3>Contacto de Emergencia</h3>
+          <h3>{{ 'patientOnboarding.medical.emergency.title' | translate }}</h3>
         </div>
         <div class="form-group">
-          <label>Nombre</label>
-          <input type="text" formControlName="emergencyContactName" placeholder="María Pérez">
+          <label>{{ 'patientOnboarding.medical.emergency.name' | translate }}</label>
+          <input type="text" formControlName="emergencyContactName" [placeholder]="'patientOnboarding.placeholders.emergencyName' | translate">
         </div>
         <div class="form-group">
-          <label>Relación</label>
-          <input type="text" formControlName="emergencyContactRelationship" placeholder="Esposa">
+          <label>{{ 'patientOnboarding.medical.emergency.relationship' | translate }}</label>
+          <input type="text" formControlName="emergencyContactRelationship" [placeholder]="'patientOnboarding.placeholders.emergencyRelationship' | translate">
         </div>
         <div class="form-group">
-          <label>Teléfono</label>
-          <input type="tel" formControlName="emergencyContactPhone" placeholder="+51 999 777 666">
+          <label>{{ 'patientOnboarding.medical.emergency.phone' | translate }}</label>
+          <input type="tel" formControlName="emergencyContactPhone" [placeholder]="'patientOnboarding.placeholders.emergencyPhone' | translate">
         </div>
       </div>
     </form>
 
     <!-- Step 3: Conditions -->
     <div *ngIf="currentStep() === 3" class="step-form">
-      <h3>Seleccione las condiciones médicas del paciente</h3>
+      <h3>{{ 'patientOnboarding.conditions.title' | translate }}</h3>
       <div class="conditions-grid">
-        <button 
+        <button
           *ngFor="let condition of availableConditions"
           type="button"
           class="condition-btn"
           [class.selected]="isConditionSelected(condition.id)"
           (click)="toggleCondition(condition.id)">
           <span class="material-icons">{{ isConditionSelected(condition.id) ? 'check_circle' : 'radio_button_unchecked' }}</span>
-          {{ condition.name }}
+          {{ condition.name | translate }}
         </button>
       </div>
     </div>
@@ -111,25 +117,25 @@
     <!-- Messages -->
     <div class="alert alert-success" *ngIf="successMessage()">
       <span class="material-icons">check_circle</span>
-      {{ successMessage() }}
+      {{ successMessage() | translate }}
     </div>
-    <div class="alert alert-error" *ngIf="errorMessage()">
+    <div class="alert alert-error" *ngIf="validationErrorMessage() || errorMessage()">
       <span class="material-icons">error</span>
-      {{ errorMessage() }}
+      {{ (validationErrorMessage() || errorMessage() || '') | translate }}
     </div>
 
     <!-- Navigation Buttons -->
     <div class="form-actions">
       <button type="button" class="btn-secondary" (click)="prevStep()" *ngIf="currentStep() > 1">
-        Anterior
+        {{ 'patientOnboarding.actions.prev' | translate }}
       </button>
       <button type="button" class="btn-primary" (click)="nextStep()" *ngIf="currentStep() < totalSteps">
-        Siguiente
+        {{ 'patientOnboarding.actions.next' | translate }}
       </button>
       <button type="button" class="btn-primary" (click)="onSubmit()" *ngIf="currentStep() === totalSteps" [disabled]="isSubmitting()">
         <span class="spinner-small" *ngIf="isSubmitting()"></span>
-        {{ isSubmitting() ? 'Registrando...' : 'Registrar Paciente' }}
+        {{ (isSubmitting() ? 'patientOnboarding.actions.submitting' : 'patientOnboarding.actions.submit') | translate }}
       </button>
     </div>
-    </div>
+  </div>
 </div>
