@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import { AuthService } from '../application/auth.service';
 import { PatientStore } from '../../patients/application/patient.store';
@@ -96,13 +96,14 @@ export class RegistrationFacade {
           })),
           catchError(() => {
              // If fetching doctors fails, proceed without assigning one
-             return Observable.of({ user, lastDoctor: null });
+             return of({ user, lastDoctor: null });
           })
         );
       }),
       switchMap(({ user, lastDoctor }) => {
         // Step 2: Create patient profile
         const newPatient = {
+          id: 0, // Backend will generate ID
           userId: user.id,
           assignedDoctorId: lastDoctor ? lastDoctor.id : null,
           tenantId: null,
@@ -183,6 +184,7 @@ export class RegistrationFacade {
 
         // Step 2: Create tenant
         const newTenant = {
+          id: 0, // Backend will generate ID
           adminUserId: user.id,
           name: data.hospitalName,
           email: data.email,
@@ -234,7 +236,7 @@ export class RegistrationFacade {
                         // But if we need to, we can call a user service.
                         // For now, let's assume backend links them.
                         
-                        return Observable.of({
+                        return of({
                             user,
                             profile: finalTenant,
                             subscriptionId: subscription.id,

@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.authService.signIn(email, password).subscribe({
+    this.authService.signIn({ email, password }).subscribe({
       next: () => {
         // Remember me functionality
         if (rememberMe) {

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { User } from '../domain/model/user.entity';
 
 export interface AuthResponse {
@@ -30,7 +30,7 @@ export class AuthService {
 
   // API Endpoint configuration
   // Using the path specified by the user: /api/v1/authentication
-  private readonly API_URL = `${environment.apiBaseUrl}/api/v1/authentication`;
+  private readonly API_URL = `${environment.apiBaseUrl}${environment.authEndpointPath}`;
   
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';

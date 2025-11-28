@@ -7,11 +7,11 @@ export const environment = {
   production: true,
   
   // Base API URL - Production backend
-  apiBaseUrl: 'https://chronicaree-api.onrender.com',
+  apiBaseUrl: 'https://chronicaree-api.onrender.com/api/v1',
   
   // === IAM Bounded Context ===
   usersEndpointPath: '/users',
-  authEndpointPath: '/auth',
+  authEndpointPath: '/authentication',
   
   // === Tenants Bounded Context ===
   tenantsEndpointPath: '/tenants',
