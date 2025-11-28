@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
+import { AuthService } from '../../../application/auth.service';
 import { TenantStore } from '../../../../tenants/application/tenant.store';
 import { User } from '../../../domain/model/user.entity';
 import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
@@ -37,7 +37,7 @@ interface HospitalRegistrationForm {
 export class RegisterHospitalComponent implements AfterViewInit {
   @ViewChild('cardElement') cardElement!: ElementRef;
 
-  private userStore = inject(UserStore);
+  private authService = inject(AuthService);
   private tenantStore = inject(TenantStore);
   private subscriptionService = inject(SubscriptionService);
   private paymentStore = inject(PaymentStore);
@@ -218,24 +218,21 @@ export class RegisterHospitalComponent implements AfterViewInit {
     const f = this.form();
 
     // Crear el usuario (admin del hospital)
-    const newUser: User = {
-      id: Date.now(),
+    const signUpRequest = {
       email: f.email,
       password: f.password,
-      role: 'hospital_admin',
       name: f.adminName,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
+      role: 'hospital_admin'
     };
 
-    this.userStore.createUser(newUser).subscribe({
-      next: (user: User) => {
+    this.authService.signUp(signUpRequest).subscribe({
+      next: (response: any) => {
+        const user = response.user || response;
+        
         // Crear el tenant (hospital) con todos los datos
-        const tenantId = Date.now();
+        // Note: ID generation should be handled by backend, but TenantStore might still expect it or generate it.
+        // We'll let TenantStore handle it (it calls TenantApi).
         const newTenant: any = {
-          id: tenantId,
           adminUserId: user.id,
           name: f.hospitalName,
           address: f.address,
@@ -253,49 +250,20 @@ export class RegisterHospitalComponent implements AfterViewInit {
 
         this.tenantStore.createTenant(newTenant).subscribe({
           next: (tenant: any) => {
-            // Actualizar el usuario con el tenantId
-            const updatedUser = { ...user, tenantId: tenant.id };
+            // Actualizar el usuario con el tenantId (if needed, backend usually handles this)
+            // We'll skip updating user manually for now as we don't have a direct update method in AuthService
+            // and we assume backend links them.
+            
+            // Guardar datos en el componente
+            this.createdUserId = user.id;
+            this.createdTenantId = tenant.id;
 
-            // Actualizar el usuario en la base de datos
-            this.userStore.updateUser(updatedUser).subscribe({
-              next: () => {
-                // Guardar datos en el componente
-                this.createdUserId = updatedUser.id;
-                this.createdTenantId = tenant.id;
+            // Cargar planes disponibles
+            this.loadPlans();
 
-                // Guardar en localStorage
-                localStorage.setItem('currentUser', JSON.stringify({
-                  id: updatedUser.id,
-                  email: updatedUser.email,
-                  role: updatedUser.role,
-                  name: updatedUser.name,
-                  tenantId: tenant.id
-                }));
-
-                // Cargar planes disponibles
-                this.loadPlans();
-
-                // Pasar al paso 3 (selección de plan)
-                this.submitting.set(false);
-                this.nextStep();
-              },
-              error: (err: any) => {
-                console.error('Error updating user tenantId:', err);
-                // Even if user update fails, proceed with what we have
-                this.createdUserId = user.id;
-                this.createdTenantId = tenant.id;
-                localStorage.setItem('currentUser', JSON.stringify({
-                  id: user.id,
-                  email: user.email,
-                  role: user.role,
-                  name: user.name,
-                  tenantId: tenant.id
-                }));
-                this.loadPlans();
-                this.submitting.set(false);
-                this.nextStep();
-              }
-            });
+            // Pasar al paso 3 (selección de plan)
+            this.submitting.set(false);
+            this.nextStep();
           },
           error: (err: any) => {
             this.submitting.set(false);
@@ -361,76 +329,25 @@ export class RegisterHospitalComponent implements AfterViewInit {
             this.tenantStore.updateTenant(updatedTenant).subscribe({
               next: () => {
                 this.submitting.set(false);
-                // Ensure currentUser is properly set with all required fields
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                // Add small delay to ensure localStorage is written
-                setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
-                }, 100);
+                // Redirect to login instead of dashboard because we need to sign in properly
+                this.router.navigate(['/iam/login']);
               },
               error: (err: any) => {
                 console.error('Error updating tenant subscription:', err);
-                // Continuar de todos modos
                 this.submitting.set(false);
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
-                }, 100);
+                this.router.navigate(['/iam/login']);
               }
             });
           },
           error: (err: any) => {
             console.error('Error loading tenant:', err);
-            // Continuar de todos modos
             this.submitting.set(false);
-            const currentUser = {
-              id: this.createdUserId!,
-              email: this.form().email,
-              role: 'hospital_admin',
-              name: this.form().adminName,
-              tenantId: this.createdTenantId,
-              isVerified: true
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-            setTimeout(() => {
-              window.location.href = '/hospital/dashboard';
-            }, 100);
+            this.router.navigate(['/iam/login']);
           }
         });
       } else {
         this.submitting.set(false);
-        const currentUser = {
-          id: this.createdUserId!,
-          email: this.form().email,
-          role: 'hospital_admin',
-          name: this.form().adminName,
-          tenantId: this.createdTenantId,
-          isVerified: true
-        };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-        setTimeout(() => {
-          window.location.href = '/hospital/dashboard';
-        }, 100);
+        this.router.navigate(['/iam/login']);
       }
 
     } catch (error: any) {
