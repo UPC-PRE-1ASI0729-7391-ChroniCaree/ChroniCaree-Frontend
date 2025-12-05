@@ -15,6 +15,7 @@ import { MedicalRecordsStore } from '../../../application/medical-records.store'
 import { MedicationStore } from '../../../../medications/application/medication.store';
 import { Medication, MedicationFrequency, MedicationType, MedicationStatus } from '../../../../medications/domain/model/medication.entity';
 import { MedicalRecord, RecordType } from '../../../domain/model/medical-record.entity';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-patient-detail',
@@ -30,7 +31,8 @@ import { MedicalRecord, RecordType } from '../../../domain/model/medical-record.
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    TranslateModule
   ],
   templateUrl: './patient-detail.html',
   styleUrls: ['./patient-detail.css']
@@ -223,21 +225,19 @@ export class DoctorsPatientDetailComponent implements OnInit {
    * Friendly label for record types
    */
   recordTypeLabel(type: RecordType | string | undefined): string {
-    if (!type) return 'Desconocido';
+    if (!type) return 'diagnoses.status.unknown';
     switch (String(type)) {
       case RecordType.SYMPTOMS:
       case 'SYMPTOMS':
-        return 'Síntomas';
+        return 'clinical.registerSymptoms';
       case RecordType.VITAL_SIGNS:
       case 'VITAL_SIGNS':
-        return 'Signos vitales';
+        return 'clinical.vitalSigns';
       case RecordType.CONSULTATION:
       case 'CONSULTATION':
-        return 'Consulta / Diagnóstico';
+        return 'appointments.types.consultation';
       default:
-        // Title case fallback
-        const s = String(type).toLowerCase().replace(/_/g, ' ');
-        return s.charAt(0).toUpperCase() + s.slice(1);
+        return String(type);
     }
   }
 }

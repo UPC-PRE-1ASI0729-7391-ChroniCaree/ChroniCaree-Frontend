@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { DoctorStore } from '../../../application/doctor.store';
 import { UserStore } from '../../../../iam/application/user.store';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 /**
  * Edit Profile View - Doctor Profile Management
@@ -30,18 +31,20 @@ import { UserStore } from '../../../../iam/application/user.store';
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatSelectModule,
+    TranslateModule
   ],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css'
 })
 export class EditProfileDoctorComponent implements OnInit {
   profileForm!: FormGroup;
-  
+  private translate = inject(TranslateService);
+
   // Getters para evitar errores de inicialización
   get loading() { return this.doctorStore.loading$; }
   get currentDoctor() { return this.doctorStore.selectedDoctor$; }
-  
+
   // Años de experiencia calculados
   yearsOfExperience = computed(() => {
     const licenseDate = this.profileForm?.get('licenseDate')?.value;
@@ -85,18 +88,16 @@ export class EditProfileDoctorComponent implements OnInit {
 
   private initializeForm(): void {
     this.profileForm = this.fb.group({
-      // Información Personal
+
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       phone: ['', [Validators.required, Validators.pattern(/^\+?\d{9,15}$/)]],
-      
-      // Información Profesional
+
       specialty: ['', Validators.required],
       licenseNumber: ['', [Validators.required, Validators.minLength(5)]],
       licenseDate: ['', Validators.required],
-      
-      // Información Adicional
+
       professionalBio: ['', [Validators.maxLength(500)]],
       consultationFee: [0, [Validators.min(0)]],
       languages: ['Español'],
@@ -105,7 +106,6 @@ export class EditProfileDoctorComponent implements OnInit {
   }
 
   private loadDoctorData(): void {
-    // Obtener el doctor actual desde UserStore o fallback a localStorage
     const user = this.userStore.currentUser$() || (() => {
       try {
         const s = localStorage.getItem('currentUser');
@@ -114,45 +114,51 @@ export class EditProfileDoctorComponent implements OnInit {
     })();
 
     if (user) {
-      const doctorId = user.doctorId || 1; // Default to 1 for demo
+      const doctorId = user.doctorId || 1;
 
       this.doctorStore.loadDoctorById(doctorId).subscribe({
-          next: () => {
-            const doctor = this.currentDoctor();
-            if (doctor) {
-              this.profileForm.patchValue({
-                firstName: doctor.firstName,
-                lastName: doctor.lastName,
-                dni: doctor.dni,
-                phone: doctor.phone,
-                specialty: doctor.specialty,
-                licenseNumber: doctor.licenseNumber,
-                licenseDate: '2015-01-01', // Demo date
-                professionalBio: 'Médico especialista con amplia experiencia en el tratamiento de enfermedades crónicas.',
-                consultationFee: 150,
-                languages: 'Español, Inglés',
-                availableForEmergencies: true
-              });
-            }
-          },
-          error: (error) => {
-            console.error('Error loading doctor data:', error);
-            this.showNotification('Error al cargar los datos del perfil', 'error');
+        next: () => {
+          const doctor = this.currentDoctor();
+          if (doctor) {
+            this.profileForm.patchValue({
+              firstName: doctor.firstName,
+              lastName: doctor.lastName,
+              dni: doctor.dni,
+              phone: doctor.phone,
+              specialty: doctor.specialty,
+              licenseNumber: doctor.licenseNumber,
+              licenseDate: '2015-01-01', // Demo date
+              professionalBio: 'Médico especialista con amplia experiencia en el tratamiento de enfermedades crónicas.',
+              consultationFee: 150,
+              languages: 'Español, Inglés',
+              availableForEmergencies: true
+            });
           }
-        });
+        },
+        error: (error) => {
+          console.error('Error loading doctor data:', error);
+          this.showNotification(
+            this.translate.instant('doctors.profileEdit.snack.loadError'),
+            'error'
+          );
+        }
+      });
     }
   }
 
   onSubmit(): void {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
-      this.showNotification('Por favor, completa todos los campos requeridos', 'error');
+      this.showNotification(
+        this.translate.instant('doctors.profileEdit.snack.invalidForm'),
+        'error'
+      );
       return;
     }
 
     const formValue = this.profileForm.value;
     const doctor = this.currentDoctor();
-    
+
     if (!doctor) {
       this.showNotification('No se encontró el perfil del doctor', 'error');
       return;
@@ -172,9 +178,11 @@ export class EditProfileDoctorComponent implements OnInit {
     // Guardar cambios
     this.doctorStore.updateDoctor(updatedDoctor).subscribe({
       next: () => {
-        this.showNotification('✅ Perfil actualizado correctamente', 'success');
-        
-        // Update current user via UserStore so other components react
+        this.showNotification(
+          this.translate.instant('doctors.profileEdit.snack.updateSuccess'),
+          'success'
+        );
+
         try {
           const userStr = localStorage.getItem('currentUser');
           if (userStr) {
@@ -188,7 +196,10 @@ export class EditProfileDoctorComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating doctor profile:', error);
-        this.showNotification('❌ Error al actualizar el perfil', 'error');
+        this.showNotification(
+          this.translate.instant('doctors.profileEdit.snack.updateError'),
+          'error'
+        );
       }
     });
   }
@@ -197,18 +208,16 @@ export class EditProfileDoctorComponent implements OnInit {
     this.router.navigate(['/doctor/dashboard']);
   }
 
-  // Validadores personalizados
   checkUnusualValues(): void {
     const fee = this.profileForm.get('consultationFee')?.value;
-    
+
     if (fee && (fee < 50 || fee > 1000)) {
       this.showNotification(
-        '⚠️ El precio de consulta parece inusual. Verifica que sea correcto.',
+        this.translate.instant('doctors.profileEdit.snack.unusualFee'),
         'warning'
       );
     }
   }
-
   private showNotification(message: string, type: 'success' | 'error' | 'warning'): void {
     const config = {
       duration: 4000,
@@ -216,32 +225,30 @@ export class EditProfileDoctorComponent implements OnInit {
       verticalPosition: 'top' as const,
       panelClass: [`snackbar-${type}`]
     };
-    
-    this.snackBar.open(message, 'Cerrar', config);
-  }
 
-  // Helpers para mensajes de error
+    this.snackBar.open(message, this.translate.instant('common.close') || 'Cerrar', config);
+  }
   getErrorMessage(fieldName: string): string {
     const field = this.profileForm.get(fieldName);
-    
+
     if (field?.hasError('required')) {
-      return 'Este campo es requerido';
+      return this.translate.instant('common.errors.required');
     }
-    
+
     if (field?.hasError('minlength')) {
       const minLength = field.errors?.['minlength'].requiredLength;
-      return `Mínimo ${minLength} caracteres`;
+      return this.translate.instant('common.errors.minlength', { min: minLength });
     }
-    
+
     if (field?.hasError('pattern')) {
-      if (fieldName === 'dni') return 'DNI debe tener 8 dígitos';
-      if (fieldName === 'phone') return 'Formato de teléfono inválido';
+      if (fieldName === 'dni') return this.translate.instant('doctors.profileEdit.errors.dniPattern');
+      if (fieldName === 'phone') return this.translate.instant('doctors.profileEdit.errors.phonePattern');
     }
-    
+
     if (field?.hasError('min')) {
-      return 'El valor no puede ser negativo';
+      return this.translate.instant('common.errors.min');
     }
-    
+
     return '';
   }
 }

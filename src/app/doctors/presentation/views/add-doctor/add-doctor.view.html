@@ -10,8 +10,8 @@
           <line x1="22" y1="11" x2="16" y2="11"></line>
         </svg>
         <div>
-          <h1>Registrar Nuevo Doctor</h1>
-          <p>Complete el formulario para agregar un doctor al hospital</p>
+          <h1>{{ 'hospital.addDoctor.title' | translate }}</h1>
+          <p>{{ 'hospital.addDoctor.subtitle' | translate }}</p>
         </div>
       </div>
     </div>
@@ -23,7 +23,7 @@
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M12 6v6l4 2"></path>
         </svg>
-        <span>¡Doctor registrado exitosamente! Redirigiendo...</span>
+        <span>{{ 'hospital.addDoctor.success' | translate }}</span>
       </div>
     }
 
@@ -42,12 +42,12 @@
     <!-- Form -->
     <form class="doctor-form" (ngSubmit)="onSubmit()">
       <div class="form-section">
-        <h2>Información Personal</h2>
+        <h2>{{ 'hospital.addDoctor.sections.personal' | translate }}</h2>
 
         <div class="form-row">
           <div class="form-group">
             <label for="name">
-              Nombre Completo
+              {{ 'hospital.addDoctor.fields.name' | translate }}
               <span class="required">*</span>
             </label>
             <input
@@ -55,7 +55,7 @@
               id="name"
               [value]="form().name"
               (input)="updateForm('name', $any($event.target).value)"
-              placeholder="Dr. Juan Pérez"
+              [placeholder]="'hospital.addDoctor.placeholders.name' | translate"
               [disabled]="submitting()"
               required
             />
@@ -63,7 +63,7 @@
 
           <div class="form-group">
             <label for="specialty">
-              Especialidad
+              {{ 'hospital.addDoctor.fields.specialty' | translate }}
               <span class="required">*</span>
             </label>
             <select
@@ -73,7 +73,7 @@
               [disabled]="submitting()"
               required
             >
-              <option value="">Seleccionar especialidad</option>
+              <option value="">{{ 'hospital.addDoctor.fields.selectSpecialty' | translate }}</option>
               @for (specialty of specialties; track specialty) {
                 <option [value]="specialty">{{ specialty }}</option>
               }
@@ -84,7 +84,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="email">
-              Correo Electrónico
+              {{ 'hospital.addDoctor.fields.email' | translate }}
               <span class="required">*</span>
             </label>
             <input
@@ -92,7 +92,7 @@
               id="email"
               [value]="form().email"
               (input)="updateForm('email', $any($event.target).value)"
-              placeholder="doctor@hospital.com"
+              [placeholder]="'hospital.addDoctor.placeholders.email' | translate"
               [disabled]="submitting()"
               required
             />
@@ -100,7 +100,7 @@
 
           <div class="form-group">
             <label for="phone">
-              Teléfono
+              {{ 'hospital.addDoctor.fields.phone' | translate }}
               <span class="required">*</span>
             </label>
             <input
@@ -108,7 +108,7 @@
               id="phone"
               [value]="form().phone"
               (input)="updateForm('phone', $any($event.target).value)"
-              placeholder="+51 999 888 777"
+              [placeholder]="'hospital.addDoctor.placeholders.phone' | translate"
               [disabled]="submitting()"
               required
             />
@@ -117,11 +117,11 @@
       </div>
 
       <div class="form-section">
-        <h2>Información Profesional</h2>
+        <h2>{{ 'hospital.addDoctor.sections.professional' | translate }}</h2>
 
         <div class="form-group">
           <label for="licenseNumber">
-            Número de Licencia Médica
+            {{ 'hospital.addDoctor.fields.license' | translate }}
             <span class="required">*</span>
           </label>
           <input
@@ -129,22 +129,22 @@
             id="licenseNumber"
             [value]="form().licenseNumber"
             (input)="updateForm('licenseNumber', $any($event.target).value)"
-            placeholder="CMP-12345"
+            [placeholder]="'hospital.addDoctor.placeholders.license' | translate"
             [disabled]="submitting()"
             required
           />
-          <small class="form-hint">Ingrese el número de colegiatura médica</small>
+          <small class="form-hint">{{ 'hospital.addDoctor.hints.license' | translate }}</small>
         </div>
       </div>
 
-      <!-- ✅ NUEVO: Credenciales -->
+      <!-- Credenciales -->
       <div class="form-section">
-        <h2>Credenciales de Acceso</h2>
+        <h2>{{ 'hospital.addDoctor.sections.credentials' | translate }}</h2>
 
         <div class="form-row">
           <div class="form-group">
             <label for="password">
-              Contraseña
+              {{ 'hospital.addDoctor.fields.password' | translate }}
               <span class="required">*</span>
             </label>
 
@@ -154,22 +154,22 @@
                 id="password"
                 [value]="form().password"
                 (input)="updateForm('password', $any($event.target).value)"
-                placeholder="Mínimo 8 caracteres"
+                [placeholder]="'hospital.addDoctor.placeholders.password' | translate"
                 [disabled]="submitting()"
                 autocomplete="new-password"
                 required
               />
               <button type="button" class="btn-eye" (click)="toggleShowPassword()" [disabled]="submitting()">
-                {{ showPassword() ? 'Ocultar' : 'Ver' }}
+                {{ showPassword() ? ('hospital.addDoctor.actions.hide' | translate) : ('hospital.addDoctor.actions.show' | translate) }}
               </button>
             </div>
 
-            <small class="form-hint">Recomendado: usar letras, números y símbolos.</small>
+            <small class="form-hint">{{ 'hospital.addDoctor.hints.password' | translate }}</small>
           </div>
 
           <div class="form-group">
             <label for="confirmPassword">
-              Confirmar Contraseña
+              {{ 'hospital.addDoctor.fields.confirmPassword' | translate }}
               <span class="required">*</span>
             </label>
 
@@ -179,18 +179,18 @@
                 id="confirmPassword"
                 [value]="form().confirmPassword"
                 (input)="updateForm('confirmPassword', $any($event.target).value)"
-                placeholder="Repite la contraseña"
+                [placeholder]="'hospital.addDoctor.placeholders.confirmPassword' | translate"
                 [disabled]="submitting()"
                 autocomplete="new-password"
                 required
               />
               <button type="button" class="btn-eye" (click)="toggleShowConfirmPassword()" [disabled]="submitting()">
-                {{ showConfirmPassword() ? 'Ocultar' : 'Ver' }}
+                {{ showConfirmPassword() ? ('hospital.addDoctor.actions.hide' | translate) : ('hospital.addDoctor.actions.show' | translate) }}
               </button>
             </div>
 
             <button type="button" class="btn-generate" (click)="generatePassword()" [disabled]="submitting()">
-              Generar contraseña segura
+              {{ 'hospital.addDoctor.actions.generate' | translate }}
             </button>
           </div>
         </div>
@@ -208,7 +208,7 @@
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
-          Cancelar
+          {{ 'hospital.addDoctor.actions.cancel' | translate }}
         </button>
 
         <button
@@ -218,12 +218,12 @@
         >
           @if (submitting()) {
             <div class="spinner"></div>
-            <span>Registrando...</span>
+            <span>{{ 'hospital.addDoctor.actions.submitting' | translate }}</span>
           } @else {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span>Registrar Doctor</span>
+            <span>{{ 'hospital.addDoctor.actions.submit' | translate }}</span>
           }
         </button>
       </div>

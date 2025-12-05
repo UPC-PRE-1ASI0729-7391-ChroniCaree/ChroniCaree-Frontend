@@ -306,11 +306,16 @@
     "pendingReviews": "Pending reviews",
     "activePatients": "Active patients",
     "avgDuration": "Average duration",
+    "criticalAlerts": "Critical Alerts",
+    "noCriticalAlerts": "No critical alerts",
+    "pendingReviewsTitle": "Records Pending Review",
     "appointments": {
       "title": "My Appointments",
       "subtitle": "Manage your appointments with patients",
       "today": "Today's Appointments",
       "upcoming": "Upcoming Appointments",
+      "all": "All",
+      "completed": "Completed",
       "loading": "Loading appointments...",
       "empty": {
         "title": "No appointments",
@@ -325,6 +330,7 @@
         "noShow": "🚫 No-show"
       },
       "actions": {
+        "refresh": "Refresh",
         "confirm": "Confirm",
         "start": "Start",
         "complete": "Complete",
@@ -332,6 +338,126 @@
         "todayBadge": "TODAY",
         "scheduled": "Scheduled",
         "completed": "Completed"
+      }
+    },
+    "patients": {
+      "title": "My Patients",
+      "subtitle": "Manage and monitor your assigned patients",
+      "loading": "Loading patients...",
+      "actions": {
+        "requestPatient": "Request Patient",
+        "refresh": "Refresh"
+      },
+      "stats": {
+        "total": "Total Patients",
+        "critical": "Critical Patients",
+        "atRisk": "At Risk",
+        "criticalAlerts": "Critical Alerts"
+      },
+      "empty": {
+        "title": "No assigned patients",
+        "subtitle": "Assigned patients will appear here"
+      },
+      "status": {
+        "critical": "Critical",
+        "atRisk": "At Risk",
+        "controlled": "Controlled",
+        "stable": "Stable"
+      },
+      "metric": {
+        "criticalAlerts": "Critical Alerts",
+        "activeAlerts": "Active Alerts",
+        "medications": "Medications",
+        "diagnoses": "Diagnoses"
+      },
+      "vitals": {
+        "header": "Last Vital Signs",
+        "glucose": "Glucose",
+        "bloodPressure": "Blood Pressure",
+        "heartRate": "Heart Rate",
+        "oxygenSaturation": "Oxygen Saturation"
+      },
+      "footer": {
+        "assignedSince": "Assigned",
+        "viewDetails": "View Details"
+      }
+    },
+    "records": {
+      "title": "Medical Records",
+      "subtitle": "Medical records of your patients",
+      "loading": "Loading records...",
+      "empty": "No records found",
+      "patientLabel": "Patient",
+      "notes": "Notes",
+      "actions": {
+        "refresh": "Refresh"
+      },
+      "stats": {
+        "total": "Total Records",
+        "vitalSigns": "Vital Signs",
+        "symptoms": "Symptoms",
+        "consultations": "Consultations"
+      },
+      "tabs": {
+        "all": "All",
+        "vitalSigns": "Vital Signs",
+        "symptoms": "Symptoms",
+        "consultations": "Consultations"
+      },
+      "vitals": {
+        "glucose": "Glucose",
+        "bloodPressure": "Blood Pressure",
+        "heartRate": "Heart Rate",
+        "temperature": "Temperature"
+      },
+      "symptoms": {
+        "fatigue": "Fatigue",
+        "pain": "Pain",
+        "dizziness": "Dizziness"
+      },
+      "consultation": {
+        "diagnosis": "Diagnosis",
+        "treatment": "Treatment"
+      }
+    },
+    "profileEdit": {
+      "title": "Edit Professional Profile",
+      "subtitle": "Update your professional and contact information",
+      "loading": "Loading profile information...",
+      "sections": {
+        "personal": {
+          "title": "Personal Information",
+          "subtitle": "Basic identification data"
+        },
+        "professional": {
+          "title": "Professional Information",
+          "subtitle": "Credentials and medical specialization"
+        },
+        "additional": {
+          "title": "Additional Configuration",
+          "subtitle": "Preferences and availability"
+        }
+      },
+      "fields": {
+        "specialty": "Specialty",
+        "licenseNumber": "License Number",
+        "licenseDate": "License Date",
+        "yearsExperience": "Years of Experience",
+        "bio": "Professional Bio",
+        "fee": "Consultation Fee (S/.)",
+        "languages": "Languages",
+        "emergencies": "Available for emergencies"
+      },
+      "placeholders": {
+        "firstName": "Ex: Mary",
+        "lastName": "Ex: Lopez",
+        "specialty": "Select your specialty",
+        "licenseNumber": "Ex: CMP-12345",
+        "bio": "Describe your experience, areas of interest, and professional focus...",
+        "languages": "Spanish, English"
+      },
+      "hints": {
+        "fee": "Price per consultation in soles"
       }
     }
   },
@@ -389,10 +515,12 @@
       "messages": "Messages"
     },
     "doctor": {
+      "ariaLabel": "Doctor menu",
       "dashboard": "Dashboard",
-      "patients": "My Patients",
-      "appointments": "My Appointments",
-      "records": "Medical Records"
+      "patients": "Patients",
+      "appointments": "Appointments",
+      "records": "Records",
+      "messages": "Messages"
     }
   },
   "devices": {
@@ -661,7 +789,22 @@
     "back": "Back",
     "na": "N/A",
     "edit": "Edit",
-    "years": "years"
+    "years": "years",
+    "dniLabel": "DNI",
+    "ageUnit": "years",
+    "units": {
+      "glucose": "mg/dL",
+      "heartRate": "bpm"
+    },
+    "actions": {
+      "retry": "Retry"
+    },
+    "saving": "Saving...",
+    "errors": {
+      "required": "This field is required",
+      "minlength": "Minimum {{min}} characters",
+      "min": "Value must be greater than or equal to 0"
+    }
   },
   "roles": {
     "patient": "Patient",
@@ -1167,6 +1310,46 @@
           "cancelled": "Cancelled"
         }
       }
+    },
+    "addDoctor": {
+      "title": "Register New Doctor",
+      "subtitle": "Complete the form to add a doctor to the hospital",
+      "success": "Doctor registered successfully! Redirecting...",
+      "sections": {
+        "personal": "Personal Information",
+        "professional": "Professional Information",
+        "credentials": "Access Credentials"
+      },
+      "fields": {
+        "name": "Full Name",
+        "specialty": "Specialty",
+        "selectSpecialty": "Select specialty",
+        "email": "Email Address",
+        "phone": "Phone",
+        "license": "Medical License Number",
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "placeholders": {
+        "name": "Dr. John Doe",
+        "email": "doctor@hospital.com",
+        "phone": "+1 555 123 4567",
+        "license": "MED-12345",
+        "password": "Minimum 8 characters",
+        "confirmPassword": "Repeat the password"
+      },
+      "hints": {
+        "license": "Enter the medical board license number",
+        "password": "Recommended: use letters, numbers, and symbols."
+      },
+      "actions": {
+        "generate": "Generate secure password",
+        "cancel": "Cancel",
+        "submit": "Register Doctor",
+        "submitting": "Registering...",
+        "hide": "Hide",
+        "show": "Show"
+      }
     }
   },
   "patientOnboarding": {
@@ -1336,18 +1519,68 @@
       }
     },
     "common": {
-      "saving": "Guardando...",
-      "cancel": "Cancelar",
-      "saveChanges": "Guardar Cambios",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
       "errors": {
-        "required": "Este campo es requerido",
-        "minlength": "Mínimo {{min}} caracteres",
-        "min": "El valor debe ser mayor o igual a 0"
+        "required": "This field is required",
+        "minlength": "Minimum {{min}} characters",
+        "min": "Value must be greater than or equal to 0"
       }
+    }
+  },
+  "patientDetail": {
+    "loadingPatientInfo": "Loading patient information...",
+    "dni": "DNI",
+    "licenseShort": "Lic",
+    "noDoctorAssigned": "No doctor assigned",
+    "errorTitle": "Could not load patient information",
+    "actions": {
+      "newAppointment": "New Appointment",
+      "assignDoctor": "Assign Doctor",
+      "backToPatients": "Back to Patients"
+    },
+    "sections": {
+      "personalInfo": "Personal Information",
+      "emergencyContact": "Emergency Contact",
+      "assignedDoctor": "Assigned Doctor",
+      "vitalSigns": "Vital Signs",
+      "currentMedications": "Current Medications",
+      "appointmentsHistory": "Appointment History"
+    },
+    "medications": {
+      "empty": "No medications recorded",
+      "prescribedBy": "Prescribed by",
+      "on": "on",
+      "frequencies": {
+        "once_daily": "Once daily",
+        "twice_daily": "Twice daily",
+        "three_times_daily": "Three times daily",
+        "four_times_daily": "Four times daily",
+        "every_8_hours": "Every 8 hours",
+        "every_12_hours": "Every 12 hours",
+        "unknown": "Frequency"
+      }
+    },
+    "appointments": {
+      "empty": "No appointments recorded",
+      "types": {
+        "consultation": "General Consultation",
+        "followUp": "Follow-up",
+        "emergency": "Emergency",
+        "routineCheck": "Routine Check-up"
+      },
+      "status": {
+        "completed": "Completed",
+        "scheduled": "Scheduled",
+        "cancelled": "Cancelled"
+      }
+    }
+  },
+  "header": {
+    "menu": {
+      "profile": "My Profile",
+      "help": "Help"
     }
   }
 }
-
-
-
-
