@@ -58,19 +58,28 @@ export class TenantStore {
   }
 
   createTenant(tenant: Tenant): Observable<Tenant> {
+    console.log('🏥 [TenantStore] createTenant() called');
+    console.log('📝 Tenant data to create:', tenant);
+    
     this.loading.set(true);
     this.error.set(null);
     
     return this.tenantApi.create(tenant).pipe(
       tap({
         next: (newTenant) => {
+          console.log('✅ [TenantStore] Tenant created successfully');
+          console.log('🏥 New tenant:', newTenant);
           this.tenants.update(tenants => [...tenants, newTenant]);
           this.loading.set(false);
         },
         error: (err) => {
+          console.error('❌ [TenantStore] Error creating tenant');
+          console.error('Error status:', err.status);
+          console.error('Error message:', err.message);
+          console.error('Error object:', err);
+          
           this.error.set('Error al crear tenant');
           this.loading.set(false);
-          console.error('Error creating tenant:', err);
         }
       })
     );

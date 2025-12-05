@@ -144,8 +144,8 @@ export class HospitalAssignmentsView implements OnInit {
   }
 
   assignPatientToDoctor(patientId: number, doctorId: number) {
-    // Actualizar en el backend
-    this.patientService.updateAssignedDoctor(patientId, doctorId).subscribe({
+    // Usar el endpoint PUT /patients/{id}/assign-doctor (no PATCH)
+    this.patientService.assignDoctor(patientId, doctorId).subscribe({
       next: () => {
         // Update local state
         this.patients.update(patients => 

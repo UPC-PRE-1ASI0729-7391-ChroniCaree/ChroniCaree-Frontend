@@ -6,8 +6,8 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
+import { map, catchError, tap } from 'rxjs/operators';
 
 import { UserEntity, UserRole } from '../domain/model/user.entity';
 import { environment } from '../../../environments/environment';
@@ -91,34 +91,72 @@ export class UserService {
 
   /**
    * Verifica si un email ya existe
+   * NOTA: El backend tiene un bug donde GET /users?email=X devuelve TODOS los usuarios
+   * en lugar de filtrar. Por eso filtramos manualmente en el frontend.
    */
   emailExists(email: string): Observable<boolean> {
+    console.log('🔍 [UserService] emailExists() - Checking email:', email);
+    console.log('  → URL:', `${USER_API}?email=${email}`);
+    
+    const normalizedEmail = email.toLowerCase().trim();
+    
     return this.http.get<UserResource[]>(`${USER_API}?email=${email}`).pipe(
-      map((resources) => resources.length > 0),
-      catchError(() => throwError(() => new Error('Failed to check email existence')))
+      tap(resources => {
+        console.log('📦 [UserService] emailExists() - Raw response:', resources);
+        console.log('  → Total users returned:', resources.length);
+      }),
+      map((resources) => {
+        // Filtrar manualmente porque el backend no filtra correctamente
+        const matchingUsers = resources.filter(u => 
+          u.email && u.email.toLowerCase().trim() === normalizedEmail
+        );
+        console.log('🔍 [UserService] emailExists() - After filtering:');
+        console.log('  → Users with exact email match:', matchingUsers.length);
+        if (matchingUsers.length > 0) {
+          console.log('  → Matching user:', matchingUsers[0]);
+        }
+        return matchingUsers.length > 0;
+      }),
+      catchError((error) => {
+        console.error('❌ [UserService] emailExists() - Error:', error);
+        // Si hay error, asumir que no existe para permitir continuar
+        // El backend validará de nuevo al crear
+        return of(false);
+      })
     );
   }
 
   /**
    * Crea un nuevo usuario
+   * Backend expects: email, password, role (UPPERCASE), name, tenantId
    */
   create(request: CreateUserRequest): Observable<UserEntity> {
-    const payload: UserResource = {
-      id: 0, // Will be assigned by backend
+    // Payload para el backend - role debe ser UPPERCASE
+    const payload = {
       email: request.email,
-      role: request.role,
+      password: request.password,
+      role: request.role.toUpperCase(),  // Backend expects UPPERCASE: DOCTOR, PATIENT, etc.
       name: request.name,
-      password: request.password, // En producción debe hashearse
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: request.tenantId || null,
+      tenantId: request.tenantId ?? null,
     };
 
+    console.log('📤 [UserService] Creating user with payload:', {
+      email: payload.email,
+      role: payload.role,
+      name: payload.name,
+      tenantId: payload.tenantId
+    });
+    console.log('  → URL:', USER_API);
+
     return this.http.post<UserResource>(USER_API, payload).pipe(
-      map((resource) => this.toEntity(resource)),
+      map((resource) => {
+        console.log('✅ [UserService] User created successfully:', resource);
+        return this.toEntity(resource);
+      }),
       catchError((error) => {
-        console.error('Error creating user:', error);
+        console.error('❌ [UserService] Error creating user:', error);
+        console.error('  → Status:', error.status);
+        console.error('  → Error body:', error.error);
         return throwError(() => new Error('Failed to create user'));
       })
     );

@@ -83,9 +83,30 @@ export class PatientService {
     );
   }
 
+  /**
+   * Obtiene pacientes de un tenant
+   * Backend endpoint: GET /patients/by-tenant/{tenantId}
+   */
   getByTenantId(tenantId: string | number): Observable<PatientEntity[]> {
-    return this.http.get<any[]>(`${PATIENT_API}?tenantId=${tenantId}`).pipe(
-      map((resources) => resources.map(r => this.toEntity(r))),
+    return this.http.get<any>(`${PATIENT_API}/by-tenant/${tenantId}`).pipe(
+      map((response) => {
+        // Manejar caso donde backend retorna objeto en vez de array
+        let resources: any[];
+        if (Array.isArray(response)) {
+          resources = response;
+        } else if (response && typeof response === 'object') {
+          // Si es un objeto, puede ser { data: [...] } o similar
+          resources = response.data || response.content || response.patients || [];
+          if (!Array.isArray(resources)) {
+            console.warn('[PatientService] Unexpected response format, wrapping in array:', response);
+            resources = [response];
+          }
+        } else {
+          resources = [];
+        }
+        console.log(`📦 [PatientService] getByTenantId(${tenantId}) - Found ${resources.length} patients`);
+        return resources.map(r => this.toEntity(r));
+      }),
       catchError((error) => {
         console.error(`Error fetching patients for tenant ${tenantId}:`, error);
         return throwError(() => new Error(`Failed to fetch patients for tenant ${tenantId}`));
@@ -97,8 +118,22 @@ export class PatientService {
    * Obtiene todos los pacientes
    */
   getAll(): Observable<PatientEntity[]> {
-    return this.http.get<any[]>(PATIENT_API).pipe(
-      map((resources) => resources.map(r => this.toEntity(r))),
+    return this.http.get<any>(PATIENT_API).pipe(
+      map((response) => {
+        // Manejar caso donde backend retorna objeto en vez de array
+        let resources: any[];
+        if (Array.isArray(response)) {
+          resources = response;
+        } else if (response && typeof response === 'object') {
+          resources = response.data || response.content || response.patients || [];
+          if (!Array.isArray(resources)) {
+            resources = [response];
+          }
+        } else {
+          resources = [];
+        }
+        return resources.map(r => this.toEntity(r));
+      }),
       catchError((error) => {
         console.error('Error fetching all patients:', error);
         return throwError(() => new Error('Failed to fetch all patients'));
@@ -145,7 +180,59 @@ export class PatientService {
   }
 
   /**
+   * Asigna un doctor a un paciente
+   * Backend endpoint: PUT /patients/{patientId}/assign-doctor
+   */
+  assignDoctor(patientId: number, doctorId: number): Observable<PatientEntity> {
+    const url = `${PATIENT_API}/${patientId}/assign-doctor`;
+    console.log(`🌐 [PatientService] assignDoctor - URL: ${url}, doctorId: ${doctorId}`);
+    
+    return this.http.put<any>(url, { doctorId }).pipe(
+      map((resource) => {
+        console.log('✅ [PatientService] Doctor assigned:', resource);
+        return this.toEntity(resource);
+      }),
+      catchError((error) => {
+        console.error(`Error assigning doctor to patient ${patientId}:`, error);
+        return throwError(() => new Error(`Failed to assign doctor to patient ${patientId}`));
+      })
+    );
+  }
+
+  /**
+   * Desasigna el doctor de un paciente
+   * Backend endpoint: DELETE /patients/{patientId}/assign-doctor
+   */
+  unassignDoctor(patientId: number): Observable<PatientEntity> {
+    const url = `${PATIENT_API}/${patientId}/assign-doctor`;
+    console.log(`🌐 [PatientService] unassignDoctor - URL: ${url}`);
+    
+    return this.http.delete<any>(url).pipe(
+      map((resource) => {
+        console.log('✅ [PatientService] Doctor unassigned:', resource);
+        return this.toEntity(resource);
+      }),
+      catchError((error) => {
+        console.error(`Error unassigning doctor from patient ${patientId}:`, error);
+        return throwError(() => new Error(`Failed to unassign doctor from patient ${patientId}`));
+      })
+    );
+  }
+
+  /**
+   * Extrae el valor de un campo que puede ser string o Value Object
+   * Backend puede devolver: "12345678" o { "value": "12345678" }
+   */
+  private extractValue(field: any): string {
+    if (field === null || field === undefined) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object' && 'value' in field) return field.value;
+    return String(field);
+  }
+
+  /**
    * Convierte un recurso del API a PatientEntity
+   * Maneja tanto formato plano como Value Objects del backend
    */
   private toEntity(resource: any): PatientEntity {
     const emergencyContact: EmergencyContact = {
@@ -160,13 +247,13 @@ export class PatientService {
       resource.assignedDoctorId,
       resource.tenantId,
       resource.subscriptionId,
-      resource.firstName,
-      resource.lastName,
-      resource.dni,
+      resource.firstName || '',
+      resource.lastName || '',
+      this.extractValue(resource.dni),
       resource.birthDate,
       resource.gender,
-      resource.phone,
-      resource.address,
+      this.extractValue(resource.phone),
+      resource.address || '',
       resource.weight,
       resource.height,
       resource.bmi,

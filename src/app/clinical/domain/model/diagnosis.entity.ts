@@ -1,11 +1,15 @@
 /**
  * Diagnosis Entity
  * Representa un diagnóstico médico de un paciente
+ * 
+ * Backend valid values:
+ * - status: ACTIVE, CONTROLLED, RESOLVED, MONITORING
+ * - severity: LOW, MODERATE, HIGH, CRITICAL
+ * - source: NOT SUPPORTED BY BACKEND (removed)
  */
 
-export type DiagnosisStatus = 'active' | 'controlled' | 'resolved' | 'pending_confirmation';
-export type DiagnosisSeverity = 'low' | 'moderate' | 'high' | 'critical';
-export type DiagnosisSource = 'patient_reported' | 'doctor_confirmed';
+export type DiagnosisStatus = 'ACTIVE' | 'CONTROLLED' | 'RESOLVED' | 'MONITORING';
+export type DiagnosisSeverity = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
 
 // Enfermedades comunes predefinidas para auto-reporte
 export const COMMON_CONDITIONS = {
@@ -21,7 +25,7 @@ export type CommonCondition = typeof COMMON_CONDITIONS[keyof typeof COMMON_CONDI
 export interface Diagnosis {
   id: number;
   patientId: number;
-  doctorId: number | null;
+  doctorId: number;  // REQUIRED by backend
   icd10Code: string;
   diagnosisName: string;
   status: DiagnosisStatus;
@@ -34,14 +38,14 @@ export interface Diagnosis {
   lastReviewDate: string;
   createdAt: string;
   updatedAt: string;
-  source: DiagnosisSource;
+  // source field removed - NOT SUPPORTED BY BACKEND
 }
 
 export class DiagnosisEntity implements Diagnosis {
   constructor(
     public id: number,
     public patientId: number,
-    public doctorId: number | null,
+    public doctorId: number,  // REQUIRED by backend
     public icd10Code: string,
     public diagnosisName: string,
     public status: DiagnosisStatus,
@@ -53,36 +57,23 @@ export class DiagnosisEntity implements Diagnosis {
     public followUpRequired: boolean,
     public lastReviewDate: string,
     public createdAt: string,
-    public updatedAt: string,
-    public source: DiagnosisSource
+    public updatedAt: string
+    // source field removed - NOT SUPPORTED BY BACKEND
   ) {}
 
   /**
-   * Verifica si el diagnóstico está pendiente de confirmación
+   * Verifica si el diagnóstico necesita revisión (MONITORING status)
+   * Note: PENDING_CONFIRMATION no existe en el backend
    */
-  get isPendingConfirmation(): boolean {
-    return this.status === 'pending_confirmation';
-  }
-
-  /**
-   * Verifica si fue auto-reportado por el paciente
-   */
-  get isPatientReported(): boolean {
-    return this.source === 'patient_reported';
-  }
-
-  /**
-   * Verifica si está confirmado por un doctor
-   */
-  get isDoctorConfirmed(): boolean {
-    return this.source === 'doctor_confirmed';
+  get needsReview(): boolean {
+    return this.status === 'MONITORING';
   }
 
   /**
    * Verifica si el diagnóstico está activo
    */
   get isActive(): boolean {
-    return this.status === 'active' || this.status === 'controlled';
+    return this.status === 'ACTIVE' || this.status === 'CONTROLLED';
   }
 
   /**
@@ -109,11 +100,9 @@ export class DiagnosisEntity implements Diagnosis {
     const errors: string[] = [];
 
     if (!this.patientId) errors.push('Patient ID is required');
+    if (!this.doctorId) errors.push('Doctor ID is required');  // REQUIRED by backend
     if (!this.diagnosisName) errors.push('Diagnosis name is required');
     if (!this.icd10Code) errors.push('ICD-10 code is required');
-    if (this.source === 'doctor_confirmed' && !this.doctorId) {
-      errors.push('Doctor ID is required for doctor-confirmed diagnoses');
-    }
 
     return errors;
   }

@@ -21,10 +21,18 @@ export class HeaderContentComponent implements OnInit {
     const userFromStore = this.userStore.currentUser$();
     const roleFromStore = localStorage.getItem('userRole') || undefined;
 
+    console.log('🔄 [HeaderContent] currentUser computed called');
+    console.log('  📊 userFromStore:', userFromStore);
+    console.log('  📊 roleFromStore:', roleFromStore);
+
     if (userFromStore && userFromStore.id) {
       const role = (roleFromStore || userFromStore.role || 'patient') as string;
+      const userName = userFromStore.name || 'Usuario';
+      console.log('  ✅ Using UserStore data');
+      console.log('    - Name:', userName);
+      console.log('    - Role:', role);
       return {
-        name: userFromStore.name || 'Usuario',
+        name: userName,
         role: role,
         avatar: this.getRoleAvatar(role),
         email: userFromStore.email
@@ -37,14 +45,19 @@ export class HeaderContentComponent implements OnInit {
 
     if (userStr && role) {
       const user = JSON.parse(userStr);
+      const userName = user.name || 'Usuario';
+      console.log('  ✅ Using localStorage fallback');
+      console.log('    - Name:', userName);
+      console.log('    - Role:', role);
       return {
-        name: user.name || 'Usuario',
+        name: userName,
         role: role,
         avatar: this.getRoleAvatar(role),
         email: user.email
       };
     }
 
+    console.log('  ⚠️ No user data found, using defaults');
     return {
       name: 'Usuario',
       role: 'guest',
@@ -61,13 +74,22 @@ export class HeaderContentComponent implements OnInit {
   ngOnInit(): void {
     // Load user from localStorage on component init
     const userStr = localStorage.getItem('currentUser');
+    console.log('🔍 [HeaderContent] ngOnInit - Loading user from localStorage');
+    console.log('  📦 userStr:', userStr);
+    
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
+        console.log('  👤 Parsed user:', user);
+        console.log('    - Name:', user.name);
+        console.log('    - Role:', user.role);
+        console.log('    - TenantId:', user.tenantId);
         this.userStore.setCurrentUser(user);
       } catch (error) {
-        console.error('Error parsing user from localStorage:', error);
+        console.error('❌ [HeaderContent] Error parsing user from localStorage:', error);
       }
+    } else {
+      console.warn('⚠️ [HeaderContent] No user found in localStorage');
     }
   }
 

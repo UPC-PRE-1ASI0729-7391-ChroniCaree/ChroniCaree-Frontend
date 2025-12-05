@@ -4,7 +4,7 @@
  */
 
 export type PayerType = 'patient' | 'tenant';
-export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due' | 'trial' | 'suspended';
+export type SubscriptionStatus = 'active' | 'cancelled' | 'past_due' | 'trial' | 'suspended' | 'pending' | 'PENDING' | 'ACTIVE';
 export type PaymentMethod = 'credit_card' | 'debit_card' | 'paypal' | 'bank_transfer';
 
 export interface Subscription {
@@ -44,12 +44,44 @@ export class SubscriptionEntity implements Subscription {
 
   /**
    * Verifica si la suscripción está activa
+   * Incluye estados: 'active', 'ACTIVE', 'pending', 'PENDING', 'trial'
    */
   get isActive(): boolean {
-    if (this.status !== 'active') return false;
+    const activeStatuses = ['active', 'ACTIVE', 'pending', 'PENDING', 'trial'];
+    
+    console.log('🔍 [SubscriptionEntity] isActive check:', {
+      id: this.id,
+      status: this.status,
+      endDate: this.endDate,
+      startDate: this.startDate
+    });
+    
+    if (!activeStatuses.includes(this.status)) {
+      console.log('  → Status NOT in active list');
+      return false;
+    }
+    
+    // Si endDate no existe o es inválido, considerarlo activo si el status es válido
+    if (!this.endDate || this.endDate === '' || this.endDate === 'null') {
+      console.log('  → endDate invalid or missing, assuming active based on status');
+      return true;
+    }
+    
     const now = new Date();
     const endDate = new Date(this.endDate);
-    return now <= endDate;
+    
+    // Verificar si endDate es una fecha válida
+    if (Number.isNaN(endDate.getTime())) {
+      console.log('  → endDate is not a valid date, assuming active');
+      return true;
+    }
+    
+    const isNotExpired = now <= endDate;
+    console.log('  → now:', now.toISOString());
+    console.log('  → endDate:', endDate.toISOString());
+    console.log('  → isNotExpired:', isNotExpired);
+    
+    return isNotExpired;
   }
 
   /**
@@ -105,7 +137,7 @@ export class SubscriptionEntity implements Subscription {
       errors.push('Start date must be before end date');
     }
 
-    if (!this.billingEmail || !this.billingEmail.includes('@')) {
+    if (!this.billingEmail?.includes('@')) {
       errors.push('Invalid billing email');
     }
 

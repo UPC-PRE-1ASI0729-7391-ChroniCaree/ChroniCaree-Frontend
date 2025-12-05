@@ -288,9 +288,10 @@ export class DoctorRegistrationByHospitalStore {
 
   /**
    * Cuenta cuántos doctores tiene un tenant
+   * Backend endpoint: GET /doctors/by-tenant/{tenantId}
    */
   private countDoctorsByTenantId(tenantId: string): Observable<number> {
-    return this.http.get<any[]>(`${this.baseUrl}/doctors?tenantId=${tenantId}`).pipe(
+    return this.http.get<any[]>(`${this.baseUrl}/doctors/by-tenant/${tenantId}`).pipe(
       map((doctors) => doctors.length),
       catchError(() => {
         console.error('Error counting doctors for tenant');
