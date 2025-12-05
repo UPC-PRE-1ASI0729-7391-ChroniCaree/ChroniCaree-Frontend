@@ -388,25 +388,35 @@ export class RegisterHospitalComponent implements AfterViewInit {
                 console.log('✅ [RegisterHospital] Tenant updated successfully!');
                 console.log('🚀 [RegisterHospital] Redirecting to login...');
                 this.submitting.set(false);
-                // Redirect to login instead of dashboard because we need to sign in properly
-                this.router.navigate(['/iam/login']);
+                setTimeout(() => {
+                  this.router.navigate(['/iam/login']);
+                }, 100);
+
               },
               error: (err: any) => {
                 console.error('❌ [RegisterHospital] Error updating tenant subscription:', err);
                 this.submitting.set(false);
-                this.router.navigate(['/iam/login']);
+                setTimeout(() => {
+                  this.router.navigate(['/iam/login']);
+                }, 100);
+
               }
             });
           },
           error: (err: any) => {
             console.error('Error loading tenant:', err);
             this.submitting.set(false);
-            this.router.navigate(['/iam/login']);
+            setTimeout(() => {
+              this.router.navigate(['/iam/login']);
+            }, 100);
           }
         });
       } else {
         this.submitting.set(false);
-        this.router.navigate(['/iam/login']);
+        setTimeout(() => {
+          this.router.navigate(['/iam/login']);
+        }, 100);
+
       }
 
     } catch (error: any) {
