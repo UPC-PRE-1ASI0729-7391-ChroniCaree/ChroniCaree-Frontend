@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { PatientOnboardingStore } from '../../../../patients/application/patient-onboarding.store';
 
 interface ConditionOption {
@@ -12,7 +13,7 @@ interface ConditionOption {
 @Component({
   selector: 'app-patient-onboarding',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './patient-onboarding.view.html',
   styleUrls: ['./patient-onboarding.view.css']
 })
@@ -20,39 +21,35 @@ export class PatientOnboardingView {
   private readonly store = inject(PatientOnboardingStore);
   private readonly fb = inject(FormBuilder);
 
-  // Multi-step form state
   currentStep = signal<number>(1);
   totalSteps = 3;
 
-  // Forms for each step
   personalInfoForm!: FormGroup;
   medicalInfoForm!: FormGroup;
   conditionsForm!: FormGroup;
 
-  // Available conditions
   availableConditions: ConditionOption[] = [
-    { id: 'diabetes_type_1', name: 'Diabetes Tipo 1', category: 'endocrine' },
-    { id: 'diabetes_type_2', name: 'Diabetes Tipo 2', category: 'endocrine' },
-    { id: 'hypertension', name: 'Hipertensión', category: 'cardiovascular' },
-    { id: 'hyperlipidemia', name: 'Hiperlipidemia', category: 'cardiovascular' },
-    { id: 'asthma', name: 'Asma', category: 'respiratory' },
-    { id: 'copd', name: 'EPOC', category: 'respiratory' },
-    { id: 'heart_disease', name: 'Enfermedad Cardíaca', category: 'cardiovascular' },
-    { id: 'kidney_disease', name: 'Enfermedad Renal', category: 'renal' },
-    { id: 'thyroid_disorder', name: 'Trastorno Tiroideo', category: 'endocrine' },
-    { id: 'arthritis', name: 'Artritis', category: 'musculoskeletal' },
-    { id: 'depression', name: 'Depresión', category: 'mental_health' },
-    { id: 'anxiety', name: 'Ansiedad', category: 'mental_health' }
+    { id: 'diabetes_type_1', name: 'patientOnboarding.conditions.items.diabetesType1', category: 'endocrine' },
+    { id: 'diabetes_type_2', name: 'patientOnboarding.conditions.items.diabetesType2', category: 'endocrine' },
+    { id: 'hypertension', name: 'patientOnboarding.conditions.items.hypertension', category: 'cardiovascular' },
+    { id: 'hyperlipidemia', name: 'patientOnboarding.conditions.items.hyperlipidemia', category: 'cardiovascular' },
+    { id: 'asthma', name: 'patientOnboarding.conditions.items.asthma', category: 'respiratory' },
+    { id: 'copd', name: 'patientOnboarding.conditions.items.copd', category: 'respiratory' },
+    { id: 'heart_disease', name: 'patientOnboarding.conditions.items.heartDisease', category: 'cardiovascular' },
+    { id: 'kidney_disease', name: 'patientOnboarding.conditions.items.kidneyDisease', category: 'renal' },
+    { id: 'thyroid_disorder', name: 'patientOnboarding.conditions.items.thyroidDisorder', category: 'endocrine' },
+    { id: 'arthritis', name: 'patientOnboarding.conditions.items.arthritis', category: 'musculoskeletal' },
+    { id: 'depression', name: 'patientOnboarding.conditions.items.depression', category: 'mental_health' },
+    { id: 'anxiety', name: 'patientOnboarding.conditions.items.anxiety', category: 'mental_health' }
   ];
 
   selectedConditions = signal<string[]>([]);
 
-  // Loading and messages
   isSubmitting = computed(() => this.store.loading());
   errorMessage = computed(() => this.store.error());
+  validationErrorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  // Progress
   progressPercentage = computed(() => (this.currentStep() / this.totalSteps) * 100);
 
   constructor() {
@@ -115,8 +112,11 @@ export class PatientOnboardingView {
   }
 
   onSubmit(): void {
+    this.validationErrorMessage.set(null);
+    this.successMessage.set(null);
+
     if (this.personalInfoForm.invalid) {
-      this.errorMessage = signal('Por favor complete todos los campos requeridos en información personal');
+      this.validationErrorMessage.set('patientOnboarding.messages.completePersonalRequired');
       return;
     }
 
@@ -138,15 +138,13 @@ export class PatientOnboardingView {
     this.store.registerPatientWithConditions(patientData, conditions as any).subscribe({
       next: (result) => {
         if (result.success) {
-          this.successMessage.set('¡Paciente registrado exitosamente!');
+          this.successMessage.set('patientOnboarding.messages.registerSuccess');
           setTimeout(() => {
             this.resetForms();
           }, 2000);
         }
       },
-      error: (err) => {
-        console.error('Error registering patient:', err);
-      }
+      error: () => {}
     });
   }
 
@@ -164,5 +162,6 @@ export class PatientOnboardingView {
     this.selectedConditions.set([]);
     this.currentStep.set(1);
     this.successMessage.set(null);
+    this.validationErrorMessage.set(null);
   }
 }

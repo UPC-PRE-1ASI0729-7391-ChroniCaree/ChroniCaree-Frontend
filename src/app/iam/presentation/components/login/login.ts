@@ -2,7 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
+import { AuthService } from '../../../application/auth.service';
 import { PatientStore } from '../../../../patients/application/patient.store';
 import { DoctorStore } from '../../../../doctors/application/doctor.store';
 import { TotpValidatorService } from '../../../../shared/infrastructure/totp-validator.service';
@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
   pendingNavigation: string | null = null;
 
   constructor(
-    private userStore: UserStore,
+    private authService: AuthService,
     private router: Router,
     private patientStore: PatientStore,
     private doctorStore: DoctorStore,
@@ -78,100 +78,127 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.userStore.loadAllUsers().subscribe({
-      next: (users) => {
-        const user = users.find(u => u.email === email && u.password === password);
-
-        if (user) {
-          if (rememberMe) {
-            localStorage.setItem('rememberedEmail', email);
-          } else {
-            localStorage.removeItem('rememberedEmail');
-          }
-
-          if (user.role === 'patient') {
-            this.patientStore.loadAllPatients().subscribe({
-              next: (patients) => {
-                const patient = patients.find(p => p.userId === user.id);
-                const patientId = patient?.id;
-                
-                if (patientId) {
-                  const has2FA = localStorage.getItem(`patient_${patientId}_2fa_verified`) === 'true';
-                  
-                  if (has2FA) {
-                    this.authenticatedUser = { ...user, patientId };
-                    this.submitting.set(false);
-                    this.showTwoFactorVerification.set(true);
-                    this.errorMessage.set(null);
-                    
-                    this.pendingNavigation = '/patient/dashboard';
-                    return;
-                  }
-                }
-                
-                this.completeLogin(user);
-              },
-              error: (error) => {
-                console.error('Error loading patients for 2FA check:', error);
-                this.completeLogin(user);
-              }
-            });
-          } else if (user.role === 'doctor') {
-            this.doctorStore.loadAllDoctors().subscribe({
-              next: (doctors) => {
-                const doctor = doctors.find(d => d.userId === user.id);
-                const doctorId = doctor?.id;
-                
-                if (doctorId) {
-                  const has2FA = localStorage.getItem(`doctor_${doctorId}_2fa_verified`) === 'true';
-                  
-                  if (has2FA) {
-                    this.authenticatedUser = { ...user, doctorId };
-                    this.submitting.set(false);
-                    this.showTwoFactorVerification.set(true);
-                    this.errorMessage.set(null);
-                    
-                    this.pendingNavigation = '/doctor/dashboard';
-                    return;
-                  }
-                }
-                
-                this.completeLogin(user);
-              },
-              error: (error) => {
-                console.error('Error loading doctors for 2FA check:', error);
-                this.completeLogin(user);
-              }
-            });
-          } else if (user.role === 'hospital_admin') {
-            const userId = user.id;
-            const has2FA = localStorage.getItem(`hospital_admin_${userId}_2fa_verified`) === 'true';
-            
-            if (has2FA) {
-              this.authenticatedUser = { ...user };
-              this.submitting.set(false);
-              this.showTwoFactorVerification.set(true);
-              this.errorMessage.set(null);
-              
-              this.pendingNavigation = '/hospital/dashboard';
-              return;
-            } else {
-              this.completeLogin(user);
-            }
-          } else {
-            this.completeLogin(user);
-          }
+    this.authService.signIn({ email, password }).subscribe({
+      next: () => {
+        // Remember me functionality
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
         } else {
-          this.errorMessage.set('Email o contraseña incorrectos');
+          localStorage.removeItem('rememberedEmail');
+        }
+
+        const role = this.authService.getUserRole();
+        const userId = this.authService.getCurrentUserId();
+        console.log('Login successful. Detected role:', role);
+
+        // Normalize role to lowercase for comparison
+        const normalizedRole = role ? role.toLowerCase() : '';
+
+        // Check if 2FA is enabled based on role
+        if (normalizedRole.includes('patient')) {
+          this.checkPatient2FA(userId, email);
+        } else if (normalizedRole.includes('doctor')) {
+          this.checkDoctor2FA(userId, email);
+        } else if (normalizedRole.includes('hospital') || normalizedRole.includes('admin') || normalizedRole.includes('tenant')) {
+          this.checkHospitalAdmin2FA(userId, email);
+        } else {
+          console.warn('Unknown role, redirecting to home:', role);
           this.submitting.set(false);
+          this.router.navigate(['/home']);
         }
       },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.errorMessage.set('Error al conectar con el servidor. Por favor intenta de nuevo.');
+      error: (err) => {
+        console.error('Login error:', err);
         this.submitting.set(false);
+        
+        // Handle specific error messages thrown by AuthService
+        if (err.message === 'Correo electrónico o contraseña incorrectos.') {
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
+        } else if (err.status === 401 || err.status === 404) {
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
+        } else {
+          this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
+        }
       }
     });
+  }
+
+  private checkPatient2FA(userId: string, email: string): void {
+    this.patientStore.loadAllPatients().subscribe({
+      next: (patients) => {
+        const patient = patients.find(p => p.userId === userId);
+        const patientId = patient?.id;
+        
+        if (patientId) {
+          const has2FA = localStorage.getItem(`patient_${patientId}_2fa_verified`) === 'true';
+          
+          if (has2FA) {
+            this.authenticatedUser = { email, role: 'patient', patientId, userId };
+            this.submitting.set(false);
+            this.showTwoFactorVerification.set(true);
+            this.errorMessage.set(null);
+            this.pendingNavigation = '/patient/dashboard';
+            return;
+          }
+        }
+        
+        // No 2FA enabled, proceed to dashboard
+        this.submitting.set(false);
+        this.router.navigate(['/patient/dashboard']);
+      },
+      error: (error) => {
+        console.error('Error loading patients for 2FA check:', error);
+        this.submitting.set(false);
+        this.router.navigate(['/patient/dashboard']);
+      }
+    });
+  }
+
+  private checkDoctor2FA(userId: string, email: string): void {
+    this.doctorStore.loadAllDoctors().subscribe({
+      next: (doctors) => {
+        const doctor = doctors.find(d => d.userId === userId);
+        const doctorId = doctor?.id;
+        
+        if (doctorId) {
+          const has2FA = localStorage.getItem(`doctor_${doctorId}_2fa_verified`) === 'true';
+          
+          if (has2FA) {
+            this.authenticatedUser = { email, role: 'doctor', doctorId, userId };
+            this.submitting.set(false);
+            this.showTwoFactorVerification.set(true);
+            this.errorMessage.set(null);
+            this.pendingNavigation = '/doctor/dashboard';
+            return;
+          }
+        }
+        
+        // No 2FA enabled, proceed to dashboard
+        this.submitting.set(false);
+        this.router.navigate(['/doctor/dashboard']);
+      },
+      error: (error) => {
+        console.error('Error loading doctors for 2FA check:', error);
+        this.submitting.set(false);
+        this.router.navigate(['/doctor/dashboard']);
+      }
+    });
+  }
+
+  private checkHospitalAdmin2FA(userId: string, email: string): void {
+    const has2FA = localStorage.getItem(`hospital_admin_${userId}_2fa_verified`) === 'true';
+    
+    if (has2FA) {
+      this.authenticatedUser = { email, role: 'hospital_admin', userId };
+      this.submitting.set(false);
+      this.showTwoFactorVerification.set(true);
+      this.errorMessage.set(null);
+      this.pendingNavigation = '/hospital/dashboard';
+    } else {
+      // No 2FA enabled, proceed to dashboard
+      this.submitting.set(false);
+      this.router.navigate(['/hospital/dashboard']);
+    }
   }
 
   onTwoFactorCodeInput(event: Event): void {
@@ -197,7 +224,7 @@ export class LoginComponent implements OnInit {
     setTimeout(() => {
       const patientId = this.authenticatedUser?.patientId;
       const doctorId = this.authenticatedUser?.doctorId;
-      const userId = this.authenticatedUser?.id;
+      const userId = this.authenticatedUser?.userId;
       const userRole = this.authenticatedUser?.role;
       
       let savedSecret: string | null = null;
@@ -219,7 +246,7 @@ export class LoginComponent implements OnInit {
       const isValid = this.totpValidator.validateToken(code, savedSecret);
       
       if (isValid) {
-        this.completeLogin(this.authenticatedUser);
+        this.completeLogin();
       } else {
         this.errorMessage.set('Código de verificación inválido. Por favor, verifica el código en Google Authenticator.');
         this.verifyingCode.set(false);
@@ -237,20 +264,16 @@ export class LoginComponent implements OnInit {
     this.errorMessage.set(null);
   }
 
-  private completeLogin(user: any): void {
-    this.userStore.setCurrentUser(user);
-
+  private completeLogin(): void {
     setTimeout(() => {
       this.submitting.set(false);
       this.verifyingCode.set(false);
       this.showTwoFactorVerification.set(false);
       
-      const navigationPath = this.pendingNavigation || 
-        (user.role === 'patient' ? '/patient/dashboard' :
-         user.role === 'doctor' ? '/doctor/dashboard' :
-         user.role === 'hospital_admin' ? '/hospital/dashboard' : '/home');
+      if (this.pendingNavigation) {
+        this.router.navigate([this.pendingNavigation]);
+      }
       
-      this.router.navigate([navigationPath]);
       this.authenticatedUser = null;
       this.pendingNavigation = null;
     }, 300);

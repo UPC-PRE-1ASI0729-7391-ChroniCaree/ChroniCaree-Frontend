@@ -1,17 +1,24 @@
 <!-- messages/presentation/components/inbox/inbox.component.html -->
 <div class="messages-shell full-bleed">
 
-  <!-- Panel izquierdo: lista / bandeja (estilo WhatsApp) -->
   <aside class="threads-pane">
-    <!-- Header con título y acciones -->
+    <!-- Header -->
     <div class="threads-header">
       <div class="header-content">
-        <h1 class="header-title">Mensajes</h1>
+        <h1 class="header-title">{{ 'messages.inbox.title' | translate }}</h1>
         <div class="header-actions">
-          <button class="icon-btn" title="Buscar">
+          <button
+            class="icon-btn"
+            type="button"
+            [attr.title]="'messages.inbox.actions.search' | translate">
             <span>🔍</span>
           </button>
-          <a *ngIf="role === 'PATIENT'" class="icon-btn" routerLink="compose" title="Nuevo mensaje">
+
+          <a
+            *ngIf="role === 'PATIENT'"
+            class="icon-btn"
+            routerLink="compose"
+            [attr.title]="'messages.inbox.actions.newMessage' | translate">
             <span>✏️</span>
           </a>
         </div>
@@ -22,11 +29,11 @@
     <div class="search-bar">
       <div class="search-input-wrapper">
         <span class="search-icon">🔍</span>
-        <input 
-          type="search" 
-          placeholder="Buscar conversaciones..." 
-          class="search-input" 
-          aria-label="Buscar conversaciones"
+        <input
+          type="search"
+          class="search-input"
+          [placeholder]="'messages.inbox.search.placeholder' | translate"
+          [attr.aria-label]="'messages.inbox.search.aria' | translate"
         />
       </div>
     </div>
@@ -34,8 +41,8 @@
     <!-- Lista de conversaciones -->
     <div class="threads-list-container">
       <ul *ngIf="threadsVM.length > 0; else empty" class="threads-list">
-        <li 
-          *ngFor="let t of threadsVM; trackBy: trackByVmId" 
+        <li
+          *ngFor="let t of threadsVM; trackBy: trackByVmId"
           class="thread-item"
           [class.thread-unread]="t.unreadCount && t.unreadCount > 0"
           [class.thread-urgent]="t.hasUrgentMessages"
@@ -46,7 +53,10 @@
         >
           <!-- Avatar -->
           <div class="thread-avatar">
-            <div class="avatar-circle" [class.avatar-doctor]="role === 'PATIENT'" [class.avatar-patient]="role === 'DOCTOR'">
+            <div
+              class="avatar-circle"
+              [class.avatar-doctor]="role === 'PATIENT'"
+              [class.avatar-patient]="role === 'DOCTOR'">
               <span class="avatar-text">{{ role === 'PATIENT' ? 'Dr' : 'P' }}</span>
             </div>
           </div>
@@ -56,7 +66,7 @@
             <!-- Primera línea: Nombre y hora -->
             <div class="thread-top">
               <div class="thread-name">
-                {{ role === 'PATIENT' ? 'Doctor Asignado' : getPatientName(t) }}
+                {{ role === 'PATIENT' ? ('messages.inbox.assignedDoctor' | translate) : getPatientName(t) }}
               </div>
               <div class="thread-time">
                 {{ t.lastMessageAt | date:'short' }}
@@ -67,15 +77,22 @@
             <div class="thread-bottom">
               <div class="thread-message">
                 <span *ngIf="t.hasUrgentMessages" class="urgent-icon">🚨</span>
+
                 <span class="message-sender">
                   {{ getLastSender(t) }}
                 </span>
+
                 <span class="message-text">
-                  {{ t.lastSnippet || 'Sin mensajes' | slice:0:60 }}{{ (t.lastSnippet || '').length > 60 ? '...' : '' }}
+                  {{
+                    ((t.lastSnippet ? t.lastSnippet : ('messages.inbox.noMessages' | translate)) | slice:0:60)
+                  }}{{ (t.lastSnippet || '').length > 60 ? '...' : '' }}
                 </span>
               </div>
+
               <div class="thread-badges">
-                <span *ngIf="t.unreadCount && t.unreadCount > 0" class="unread-count">{{ t.unreadCount }}</span>
+                <span *ngIf="t.unreadCount && t.unreadCount > 0" class="unread-count">
+                  {{ t.unreadCount }}
+                </span>
               </div>
             </div>
           </div>
@@ -86,15 +103,18 @@
       <ng-template #empty>
         <div class="empty-state">
           <div class="empty-icon">💬</div>
-          <h3 class="empty-title">No hay conversaciones</h3>
+          <h3 class="empty-title">{{ 'messages.inbox.empty.title' | translate }}</h3>
+
           <p class="empty-text">
-            {{ role === 'PATIENT' 
-              ? 'Inicia una conversación con tu doctor'
-              : 'Tus pacientes aún no han enviado mensajes' 
+            {{
+              role === 'PATIENT'
+                ? ('messages.inbox.empty.patientText' | translate)
+                : ('messages.inbox.empty.doctorText' | translate)
             }}
           </p>
+
           <a *ngIf="role === 'PATIENT'" class="btn-new-message" routerLink="compose">
-            ✏️ Nuevo Mensaje
+            ✏️ {{ 'messages.inbox.actions.newMessage' | translate }}
           </a>
         </div>
       </ng-template>
@@ -103,15 +123,15 @@
 
   <!-- Panel derecho: detalle / chat (ocupa resto) -->
   <section class="detail-pane">
-      <div class="detail-inner">
+    <div class="detail-inner">
       <router-outlet></router-outlet>
-      <!-- Placeholder cuando no hay hilo seleccionado: mejora UX visual -->
+
+      <!-- Placeholder cuando no hay hilo seleccionado -->
       <div *ngIf="!hasDetail()" class="detail-empty center">
-        <h3>Selecciona una conversación para comenzar a chatear</h3>
-        <p class="muted">Aquí verás el chat cuando selecciones una conversación. Puedes responder desde el panel derecho.</p>
+        <h3>{{ 'messages.detailEmpty.title' | translate }}</h3>
+        <p class="muted">{{ 'messages.detailEmpty.subtitle' | translate }}</p>
       </div>
     </div>
   </section>
-
 
 </div>

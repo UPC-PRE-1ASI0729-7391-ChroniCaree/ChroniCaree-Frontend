@@ -7,11 +7,11 @@ export const environment = {
   production: false,
   
   // Base API URL
-  apiBaseUrl: 'http://localhost:3000',
+  apiBaseUrl: 'http://localhost:11083/api/v1',
   
   // === IAM Bounded Context ===
   usersEndpointPath: '/users',
-  authEndpointPath: '/auth',
+  authEndpointPath: '/authentication',
   
   // === Tenants Bounded Context ===
   tenantsEndpointPath: '/tenants',

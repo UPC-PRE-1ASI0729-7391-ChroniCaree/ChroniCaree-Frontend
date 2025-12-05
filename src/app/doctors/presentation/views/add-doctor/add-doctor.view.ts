@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HospitalDashboardStore } from '../../../../tenants/application/hospital-dashboard.store';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 interface DoctorForm {
   name: string;
@@ -10,8 +11,7 @@ interface DoctorForm {
   email: string;
   phone: string;
   licenseNumber: string;
-
-  // ✅ NUEVO
+  dni: string; 
   password: string;
   confirmPassword: string;
 }
@@ -19,13 +19,18 @@ interface DoctorForm {
 @Component({
   selector: 'app-add-doctor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule
+  ],
   templateUrl: './add-doctor.view.html',
   styleUrls: ['./add-doctor.view.css']
 })
 export class AddDoctorView {
   private dashboardStore = inject(HospitalDashboardStore);
   private router = inject(Router);
+  private translate = inject(TranslateService); // 3. Inyectar el servicio de traducción
 
   form = signal<DoctorForm>({
     name: '',
@@ -33,6 +38,7 @@ export class AddDoctorView {
     email: '',
     phone: '',
     licenseNumber: '',
+    dni: '',
     password: '',
     confirmPassword: ''
   });
@@ -41,7 +47,6 @@ export class AddDoctorView {
   error = signal<string | null>(null);
   success = signal<boolean>(false);
 
-  // ✅ NUEVO: mostrar/ocultar
   showPassword = signal<boolean>(false);
   showConfirmPassword = signal<boolean>(false);
 
@@ -83,7 +88,6 @@ export class AddDoctorView {
   }
 
   private generateSecurePassword(length = 12): string {
-    // sin caracteres ambiguos
     const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
     const lower = 'abcdefghijkmnopqrstuvwxyz';
     const digits = '23456789';
@@ -102,7 +106,6 @@ export class AddDoctorView {
 
     const pick = (set: string) => set[rand(set.length)];
 
-    // asegura complejidad mínima
     let pass = pick(upper) + pick(lower) + pick(digits) + pick(symbols);
     while (pass.length < length) pass += pick(all);
 
@@ -122,38 +125,50 @@ export class AddDoctorView {
     const f = this.form();
 
     if (!f.name.trim()) {
-      this.error.set('El nombre es requerido');
+      this.error.set(this.translate.instant('common.errors.required'));
       return false;
     }
 
     if (!f.specialty) {
-      this.error.set('La especialidad es requerida');
+      this.error.set(this.translate.instant('common.errors.required'));
       return false;
     }
 
     if (!f.email.trim() || !this.isValidEmail(f.email)) {
-      this.error.set('Email inválido');
+      this.error.set(this.translate.instant('hospital.profileEdit.errors.email'));
       return false;
     }
 
     if (!f.phone.trim()) {
-      this.error.set('El teléfono es requerido');
+      this.error.set(this.translate.instant('common.errors.required'));
       return false;
     }
 
     if (!f.licenseNumber.trim()) {
-      this.error.set('El número de licencia es requerido');
+      this.error.set(this.translate.instant('common.errors.required'));
       return false;
     }
 
-    // ✅ NUEVO: password obligatorio
+
+    // Validar DNI (requerido por backend, mínimo 8 caracteres)
+    if (!f.dni.trim()) {
+      this.error.set('El DNI es requerido');
+      return false;
+    }
+
+    if (f.dni.trim().length < 8 || f.dni.trim().length > 20) {
+      this.error.set('El DNI debe tener entre 8 y 20 caracteres');
+      return false;
+    }
+
+
     if (!f.password || !f.confirmPassword) {
-      this.error.set('La contraseña y su confirmación son requeridas');
+      this.error.set(this.translate.instant('common.errors.required'));
       return false;
     }
 
     if (f.password.length < 8) {
-      this.error.set('La contraseña debe tener al menos 8 caracteres');
+      this.error.set(this.translate.instant('common.errors.minlength', { min: 8 }));
       return false;
     }
 
@@ -176,14 +191,12 @@ export class AddDoctorView {
     const tenantId = currentUser.tenantId;
 
     if (!tenantId) {
-      this.error.set('No se encontró el hospital asociado');
+      this.error.set(this.translate.instant('hospital.profileEdit.snack.noTenant'));
       this.submitting.set(false);
       return;
     }
-
     const f = this.form();
 
-    // Separar nombre en firstName y lastName
     const nameParts = f.name.trim().replace(/\s+/g, ' ').split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || nameParts[0] || '';
@@ -191,15 +204,14 @@ export class AddDoctorView {
     const request = {
       tenantId,
       email: f.email.trim(),
-      // ✅ ahora sale del formulario (NO default/temporal)
       password: f.password,
       firstName,
       lastName,
       licenseNumber: f.licenseNumber.trim(),
       specialty: f.specialty,
-      phone: f.phone.trim()
+      phone: f.phone.trim(),
+      dni: f.dni.trim() // DNI requerido por backend
     };
-
     this.dashboardStore.registerDoctorAsAdmin(request).subscribe({
       next: () => {
         this.success.set(true);
@@ -216,7 +228,6 @@ export class AddDoctorView {
       }
     });
   }
-
   cancel(): void {
     this.router.navigate(['/hospital/doctors']);
   }

@@ -2,25 +2,29 @@
   <!-- Header -->
   <div class="page-header">
     <div class="header-content">
-      <button mat-icon-button routerLink="/patient/dashboard" class="back-button">
+      <button mat-icon-button routerLink="/patient/dashboard" class="back-button"
+              [attr.aria-label]="'common.back' | translate">
         <mat-icon>arrow_back</mat-icon>
       </button>
+
       <div class="header-text">
-        <h1>Recordatorios</h1>
-        <p>Gestiona tus notificaciones y recordatorios importantes</p>
+        <h1>{{ 'nudgesPage.title' | translate }}</h1>
+        <p>{{ 'nudgesPage.subtitle' | translate }}</p>
       </div>
     </div>
+
     <div class="header-actions">
       <div class="stat-card">
         <mat-icon class="stat-icon">notifications_active</mat-icon>
         <div class="stat-content">
           <span class="stat-value">{{ activeCount() }}</span>
-          <span class="stat-label">Activos</span>
+          <span class="stat-label">{{ 'nudgesPage.active' | translate }}</span>
         </div>
       </div>
+
       <button mat-raised-button color="primary" (click)="toggleCreateForm()" class="create-btn">
         <mat-icon>add</mat-icon>
-        Crear Recordatorio
+        {{ 'nudgesPage.createReminder' | translate }}
       </button>
     </div>
   </div>
@@ -30,7 +34,7 @@
     @if (loading()) {
       <div class="loading-state">
         <div class="spinner"></div>
-        <p>Cargando recordatorios...</p>
+        <p>{{ 'nudges.loading' | translate }}</p>
       </div>
     } @else {
       <div class="nudges-full-panel">
@@ -39,32 +43,42 @@
           <div class="create-reminder-form">
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Título</mat-label>
-                <input matInput placeholder="Ej: Tomar medicamento" [(ngModel)]="createTitle" />
+                <mat-label>{{ 'nudgesPage.form.titleLabel' | translate }}</mat-label>
+                <input
+                  matInput
+                  [placeholder]="'nudgesPage.form.titlePlaceholder' | translate"
+                  [(ngModel)]="createTitle" />
               </mat-form-field>
+
               <mat-form-field appearance="outline" class="form-field form-field-wide">
-                <mat-label>Mensaje</mat-label>
-                <input matInput placeholder="Detalles del recordatorio" [(ngModel)]="createMessage" />
+                <mat-label>{{ 'nudgesPage.form.messageLabel' | translate }}</mat-label>
+                <input
+                  matInput
+                  [placeholder]="'nudgesPage.form.messagePlaceholder' | translate"
+                  [(ngModel)]="createMessage" />
               </mat-form-field>
             </div>
+
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Prioridad</mat-label>
+                <mat-label>{{ 'nudgesPage.form.priorityLabel' | translate }}</mat-label>
                 <mat-select [(ngModel)]="createPriority">
-                  <mat-option [value]="'low'">🟢 Baja</mat-option>
-                  <mat-option [value]="'medium'">🟡 Media</mat-option>
-                  <mat-option [value]="'high'">🟠 Alta</mat-option>
-                  <mat-option [value]="'urgent'">🔴 Urgente</mat-option>
+                  <mat-option [value]="NudgePriority.LOW">🟢 {{ 'nudgesPage.form.priority.low' | translate }}</mat-option>
+                  <mat-option [value]="NudgePriority.MEDIUM">🟡 {{ 'nudgesPage.form.priority.medium' | translate }}</mat-option>
+                  <mat-option [value]="NudgePriority.HIGH">🟠 {{ 'nudgesPage.form.priority.high' | translate }}</mat-option>
+                  <mat-option [value]="NudgePriority.URGENT">🔴 {{ 'nudgesPage.form.priority.urgent' | translate }}</mat-option>
                 </mat-select>
               </mat-form-field>
+
               <div class="form-actions">
                 <button mat-raised-button color="primary" (click)="createNudge()">
                   <mat-icon>check</mat-icon>
-                  Guardar
+                  {{ 'common.save' | translate }}
                 </button>
+
                 <button mat-button (click)="toggleCreateForm()">
                   <mat-icon>close</mat-icon>
-                  Cancelar
+                  {{ 'common.cancel' | translate }}
                 </button>
               </div>
             </div>

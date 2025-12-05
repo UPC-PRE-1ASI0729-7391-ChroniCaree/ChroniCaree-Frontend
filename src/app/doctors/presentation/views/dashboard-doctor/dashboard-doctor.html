@@ -1,14 +1,10 @@
-<div class="dashboard-container">
-  <!-- Onboarding Component -->
-  <app-onboarding />
 <!-- dashboard-doctor.html -->
 <div class="dashboard-container" #printArea id="print-area">
   <!-- Header Section -->
-
   <div class="dashboard-header">
     <div class="welcome-section">
-  <h1 class="h1">{{ 'doctors.welcome' | translate:{name: doctorName()} }}</h1>
-  <p class="text">{{ specialty() }}</p>
+      <h1 class="h1">{{ 'doctors.welcome' | translate:{name: doctorName()} }}</h1>
+      <p class="text">{{ specialty() }}</p>
     </div>
 
     <div class="quick-actions" data-html2canvas-ignore="true">
@@ -19,14 +15,14 @@
           <path d="M15 2v5h5" stroke="currentColor" stroke-width="2"/>
           <path d="M7.5 16h1.5a2 2 0 0 0 0-4H7.5v4zM12 12v4m0 0h1.2a1.8 1.8 0 1 0 0-3.6H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-  {{ exporting() ? ('doctors.exporting' | translate) : ('doctors.exportPdf' | translate) }}
+        {{ exporting() ? ('doctors.exporting' | translate) : ('doctors.exportPdf' | translate) }}
       </button>
 
-      <a routerLink="/appointments/schedule" class="btn btn-primary">
+      <a routerLink="/doctor/appointments/schedule" class="btn btn-primary">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-  {{ 'doctors.newAppointment' | translate }}
+        {{ 'doctors.newAppointment' | translate }}
       </a>
     </div>
   </div>
@@ -41,7 +37,8 @@
         </svg>
       </div>
       <div class="stat-content">
-  <p class="stat-label">{{ 'doctors.appointmentsToday' | translate }}</p>
+        <!-- CORREGIDO: appointmentsToday -->
+        <p class="stat-label">{{ 'doctors.appointmentsToday' | translate }}</p>
         <p class="stat-value">{{ todayAppointments() }}</p>
       </div>
     </div>
@@ -53,7 +50,7 @@
         </svg>
       </div>
       <div class="stat-content">
-  <p class="stat-label">{{ 'doctors.pendingReviews' | translate }}</p>
+        <p class="stat-label">{{ 'doctors.pendingReviews' | translate }}</p>
         <p class="stat-value">{{ pendingReviews() }}</p>
       </div>
     </div>
@@ -68,7 +65,7 @@
         </svg>
       </div>
       <div class="stat-content">
-  <p class="stat-label">{{ 'doctors.activePatients' | translate }}</p>
+        <p class="stat-label">{{ 'doctors.activePatients' | translate }}</p>
         <p class="stat-value">{{ activePatients() }}</p>
       </div>
     </div>
@@ -76,11 +73,12 @@
 
   <!-- Main Content Grid -->
   <div class="content-grid">
-    <!-- Upcoming Appointments -->
+
     <div class="card">
       <div class="card-header">
-  <h2 class="h3">{{ 'doctors.todaysAppointments' | translate }}</h2>
-  <a routerLink="/appointments" class="link-primary">{{ 'doctors.viewAll' | translate }}</a>
+
+        <h2 class="h3">{{ 'doctors.appointmentsToday' | translate }}</h2>
+        <a routerLink="/appointments" class="link-primary">{{ 'doctors.viewAll' | translate }}</a>
       </div>
       <div class="appointments-list">
         @if (upcomingAppointments().length === 0) {
@@ -117,10 +115,9 @@
 
     <!-- Critical Alerts -->
     <div class="card">
-      <div class="card-header">
-        <h2 class="h3">Alertas Críticas</h2>
-
-        <a routerLink="/health-alerts" class="link-danger">Ver todas</a>
+      <div class="card-header">>
+        <h2 class="h3">{{ 'doctors.criticalAlerts' | translate }}</h2>
+        <a routerLink="/health-alerts" class="link-danger">{{ 'doctors.viewAll' | translate }}</a>
       </div>
       <div class="alerts-list">
         @if (criticalAlerts().length === 0) {
@@ -129,7 +126,7 @@
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
               <path d="M12 8V12M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            <p>No hay alertas críticas</p>
+            <p>{{ 'doctors.noCriticalAlerts' | translate }}</p>
           </div>
         }
         @for (alert of criticalAlerts(); track alert.id) {
@@ -159,11 +156,12 @@
           <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
           <path d="M14 2V8H20M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-        Historiales Pendientes de Revisión
+        {{ 'doctors.pendingReviewsTitle' | translate }}
       </h2>
-      <a routerLink="/medical-records" class="link-primary">Ver todos</a>
+
+      <a routerLink="/medical-records" class="link-primary">{{ 'doctors.viewAll' | translate }}</a>
     </div>
-    
+
     <div class="pending-records-grid">
       @if (pendingRecords().length === 0) {
         <div class="empty-state-large">
@@ -198,26 +196,25 @@
   <!-- Quick Stats Section -->
   <div class="quick-stats-section">
     <div class="section-header">
-  <h2 class="h2">{{ 'doctors.weeklySummary' | translate }}</h2>
+      <h2 class="h2">{{ 'doctors.weeklySummary' | translate }}</h2>
     </div>
     <div class="quick-stats-grid">
       <div class="quick-stat">
         <div class="stat-number">{{ weeklyStats().consultations }}</div>
-  <div class="stat-description">{{ 'doctors.consultations' | translate }}</div>
+        <div class="stat-description">{{ 'doctors.consultations' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ pendingReviews() }}</div>
-  <div class="stat-description">{{ 'doctors.pendingReviews' | translate }}</div>
+        <div class="stat-description">{{ 'doctors.pendingReviews' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ activePatients() }}</div>
-  <div class="stat-description">{{ 'doctors.activePatients' | translate }}</div>
+        <div class="stat-description">{{ 'doctors.activePatients' | translate }}</div>
       </div>
       <div class="quick-stat">
         <div class="stat-number">{{ weeklyStats().avgDuration }}</div>
-  <div class="stat-description">{{ 'doctors.avgDuration' | translate }}</div>
+        <div class="stat-description">{{ 'doctors.avgDuration' | translate }}</div>
       </div>
     </div>
   </div>
-</div>
 </div>

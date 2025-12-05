@@ -2,10 +2,7 @@
   <div class="header-container">
     <!-- Actions Section -->
     <div class="actions-section">
-      <!-- Language Switcher -->
       <app-language-switcher></app-language-switcher>
-
-      <!-- User Menu -->
       <div class="action-item">
         <button
           class="user-btn"
@@ -41,7 +38,7 @@
                   [routerLink]="getProfileRoute()"
                   (click)="closeMenus()"
                   class="menu-link">
-                  👤 Mi Perfil
+                  👤 {{ 'header.menu.profile' | translate }}
                 </a>
               </li>
 
@@ -51,7 +48,7 @@
                   [routerLink]="'/tutorial'"
                   (click)="closeMenus()"
                   class="menu-link">
-                  ❓ Ayuda
+                  ❓ {{ 'header.menu.help' | translate }}
                 </a>
               </li>
 
@@ -61,7 +58,7 @@
                 <button
                   (click)="logout()"
                   class="menu-link logout">
-                  🚪 Cerrar Sesión
+                  🚪 {{ 'common.logout' | translate }}
                 </button>
               </li>
             </ul>

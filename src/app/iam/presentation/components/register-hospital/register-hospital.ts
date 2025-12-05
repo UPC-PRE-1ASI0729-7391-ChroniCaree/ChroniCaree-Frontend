@@ -3,9 +3,8 @@ import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
+import { AuthService } from '../../../application/auth.service';
 import { TenantStore } from '../../../../tenants/application/tenant.store';
-import { User } from '../../../domain/model/user.entity';
 import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
 import { SubscriptionPlanEntity } from '../../../../subscriptions/domain/model/subscription-plan.entity';
 import { PaymentStore } from '../../../../payments/application/payment.store';
@@ -37,12 +36,12 @@ interface HospitalRegistrationForm {
 export class RegisterHospitalComponent implements AfterViewInit {
   @ViewChild('cardElement') cardElement!: ElementRef;
 
-  private userStore = inject(UserStore);
-  private tenantStore = inject(TenantStore);
-  private subscriptionService = inject(SubscriptionService);
-  private paymentStore = inject(PaymentStore);
-  private stripeService = inject(StripeService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly tenantStore = inject(TenantStore);
+  private readonly subscriptionService = inject(SubscriptionService);
+  private readonly paymentStore = inject(PaymentStore);
+  private readonly stripeService = inject(StripeService);
+  private readonly router = inject(Router);
 
   form = signal<HospitalRegistrationForm>({
     email: '',
@@ -170,6 +169,11 @@ export class RegisterHospitalComponent implements AfterViewInit {
       this.errorMessage.set('Todos los campos son requeridos');
       return false;
     }
+    // Basic email format validation
+    if (!this.isValidEmail(f.email)) {
+      this.errorMessage.set('El correo electrónico no es válido');
+      return false;
+    }
     if (f.password !== f.confirmPassword) {
       this.errorMessage.set('Las contraseñas no coinciden');
       return false;
@@ -188,6 +192,14 @@ export class RegisterHospitalComponent implements AfterViewInit {
       this.errorMessage.set('Todos los campos son requeridos');
       return false;
     }
+    if (f.hospitalName.trim().length < 2) {
+      this.errorMessage.set('El nombre del hospital debe tener al menos 2 caracteres');
+      return false;
+    }
+    if (!this.isValidPhone(f.phone)) {
+      this.errorMessage.set('El teléfono debe contener solo dígitos (6-15)');
+      return false;
+    }
     this.errorMessage.set(null);
     return true;
   }
@@ -202,6 +214,17 @@ export class RegisterHospitalComponent implements AfterViewInit {
     return true;
   }
 
+  private isValidEmail(email: string): boolean {
+    const trimmed = (email || '').trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return emailRegex.test(trimmed);
+  }
+
+  private isValidPhone(phone: string): boolean {
+    const digits = (phone || '').trim().replaceAll(/\D/g, '');
+    return digits.length >= 6 && digits.length <= 15;
+  }
+
   onNextStep(): void {
     if (this.currentStep() === 1 && this.validateStep1()) {
       this.nextStep();
@@ -213,101 +236,88 @@ export class RegisterHospitalComponent implements AfterViewInit {
       return;
     }
 
-    // Crear usuario y tenant ANTES de ir al paso 3
+    // ✅ Nuevo flujo: Usar el endpoint correcto que realiza la operación en una sola transacción atómica
     this.submitting.set(true);
     const f = this.form();
 
-    // Crear el usuario (admin del hospital)
-    const newUser: User = {
-      id: Date.now(),
+    console.log('🚀 [RegisterHospital] Starting hospital admin registration (ONE REQUEST)...');
+    console.log('📧 Email:', f.email);
+    console.log('🏥 Hospital Name:', f.hospitalName);
+
+    // ✅ Un solo request - Operación en una transacción atómica
+    this.authService.signUpHospitalAdmin({
+      // User data
       email: f.email,
       password: f.password,
-      role: 'hospital_admin',
       name: f.adminName,
-      isVerified: false,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-      tenantId: null
-    };
+      
+      // Hospital data
+      hospitalName: f.hospitalName,
+      hospitalPhone: f.phone,
+      hospitalAddress: f.address
+    }).subscribe({
+      next: (response: any) => {
+        console.log('✅ [RegisterHospital] Hospital admin registration successful!');
+        console.log('📦 Full Response:', response);
+        console.log('🎫 AccessToken:', response.accessToken ? 'Present' : 'Missing');
+        console.log('🔄 RefreshToken:', response.refreshToken ? 'Present' : 'Missing');
+        console.log('👤 User:', response.user);
+        console.log('🏥 Tenant:', response.user?.tenant || response.tenant);
 
-    this.userStore.createUser(newUser).subscribe({
-      next: (user: User) => {
-        // Crear el tenant (hospital) con todos los datos
-        const tenantId = Date.now();
-        const newTenant: any = {
-          id: tenantId,
-          adminUserId: user.id,
-          name: f.hospitalName,
-          address: f.address,
-          phone: f.phone,
-          email: f.email,
-          status: 'pending',
-          subscriptionId: null,
-          registrationDate: new Date().toISOString(),
-          settings: {
-            allowIndependentDoctors: false,
-            requirePatientApproval: true,
-            maxDoctors: 5
-          }
-        };
+        // Estructura de respuesta del backend:
+        // { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant: {...} } }
+        const userId = response.user?.id;
+        const tenantId = response.user?.tenantId;
+        const tenant = response.user?.tenant || response.tenant;
 
-        this.tenantStore.createTenant(newTenant).subscribe({
-          next: (tenant: any) => {
-            // Actualizar el usuario con el tenantId
-            const updatedUser = { ...user, tenantId: tenant.id };
+        if (!tenantId) {
+          console.error('❌ ERROR: Backend no devolvió tenantId en response.user.tenantId');
+          this.submitting.set(false);
+          this.errorMessage.set('Error: No se pudo crear el hospital. Por favor contacte al administrador.');
+          return;
+        }
 
-            // Actualizar el usuario en la base de datos
-            this.userStore.updateUser(updatedUser).subscribe({
-              next: () => {
-                // Guardar datos en el componente
-                this.createdUserId = updatedUser.id;
-                this.createdTenantId = tenant.id;
+        // Guardar los IDs para uso posterior
+        this.createdUserId = userId;
+        this.createdTenantId = tenantId;
 
-                // Guardar en localStorage
-                localStorage.setItem('currentUser', JSON.stringify({
-                  id: updatedUser.id,
-                  email: updatedUser.email,
-                  role: updatedUser.role,
-                  name: updatedUser.name,
-                  tenantId: tenant.id
-                }));
+        console.log('💾 IDs saved - User:', this.createdUserId, ', Tenant:', this.createdTenantId);
+        if (tenant) {
+          console.log('🏥 Hospital Name:', tenant.name);
+          console.log('🏥 Hospital Status:', tenant.status);
+        }
+        console.log('✅ Session saved with tenantId (by authService)');
 
-                // Cargar planes disponibles
-                this.loadPlans();
+        console.log('📋 [RegisterHospital] Loading subscription plans...');
+        // Cargar planes de suscripción
+        this.loadPlans();
 
-                // Pasar al paso 3 (selección de plan)
-                this.submitting.set(false);
-                this.nextStep();
-              },
-              error: (err: any) => {
-                console.error('Error updating user tenantId:', err);
-                // Even if user update fails, proceed with what we have
-                this.createdUserId = user.id;
-                this.createdTenantId = tenant.id;
-                localStorage.setItem('currentUser', JSON.stringify({
-                  id: user.id,
-                  email: user.email,
-                  role: user.role,
-                  name: user.name,
-                  tenantId: tenant.id
-                }));
-                this.loadPlans();
-                this.submitting.set(false);
-                this.nextStep();
-              }
-            });
-          },
-          error: (err: any) => {
-            this.submitting.set(false);
-            this.errorMessage.set('Error al crear el hospital: ' + (err.message || 'Error desconocido'));
-            console.error('Error creating tenant:', err);
-          }
-        });
+        // Avanzar al paso 3 (pago)
+        this.submitting.set(false);
+        console.log('➡️ [RegisterHospital] Proceeding to step 3 (payment)');
+        this.nextStep();
       },
       error: (err: any) => {
         this.submitting.set(false);
-        this.errorMessage.set('Error al crear el usuario: ' + (err.message || 'Error desconocido'));
-        console.error('Error creating user:', err);
+        
+        console.error('❌ [RegisterHospital] Hospital admin registration FAILED');
+        console.error('Error object:', err);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
+        console.error('Error body:', err.error);
+        
+        // Manejo de errores específicos
+        const errorMsg = err.error?.message || err.error?.error || err.message || 'Error desconocido';
+        
+        if (errorMsg.includes('Email already exists') || errorMsg.includes('ya está registrado')) {
+          this.errorMessage.set('⚠️ Este correo electrónico ya está registrado. Por favor inicia sesión.');
+        } else if (errorMsg.includes('Hospital name already exists') || errorMsg.includes('hospital ya existe')) {
+          this.errorMessage.set('⚠️ Ya existe un hospital con este nombre. Por favor usa otro nombre.');
+        } else {
+          this.errorMessage.set('❌ Error al registrar el hospital: ' + errorMsg);
+        }
+        
+        console.error('📋 [RegisterHospital] User-friendly error message:', this.errorMessage());
       }
     });
   }
@@ -329,6 +339,7 @@ export class RegisterHospitalComponent implements AfterViewInit {
       }
 
       // Procesar el pago con Stripe
+      console.log('💳 [RegisterHospital] Processing payment with Stripe...');
       const payment = await this.paymentStore.processPayment(
         0, // subscriptionId será 0 por ahora
         this.createdTenantId,
@@ -336,8 +347,14 @@ export class RegisterHospitalComponent implements AfterViewInit {
         selectedPlan.price,
         this.cardholderName()
       );
+      console.log('✅ [RegisterHospital] Payment processed:', payment);
 
       // Crear la suscripción
+      console.log('📋 [RegisterHospital] Creating subscription...');
+      console.log('  - payerType: tenant');
+      console.log('  - payerId:', this.createdTenantId);
+      console.log('  - planId:', selectedPlan.id);
+      
       const subscription = await firstValueFrom(this.subscriptionService.create({
         payerType: 'tenant',
         payerId: this.createdTenantId,
@@ -346,91 +363,60 @@ export class RegisterHospitalComponent implements AfterViewInit {
         paymentMethod: 'credit_card',
         billingEmail: this.form().email
       }));
+      
+      console.log('✅ [RegisterHospital] Subscription created:', subscription);
 
       // Actualizar el tenant con el subscriptionId
-      if (subscription && subscription.id) {
+      if (subscription?.id) {
+        console.log('🔄 [RegisterHospital] Updating tenant with subscriptionId:', subscription.id);
+        
         // Cargar tenant actual y actualizarlo
         this.tenantStore.loadTenantById(this.createdTenantId).subscribe({
           next: (tenant) => {
+            console.log('✅ [RegisterHospital] Tenant loaded:', tenant);
+            
             const updatedTenant: any = {
               ...tenant,
               subscriptionId: subscription.id,
               status: 'active' as any
             };
 
+            console.log('🔄 [RegisterHospital] Updating tenant to:', updatedTenant);
+
             this.tenantStore.updateTenant(updatedTenant).subscribe({
               next: () => {
+                console.log('✅ [RegisterHospital] Tenant updated successfully!');
+                console.log('🚀 [RegisterHospital] Redirecting to login...');
                 this.submitting.set(false);
-                // Ensure currentUser is properly set with all required fields
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
-                // Add small delay to ensure localStorage is written
                 setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
+                  this.router.navigate(['/iam/login']);
                 }, 100);
+
               },
               error: (err: any) => {
-                console.error('Error updating tenant subscription:', err);
-                // Continuar de todos modos
+                console.error('❌ [RegisterHospital] Error updating tenant subscription:', err);
                 this.submitting.set(false);
-                const currentUser = {
-                  id: this.createdUserId!,
-                  email: this.form().email,
-                  role: 'hospital_admin',
-                  name: this.form().adminName,
-                  tenantId: this.createdTenantId,
-                  isVerified: true
-                };
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
                 setTimeout(() => {
-                  window.location.href = '/hospital/dashboard';
+                  this.router.navigate(['/iam/login']);
                 }, 100);
+
               }
             });
           },
           error: (err: any) => {
             console.error('Error loading tenant:', err);
-            // Continuar de todos modos
             this.submitting.set(false);
-            const currentUser = {
-              id: this.createdUserId!,
-              email: this.form().email,
-              role: 'hospital_admin',
-              name: this.form().adminName,
-              tenantId: this.createdTenantId,
-              isVerified: true
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
             setTimeout(() => {
-              window.location.href = '/hospital/dashboard';
+              this.router.navigate(['/iam/login']);
             }, 100);
           }
         });
       } else {
         this.submitting.set(false);
-        const currentUser = {
-          id: this.createdUserId!,
-          email: this.form().email,
-          role: 'hospital_admin',
-          name: this.form().adminName,
-          tenantId: this.createdTenantId,
-          isVerified: true
-        };
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-
         setTimeout(() => {
-          window.location.href = '/hospital/dashboard';
+          this.router.navigate(['/iam/login']);
         }, 100);
+
       }
 
     } catch (error: any) {
@@ -465,10 +451,10 @@ export class RegisterHospitalComponent implements AfterViewInit {
 
     // If features already contains tenant fields, return them preserving
     // sentinel values (e.g. -1 for unlimited).
-    if (typeof features.maxDoctors !== 'undefined' || typeof features.maxPatients !== 'undefined') {
+    if (features.maxDoctors !== undefined || features.maxPatients !== undefined) {
       return {
-        maxDoctors: typeof features.maxDoctors !== 'undefined' ? features.maxDoctors : 0,
-        maxPatients: typeof features.maxPatients !== 'undefined' ? features.maxPatients : 0,
+        maxDoctors: features.maxDoctors ?? 0,
+        maxPatients: features.maxPatients ?? 0,
         advancedAnalytics: !!features.advancedAnalytics,
         customBranding: !!features.customBranding,
         support: features.support ?? 'email'

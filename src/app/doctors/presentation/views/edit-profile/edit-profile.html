@@ -4,35 +4,35 @@
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="header-text">
-      <h1>Editar Perfil Profesional</h1>
-      <p>Actualiza tu información profesional y de contacto</p>
+      <h1>{{ 'doctors.profileEdit.title' | translate }}</h1>
+      <p>{{ 'doctors.profileEdit.subtitle' | translate }}</p>
     </div>
   </div>
 
   @if (loading()) {
     <div class="loading-overlay">
       <mat-spinner diameter="50"></mat-spinner>
-      <p>Cargando información del perfil...</p>
+      <p>{{ 'doctors.profileEdit.loading' | translate }}</p>
     </div>
   }
 
   <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
-    
+
     <!-- Información Personal -->
     <mat-card class="section-card">
       <mat-card-header>
         <div class="section-icon personal-icon">
           <mat-icon>person</mat-icon>
         </div>
-        <mat-card-title>Información Personal</mat-card-title>
-        <mat-card-subtitle>Datos básicos de identificación</mat-card-subtitle>
+        <mat-card-title>{{ 'doctors.profileEdit.sections.personal.title' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'doctors.profileEdit.sections.personal.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="firstName" placeholder="Ej: María" />
+            <mat-label>{{ 'common.firstName' | translate }}</mat-label>
+            <input matInput formControlName="firstName" [placeholder]="'doctors.profileEdit.placeholders.firstName' | translate" />
             <mat-icon matPrefix>badge</mat-icon>
             @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
               <mat-error>{{ getErrorMessage('firstName') }}</mat-error>
@@ -40,8 +40,8 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Apellido</mat-label>
-            <input matInput formControlName="lastName" placeholder="Ej: López" />
+            <mat-label>{{ 'common.lastName' | translate }}</mat-label>
+            <input matInput formControlName="lastName" [placeholder]="'doctors.profileEdit.placeholders.lastName' | translate" />
             <mat-icon matPrefix>badge</mat-icon>
             @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
               <mat-error>{{ getErrorMessage('lastName') }}</mat-error>
@@ -51,7 +51,7 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>DNI</mat-label>
+            <mat-label>{{ 'common.dniLabel' | translate }}</mat-label>
             <input matInput formControlName="dni" placeholder="12345678" maxlength="8" />
             <mat-icon matPrefix>credit_card</mat-icon>
             @if (profileForm.get('dni')?.invalid && profileForm.get('dni')?.touched) {
@@ -60,7 +60,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Teléfono</mat-label>
+            <mat-label>{{ 'common.phone' | translate }}</mat-label>
             <input matInput formControlName="phone" placeholder="+51 999 888 777" />
             <mat-icon matPrefix>phone</mat-icon>
             @if (profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched) {
@@ -77,15 +77,15 @@
         <div class="section-icon professional-icon">
           <mat-icon>medical_services</mat-icon>
         </div>
-        <mat-card-title>Información Profesional</mat-card-title>
-        <mat-card-subtitle>Credenciales y especialización médica</mat-card-subtitle>
+        <mat-card-title>{{ 'doctors.profileEdit.sections.professional.title' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'doctors.profileEdit.sections.professional.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Especialidad</mat-label>
-            <mat-select formControlName="specialty" placeholder="Selecciona tu especialidad">
+            <mat-label>{{ 'doctors.profileEdit.fields.specialty' | translate }}</mat-label>
+            <mat-select formControlName="specialty" [placeholder]="'doctors.profileEdit.placeholders.specialty' | translate">
               @for (specialty of specialties; track specialty) {
                 <mat-option [value]="specialty">{{ specialty }}</mat-option>
               }
@@ -97,8 +97,8 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Número de Colegiatura</mat-label>
-            <input matInput formControlName="licenseNumber" placeholder="Ej: CMP-12345" />
+            <mat-label>{{ 'doctors.profileEdit.fields.licenseNumber' | translate }}</mat-label>
+            <input matInput formControlName="licenseNumber" [placeholder]="'doctors.profileEdit.placeholders.licenseNumber' | translate" />
             <mat-icon matPrefix>verified</mat-icon>
             @if (profileForm.get('licenseNumber')?.invalid && profileForm.get('licenseNumber')?.touched) {
               <mat-error>{{ getErrorMessage('licenseNumber') }}</mat-error>
@@ -108,7 +108,7 @@
 
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha de Colegiatura</mat-label>
+            <mat-label>{{ 'doctors.profileEdit.fields.licenseDate' | translate }}</mat-label>
             <input matInput type="date" formControlName="licenseDate" />
             <mat-icon matPrefix>event</mat-icon>
             @if (profileForm.get('licenseDate')?.invalid && profileForm.get('licenseDate')?.touched) {
@@ -121,18 +121,18 @@
               <mat-icon>workspace_premium</mat-icon>
               <div class="experience-text">
                 <span class="experience-years">{{ yearsOfExperience() }}</span>
-                <span class="experience-label">Años de Experiencia</span>
+                <span class="experience-label">{{ 'doctors.profileEdit.fields.yearsExperience' | translate }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Biografía Profesional</mat-label>
-          <textarea 
-            matInput 
-            formControlName="professionalBio" 
-            placeholder="Describe tu experiencia, áreas de interés y enfoque profesional..."
+          <mat-label>{{ 'doctors.profileEdit.fields.bio' | translate }}</mat-label>
+          <textarea
+            matInput
+            formControlName="professionalBio"
+            [placeholder]="'doctors.profileEdit.placeholders.bio' | translate"
             rows="4"
             maxlength="500"></textarea>
           <mat-icon matPrefix>description</mat-icon>
@@ -317,30 +317,30 @@
         <div class="section-icon additional-icon">
           <mat-icon>settings</mat-icon>
         </div>
-        <mat-card-title>Configuración Adicional</mat-card-title>
-        <mat-card-subtitle>Preferencias y disponibilidad</mat-card-subtitle>
+        <mat-card-title>{{ 'doctors.profileEdit.sections.additional.title' | translate }}</mat-card-title>
+        <mat-card-subtitle>{{ 'doctors.profileEdit.sections.additional.subtitle' | translate }}</mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tarifa de Consulta (S/.)</mat-label>
-            <input 
-              matInput 
-              type="number" 
-              formControlName="consultationFee" 
+            <mat-label>{{ 'doctors.profileEdit.fields.fee' | translate }}</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="consultationFee"
               placeholder="150"
               (blur)="checkUnusualValues()" />
             <mat-icon matPrefix>payments</mat-icon>
-            <mat-hint>Precio por consulta en soles</mat-hint>
+            <mat-hint>{{ 'doctors.profileEdit.hints.fee' | translate }}</mat-hint>
             @if (profileForm.get('consultationFee')?.invalid && profileForm.get('consultationFee')?.touched) {
               <mat-error>{{ getErrorMessage('consultationFee') }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Idiomas</mat-label>
-            <input matInput formControlName="languages" placeholder="Español, Inglés" />
+            <mat-label>{{ 'doctors.profileEdit.fields.languages' | translate }}</mat-label>
+            <input matInput formControlName="languages" [placeholder]="'doctors.profileEdit.placeholders.languages' | translate" />
             <mat-icon matPrefix>language</mat-icon>
           </mat-form-field>
         </div>
@@ -349,7 +349,7 @@
           <mat-checkbox formControlName="availableForEmergencies">
             <div class="checkbox-content">
               <mat-icon>emergency</mat-icon>
-              <span>Disponible para emergencias</span>
+              <span>{{ 'doctors.profileEdit.fields.emergencies' | translate }}</span>
             </div>
           </mat-checkbox>
         </div>
@@ -358,23 +358,23 @@
 
     <!-- Action Buttons -->
     <div class="form-actions">
-      <button 
-        mat-stroked-button 
-        type="button" 
+      <button
+        mat-stroked-button
+        type="button"
         class="btn-cancel"
         (click)="onCancel()">
         <mat-icon>close</mat-icon>
-        Cancelar
+        {{ 'common.cancel' | translate }}
       </button>
 
-      <button 
-        mat-raised-button 
-        color="primary" 
+      <button
+        mat-raised-button
+        color="primary"
         type="submit"
         [disabled]="profileForm.invalid || loading()"
         class="btn-save">
         <mat-icon>save</mat-icon>
-        Guardar Cambios
+        {{ 'common.saveChanges' | translate }}
       </button>
     </div>
   </form>

@@ -24,8 +24,12 @@ export class PatientApiEndpoint {
     return `${PATIENT_API}?assignedDoctorId=${doctorId}`;
   }
 
+  /**
+   * Obtener pacientes por tenant (hospital)
+   * Backend endpoint: GET /patients/by-tenant/{tenantId}
+   */
   static getByTenantId(tenantId: string | number): string {
-    return `${PATIENT_API}?tenantId=${tenantId}`;
+    return `${PATIENT_API}/by-tenant/${tenantId}`;
   }
 
   static create(): string {
@@ -38,5 +42,21 @@ export class PatientApiEndpoint {
 
   static delete(id: string | number): string {
     return `${PATIENT_API}/${id}`;
+  }
+
+  /**
+   * Asignar doctor a paciente
+   * Backend endpoint: PUT /patients/{patientId}/assign-doctor
+   */
+  static assignDoctor(patientId: string | number): string {
+    return `${PATIENT_API}/${patientId}/assign-doctor`;
+  }
+
+  /**
+   * Desasignar doctor de paciente
+   * Backend endpoint: DELETE /patients/{patientId}/assign-doctor
+   */
+  static unassignDoctor(patientId: string | number): string {
+    return `${PATIENT_API}/${patientId}/assign-doctor`;
   }
 }
