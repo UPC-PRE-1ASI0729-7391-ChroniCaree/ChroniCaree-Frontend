@@ -14,14 +14,19 @@ export class AlertApiEndpoint extends BaseApi {
 
   // Obtiene todas las alertas asociadas a un paciente específico
   getByPatientId(patientId: string): Observable<AlertResource[]> {
-    return this.http.get<AlertResource[]>(`${this.baseUrl}${this.resourcePath}?patientId=${patientId}`);
+    return this.http.get<AlertResource[]>(`${this.baseUrl}${this.resourcePath}/patient/${patientId}`);
   }
 
   // Obtiene únicamente las alertas activas de un paciente
   getActiveAlerts(patientId: string): Observable<AlertResource[]> {
     return this.http.get<AlertResource[]>(
-      `${this.baseUrl}${this.resourcePath}?patientId=${patientId}&status=${AlertStatus.ACTIVE}`
+      `${this.baseUrl}${this.resourcePath}/patient/${patientId}?status=${AlertStatus.ACTIVE}`
     );
+  }
+  
+  // Obtiene todas las alertas de un doctor
+  getByDoctorId(doctorId: string): Observable<AlertResource[]> {
+    return this.http.get<AlertResource[]>(`${this.baseUrl}${this.resourcePath}/doctor/${doctorId}`);
   }
 
   // Busca una alerta por su identificador único

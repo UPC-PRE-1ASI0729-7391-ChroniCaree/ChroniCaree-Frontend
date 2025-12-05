@@ -9,7 +9,7 @@ export interface SubscriptionResource {
   payerId: number;
   patientId?: number | null;
   planId: string;
-  status: 'active' | 'cancelled' | 'past_due' | 'trial' | 'suspended';
+  status: 'active' | 'cancelled' | 'past_due' | 'trial' | 'suspended' | 'pending' | 'PENDING' | 'ACTIVE';
   startDate: string;
   endDate: string;
   autoRenew: boolean;

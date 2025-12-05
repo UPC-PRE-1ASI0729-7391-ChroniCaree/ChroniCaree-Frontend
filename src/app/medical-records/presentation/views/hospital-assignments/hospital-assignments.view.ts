@@ -148,7 +148,9 @@ export class HospitalAssignmentsView implements OnInit {
   }
 
   assignPatientToDoctor(patientId: number, doctorId: number) {
-    this.patientService.updateAssignedDoctor(patientId, doctorId).subscribe({
+
+    // Usar el endpoint PUT /patients/{id}/assign-doctor (no PATCH)
+    this.patientService.assignDoctor(patientId, doctorId).subscribe({
       next: () => {
         this.patients.update(patients =>
           patients.map(p =>

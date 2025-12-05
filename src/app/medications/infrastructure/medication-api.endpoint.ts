@@ -67,9 +67,10 @@ export class MedicationApiEndpoint extends BaseApi {
 
   /**
    * Create a new medication
+   * Usa CreateMedicationResource con estructura plana (frequency + timeOfDay)
    */
   create(medication: Medication): Observable<Medication> {
-    const resource = MedicationAssembler.toResource(medication);
+    const resource = MedicationAssembler.toCreateResource(medication);
     return this.http
       .post<MedicationResource>(`${this.baseUrl}${this.resourcePath}`, resource)
       .pipe(
@@ -79,9 +80,10 @@ export class MedicationApiEndpoint extends BaseApi {
 
   /**
    * Update an existing medication
+   * Usa CreateMedicationResource con estructura plana (frequency + timeOfDay)
    */
   update(id: number, medication: Medication): Observable<Medication> {
-    const resource = MedicationAssembler.toResource(medication);
+    const resource = MedicationAssembler.toCreateResource(medication);
     return this.http
       .put<MedicationResource>(`${this.baseUrl}${this.resourcePath}/${id}`, resource)
       .pipe(

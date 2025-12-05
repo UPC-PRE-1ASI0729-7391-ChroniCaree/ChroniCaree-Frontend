@@ -1,23 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { DiagnosisEntity, DiagnosisStatus, DiagnosisSeverity, DiagnosisSource } from '../domain/model/diagnosis.entity';
+import { DiagnosisEntity, DiagnosisStatus, DiagnosisSeverity } from '../domain/model/diagnosis.entity';
 import { environment } from '../../../environments/environment';
 
 const DIAGNOSIS_API = `${environment.apiBaseUrl}${environment.diagnosesEndpointPath}`;
 
 /**
  * Diagnosis Resource (DTO para comunicación con API)
+ * Note: source field NOT SUPPORTED by backend
  */
 export interface DiagnosisResource {
   id: number;
   patientId: number;
-  doctorId?: number;
+  doctorId: number;  // REQUIRED by backend
   diagnosisName: string;
-  icd10Code?: string;
+  icd10Code: string;  // REQUIRED by backend
   status: DiagnosisStatus;
-  severity?: DiagnosisSeverity;
-  source: DiagnosisSource;
+  severity: DiagnosisSeverity;  // REQUIRED by backend
+  // source: NOT SUPPORTED BY BACKEND - removed
   diagnosisDate: string;
   notes?: string;
   lastReviewDate?: string;
@@ -28,18 +29,24 @@ export interface DiagnosisResource {
 
 /**
  * Request para crear un diagnóstico
+ * 
+ * Backend requirements:
+ * - doctorId: REQUIRED (cannot be null)
+ * - status: ACTIVE, CONTROLLED, RESOLVED, MONITORING (no PENDING_CONFIRMATION)
+ * - severity: LOW, MODERATE, HIGH, CRITICAL
+ * - source: NOT SUPPORTED (removed)
  */
 export interface CreateDiagnosisRequest {
   patientId: number;
-  doctorId?: number;
+  doctorId: number;  // REQUIRED by backend - cannot be null/omitted
   diagnosisName: string;
-  icd10Code?: string;
+  icd10Code: string;  // REQUIRED by backend
   status: DiagnosisStatus;
-  severity?: DiagnosisSeverity;
-  source: DiagnosisSource;
-  diagnosisDate: string;
+  severity: DiagnosisSeverity;  // REQUIRED by backend
+  diagnosedDate: string;  // Backend expects 'diagnosedDate' YYYY-MM-DD format
+  followUpRequired: boolean;  // REQUIRED by backend
   notes?: string;
-  followUpDate?: string;
+  treatment?: string;
 }
 
 /**
@@ -99,25 +106,55 @@ export class DiagnosisService {
   }
 
   /**
-   * Obtiene diagnósticos pendientes de confirmación de un paciente
+   * Obtiene diagnósticos que necesitan revisión/monitoreo de un paciente
+   * Note: PENDING_CONFIRMATION no existe en backend, usamos MONITORING
    */
-  getPendingConfirmations(patientId: number): Observable<DiagnosisEntity[]> {
+  getMonitoringDiagnoses(patientId: number): Observable<DiagnosisEntity[]> {
     return this.http.get<DiagnosisResource[]>(
-      `${DIAGNOSIS_API}?patientId=${patientId}&status=pending_confirmation&source=patient_reported`
+      `${DIAGNOSIS_API}?patientId=${patientId}&status=MONITORING`
     ).pipe(map(resources => resources.map(r => this.toEntity(r))));
   }
 
   /**
    * Crea un nuevo diagnóstico
+   * 
+   * Backend REQUIRED fields:
+   * - patientId, doctorId, icd10Code, diagnosisName, status, severity, diagnosedDate, followUpRequired
+   * 
+   * NOTE: source field does NOT exist in backend - do not send it
    */
   create(request: CreateDiagnosisRequest): Observable<DiagnosisEntity> {
-    const resource: Partial<DiagnosisResource> = {
-      ...request,
-      lastReviewDate: new Date().toISOString()
+    // Build payload with ALL required fields
+    const payload: Record<string, any> = {
+      patientId: request.patientId,
+      doctorId: request.doctorId,  // REQUIRED - backend rejects if null/missing
+      icd10Code: request.icd10Code,  // REQUIRED
+      diagnosisName: request.diagnosisName,
+      status: request.status.toUpperCase(),  // ACTIVE, CONTROLLED, RESOLVED, MONITORING
+      severity: request.severity.toUpperCase(),  // LOW, MODERATE, HIGH, CRITICAL
+      diagnosedDate: request.diagnosedDate.split('T')[0],  // Backend expects YYYY-MM-DD format
+      followUpRequired: request.followUpRequired
     };
 
-    return this.http.post<DiagnosisResource>(DIAGNOSIS_API, resource)
-      .pipe(map(r => this.toEntity(r)));
+    // Optional fields
+    if (request.notes) {
+      payload['notes'] = request.notes;
+    }
+    if (request.treatment) {
+      payload['treatment'] = request.treatment;
+    }
+    // NOTE: source field removed - NOT SUPPORTED BY BACKEND
+
+    console.log('📤 [DiagnosisService] Creating diagnosis with payload:', payload);
+    console.log('  → URL:', DIAGNOSIS_API);
+
+    return this.http.post<DiagnosisResource>(DIAGNOSIS_API, payload)
+      .pipe(
+        map(r => {
+          console.log('✅ [DiagnosisService] Diagnosis created successfully:', r);
+          return this.toEntity(r);
+        })
+      );
   }
 
   /**
@@ -139,15 +176,16 @@ export class DiagnosisService {
   confirmByDoctor(diagnosisId: number, request: ConfirmDiagnosisRequest): Observable<DiagnosisEntity> {
     const resource = {
       doctorId: request.doctorId,
-      status: 'active' as DiagnosisStatus,
-      source: 'doctor_confirmed' as DiagnosisSource,
+      status: 'ACTIVE',  // Backend expects UPPERCASE
       confirmedAt: new Date().toISOString(),
       confirmedBy: request.doctorId,
-      lastReviewDate: new Date().toISOString(),
+      lastReviewDate: new Date().toISOString().split('T')[0],
       ...(request.icd10Code && { icd10Code: request.icd10Code }),
-      ...(request.severity && { severity: request.severity }),
+      ...(request.severity && { severity: request.severity.toUpperCase() }),  // Backend expects UPPERCASE
       ...(request.notes && { notes: request.notes })
     };
+
+    console.log('📤 [DiagnosisService] Confirming diagnosis with payload:', resource);
 
     return this.http.patch<DiagnosisResource>(`${DIAGNOSIS_API}/${diagnosisId}`, resource)
       .pipe(map(r => this.toEntity(r)));
@@ -167,11 +205,11 @@ export class DiagnosisService {
     return new DiagnosisEntity(
       resource.id,
       resource.patientId,
-      resource.doctorId || null,
+      resource.doctorId || 0,  // doctorId is required
       resource.icd10Code || '',
       resource.diagnosisName,
       resource.status,
-      resource.severity || 'moderate',
+      resource.severity || 'MODERATE',
       resource.diagnosisDate,
       null, // resolvedDate
       resource.notes || '',
@@ -179,8 +217,7 @@ export class DiagnosisService {
       false, // followUpRequired
       resource.lastReviewDate || new Date().toISOString(),
       resource.diagnosisDate, // createdAt
-      resource.lastReviewDate || resource.diagnosisDate, // updatedAt
-      resource.source
+      resource.lastReviewDate || resource.diagnosisDate // updatedAt
     );
   }
 }

@@ -9,6 +9,17 @@ import { TenantResource } from './tenant.resource';
 export class TenantAssembler implements BaseAssembler<Tenant, TenantResource, BaseResponse> {
   
   /**
+   * Extrae el valor de un campo que puede ser string o Value Object
+   * Backend puede devolver: "12345678" o { "value": "12345678" }
+   */
+  private extractValue(field: any): string {
+    if (field === null || field === undefined) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object' && 'value' in field) return field.value;
+    return String(field);
+  }
+
+  /**
    * Convierte un recurso TenantResource a una entidad Tenant
    */
   toEntityFromResource(resource: TenantResource): Tenant {
@@ -17,8 +28,8 @@ export class TenantAssembler implements BaseAssembler<Tenant, TenantResource, Ba
       adminUserId: (resource as any).adminUserId || 0,
       name: resource.name,
       address: (resource as any).address || '',
-      phone: (resource as any).phone || '',
-      email: (resource as any).email || '',
+      phone: this.extractValue((resource as any).phone),
+      email: this.extractValue((resource as any).email),
       status: (resource as any).status || 'pending_subscription',
       subscriptionId: (resource as any).subscriptionId || null,
       registrationDate: (resource as any).registrationDate || new Date().toISOString(),

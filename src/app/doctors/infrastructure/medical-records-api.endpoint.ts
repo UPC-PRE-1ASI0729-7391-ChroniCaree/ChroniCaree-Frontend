@@ -30,8 +30,7 @@ export class MedicalRecordsApiEndpoint {
    * Obtiene todos los registros médicos de un doctor
    */
   getRecordsByDoctor(doctorId: number): Observable<MedicalRecord[]> {
-    return this.http.get<MedicalRecordResource[]>(this.recordsUrl).pipe(
-      map(records => records.filter(r => r.doctorId === doctorId)),
+    return this.http.get<MedicalRecordResource[]>(`${this.recordsUrl}/doctor/${doctorId}`).pipe(
       switchMap(records => {
         if (records.length === 0) {
           return of([]);
@@ -73,8 +72,7 @@ export class MedicalRecordsApiEndpoint {
    * Obtiene registros de un paciente específico
    */
   getRecordsByPatient(patientId: number): Observable<MedicalRecord[]> {
-    return this.http.get<MedicalRecordResource[]>(this.recordsUrl).pipe(
-      map(records => records.filter(r => r.patientId === patientId)),
+    return this.http.get<MedicalRecordResource[]>(`${this.recordsUrl}/patient/${patientId}`).pipe(
       map(records => records.map(r => MedicalRecordAssembler.toDomain(r))),
       catchError(() => of([]))
     );

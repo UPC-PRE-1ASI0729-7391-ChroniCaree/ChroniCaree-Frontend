@@ -4,13 +4,19 @@
  */
 
 import { Medication, MedicationLog } from '../domain/model/medication.entity';
-import { MedicationResource, MedicationLogResource } from './medication.resource';
+import { MedicationResource, MedicationLogResource, CreateMedicationResource } from './medication.resource';
 
 export class MedicationAssembler {
   /**
    * Convert API resource to domain entity
    */
   static toDomain(resource: MedicationResource): Medication {
+    // Validar que resource.schedule existe antes de acceder a sus propiedades
+    if (!resource.schedule) {
+      console.error('❌ Backend returned MedicationResource WITHOUT schedule object:', resource);
+      throw new Error('Backend response is missing required "schedule" object. Check backend MedicationResource structure.');
+    }
+
     return new Medication({
       id: resource.id,
       patientId: resource.patientId,
@@ -38,7 +44,43 @@ export class MedicationAssembler {
   }
 
   /**
-   * Convert domain entity to API resource
+   * Convert domain entity to CREATE resource (para POST al backend)
+   * Estructura plana con frequency + timeOfDay en lugar de schedule object
+   */
+  static toCreateResource(medication: Medication): CreateMedicationResource {
+    // Convertir array de times ["09:00", "21:00"] a string separado por comas
+    const timeOfDay = medication.schedule.times.join(',');
+    
+    // Convertir enums a MAYÚSCULAS como espera el backend
+    const type = medication.type.toUpperCase();
+    const frequency = medication.schedule.frequency.toUpperCase();
+    const status = medication.status.toUpperCase();
+    
+    // Formatear fechas a YYYY-MM-DD
+    const prescribedDate = medication.prescribedDate.toISOString().split('T')[0];
+    const refillDate = medication.refillDate?.toISOString().split('T')[0];
+    
+    return {
+      patientId: medication.patientId.toString(), // Backend espera string
+      name: medication.name,
+      type: type,
+      dosage: medication.dosage,
+      frequency: frequency,
+      timeOfDay: timeOfDay,
+      prescribedBy: medication.prescribedBy,
+      prescribedDate: prescribedDate,
+      status: status,
+      instructions: medication.instructions,
+      sideEffects: medication.sideEffects,
+      contraindications: medication.contraindications,
+      purpose: medication.purpose,
+      refillDate: refillDate
+    };
+  }
+
+  /**
+   * Convert domain entity to API resource (para respuestas del backend)
+   * DEPRECATED: Usar toCreateResource para POST requests
    */
   static toResource(medication: Medication): MedicationResource {
     return {

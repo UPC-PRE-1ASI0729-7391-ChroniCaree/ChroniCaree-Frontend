@@ -11,6 +11,7 @@ interface DoctorForm {
   email: string;
   phone: string;
   licenseNumber: string;
+  dni: string; 
   password: string;
   confirmPassword: string;
 }
@@ -37,6 +38,7 @@ export class AddDoctorView {
     email: '',
     phone: '',
     licenseNumber: '',
+    dni: '',
     password: '',
     confirmPassword: ''
   });
@@ -147,6 +149,19 @@ export class AddDoctorView {
       return false;
     }
 
+
+    // Validar DNI (requerido por backend, mínimo 8 caracteres)
+    if (!f.dni.trim()) {
+      this.error.set('El DNI es requerido');
+      return false;
+    }
+
+    if (f.dni.trim().length < 8 || f.dni.trim().length > 20) {
+      this.error.set('El DNI debe tener entre 8 y 20 caracteres');
+      return false;
+    }
+
+
     if (!f.password || !f.confirmPassword) {
       this.error.set(this.translate.instant('common.errors.required'));
       return false;
@@ -194,7 +209,8 @@ export class AddDoctorView {
       lastName,
       licenseNumber: f.licenseNumber.trim(),
       specialty: f.specialty,
-      phone: f.phone.trim()
+      phone: f.phone.trim(),
+      dni: f.dni.trim() // DNI requerido por backend
     };
     this.dashboardStore.registerDoctorAsAdmin(request).subscribe({
       next: () => {

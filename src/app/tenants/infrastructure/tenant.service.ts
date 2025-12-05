@@ -6,7 +6,7 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 
 import { TenantEntity, TenantStatus, TenantSettings } from '../domain/model/tenant.entity';
@@ -51,7 +51,7 @@ export interface UpdateTenantRequest {
   providedIn: 'root',
 })
 export class TenantService {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   /**
    * Obtiene todos los tenants
@@ -70,10 +70,24 @@ export class TenantService {
    * Obtiene un tenant por ID
    */
   getById(id: string | number): Observable<TenantEntity> {
+    console.log(`🌐 [TenantService] getById(${id}) - URL: ${TENANT_API}/${id}`);
+    
     return this.http.get<TenantResource>(`${TENANT_API}/${id}`).pipe(
-      map((resource) => this.toEntity(resource)),
+      map((resource) => {
+        console.log('📦 [TenantService] Response raw:', resource);
+        const entity = this.toEntity(resource);
+        console.log('📦 [TenantService] Entity mapped:', entity);
+        console.log('  → id:', entity.id);
+        console.log('  → status:', entity.status);
+        console.log('  → subscriptionId:', entity.subscriptionId);
+        console.log('  → settings:', entity.settings);
+        return entity;
+      }),
       catchError((error) => {
-        console.error(`Error fetching tenant ${id}:`, error);
+        console.error(`❌ [TenantService] Error fetching tenant ${id}:`, error);
+        console.error('  → status:', error.status);
+        console.error('  → message:', error.message);
+        console.error('  → error:', error.error);
         return throwError(() => new Error(`Failed to fetch tenant with id ${id}`));
       })
     );
@@ -81,15 +95,24 @@ export class TenantService {
 
   /**
    * Obtiene tenant por adminUserId
+   * Backend endpoint: GET /tenants/by-admin/{adminUserId}
    */
   getByAdminUserId(adminUserId: string | number): Observable<TenantEntity | null> {
-    return this.http.get<TenantResource[]>(`${TENANT_API}?adminUserId=${adminUserId}`).pipe(
-      map((resources) => {
-        if (resources.length === 0) return null;
-        return this.toEntity(resources[0]);
+    const url = `${TENANT_API}/by-admin/${adminUserId}`;
+    console.log('🌐 [TenantService] GET by admin:', url);
+    
+    return this.http.get<TenantResource>(url).pipe(
+      map((resource) => {
+        console.log('✅ [TenantService] Tenant found:', resource);
+        return this.toEntity(resource);
       }),
       catchError((error) => {
-        console.error(`Error fetching tenant by adminUserId ${adminUserId}:`, error);
+        console.error(`❌ [TenantService] Error fetching tenant by adminUserId ${adminUserId}:`, error);
+        // Si es 404, retornar null en lugar de error
+        if (error.status === 404) {
+          console.log('ℹ️ [TenantService] No tenant found for admin, returning null');
+          return of(null);
+        }
         return throwError(() => new Error(`Failed to fetch tenant with adminUserId ${adminUserId}`));
       })
     );

@@ -2,7 +2,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { UserStore } from '../../../application/user.store';
+import { AuthService } from '../../../application/auth.service';
 
 interface LoginForm {
   email: string;
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   constructor(
-    private userStore: UserStore,
+    private authService: AuthService,
     private router: Router
   ) {}
 
@@ -69,50 +69,46 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // Load users from store and authenticate
-    this.userStore.loadAllUsers().subscribe({
-      next: (users) => {
-        // Find user with matching email and password
-        const user = users.find(u => u.email === email && u.password === password);
-
-        if (user) {
-          // Store user in UserStore (this will persist + emit userChanged)
-          this.userStore.setCurrentUser(user);
-
-          // Remember me functionality (only rememberedEmail remains in localStorage)
-          if (rememberMe) {
-            localStorage.setItem('rememberedEmail', email);
-          } else {
-            localStorage.removeItem('rememberedEmail');
-          }
-
-          // Navigate based on role
-          setTimeout(() => {
-            this.submitting.set(false);
-            
-            switch(user.role) {
-              case 'patient':
-                this.router.navigate(['/patient/dashboard']);
-                break;
-              case 'doctor':
-                this.router.navigate(['/doctor/dashboard']);
-                break;
-              case 'hospital_admin':
-                this.router.navigate(['/hospital/dashboard']);
-                break;
-              default:
-                this.router.navigate(['/home']);
-            }
-          }, 800);
+    this.authService.signIn({ email, password }).subscribe({
+      next: () => {
+        // Remember me functionality
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
         } else {
-          this.errorMessage.set('❌ Email o contraseña incorrectos');
-          this.submitting.set(false);
+          localStorage.removeItem('rememberedEmail');
+        }
+
+        const role = this.authService.getUserRole();
+        console.log('Login successful. Detected role:', role);
+        this.submitting.set(false);
+
+        // Normalize role to lowercase for comparison
+        const normalizedRole = role ? role.toLowerCase() : '';
+
+        if (normalizedRole.includes('patient')) {
+          this.router.navigate(['/patient/dashboard']);
+        } else if (normalizedRole.includes('doctor')) {
+          this.router.navigate(['/doctor/dashboard']);
+        } else if (normalizedRole.includes('hospital') || normalizedRole.includes('admin') || normalizedRole.includes('tenant')) {
+          this.router.navigate(['/hospital/dashboard']);
+        } else {
+          console.warn('Unknown role, redirecting to home:', role);
+          this.router.navigate(['/home']);
         }
       },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
+      error: (err) => {
+        console.error('Login error:', err);
         this.submitting.set(false);
+        
+        // Handle specific error messages thrown by AuthService
+        if (err.message === 'Correo electrónico o contraseña incorrectos.') {
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
+        } else if (err.status === 401 || err.status === 404) {
+          // Fallback for status codes if message doesn't match
+          this.errorMessage.set('❌ Correo electrónico o contraseña incorrectos.');
+        } else {
+          this.errorMessage.set('⚠️ Error al conectar con el servidor. Por favor intenta de nuevo.');
+        }
       }
     });
   }

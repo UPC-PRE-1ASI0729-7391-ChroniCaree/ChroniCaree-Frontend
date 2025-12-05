@@ -91,12 +91,23 @@ export class DoctorService {
 
   /**
    * Obtiene doctores de un tenant
+   * Backend endpoint: GET /doctors/by-tenant/{tenantId}
    */
   getByTenantId(tenantId: string | number): Observable<DoctorEntity[]> {
-    return this.http.get<DoctorResource[]>(`${DOCTOR_API}?tenantId=${tenantId}`).pipe(
-      map((resources) => resources.map((r) => this.toEntity(r))),
+    const url = `${DOCTOR_API}/by-tenant/${tenantId}`;
+    console.log(`🌐 [DoctorService] getByTenantId(${tenantId}) - URL: ${url}`);
+    
+    return this.http.get<DoctorResource[]>(url).pipe(
+      map((resources) => {
+        console.log('📦 [DoctorService] Response raw:', resources);
+        const entities = resources.map((r) => this.toEntity(r));
+        console.log('📦 [DoctorService] Entities mapped:', entities.length, 'doctors');
+        return entities;
+      }),
       catchError((error) => {
-        console.error(`Error fetching doctors for tenant ${tenantId}:`, error);
+        console.error(`❌ [DoctorService] getByTenantId(${tenantId}) error:`, error);
+        console.error('  → status:', error.status);
+        console.error('  → error:', error.error);
         return throwError(() => new Error(`Failed to fetch doctors for tenant ${tenantId}`));
       })
     );
@@ -104,12 +115,19 @@ export class DoctorService {
 
   /**
    * Cuenta cuántos doctores tiene un tenant
+   * Backend endpoint: GET /doctors/by-tenant/{tenantId}
    */
   countByTenantId(tenantId: string | number): Observable<number> {
-    return this.http.get<DoctorResource[]>(`${DOCTOR_API}?tenantId=${tenantId}`).pipe(
-      map((resources) => resources.length),
+    const url = `${DOCTOR_API}/by-tenant/${tenantId}`;
+    console.log(`🌐 [DoctorService] countByTenantId(${tenantId}) - URL: ${url}`);
+    
+    return this.http.get<DoctorResource[]>(url).pipe(
+      map((resources) => {
+        console.log('📦 [DoctorService] countByTenantId result:', resources.length, 'doctors');
+        return resources.length;
+      }),
       catchError((error) => {
-        console.error(`Error counting doctors for tenant ${tenantId}:`, error);
+        console.error(`❌ [DoctorService] countByTenantId error:`, error);
         return throwError(() => new Error(`Failed to count doctors for tenant ${tenantId}`));
       })
     );
@@ -146,31 +164,33 @@ export class DoctorService {
 
   /**
    * Crea un nuevo doctor
+   * El backend espera: userId, tenantId, firstName, lastName, dni, specialty, licenseNumber, phone
    */
   create(request: CreateDoctorRequest): Observable<DoctorEntity> {
-    const payload: DoctorResource = {
-      id: 0, // Will be assigned by backend
+    // Payload simplificado para el backend
+    const payload = {
       userId: request.userId,
-      tenantId: request.tenantId || null,
-      isIndependent: request.isIndependent ?? true,
+      tenantId: request.tenantId ?? null,
       firstName: request.firstName,
       lastName: request.lastName,
-      dni: request.dni,
+      dni: request.dni || 'N/A',
       specialty: request.specialty,
       licenseNumber: request.licenseNumber,
-      phone: request.phone,
-      isVerified: false, // Requiere verificación
-      acceptingPatients: false, // Por defecto no acepta hasta verificación
-      consultationFee: request.consultationFee || 0,
-      languages: request.languages || ['es'],
-      education: request.education || [],
-      joinedAt: new Date().toISOString(),
+      phone: request.phone || '',
     };
 
+    console.log('📤 [DoctorService] Creating doctor with payload:', payload);
+    console.log('  → URL:', DOCTOR_API);
+
     return this.http.post<DoctorResource>(DOCTOR_API, payload).pipe(
-      map((resource) => this.toEntity(resource)),
+      map((resource) => {
+        console.log('✅ [DoctorService] Doctor created successfully:', resource);
+        return this.toEntity(resource);
+      }),
       catchError((error) => {
-        console.error('Error creating doctor:', error);
+        console.error('❌ [DoctorService] Error creating doctor:', error);
+        console.error('  → Status:', error.status);
+        console.error('  → Error body:', error.error);
         return throwError(() => new Error('Failed to create doctor'));
       })
     );
