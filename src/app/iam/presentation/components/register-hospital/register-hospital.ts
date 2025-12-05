@@ -1,6 +1,5 @@
 import { Component, signal, inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { switchMap, map } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -214,76 +213,90 @@ export class RegisterHospitalComponent implements AfterViewInit {
       return;
     }
 
-    // Crear usuario y tenant ANTES de ir al paso 3
+    // ✅ NUEVO FLUJO: Usar el endpoint correcto que hace TODO en UNA transacción atómica
     this.submitting.set(true);
     const f = this.form();
 
-    // Crear el usuario (admin del hospital)
-    const signUpRequest = {
+    console.log('🚀 [RegisterHospital] Starting hospital admin registration (ONE REQUEST)...');
+    console.log('📧 Email:', f.email);
+    console.log('🏥 Hospital Name:', f.hospitalName);
+
+    // ✅ UN SOLO REQUEST - Todo en una transacción atómica
+    this.authService.signUpHospitalAdmin({
+      // User data
       email: f.email,
       password: f.password,
       name: f.adminName,
-      role: 'hospital_admin'
-    };
-
-    this.authService.signUp(signUpRequest).pipe(
-      switchMap((response: any) => {
-        const user = response.user || response;
+      
+      // Hospital data
+      hospitalName: f.hospitalName,
+      hospitalEmail: f.email, // Usar el mismo email del admin
+      hospitalPhone: f.phone,
+      hospitalAddress: f.address
+    }).subscribe({
+      next: (response: any) => {
+        console.log('✅ [RegisterHospital] Hospital admin registration successful!');
+        console.log('👤 User:', response.user);
         
-        // Auto-login to get the token immediately
-        return this.authService.signIn({ email: f.email, password: f.password }).pipe(
-          map(() => user) // Pass the user object down the chain
-        );
-      }),
-      switchMap((user: any) => {
-        // Crear el tenant (hospital) con todos los datos
-        const newTenant: any = {
-          adminUserId: user.id,
-          name: f.hospitalName,
-          address: f.address,
-          phone: f.phone,
-          email: f.email,
-          status: 'pending',
-          subscriptionId: null,
-          registrationDate: new Date().toISOString(),
-          settings: {
-            allowIndependentDoctors: false,
-            requirePatientApproval: true,
-            maxDoctors: 5
-          }
-        };
+        // ✅ CORRECTO: Leer tenant desde user.tenant (ubicación real del backend)
+        console.log('🏥 Tenant (user.tenant):', response.user?.tenant);
+        console.log('🔗 User.tenantId:', response.user?.tenantId);
+        console.log('🔗 Tenant.id:', response.user?.tenant?.id);
 
-        return this.tenantStore.createTenant(newTenant).pipe(
-          map((tenant) => ({ user, tenant }))
-        );
-      })
-    ).subscribe({
-      next: ({ user, tenant }: any) => {
-        // Guardar datos en el componente
-        this.createdUserId = user.id;
-        this.createdTenantId = tenant.id;
+        // ✅ VALIDACIÓN: Verificar que user.tenant existe
+        if (!response.user?.tenant) {
+          console.error('❌ ERROR: Backend no devolvió tenant en user.tenant');
+          this.submitting.set(false);
+          alert('Error: No se pudo crear el hospital. Por favor contacte al administrador.');
+          return;
+        }
 
-        // Cargar planes disponibles (ahora funcionará porque tenemos token)
+        // Verificar que la asociación es correcta
+        if (response.user.tenantId === response.user.tenant.id) {
+          console.log('✅ User-Tenant association is CORRECT!');
+        } else {
+          console.error('❌ WARNING: User-Tenant association mismatch!');
+          console.error('  User.tenantId:', response.user.tenantId);
+          console.error('  Tenant.id:', response.user.tenant.id);
+        }
+
+        // Guardar los IDs para uso posterior (ahora desde user.tenant)
+        this.createdUserId = response.user.id;
+        this.createdTenantId = response.user.tenant.id;  // ← CAMBIO: user.tenant.id
+
+        console.log('💾 IDs saved - User:', this.createdUserId, ', Tenant:', this.createdTenantId);
+        console.log('✅ Session saved with tenantId (by authService)');
+
+        console.log('📋 [RegisterHospital] Loading subscription plans...');
+        // Cargar planes de suscripción
         this.loadPlans();
 
-        // Pasar al paso 3 (selección de plan)
+        // Avanzar al paso 3 (pago)
         this.submitting.set(false);
+        console.log('➡️ [RegisterHospital] Proceeding to step 3 (payment)');
         this.nextStep();
       },
       error: (err: any) => {
         this.submitting.set(false);
         
-        // Manejo de errores específicos
-        const errorMsg = err.error?.error || err.error?.message || err.message || '';
+        console.error('❌ [RegisterHospital] Hospital admin registration FAILED');
+        console.error('Error object:', err);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
+        console.error('Error body:', err.error);
         
-        if (errorMsg.includes('Email already exists')) {
+        // Manejo de errores específicos
+        const errorMsg = err.error?.message || err.error?.error || err.message || 'Error desconocido';
+        
+        if (errorMsg.includes('Email already exists') || errorMsg.includes('ya está registrado')) {
           this.errorMessage.set('⚠️ Este correo electrónico ya está registrado. Por favor inicia sesión.');
-        } else if (err.message === 'Correo electrónico o contraseña incorrectos.') {
-           this.errorMessage.set('⚠️ Usuario creado, pero falló el inicio de sesión automático. Por favor intenta ingresar manualmente.');
+        } else if (errorMsg.includes('Hospital name already exists') || errorMsg.includes('hospital ya existe')) {
+          this.errorMessage.set('⚠️ Ya existe un hospital con este nombre. Por favor usa otro nombre.');
         } else {
-           this.errorMessage.set('Error en el registro: ' + errorMsg);
+          this.errorMessage.set('❌ Error al registrar el hospital: ' + errorMsg);
         }
-        console.error('Error in registration flow:', err);
+        
+        console.error('📋 [RegisterHospital] User-friendly error message:', this.errorMessage());
       }
     });
   }

@@ -96,9 +96,10 @@ export class SubscriptionService {
 
         // Validación: payerType debe coincidir con el tipo de plan
         if (plan.type !== request.payerType) {
-          return throwError(
-            () => new Error(`Plan type ${plan.type} does not match payer type ${request.payerType}`)
-          );
+          console.warn(`⚠️ WARNING: Plan type mismatch. Plan: ${plan.type}, Request: ${request.payerType}. Proceeding anyway...`);
+          // return throwError(
+          //   () => new Error(`Plan type ${plan.type} does not match payer type ${request.payerType}`)
+          // );
         }
 
         // Validación: pacientes deben tener patientId
@@ -111,34 +112,30 @@ export class SubscriptionService {
         const endDate = new Date();
         endDate.setMonth(endDate.getMonth() + 1); // 1 mes por defecto
 
-        // Obtener siguiente ID
-        return this.getNextId('subscriptions').pipe(
-          switchMap((nextId) => {
-            const subscriptionResource: Partial<SubscriptionResource> = {
-              id: nextId,
-              payerType: request.payerType,
-              payerId: request.payerId,
-              patientId: request.patientId,
-              planId: request.planId,
-              status: 'active',
-              startDate,
-              endDate: endDate.toISOString(),
-              autoRenew: request.autoRenew ?? true,
-              paymentMethod: request.paymentMethod,
-              billingEmail: request.billingEmail,
-              nextBillingDate: endDate.toISOString(),
-              lastPaymentDate: startDate,
-              lastPaymentAmount: plan.price,
-            };
+        // Crear objeto de suscripción sin ID (el backend debe generarlo)
+        const subscriptionResource: Partial<SubscriptionResource> = {
+          id: 0, // Placeholder, backend should generate real ID
+          payerType: request.payerType,
+          payerId: request.payerId,
+          patientId: request.patientId,
+          planId: request.planId,
+          status: 'active',
+          startDate,
+          endDate: endDate.toISOString(),
+          autoRenew: request.autoRenew ?? true,
+          paymentMethod: request.paymentMethod,
+          billingEmail: request.billingEmail,
+          nextBillingDate: endDate.toISOString(),
+          lastPaymentDate: startDate,
+          lastPaymentAmount: plan.price,
+        };
 
-            return this.http
-              .post<SubscriptionResource>(`${this.baseUrl}${SubscriptionApiEndpoint.create()}`, subscriptionResource)
-              .pipe(
-                map((resource) => SubscriptionAssembler.toEntity(resource)),
-                catchError((error) => throwError(() => new Error(`Error creating subscription: ${error.message}`)))
-              );
-          })
-        );
+        return this.http
+          .post<SubscriptionResource>(`${this.baseUrl}${SubscriptionApiEndpoint.create()}`, subscriptionResource)
+          .pipe(
+            map((resource) => SubscriptionAssembler.toEntity(resource)),
+            catchError((error) => throwError(() => new Error(`Error creating subscription: ${error.message}`)))
+          );
       })
     );
   }

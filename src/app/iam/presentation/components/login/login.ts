@@ -79,20 +79,21 @@ export class LoginComponent implements OnInit {
         }
 
         const role = this.authService.getUserRole();
+        console.log('Login successful. Detected role:', role);
         this.submitting.set(false);
 
-        switch(role) {
-          case 'patient':
-            this.router.navigate(['/patient/dashboard']);
-            break;
-          case 'doctor':
-            this.router.navigate(['/doctor/dashboard']);
-            break;
-          case 'hospital_admin':
-            this.router.navigate(['/hospital/dashboard']);
-            break;
-          default:
-            this.router.navigate(['/home']);
+        // Normalize role to lowercase for comparison
+        const normalizedRole = role ? role.toLowerCase() : '';
+
+        if (normalizedRole.includes('patient')) {
+          this.router.navigate(['/patient/dashboard']);
+        } else if (normalizedRole.includes('doctor')) {
+          this.router.navigate(['/doctor/dashboard']);
+        } else if (normalizedRole.includes('hospital') || normalizedRole.includes('admin') || normalizedRole.includes('tenant')) {
+          this.router.navigate(['/hospital/dashboard']);
+        } else {
+          console.warn('Unknown role, redirecting to home:', role);
+          this.router.navigate(['/home']);
         }
       },
       error: (err) => {
