@@ -1,12 +1,12 @@
 <div class="records-container">
   <header class="records-header">
     <div>
-      <h1>📋 Historiales Médicos</h1>
-      <p class="subtitle">Registros médicos de tus pacientes</p>
+      <h1>📋 {{ 'doctors.records.title' | translate }}</h1>
+      <p class="subtitle">{{ 'doctors.records.subtitle' | translate }}</p>
     </div>
     <button class="btn-refresh" (click)="refresh()" [disabled]="loading()">
       <span class="material-icons">refresh</span>
-      Actualizar
+      {{ 'doctors.records.actions.refresh' | translate }}
     </button>
   </header>
 
@@ -15,51 +15,51 @@
       <span class="stat-icon">📊</span>
       <div>
         <h3>{{ totalRecords() }}</h3>
-        <p>Total Registros</p>
+        <p>{{ 'doctors.records.stats.total' | translate }}</p>
       </div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">🩺</span>
       <div>
         <h3>{{ vitalSignsRecords().length }}</h3>
-        <p>Signos Vitales</p>
+        <p>{{ 'doctors.records.stats.vitalSigns' | translate }}</p>
       </div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">🤒</span>
       <div>
         <h3>{{ symptomsRecords().length }}</h3>
-        <p>Síntomas</p>
+        <p>{{ 'doctors.records.stats.symptoms' | translate }}</p>
       </div>
     </div>
     <div class="stat-card">
       <span class="stat-icon">👨‍⚕️</span>
       <div>
         <h3>{{ consultationRecords().length }}</h3>
-        <p>Consultas</p>
+        <p>{{ 'doctors.records.stats.consultations' | translate }}</p>
       </div>
     </div>
   </div>
 
   <div class="tabs-container">
     <button class="tab" [class.active]="selectedTab() === 'all'" (click)="setTab('all')">
-      Todos ({{ totalRecords() }})
+      {{ 'doctors.records.tabs.all' | translate }} ({{ totalRecords() }})
     </button>
     <button class="tab" [class.active]="selectedTab() === 'vital_signs'" (click)="setTab('vital_signs')">
-      Signos Vitales ({{ vitalSignsRecords().length }})
+      {{ 'doctors.records.tabs.vitalSigns' | translate }} ({{ vitalSignsRecords().length }})
     </button>
     <button class="tab" [class.active]="selectedTab() === 'symptoms'" (click)="setTab('symptoms')">
-      Síntomas ({{ symptomsRecords().length }})
+      {{ 'doctors.records.tabs.symptoms' | translate }} ({{ symptomsRecords().length }})
     </button>
     <button class="tab" [class.active]="selectedTab() === 'consultation'" (click)="setTab('consultation')">
-      Consultas ({{ consultationRecords().length }})
+      {{ 'doctors.records.tabs.consultations' | translate }} ({{ consultationRecords().length }})
     </button>
   </div>
 
   @if (loading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Cargando registros...</p>
+      <p>{{ 'doctors.records.loading' | translate }}</p>
     </div>
   }
 
@@ -75,43 +75,44 @@
       @if (getFilteredRecords().length === 0) {
         <div class="empty-state">
           <span class="material-icons">folder_open</span>
-          <h3>No hay registros</h3>
+          <h3>{{ 'doctors.records.empty' | translate }}</h3>
         </div>
       } @else {
         @for (record of getFilteredRecords(); track record.id) {
           <div class="record-card">
             <div class="record-header">
-              <span class="record-type">{{ getRecordTypeLabel(record.type) }}</span>
+              <!-- Asegúrate que getRecordTypeLabel devuelva una KEY de traducción -->
+              <span class="record-type">{{ getRecordTypeLabel(record.type) | translate }}</span>
               <span class="record-date">{{ formatDate(record.date) }}</span>
             </div>
-            
+
             <div class="record-patient">
-              <strong>Paciente:</strong> {{ record.patientName || 'Desconocido' }}
+              <strong>{{ 'doctors.records.patientLabel' | translate }}:</strong> {{ record.patientName || ('common.na' | translate) }}
             </div>
 
             @if (record.type === RecordType.VITAL_SIGNS) {
               <div class="record-data">
                 @if (record.glucose) {
                   <div class="data-item">
-                    <span class="label">🩸 Glucosa:</span>
-                    <span class="value">{{ record.glucose }} mg/dL</span>
+                    <span class="label">🩸 {{ 'doctors.records.vitals.glucose' | translate }}:</span>
+                    <span class="value">{{ record.glucose }} {{ 'common.units.glucose' | translate }}</span>
                   </div>
                 }
                 @if (record.bloodPressure) {
                   <div class="data-item">
-                    <span class="label">💓 Presión:</span>
+                    <span class="label">💓 {{ 'doctors.records.vitals.bloodPressure' | translate }}:</span>
                     <span class="value">{{ record.bloodPressure }}</span>
                   </div>
                 }
                 @if (record.heartRate) {
                   <div class="data-item">
-                    <span class="label">💗 Frecuencia:</span>
-                    <span class="value">{{ record.heartRate }} bpm</span>
+                    <span class="label">💗 {{ 'doctors.records.vitals.heartRate' | translate }}:</span>
+                    <span class="value">{{ record.heartRate }} {{ 'common.units.heartRate' | translate }}</span>
                   </div>
                 }
                 @if (record.temperature) {
                   <div class="data-item">
-                    <span class="label">🌡️ Temperatura:</span>
+                    <span class="label">🌡️ {{ 'doctors.records.vitals.temperature' | translate }}:</span>
                     <span class="value">{{ record.temperature }}°C</span>
                   </div>
                 }
@@ -122,19 +123,19 @@
               <div class="record-data">
                 @if (record.fatigue) {
                   <div class="data-item">
-                    <span class="label">😴 Fatiga:</span>
+                    <span class="label">😴 {{ 'doctors.records.symptoms.fatigue' | translate }}:</span>
                     <span class="value">{{ record.fatigue }}/10</span>
                   </div>
                 }
                 @if (record.pain) {
                   <div class="data-item">
-                    <span class="label">😣 Dolor:</span>
+                    <span class="label">😣 {{ 'doctors.records.symptoms.pain' | translate }}:</span>
                     <span class="value">{{ record.pain }}/10</span>
                   </div>
                 }
                 @if (record.dizziness) {
                   <div class="data-item">
-                    <span class="label">😵 Mareo:</span>
+                    <span class="label">😵 {{ 'doctors.records.symptoms.dizziness' | translate }}:</span>
                     <span class="value">{{ record.dizziness }}/10</span>
                   </div>
                 }
@@ -145,13 +146,13 @@
               <div class="record-data consultation">
                 @if (record.diagnosis) {
                   <div class="consultation-item">
-                    <strong>📋 Diagnóstico:</strong>
+                    <strong>📋 {{ 'doctors.records.consultation.diagnosis' | translate }}:</strong>
                     <p>{{ record.diagnosis }}</p>
                   </div>
                 }
                 @if (record.treatment) {
                   <div class="consultation-item">
-                    <strong>💊 Tratamiento:</strong>
+                    <strong>💊 {{ 'doctors.records.consultation.treatment' | translate }}:</strong>
                     <p>{{ record.treatment }}</p>
                   </div>
                 }
@@ -160,7 +161,7 @@
 
             @if (record.notes) {
               <div class="record-notes">
-                <strong>📝 Notas:</strong> {{ record.notes }}
+                <strong>📝 {{ 'doctors.records.notes' | translate }}:</strong> {{ record.notes }}
               </div>
             }
           </div>

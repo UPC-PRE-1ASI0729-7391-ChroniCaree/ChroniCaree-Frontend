@@ -2,7 +2,7 @@
   @if (loading()) {
     <div class="loading-state">
       <mat-spinner diameter="64"></mat-spinner>
-      <p>Cargando información del doctor...</p>
+      <p>{{ 'hospitalDoctors.edit.states.loading' | translate }}</p>
     </div>
   } @else {
     <div class="edit-content">
@@ -14,9 +14,11 @@
         <div class="header-info">
           <h1>
             <mat-icon>edit</mat-icon>
-            Editar Doctor
+            {{ 'hospitalDoctors.edit.header.title' | translate }}
           </h1>
-          <p class="subtitle">Actualiza la información del doctor {{ doctor()?.fullName }}</p>
+          <p class="subtitle">
+            {{ 'hospitalDoctors.edit.header.subtitle' | translate:{ name: (doctor()?.fullName || '') } }}
+          </p>
         </div>
       </div>
 
@@ -27,36 +29,37 @@
           <div class="form-section">
             <h2 class="section-title">
               <mat-icon>person</mat-icon>
-              Información Personal
+              {{ 'hospitalDoctors.edit.sections.personal.title' | translate }}
             </h2>
+
             <div class="info-grid">
               <div class="info-item">
-                <span><mat-icon>person</mat-icon> Nombre Completo</span>
+                <span><mat-icon>person</mat-icon> {{ 'hospitalDoctors.edit.personal.fullName' | translate }}</span>
                 <p>{{ doctor()?.fullName }}</p>
               </div>
 
               <div class="info-item">
-                <span><mat-icon>badge</mat-icon> DNI</span>
+                <span><mat-icon>badge</mat-icon> {{ 'hospitalDoctors.edit.personal.dni' | translate }}</span>
                 <p>{{ doctor()?.dni }}</p>
               </div>
 
               <div class="info-item">
-                <span><mat-icon>local_hospital</mat-icon> Especialidad</span>
+                <span><mat-icon>local_hospital</mat-icon> {{ 'hospitalDoctors.edit.personal.specialty' | translate }}</span>
                 <p>{{ doctor()?.specialty }}</p>
               </div>
 
               <div class="info-item">
-                <span><mat-icon>card_membership</mat-icon> Número de Licencia</span>
+                <span><mat-icon>card_membership</mat-icon> {{ 'hospitalDoctors.edit.personal.licenseNumber' | translate }}</span>
                 <p>{{ doctor()?.licenseNumber }}</p>
               </div>
             </div>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Teléfono</mat-label>
-              <input 
-                matInput 
-                formControlName="phone" 
-                placeholder="987654321"
+              <mat-label>{{ 'hospitalDoctors.edit.fields.phone.label' | translate }}</mat-label>
+              <input
+                matInput
+                formControlName="phone"
+                [placeholder]="'hospitalDoctors.edit.fields.phone.placeholder' | translate"
                 type="tel">
               <mat-icon matPrefix>phone</mat-icon>
               @if (doctorForm.get('phone')?.invalid && doctorForm.get('phone')?.touched) {
@@ -69,17 +72,18 @@
           <div class="form-section">
             <h2 class="section-title">
               <mat-icon>medical_services</mat-icon>
-              Configuración Profesional
+              {{ 'hospitalDoctors.edit.sections.professional.title' | translate }}
             </h2>
+
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Tarifa de Consulta (S/)</mat-label>
-                <input 
-                  matInput 
-                  formControlName="consultationFee" 
+                <mat-label>{{ 'hospitalDoctors.edit.fields.consultationFee.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="consultationFee"
                   type="number"
                   min="0"
-                  placeholder="0"
+                  [placeholder]="'hospitalDoctors.edit.fields.consultationFee.placeholder' | translate"
                   step="0.01">
                 <mat-icon matPrefix>attach_money</mat-icon>
                 @if (doctorForm.get('consultationFee')?.invalid && doctorForm.get('consultationFee')?.touched) {
@@ -91,7 +95,7 @@
                 <mat-icon>how_to_reg</mat-icon>
                 <label>
                   <input type="checkbox" formControlName="acceptingPatients" />
-                  <span>Aceptando nuevos pacientes</span>
+                  <span>{{ 'hospitalDoctors.edit.fields.acceptingPatients.label' | translate }}</span>
                 </label>
               </div>
             </div>
@@ -99,27 +103,28 @@
 
           <!-- Action Buttons -->
           <div class="form-actions">
-            <button 
-              mat-stroked-button 
-              type="button" 
+            <button
+              mat-stroked-button
+              type="button"
               class="cancel-btn"
               (click)="goBack()"
               [disabled]="saving()">
               <mat-icon>close</mat-icon>
-              Cancelar
+              {{ 'common.cancel' | translate }}
             </button>
-            <button 
-              mat-raised-button 
-              type="submit" 
+
+            <button
+              mat-raised-button
+              type="submit"
               class="save-btn"
               [disabled]="doctorForm.invalid || saving()">
               @if (saving()) {
                 <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-                <span>Guardando...</span>
+                <span>{{ 'common.saving' | translate }}</span>
               } @else {
                 <ng-container>
                   <mat-icon>save</mat-icon>
-                  <span>Guardar Cambios</span>
+                  <span>{{ 'common.saveChanges' | translate }}</span>
                 </ng-container>
               }
             </button>

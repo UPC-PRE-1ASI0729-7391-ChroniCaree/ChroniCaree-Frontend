@@ -1,11 +1,11 @@
 ﻿{
   "alerts": {
     "title": "Alertas",
-    "viewAll": "Ver todo",
+    "viewAll": "Ver todas",
     "loading": "Cargando alertas...",
     "empty": {
       "title": "Sin alertas activas",
-      "subtitle": "Estás al día. No hay alertas por ahora."
+      "subtitle": "Estás al día. No hay alertas por el momento."
     },
     "actions": {
       "acknowledge": "Reconocer",
@@ -14,10 +14,10 @@
       "seeAll": "Ver todas las alertas"
     },
     "stats": {
-      "critical": "Críticas",
-      "high": "Altas",
-      "medium": "Medias",
-      "low": "Bajas"
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
     },
     "subtitle": "Monitorea tus signos vitales y alertas de salud",
     "tab": {
@@ -38,7 +38,6 @@
       }
     }
   },
-
   "clinical": {
     "registerSymptoms": "Registrar síntomas",
     "saving": "Guardando síntomas...",
@@ -55,19 +54,19 @@
     "severe": "Severo",
     "confirmation": {
       "title": "¡Síntomas registrados!",
-      "subtitle": "Tu información se ha guardado correctamente",
-      "summary": "Resumen de tu registro",
-      "doctorNotified": "Médico notificado",
-      "criticalValues": "Se detectaron valores críticos",
+      "subtitle": "Tu información ha sido guardada exitosamente",
+      "summary": "Resumen de tu entrada",
+      "doctorNotified": "Doctor notificado",
+      "criticalValues": "Valores críticos detectados",
       "viewHistory": "Ver mi historial",
       "backToDashboard": "Volver al panel"
     },
     "subjective": {
-      "title": "Síntomas Subjetivos",
-      "subtitle": "Cómo te sientes hoy (escala 1-10)"
+      "title": "Síntomas subjetivos",
+      "subtitle": "¿Cómo te sientes hoy? (Escala 1–10)"
     },
     "notesSubtitle": "Describe cualquier otro síntoma o detalle importante",
-    "notesPlaceholder": "Ej: Dolor de cabeza desde esta mañana, aumenta con la luz...",
+    "notesPlaceholder": "Ej. Dolor de cabeza desde la mañana, empeora con la luz...",
     "scale": {
       "veryLow": "Muy bajo",
       "low": "Bajo",
@@ -78,36 +77,34 @@
     "vitals": {
       "glucose": {
         "label": "Glucosa (mg/dL)",
-        "placeholder": "Ej: 120",
-        "errorRange": "Valor debe estar entre 0 y 600 mg/dL"
+        "placeholder": "ej. 120",
+        "errorRange": "El valor debe estar entre 0 y 600 mg/dL"
       },
       "bloodPressure": {
-        "label": "Presión Arterial (mmHg)",
-        "placeholder": "Ej: 120/80",
-        "errorPattern": "Formato inválido. Use XXX/XX (ej: 120/80)"
+        "label": "Presión arterial (mmHg)",
+        "placeholder": "ej. 120/80",
+        "errorPattern": "Formato inválido. Usa XXX/XX (ej. 120/80)"
       },
       "heartRate": {
-        "label": "Frecuencia Cardíaca (bpm)",
-        "placeholder": "Ej: 72",
-        "errorRange": "Valor debe estar entre 30 y 220 bpm"
+        "label": "Frecuencia cardíaca (lpm)",
+        "placeholder": "ej. 72",
+        "errorRange": "El valor debe estar entre 30 y 220 lpm"
       },
       "temperature": {
         "label": "Temperatura (°C)",
-        "placeholder": "Ej: 36.5",
-        "errorRange": "Valor debe estar entre 34 y 42 °C"
+        "placeholder": "ej. 36.5",
+        "errorRange": "El valor debe estar entre 34 y 42 °C"
       },
       "oxygenSaturation": {
-        "label": "Saturación de Oxígeno (%)",
-        "placeholder": "Ej: 98",
-        "errorRange": "Valor debe estar entre 0 y 100%"
+        "label": "Saturación de oxígeno (%)",
+        "placeholder": "ej. 98",
+        "errorRange": "El valor debe estar entre 0 y 100%"
       }
     }
-
   },
-
   "patients": {
     "loading": "Cargando tu información...",
-    "greeting": "Hola, {{name}}!",
+    "greeting": "¡Hola, {{name}}!",
     "years": "años",
     "registerSymptom": "Registrar síntoma",
     "viewDiagnoses": "Ver diagnósticos",
@@ -125,7 +122,7 @@
     "reminders": "Recordatorios",
     "recentSymptoms": "Síntomas recientes",
     "viewHistory": "Ver historial",
-    "noRecentSymptoms": "No se han registrado síntomas recientes",
+    "noRecentSymptoms": "No hay síntomas recientes registrados",
     "severity": {
       "low": "Leve",
       "medium": "Moderado",
@@ -137,7 +134,7 @@
       "loading": "Cargando perfil...",
       "personal": {
         "title": "Información personal",
-        "subtitle": "Datos básicos de tu perfil"
+        "subtitle": "Detalles básicos de tu perfil"
       },
       "errors": {
         "firstName": {
@@ -165,18 +162,18 @@
           "max": "El peso máximo es 300 kg"
         },
         "height": {
-          "required": "La talla es obligatoria",
-          "min": "La talla mínima es 50 cm",
-          "max": "La talla máxima es 250 cm"
+          "required": "La estatura es obligatoria",
+          "min": "La estatura mínima es 50 cm",
+          "max": "La estatura máxima es 250 cm"
         }
       },
       "ageLabel": "Edad: {{age}} años",
       "measurements": {
         "title": "Medidas corporales",
-        "subtitle": "Peso y talla para el cálculo del IMC"
+        "subtitle": "Peso y estatura para el cálculo del IMC"
       },
       "weight": "Peso (kg)",
-      "height": "Talla (cm)",
+      "height": "Estatura (cm)",
       "bmi": {
         "title": "Índice de Masa Corporal (IMC)",
         "labels": {
@@ -188,12 +185,11 @@
       }
     },
     "bmiLabel": "IMC",
-    "noActiveDiagnoses": "No tienes diagnósticos activos"
+    "noActiveDiagnoses": "Sin diagnósticos activos"
   },
-
   "medications": {
-    "todayTitle": "Medicaciones de hoy",
-    "viewAll": "Ver todas",
+    "todayTitle": "Medicamentos de hoy",
+    "viewAll": "Ver todos",
     "adherence": "Adherencia",
     "loading": "Cargando medicamentos...",
     "emptyToday": "No tienes medicamentos programados para hoy",
@@ -211,11 +207,11 @@
     },
     "footer": {
       "active": "{{count}} activos",
-      "needRefill": "{{count}} requieren reposición"
+      "needRefill": "{{count}} necesitan reposición"
     },
     "history": {
-      "title": "💊 Mis Medicamentos",
-      "subtitle": "Historial y registro de medicación",
+      "title": "💊 Mis medicamentos",
+      "subtitle": "Historial y seguimiento de medicación",
       "addMedication": "Agregar medicamento",
       "stats": {
         "adherence": "Adherencia",
@@ -229,10 +225,10 @@
       },
       "emptyActive": "No tienes medicamentos activos",
       "emptyAll": "No se encontraron medicamentos",
-      "prescribedBy": "Prescrito por:",
-      "prescribed": "Prescrito:",
+      "prescribedBy": "Recetado por:",
+      "prescribed": "Recetado:",
       "date": "Fecha:",
-      "lastTaken": "Último:",
+      "lastTaken": "Última:",
       "schedules": "Horarios",
       "instructions": "Instrucciones",
       "actions": {
@@ -241,9 +237,9 @@
       },
       "quickAdd": {
         "title": "Agregar medicamento rápido",
-        "description": "Usa este panel para añadir un medicamento rápidamente.",
+        "description": "Usa este panel para agregar rápidamente un medicamento.",
         "name": "Nombre",
-        "dosage": "Dosificación",
+        "dosage": "Dosis",
         "add": "Agregar",
         "moreOptions": "Más opciones"
       },
@@ -256,22 +252,53 @@
       }
     }
   },
-
   "nudges": {
-    "empty": "¡Genial! No tienes recordatorios pendientes"
+    "empty": "¡Genial! No tienes recordatorios pendientes",
+    "loading": "Cargando recordatorios...",
+    "later": "Más tarde",
+    "snooze1h": "Posponer 1 hora",
+    "dismiss": "Descartar",
+    "snack": {
+      "dismissed": "Recordatorio descartado",
+      "dismissError": "Error al descartar recordatorio",
+      "snoozed1h": "Recordatorio pospuesto por 1 hora",
+      "snoozeError": "Error al posponer recordatorio"
+    }
   },
-
+  "nudgesPage": {
+    "title": "Recordatorios",
+    "subtitle": "Gestiona tus notificaciones y recordatorios importantes",
+    "active": "Activos",
+    "createReminder": "Crear recordatorio",
+    "form": {
+      "titleLabel": "Título",
+      "titlePlaceholder": "ej. Tomar medicamento",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Detalles del recordatorio",
+      "priorityLabel": "Prioridad",
+      "priority": {
+        "low": "Baja",
+        "medium": "Media",
+        "high": "Alta",
+        "urgent": "Urgente"
+      }
+    },
+    "defaults": {
+      "quickTitle": "Recordatorio rápido",
+      "quickMessage": "Recordatorio creado desde la interfaz"
+    }
+  },
   "doctors": {
     "welcome": "Bienvenido, {{name}}",
     "exportPdf": "Exportar PDF",
     "exporting": "Exportando...",
     "newAppointment": "Nueva cita",
     "appointmentsToday": "Citas de hoy",
-    "viewAll": "Ver todo",
+    "viewAll": "Ver todas",
     "noAppointmentsToday": "No hay citas programadas para hoy",
     "review": "Revisar",
     "allCaughtUp": "¡Todo al día!",
-    "noPendingRecords": "No hay registros pendientes por revisar",
+    "noPendingRecords": "No hay registros pendientes de revisión",
     "pending": "Pendiente",
     "reviewRecord": "Revisar registro",
     "weeklySummary": "Resumen semanal",
@@ -279,11 +306,16 @@
     "pendingReviews": "Revisiones pendientes",
     "activePatients": "Pacientes activos",
     "avgDuration": "Duración promedio",
+    "criticalAlerts": "Alertas Críticas",
+    "noCriticalAlerts": "No hay alertas críticas",
+    "pendingReviewsTitle": "Historiales Pendientes de Revisión",
     "appointments": {
-      "title": "Mis citas",
-      "subtitle": "Gestiona tus citas con pacientes",
-      "today": "Citas de hoy",
-      "upcoming": "Próximas citas",
+      "title": "Citas Médicas",
+      "subtitle": "Vista general y gestión de tus próximas citas.",
+      "today": "Citas Hoy",
+      "upcoming": "Próximas Citas",
+      "all": "Todas",
+      "completed": "Completadas",
       "loading": "Cargando citas...",
       "empty": {
         "title": "Sin citas",
@@ -292,12 +324,13 @@
       "status": {
         "scheduled": "📅 Programada",
         "confirmed": "✅ Confirmada",
-        "inProgress": "⏳ En curso",
+        "inProgress": "⏳ En progreso",
         "completed": "✔️ Completada",
         "cancelled": "❌ Cancelada",
-        "noShow": "🚫 Inasistencia"
+        "noShow": "🚫 No se presentó"
       },
       "actions": {
+        "refresh": "Actualizar",
         "confirm": "Confirmar",
         "start": "Iniciar",
         "complete": "Completar",
@@ -306,12 +339,131 @@
         "scheduled": "Programada",
         "completed": "Completada"
       }
+    },
+    "patients": {
+      "title": "Mis pacientes",
+      "subtitle": "Gestiona y monitorea tus pacientes asignados",
+      "loading": "Cargando pacientes...",
+      "actions": {
+        "requestPatient": "Solicitar paciente",
+        "refresh": "Actualizar"
+      },
+      "stats": {
+        "total": "Total de pacientes",
+        "critical": "Pacientes críticos",
+        "atRisk": "En riesgo",
+        "criticalAlerts": "Alertas críticas"
+      },
+      "empty": {
+        "title": "Sin pacientes asignados",
+        "subtitle": "Los pacientes asignados aparecerán aquí"
+      },
+      "status": {
+        "critical": "Crítico",
+        "atRisk": "En riesgo",
+        "controlled": "Controlado",
+        "stable": "Estable"
+      },
+      "metric": {
+        "criticalAlerts": "Alertas críticas",
+        "activeAlerts": "Alertas activas",
+        "medications": "Medicamentos",
+        "diagnoses": "Diagnósticos"
+      },
+      "vitals": {
+        "header": "Últimos signos vitales",
+        "glucose": "Glucosa",
+        "bloodPressure": "Presión arterial",
+        "heartRate": "Frecuencia cardíaca",
+        "oxygenSaturation": "Saturación de oxígeno"
+      },
+      "footer": {
+        "assignedSince": "Asignado",
+        "viewDetails": "Ver detalles"
+      }
+    },
+    "records": {
+      "title": "Historiales Médicos",
+      "subtitle": "Registros médicos de tus pacientes",
+      "loading": "Cargando registros...",
+      "empty": "No hay registros",
+      "patientLabel": "Paciente",
+      "notes": "Notas",
+      "actions": {
+        "refresh": "Actualizar"
+      },
+      "stats": {
+        "total": "Total Registros",
+        "vitalSigns": "Signos Vitales",
+        "symptoms": "Síntomas",
+        "consultations": "Consultas"
+      },
+      "tabs": {
+        "all": "Todos",
+        "vitalSigns": "Signos Vitales",
+        "symptoms": "Síntomas",
+        "consultations": "Consultas"
+      },
+      "vitals": {
+        "glucose": "Glucosa",
+        "bloodPressure": "Presión",
+        "heartRate": "Frecuencia",
+        "temperature": "Temperatura"
+      },
+      "symptoms": {
+        "fatigue": "Fatiga",
+        "pain": "Dolor",
+        "dizziness": "Mareo"
+      },
+      "consultation": {
+        "diagnosis": "Diagnóstico",
+        "treatment": "Tratamiento"
+      }
+    },
+    "profileEdit": {
+      "title": "Editar Perfil Profesional",
+      "subtitle": "Actualiza tu información profesional y de contacto",
+      "loading": "Cargando información del perfil...",
+      "sections": {
+        "personal": {
+          "title": "Información Personal",
+          "subtitle": "Datos básicos de identificación"
+        },
+        "professional": {
+          "title": "Información Profesional",
+          "subtitle": "Credenciales y especialización médica"
+        },
+        "additional": {
+          "title": "Configuración Adicional",
+          "subtitle": "Preferencias y disponibilidad"
+        }
+      },
+      "fields": {
+        "specialty": "Especialidad",
+        "licenseNumber": "Número de Colegiatura",
+        "licenseDate": "Fecha de Colegiatura",
+        "yearsExperience": "Años de Experiencia",
+        "bio": "Biografía Profesional",
+        "fee": "Tarifa de Consulta (S/.)",
+        "languages": "Idiomas",
+        "emergencies": "Disponible para emergencias"
+      },
+      "placeholders": {
+        "firstName": "Ej: María",
+        "lastName": "Ej: López",
+        "specialty": "Selecciona tu especialidad",
+        "licenseNumber": "Ej: CMP-12345",
+        "bio": "Describe tu experiencia, áreas de interés y enfoque profesional...",
+        "languages": "Español, Inglés"
+      },
+      "hints": {
+        "fee": "Precio por consulta en soles"
+      }
     }
   },
-
   "appointments": {
     "scheduler": {
-      "title": "Programar nueva cita",
+      "title": "Agendar nueva cita",
       "subtitle": "Reserva una cita con tu médico asignado",
       "date": {
         "label": "Fecha de la cita",
@@ -320,61 +472,102 @@
       "time": {
         "label": "Hora de la cita",
         "placeholder": "Selecciona una hora",
-        "hint": "Horario de atención: 8:00 a. m. - 6:00 p. m."
+        "hint": "Horario de atención: 8:00 AM - 6:00 PM"
       },
       "type": {
         "label": "Tipo de cita"
       },
       "types": {
         "consultation": "Consulta de chequeo",
-        "followUp": "Control",
+        "followUp": "Seguimiento",
         "emergency": "Emergencia",
-        "routineCheck": "Chequeo rutinario",
+        "routineCheck": "Chequeo de rutina",
         "labResults": "Revisión de resultados de laboratorio"
       },
       "notes": {
         "label": "Notas adicionales (opcional)",
-        "placeholder": "Describe el motivo de tu visita o información relevante para tu médico...",
+        "placeholder": "Describe la razón de tu visita o cualquier información relevante para tu médico...",
         "hint": "Máximo 500 caracteres"
       },
       "info": {
         "title": "Información importante:",
         "items": {
           "notify": "Tu médico recibirá una notificación inmediata.",
-          "status": "La cita permanecerá \"Programada\" hasta que el médico la confirme.",
+          "status": "La cita permanecerá como \"Programada\" hasta que el médico la confirme.",
           "reminder": "Recibirás un recordatorio 24 horas antes de la cita."
         }
       },
       "cancel": "Cancelar",
-      "submit": "Programar cita",
-      "submitting": "Programando..."
+      "submit": "Agendar cita",
+      "submitting": "Agendando..."
     }
   },
-
   "navigation": {
     "patient": {
       "dashboard": "Panel",
       "myHealth": "Mi salud",
       "appointments": "Mis citas",
       "medications": "Medicamentos",
-      "medicalRecord": "Historial médico",
-      "medicalRecords": "Historial médico",
+      "medicalRecord": "Historia clínica",
+      "medicalRecords": "Historia clínica",
       "reminders": "Recordatorios",
       "devices": "Mis dispositivos",
       "messages": "Mensajes"
     },
     "doctor": {
-      "dashboard": "Panel",
-      "patients": "Mis pacientes",
-      "appointments": "Mis citas",
-      "records": "Historias clínicas"
+      "ariaLabel": "Menú del médico",
+      "dashboard": "Dashboard",
+      "patients": "Pacientes",
+      "appointments": "Citas",
+      "records": "Historiales",
+      "messages": "Mensajes"
     }
   },
-
   "devices": {
     "status": {
       "connected": "Conectado",
       "disconnected": "Desconectado"
+    },
+    "benefits": {
+      "title": "Beneficios del monitoreo IoT",
+      "realTime": {
+        "title": "Datos en tiempo real",
+        "description": "Visualiza tus métricas de salud constantemente actualizadas"
+      },
+      "alerts": {
+        "title": "Alertas automáticas",
+        "description": "Recibe notificaciones cuando tus valores estén fuera de rango"
+      },
+      "history": {
+        "title": "Historial completo",
+        "description": "Accede al historial completo de todas tus mediciones"
+      },
+      "share": {
+        "title": "Compartir con médicos",
+        "description": "Tu médico puede ver tus datos de forma remota"
+      }
+    },
+    "cards": {
+      "glucometer": {
+        "name": "Glucómetro",
+        "description": "Monitorea los niveles de glucosa en sangre para el control de la diabetes"
+      },
+      "bloodPressure": {
+        "name": "Monitor de presión arterial",
+        "description": "Mide la presión sistólica, diastólica y la frecuencia cardíaca"
+      },
+      "pulseOximeter": {
+        "name": "Oxímetro de pulso",
+        "description": "Saturación de oxígeno en tiempo real (SpO2) y frecuencia cardíaca"
+      },
+      "ecg": {
+        "name": "Monitor ECG",
+        "description": "Electrocardiograma portátil para análisis del ritmo cardíaco"
+      },
+      "smartScale": {
+        "name": "Balanza inteligente",
+        "description": "Análisis de peso, IMC, composición corporal y masa"
+      }
     },
     "common": {
       "lastReading": "Última lectura",
@@ -383,7 +576,9 @@
         "manufacturer": "Fabricante:",
         "model": "Modelo:",
         "serialNumber": "Número de serie:",
-        "lastSync": "Última sincronización:"
+        "lastSync": "Última sincr.:",
+        "save": "Guardar",
+        "view": "Ver"
       }
     },
     "list": {
@@ -400,30 +595,30 @@
       "cards": {
         "glucometer": {
           "title": "Glucómetro",
-          "description": "Monitoreo de niveles de glucosa en sangre para control de diabetes"
+          "description": "Monitorea los niveles de glucosa en sangre para el control de la diabetes"
         },
         "bloodPressure": {
           "title": "Monitor de presión arterial",
-          "description": "Mide presión sistólica, diastólica y frecuencia cardíaca"
+          "description": "Mide la presión sistólica, diastólica y la frecuencia cardíaca"
         },
         "pulseOximeter": {
           "title": "Oxímetro de pulso",
-          "description": "Saturación de oxígeno (SpO2) y frecuencia cardíaca en tiempo real"
+          "description": "Saturación de oxígeno en tiempo real (SpO2) y frecuencia cardíaca"
         },
         "ecg": {
           "title": "Monitor ECG",
           "description": "Electrocardiograma portátil para análisis del ritmo cardíaco"
         },
         "smartScale": {
-          "title": "Báscula inteligente",
-          "description": "Peso, IMC, composición corporal y análisis de masa"
+          "title": "Balanza inteligente",
+          "description": "Análisis de peso, IMC, composición corporal y masa"
         }
       },
       "benefits": {
         "title": "Beneficios del monitoreo IoT",
         "realTime": {
           "title": "Datos en tiempo real",
-          "description": "Visualiza tus métricas de salud actualizadas constantemente"
+          "description": "Visualiza tus métricas de salud constantemente actualizadas"
         },
         "alerts": {
           "title": "Alertas automáticas",
@@ -431,7 +626,7 @@
         },
         "history": {
           "title": "Historial completo",
-          "description": "Accede al histórico de todas tus mediciones"
+          "description": "Accede al historial completo de todas tus mediciones"
         },
         "share": {
           "title": "Compartir con médicos",
@@ -442,23 +637,23 @@
     "options": {
       "glucometer": {
         "name": "Glucómetro",
-        "description": "Monitoreo de niveles de glucosa en sangre para control de diabetes"
+        "description": "Monitorea los niveles de glucosa en sangre para el control de la diabetes"
       },
       "bloodPressure": {
         "name": "Monitor de presión arterial",
-        "description": "Mide presión sistólica, diastólica y frecuencia cardíaca"
+        "description": "Mide la presión sistólica, diastólica y la frecuencia cardíaca"
       },
       "pulseOximeter": {
         "name": "Oxímetro de pulso",
-        "description": "Saturación de oxígeno (SpO2) y frecuencia cardíaca en tiempo real"
+        "description": "Saturación de oxígeno en tiempo real (SpO2) y frecuencia cardíaca"
       },
       "ecg": {
         "name": "Monitor ECG",
         "description": "Electrocardiograma portátil para análisis del ritmo cardíaco"
       },
       "smartScale": {
-        "name": "Báscula inteligente",
-        "description": "Peso, IMC, composición corporal y análisis de masa"
+        "name": "Balanza inteligente",
+        "description": "Análisis de peso, IMC, composición corporal y masa"
       }
     },
     "glucometer": {
@@ -497,30 +692,125 @@
       "tips": {
         "title": "Consejos de salud",
         "tip1": "Mide tu glucosa antes y después de las comidas para un mejor control.",
-        "tip2": "Mantén una buena hidratación para obtener lecturas más precisas.",
+        "tip2": "Mantente bien hidratado para obtener lecturas más precisas.",
         "tip3": "Registra siempre la hora y el contexto de cada medición."
       }
     }
   },
-
-  "roles": {
-    "patient": "Paciente",
-    "doctor": "Médico",
-    "hospital_admin": "Administrador del hospital"
+  "messages": {
+    "inbox": {
+      "title": "Mensajes",
+      "assignedDoctor": "Médico asignado",
+      "noMessages": "Sin mensajes",
+      "noSubject": "(Sin asunto)",
+      "patient": "Paciente",
+      "patientId": "Paciente #{{id}}",
+      "actions": {
+        "search": "Buscar",
+        "newMessage": "Nuevo mensaje"
+      },
+      "search": {
+        "placeholder": "Buscar conversaciones...",
+        "aria": "Buscar conversaciones"
+      },
+      "empty": {
+        "title": "Sin conversaciones",
+        "patientText": "Inicia una conversación con tu médico",
+        "doctorText": "Tus pacientes aún no han enviado mensajes"
+      }
+    },
+    "detailEmpty": {
+      "title": "Selecciona una conversación para empezar a chatear",
+      "subtitle": "Verás el chat aquí cuando selecciones una conversación. Puedes responder desde el panel derecho."
+    },
+    "sender": {
+      "you": "Tú:",
+      "patient": "Paciente:",
+      "doctor": "Doctor:"
+    },
+    "compose": {
+      "breadcrumbs": {
+        "messages": "Mensajes",
+        "new": "Nuevo"
+      },
+      "title": "Nuevo mensaje para el doctor",
+      "backToInbox": "Volver a la bandeja",
+      "noDoctor": {
+        "title": "No tienes un médico asignado",
+        "subtitle": "Debes tener un médico asignado para enviar mensajes. Por favor, contacta al administrador."
+      },
+      "to": {
+        "label": "Para",
+        "selectPatient": "Selecciona un paciente...",
+        "yourDoctorWithId": "Tu médico (ID: {{id}})",
+        "noDoctorAssigned": "Sin médico asignado"
+      },
+      "subject": {
+        "label": "Asunto",
+        "placeholder": "ej. Consulta por dolor de cabeza"
+      },
+      "body": {
+        "label": "Mensaje",
+        "placeholder": "Describe tu inquietud clínica con el mayor detalle posible...",
+        "hint": "Evita compartir datos sensibles innecesarios."
+      },
+      "urgent": {
+        "label": "Marcar como urgente",
+        "hint": "Este mensaje será marcado como prioritario para tu médico."
+      },
+      "attachments": {
+        "label": "Adjuntos",
+        "select": "Seleccionar archivos",
+        "dropTitle": "Arrastra y suelta aquí",
+        "dropSub": "o haz clic en “Seleccionar archivos”",
+        "removeAria": "Eliminar archivo"
+      },
+      "actions": {
+        "send": "Enviar mensaje",
+        "sending": "Enviando..."
+      },
+      "alerts": {
+        "fillAll": "Por favor completa todos los campos y asegúrate de tener un médico asignado.",
+        "missingRecipient": "Falta el remitente o el destinatario.",
+        "sentOk": "Mensaje enviado exitosamente.",
+        "sendError": "Error al enviar el mensaje. Por favor intenta de nuevo."
+      }
+    }
   },
-
   "common": {
-    "firstName": "Nombre",
-    "lastName": "Apellido",
+    "firstName": "Nombres",
+    "lastName": "Apellidos",
     "birthDate": "Fecha de nacimiento",
     "phone": "Teléfono",
     "address": "Dirección",
     "cancel": "Cancelar",
     "saveChanges": "Guardar cambios",
     "logout": "Cerrar sesión",
-    "back": "Volver"
+    "back": "Atrás",
+    "na": "N/A",
+    "edit": "Editar",
+    "years": "años",
+    "dniLabel": "DNI",
+    "ageUnit": "años",
+    "units": {
+      "glucose": "mg/dL",
+      "heartRate": "lpm"
+    },
+    "actions": {
+      "retry": "Reintentar"
+    },
+    "saving": "Guardando...",
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "minlength": "Mínimo {{min}} caracteres",
+      "min": "El valor debe ser mayor o igual a 0"
+    }
   },
-
+  "roles": {
+    "patient": "Paciente",
+    "doctor": "Doctor",
+    "hospital_admin": "Admin del Hospital"
+  },
   "diagnoses": {
     "header": {
       "title": "Mis diagnósticos médicos",
@@ -540,13 +830,13 @@
       "resolved": "Resueltos ({{count}})"
     },
     "empty": {
-      "title": "No hay diagnósticos en esta categoría",
+      "title": "Sin diagnósticos en esta categoría",
       "all": "Aún no se han registrado diagnósticos médicos",
       "filtered": "No tienes diagnósticos en esta categoría"
     },
     "timeline": {
       "diagnosed": "Diagnosticado:",
-      "since": "Hace {{days}} días",
+      "since": "hace {{days}} días",
       "resolved": "Resuelto:",
       "lastReview": "Última revisión:"
     },
@@ -567,7 +857,7 @@
       "active": "Activo",
       "controlled": "Controlado",
       "resolved": "Resuelto",
-      "monitoring": "En monitoreo",
+      "monitoring": "Bajo monitoreo",
       "unknown": "Desconocido"
     },
     "severity": {
@@ -576,6 +866,721 @@
       "high": "Alto",
       "critical": "Crítico",
       "unknown": "Desconocido"
+    }
+  },
+  "hospitalDashboard": {
+    "header": {
+      "title": "Panel del Hospital",
+      "subtitle": "Resumen de métricas y estadísticas clave"
+    },
+    "states": {
+      "loading": "Cargando panel..."
+    },
+    "errors": {
+      "noHospital": "No se encontró ningún hospital asociado",
+      "loadError": "Error cargando el panel"
+    },
+    "subscription": {
+      "title": "Suscripción activa",
+      "noPlan": "Sin plan",
+      "manage": "Gestionar",
+      "statusLabel": "Estado",
+      "monthlyPrice": "Precio mensual",
+      "nextRenewal": "Próxima renovación",
+      "statuses": {
+        "active": "Activa",
+        "inactive": "Inactiva",
+        "cancelled": "Cancelada",
+        "paused": "Pausada",
+        "expired": "Vencida",
+        "unknown": "Desconocido"
+      }
+    },
+    "metrics": {
+      "doctors": "Médicos",
+      "patients": "Pacientes",
+      "monthlyInvestment": "Inversión mensual",
+      "unlimited": "Ilimitado",
+      "ofAvailable": "de {{max}} disponibles",
+      "avgPatientsPerDoctor": "~{{avg}} por médico",
+      "plan": "Plan {{name}}"
+    },
+    "charts": {
+      "patientsPerMonth": "Pacientes por mes",
+      "yearDistribution": "Distribución anual",
+      "tooltipPatients": "{{count}} pacientes",
+      "months": {
+        "jan": "Ene",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Abr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Ago",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dic"
+      }
+    },
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "registerDoctor": {
+        "title": "Registrar médico",
+        "subtitle": "Agregar un nuevo médico"
+      },
+      "registerPatient": {
+        "title": "Registrar paciente",
+        "subtitle": "Agregar un nuevo paciente"
+      },
+      "assignDoctor": {
+        "title": "Asignar médico",
+        "subtitle": "Médico → Paciente"
+      },
+      "upgradePlan": {
+        "title": "Mejorar plan",
+        "subtitle": "Actualizar suscripción"
+      }
+    }
+  },
+  "hospital": {
+    "profileEdit": {
+      "header": {
+        "title": "Configuración del Hospital",
+        "subtitle": "Gestiona la información de tu hospital y tu perfil de administrador"
+      },
+      "loading": "Cargando información...",
+      "hospitalCard": {
+        "title": "Información del Hospital",
+        "subtitle": "Detalles generales y de contacto de la institución"
+      },
+      "adminCard": {
+        "title": "Mi perfil personal",
+        "subtitle": "Información de tu cuenta de administrador"
+      },
+      "sections": {
+        "general": {
+          "title": "Detalles generales"
+        },
+        "contact": {
+          "title": "Información de contacto"
+        },
+        "personal": {
+          "title": "Detalles personales"
+        }
+      },
+      "fields": {
+        "hospitalName": {
+          "label": "Nombre del hospital",
+          "placeholder": "Hospital General Central"
+        },
+        "address": {
+          "label": "Dirección",
+          "placeholder": "Av. Principal 123"
+        },
+        "city": {
+          "label": "Ciudad",
+          "placeholder": "Lima"
+        },
+        "state": {
+          "label": "Departamento/Región",
+          "placeholder": "Lima"
+        },
+        "zipCode": {
+          "label": "Código postal",
+          "placeholder": "15001"
+        },
+        "phone": {
+          "label": "Teléfono principal",
+          "placeholder": "987654321"
+        },
+        "institutionalEmail": {
+          "label": "Correo institucional",
+          "placeholder": "contacto@hospital.com"
+        },
+        "website": {
+          "label": "Sitio web (opcional)",
+          "placeholder": "https://www.hospital.com"
+        },
+        "fullName": {
+          "label": "Nombre completo",
+          "placeholder": "Dr. Juan Pérez"
+        },
+        "personalEmail": {
+          "label": "Correo personal",
+          "placeholder": "admin@hospital.com"
+        },
+        "personalPhone": {
+          "label": "Teléfono personal",
+          "placeholder": "987654321"
+        },
+        "position": {
+          "placeholder": "Administrador del Hospital"
+        }
+      },
+      "errors": {
+        "name": {
+          "required": "El nombre es obligatorio",
+          "minlength": "Mínimo 3 caracteres"
+        },
+        "fullName": {
+          "required": "El nombre completo es obligatorio",
+          "minlength": "Mínimo 3 caracteres"
+        },
+        "address": {
+          "required": "La dirección es obligatoria"
+        },
+        "city": {
+          "required": "La ciudad es obligatoria"
+        },
+        "state": {
+          "required": "El departamento/región es obligatorio"
+        },
+        "zipCode": {
+          "required": "El código postal es obligatorio",
+          "pattern": "Debe tener 5 dígitos"
+        },
+        "phone": {
+          "required": "El teléfono es obligatorio",
+          "pattern": "Formato inválido (9–10 dígitos)"
+        },
+        "email": {
+          "required": "El correo es obligatorio",
+          "email": "Correo inválido"
+        },
+        "position": {
+          "required": "El cargo/puesto es obligatorio"
+        }
+      },
+      "actions": {
+        "saveHospital": "Guardar información del hospital",
+        "saveAdmin": "Guardar mi perfil"
+      },
+      "defaults": {
+        "position": "Administrador del Hospital"
+      },
+      "snack": {
+        "noTenant": "No se encontró hospital para esta cuenta.",
+        "loadError": "Error cargando datos del hospital.",
+        "hospitalInvalid": "Por favor completa todos los campos requeridos del hospital.",
+        "hospitalSaved": "✅ Información del hospital actualizada exitosamente.",
+        "hospitalSaveError": "❌ Error actualizando la información del hospital.",
+        "adminInvalid": "Por favor completa todos los campos requeridos del perfil.",
+        "adminSaved": "✅ Perfil actualizado exitosamente.",
+        "adminSaveError": "❌ Error actualizando el perfil."
+      }
+    },
+    "subscription": {
+      "header": {
+        "title": "Gestión de suscripción",
+        "subtitle": "Gestiona el plan de suscripción de tu hospital"
+      },
+      "loading": "Cargando información...",
+      "current": {
+        "title": "Suscripción actual",
+        "plan": "Plan",
+        "start": "Inicio",
+        "renewal": "Renovación",
+        "lastPayment": "Último pago"
+      },
+      "plans": {
+        "title": "Planes disponibles"
+      },
+      "billing": {
+        "month": "mes",
+        "year": "año"
+      },
+      "features": {
+        "doctorsCount": "{{count}} médicos",
+        "patientsCount": "{{count}} pacientes",
+        "doctorsUnlimited": "Médicos ilimitados",
+        "patientsUnlimited": "Pacientes ilimitados",
+        "advancedAnalytics": "Analítica avanzada",
+        "customBranding": "Marca personalizada",
+        "supportPrefix": "Soporte"
+      },
+      "support": {
+        "standard": "estándar",
+        "dedicated": "dedicado"
+      },
+      "actions": {
+        "select": "Seleccionar plan",
+        "renew": "Renovar plan",
+        "manage": "Gestionar"
+      },
+      "status": {
+        "active": "Activa",
+        "cancelled": "Cancelada",
+        "expired": "Vencida",
+        "pending": "Pendiente",
+        "unknown": "Desconocido"
+      }
+    },
+    "adminSidebar": {
+      "ariaLabel": "Menú de administración",
+      "brand": {
+        "ariaDashboard": "Ir al panel",
+        "alt": "ChroniCaree",
+        "name": "ChroniCaree"
+      },
+      "menu": {
+        "dashboard": "Panel",
+        "doctors": "Médicos",
+        "patients": "Pacientes",
+        "registerPatient": "Registrar paciente",
+        "assignments": "Asignaciones",
+        "subscription": "Suscripción"
+      },
+      "footer": {
+        "logout": "Cerrar sesión"
+      }
+    },
+    "doctors": {
+      "header": {
+        "title": "Gestión de Médicos",
+        "subtitle": "Gestiona los médicos y sus pacientes asignados"
+      },
+      "actions": {
+        "addDoctor": "Agregar médico",
+        "editTooltip": "Editar médico",
+        "deleteTooltip": "Eliminar médico"
+      },
+      "stats": {
+        "activeDoctors": "Médicos activos",
+        "assignedPatients": "Pacientes asignados"
+      },
+      "card": {
+        "patientsCount": "{{count}} pacientes"
+      },
+      "contact": {
+        "title": "Información de contacto",
+        "license": "Licencia: {{license}}"
+      },
+      "patients": {
+        "title": "Pacientes asignados ({{count}})",
+        "empty": "Este médico aún no tiene pacientes asignados",
+        "assignCta": "Asignar pacientes"
+      },
+      "patient": {
+        "age": "{{age}} años",
+        "conditionFallback": "Ver historial"
+      },
+      "empty": {
+        "title": "No hay médicos registrados",
+        "subtitle": "Empieza agregando al primer médico de tu hospital",
+        "cta": "Agregar primer médico"
+      },
+      "errors": {
+        "noAuthUser": "No se encontró usuario autenticado",
+        "noTenant": "El usuario no tiene hospital asignado",
+        "loadDoctors": "Error cargando los médicos del hospital"
+      },
+      "confirm": {
+        "delete": "¿Estás seguro de que quieres eliminar al Dr. {{name}}?\n\nEsta acción no se puede deshacer. El médico será eliminado permanentemente del sistema."
+      },
+      "snack": {
+        "deleted": "Médico {{name}} eliminado exitosamente",
+        "deleteError": "Error al eliminar médico. Por favor intenta de nuevo."
+      }
+    },
+    "patients": {
+      "header": {
+        "title": "Gestión de Pacientes",
+        "subtitle": "Ver y gestionar todos los pacientes del hospital"
+      },
+      "actions": {
+        "registerPatient": "Registrar paciente",
+        "viewDetails": "Ver detalles"
+      },
+      "stats": {
+        "total": "Total de pacientes",
+        "active": "Activos",
+        "critical": "Críticos"
+      },
+      "search": {
+        "label": "Buscar paciente, condición o médico...",
+        "placeholder": "ej., María, Diabetes, Dr. Pérez"
+      },
+      "card": {
+        "age": "{{age}} años",
+        "conditionLabel": "Condición",
+        "assignedDoctorLabel": "Médico asignado",
+        "lastVisitLabel": "Última visita"
+      },
+      "statuses": {
+        "active": "Activo",
+        "monitoring": "Bajo monitoreo",
+        "critical": "Crítico"
+      },
+      "genders": {
+        "male": "Masculino",
+        "female": "Femenino"
+      },
+      "defaults": {
+        "condition": "Ver diagnósticos",
+        "unassigned": "Sin asignar"
+      },
+      "empty": {
+        "search": {
+          "title": "No se encontraron pacientes",
+          "subtitle": "Ningún paciente coincide con \"{{term}}\"",
+          "clear": "Limpiar búsqueda"
+        },
+        "initial": {
+          "title": "No hay pacientes registrados",
+          "subtitle": "Empieza registrando al primer paciente de tu hospital",
+          "cta": "Registrar primer paciente"
+        }
+      },
+      "quickActions": {
+        "assignments": "Ver asignaciones",
+        "doctors": "Ver médicos"
+      },
+      "errors": {
+        "noAuthUser": "No se encontró usuario autenticado",
+        "noTenant": "El usuario no tiene hospital asignado",
+        "loadPatients": "Error cargando los pacientes del hospital"
+      }
+    },
+    "patientDetail": {
+      "loadingPatientInfo": "Cargando información del paciente...",
+      "dni": "DNI",
+      "licenseShort": "Lic",
+      "noDoctorAssigned": "Sin médico asignado",
+      "errorTitle": "No se pudo cargar la información del paciente",
+      "actions": {
+        "newAppointment": "Nueva cita",
+        "assignDoctor": "Asignar médico",
+        "backToPatients": "Volver a Pacientes"
+      },
+      "sections": {
+        "personalInfo": "Información personal",
+        "emergencyContact": "Contacto de emergencia",
+        "assignedDoctor": "Médico asignado",
+        "vitalSigns": "Signos vitales",
+        "currentMedications": "Medicamentos actuales",
+        "appointmentsHistory": "Historial de citas"
+      },
+      "fields": {
+        "phone": "Teléfono",
+        "address": "Dirección",
+        "birthDate": "Fecha de nacimiento",
+        "name": "Nombre",
+        "relationship": "Parentesco"
+      },
+      "bmi": {
+        "label": "Índice de Masa Corporal",
+        "weight": "Peso",
+        "height": "Estatura"
+      },
+      "vitals": {
+        "types": {
+          "bloodPressure": "Presión arterial",
+          "heartRate": "Frecuencia cardíaca",
+          "temperature": "Temperatura",
+          "glucose": "Glucosa"
+        }
+      },
+      "medications": {
+        "empty": "No hay medicamentos registrados",
+        "prescribedBy": "Recetado por",
+        "on": "el",
+        "frequencies": {
+          "once_daily": "Una vez al día",
+          "twice_daily": "Dos veces al día",
+          "three_times_daily": "Tres veces al día",
+          "four_times_daily": "Cuatro veces al día",
+          "every_8_hours": "Cada 8 horas",
+          "every_12_hours": "Cada 12 horas",
+          "unknown": "Frecuencia"
+        }
+      },
+      "appointments": {
+        "empty": "No hay citas registradas",
+        "types": {
+          "consultation": "Consulta general",
+          "followUp": "Seguimiento",
+          "emergency": "Emergencia",
+          "routineCheck": "Chequeo de rutina"
+        },
+        "status": {
+          "completed": "Completada",
+          "scheduled": "Programada",
+          "cancelled": "Cancelada"
+        }
+      }
+    },
+    "addDoctor": {
+      "title": "Registrar Nuevo Doctor",
+      "subtitle": "Complete el formulario para agregar un doctor al hospital",
+      "success": "¡Doctor registrado exitosamente! Redirigiendo...",
+      "sections": {
+        "personal": "Información Personal",
+        "professional": "Información Profesional",
+        "credentials": "Credenciales de Acceso"
+      },
+      "fields": {
+        "name": "Nombre Completo",
+        "specialty": "Especialidad",
+        "selectSpecialty": "Seleccionar especialidad",
+        "email": "Correo Electrónico",
+        "phone": "Teléfono",
+        "license": "Número de Licencia Médica",
+        "password": "Contraseña",
+        "confirmPassword": "Confirmar Contraseña"
+      },
+      "placeholders": {
+        "name": "Dr. Juan Pérez",
+        "email": "doctor@hospital.com",
+        "phone": "+51 999 888 777",
+        "license": "CMP-12345",
+        "password": "Mínimo 8 caracteres",
+        "confirmPassword": "Repite la contraseña"
+      },
+      "hints": {
+        "license": "Ingrese el número de colegiatura médica",
+        "password": "Recomendado: usar letras, números y símbolos."
+      },
+      "actions": {
+        "generate": "Generar contraseña segura",
+        "cancel": "Cancelar",
+        "submit": "Registrar Doctor",
+        "submitting": "Registrando...",
+        "hide": "Ocultar",
+        "show": "Ver"
+      }
+    }
+  },
+  "patientOnboarding": {
+    "title": "Registro de paciente",
+    "subtitle": "Completa la información del paciente y sus condiciones médicas",
+    "steps": {
+      "personal": "Información personal",
+      "medical": "Información médica",
+      "conditions": "Condiciones"
+    },
+    "personal": {
+      "firstName": "Nombres",
+      "lastName": "Apellidos",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "dni": "Documento de identidad (DNI)",
+      "birthDate": "Fecha de nacimiento",
+      "gender": {
+        "label": "Género",
+        "select": "Seleccionar...",
+        "male": "Masculino",
+        "female": "Femenino",
+        "other": "Otro"
+      },
+      "phone": "Teléfono",
+      "address": "Dirección"
+    },
+    "medical": {
+      "weight": "Peso (kg)",
+      "height": "Estatura (m)",
+      "emergency": {
+        "title": "Contacto de emergencia",
+        "name": "Nombre",
+        "relationship": "Parentesco",
+        "phone": "Teléfono"
+      }
+    },
+    "placeholders": {
+      "firstName": "Juan",
+      "lastName": "Pérez",
+      "email": "juan@ejemplo.com",
+      "password": "Mínimo 8 caracteres",
+      "dni": "12345678",
+      "phone": "+51 999 888 777",
+      "address": "Av. Principal 123",
+      "weight": "70",
+      "height": "1.75",
+      "emergencyName": "María Pérez",
+      "emergencyRelationship": "Esposa",
+      "emergencyPhone": "+51 999 777 666"
+    },
+    "conditions": {
+      "title": "Selecciona las condiciones médicas del paciente",
+      "items": {
+        "diabetesType1": "Diabetes Tipo 1",
+        "diabetesType2": "Diabetes Tipo 2",
+        "hypertension": "Hipertensión",
+        "hyperlipidemia": "Hiperlipidemia",
+        "asthma": "Asma",
+        "copd": "EPOC",
+        "heartDisease": "Enfermedad cardíaca",
+        "kidneyDisease": "Enfermedad renal",
+        "thyroidDisorder": "Trastorno tiroideo",
+        "arthritis": "Artritis",
+        "depression": "Depresión",
+        "anxiety": "Ansiedad"
+      }
+    },
+    "actions": {
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "submit": "Registrar paciente",
+      "submitting": "Registrando..."
+    },
+    "messages": {
+      "completePersonalRequired": "Por favor completa todos los campos obligatorios en información personal",
+      "registerSuccess": "¡Paciente registrado exitosamente!"
+    }
+  },
+  "hospitalAssignments": {
+    "header": {
+      "title": "Asignaciones Médico-Paciente",
+      "subtitle": "Gestiona la asignación de pacientes a los médicos"
+    },
+    "stats": {
+      "unassigned": "Sin asignar",
+      "assigned": "Asignados"
+    },
+    "sections": {
+      "unassignedTitle": "Pacientes sin asignar",
+      "assignedTitle": "Asignaciones actuales"
+    },
+    "patient": {
+      "years": "años",
+      "conditionFallback": "Ver diagnósticos"
+    },
+    "assign": {
+      "label": "Asignar a médico",
+      "placeholder": "Selecciona un médico",
+      "patientsCount": "{{count}} pacientes"
+    },
+    "empty": {
+      "allAssigned": "¡Excelente! Todos los pacientes están asignados",
+      "noAssignmentsTitle": "No hay asignaciones aún",
+      "noAssignmentsSubtitle": "Empieza asignando pacientes a los médicos"
+    },
+    "tooltips": {
+      "unassign": "Desasignar paciente"
+    },
+    "actions": {
+      "viewDoctors": "Ver médicos",
+      "viewPatients": "Ver pacientes",
+      "registerNewPatient": "Registrar nuevo paciente"
+    },
+    "errors": {
+      "noAuthUser": "No se encontró usuario autenticado",
+      "noTenant": "El usuario no tiene hospital asignado",
+      "loadDoctors": "Error cargando los médicos del hospital",
+      "loadPatients": "Error cargando pacientes",
+      "assign": "Error asignando paciente al médico",
+      "unassign": "Error desasignando paciente"
+    }
+  },
+  "hospitalDoctors": {
+    "edit": {
+      "states": {
+        "loading": "Cargando información del médico..."
+      },
+      "header": {
+        "title": "Editar médico",
+        "subtitle": "Actualizar la información del Dr. {{name}}"
+      },
+      "sections": {
+        "personal": {
+          "title": "Información personal"
+        },
+        "professional": {
+          "title": "Configuración profesional"
+        }
+      },
+      "personal": {
+        "fullName": "Nombre completo",
+        "dni": "DNI",
+        "specialty": "Especialidad",
+        "licenseNumber": "Número de licencia"
+      },
+      "fields": {
+        "phone": {
+          "label": "Teléfono",
+          "placeholder": "987654321"
+        },
+        "consultationFee": {
+          "label": "Tarifa de consulta (S/)",
+          "placeholder": "0"
+        },
+        "acceptingPatients": {
+          "label": "Acepta nuevos pacientes"
+        }
+      },
+      "errors": {
+        "phonePattern": "Formato de teléfono inválido (mínimo 9 dígitos)"
+      },
+      "snack": {
+        "loadError": "Error cargando datos del médico",
+        "updatedOk": "Médico actualizado exitosamente",
+        "updateError": "Error actualizando el médico. Algunos campos pueden no ser editables."
+      }
+    },
+    "common": {
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "saveChanges": "Guardar cambios",
+      "errors": {
+        "required": "Este campo es obligatorio",
+        "minlength": "Mínimo {{min}} caracteres",
+        "min": "El valor debe ser mayor o igual a 0"
+      }
+    }
+  },
+  "patientDetail": {
+    "loadingPatientInfo": "Cargando información del paciente...",
+    "dni": "DNI",
+    "licenseShort": "Lic",
+    "noDoctorAssigned": "Sin doctor asignado",
+    "errorTitle": "No se pudo cargar la información del paciente",
+    "actions": {
+      "newAppointment": "Nueva Cita",
+      "assignDoctor": "Asignar Doctor",
+      "backToPatients": "Volver a Pacientes"
+    },
+    "sections": {
+      "personalInfo": "Información Personal",
+      "emergencyContact": "Contacto de Emergencia",
+      "assignedDoctor": "Doctor Asignado",
+      "vitalSigns": "Signos Vitales",
+      "currentMedications": "Medicamentos Actuales",
+      "appointmentsHistory": "Historial de Citas"
+    },
+    "medications": {
+      "empty": "No hay medicamentos registrados",
+      "prescribedBy": "Prescrito por",
+      "on": "el",
+      "frequencies": {
+        "once_daily": "Una vez al día",
+        "twice_daily": "Dos veces al día",
+        "three_times_daily": "Tres veces al día",
+        "four_times_daily": "Cuatro veces al día",
+        "every_8_hours": "Cada 8 horas",
+        "every_12_hours": "Cada 12 horas",
+        "unknown": "Frecuencia"
+      }
+    },
+    "appointments": {
+      "empty": "No hay citas registradas",
+      "types": {
+        "consultation": "Consulta General",
+        "followUp": "Seguimiento",
+        "emergency": "Emergencia",
+        "routineCheck": "Chequeo de Rutina"
+      },
+      "status": {
+        "completed": "Completada",
+        "scheduled": "Programada",
+        "cancelled": "Cancelada"
+      }
+    }
+  },
+  "header": {
+    "menu": {
+      "profile": "Mi Perfil",
+      "help": "Ayuda"
     }
   }
 }

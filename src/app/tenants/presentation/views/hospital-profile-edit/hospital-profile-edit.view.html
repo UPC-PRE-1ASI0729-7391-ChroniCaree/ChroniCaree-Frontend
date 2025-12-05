@@ -1,94 +1,121 @@
 <div class="hospital-profile-edit">
   <!-- Header -->
   <div class="page-header">
-    <button mat-icon-button class="back-button" (click)="goBack()">
+    <button
+      mat-icon-button
+      class="back-button"
+      (click)="goBack()"
+      [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back</mat-icon>
     </button>
+
     <div class="header-content">
       <h1>
         <mat-icon>business</mat-icon>
-        Configuración del Hospital
+        {{ 'hospital.profileEdit.header.title' | translate }}
       </h1>
-      <p class="subtitle">Administra la información de tu hospital y tu perfil personal</p>
+      <p class="subtitle">{{ 'hospital.profileEdit.header.subtitle' | translate }}</p>
     </div>
   </div>
 
   @if (loading()) {
     <div class="loading-overlay">
       <mat-spinner diameter="50"></mat-spinner>
-      <p>Cargando información...</p>
+      <p>{{ 'hospital.profileEdit.loading' | translate }}</p>
     </div>
   } @else {
     <div class="profile-content">
-      <!-- Hospital Information Card -->
+      <!-- Hospital Card -->
       <mat-card class="info-card hospital-card">
         <div class="card-header">
           <div class="header-icon hospital-icon">
             <mat-icon>business</mat-icon>
           </div>
           <div>
-            <h2>Información del Hospital</h2>
-            <p class="card-subtitle">Datos generales y de contacto de la institución</p>
+            <h2>{{ 'hospital.profileEdit.hospitalCard.title' | translate }}</h2>
+            <p class="card-subtitle">{{ 'hospital.profileEdit.hospitalCard.subtitle' | translate }}</p>
           </div>
         </div>
 
         <mat-divider></mat-divider>
 
         <form [formGroup]="hospitalForm" (ngSubmit)="saveHospitalInfo()">
+          <!-- General -->
           <div class="form-section">
             <h3 class="section-title">
               <mat-icon>info</mat-icon>
-              Datos Generales
+              {{ 'hospital.profileEdit.sections.general.title' | translate }}
             </h3>
+
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Nombre del Hospital</mat-label>
-                <input matInput formControlName="name" placeholder="Hospital General Central" />
+                <mat-label>{{ 'hospital.profileEdit.fields.hospitalName.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="name"
+                  [placeholder]="'hospital.profileEdit.fields.hospitalName.placeholder' | translate" />
                 <mat-icon matPrefix>business</mat-icon>
+
                 @if (hospitalForm.get('name')?.hasError('required')) {
-                  <mat-error>El nombre es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.name.required' | translate }}</mat-error>
                 }
                 @if (hospitalForm.get('name')?.hasError('minlength')) {
-                  <mat-error>Mínimo 3 caracteres</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.name.minlength' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Dirección</mat-label>
-                <input matInput formControlName="address" placeholder="Av. Principal 123" />
+                <mat-label>{{ 'hospital.profileEdit.fields.address.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="address"
+                  [placeholder]="'hospital.profileEdit.fields.address.placeholder' | translate" />
                 <mat-icon matPrefix>location_on</mat-icon>
+
                 @if (hospitalForm.get('address')?.hasError('required')) {
-                  <mat-error>La dirección es requerida</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.address.required' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Ciudad</mat-label>
-                <input matInput formControlName="city" placeholder="Lima" />
+                <mat-label>{{ 'hospital.profileEdit.fields.city.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="city"
+                  [placeholder]="'hospital.profileEdit.fields.city.placeholder' | translate" />
                 <mat-icon matPrefix>location_city</mat-icon>
+
                 @if (hospitalForm.get('city')?.hasError('required')) {
-                  <mat-error>La ciudad es requerida</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.city.required' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Estado/Región</mat-label>
-                <input matInput formControlName="state" placeholder="Lima" />
+                <mat-label>{{ 'hospital.profileEdit.fields.state.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="state"
+                  [placeholder]="'hospital.profileEdit.fields.state.placeholder' | translate" />
                 <mat-icon matPrefix>map</mat-icon>
+
                 @if (hospitalForm.get('state')?.hasError('required')) {
-                  <mat-error>El estado es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.state.required' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Código Postal</mat-label>
-                <input matInput formControlName="zipCode" placeholder="15001" />
+                <mat-label>{{ 'hospital.profileEdit.fields.zipCode.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="zipCode"
+                  [placeholder]="'hospital.profileEdit.fields.zipCode.placeholder' | translate" />
                 <mat-icon matPrefix>markunread_mailbox</mat-icon>
+
                 @if (hospitalForm.get('zipCode')?.hasError('required')) {
-                  <mat-error>El código postal es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.zipCode.required' | translate }}</mat-error>
                 }
                 @if (hospitalForm.get('zipCode')?.hasError('pattern')) {
-                  <mat-error>Debe tener 5 dígitos</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.zipCode.pattern' | translate }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -96,39 +123,53 @@
 
           <mat-divider class="section-divider"></mat-divider>
 
+          <!-- Contact -->
           <div class="form-section">
             <h3 class="section-title">
               <mat-icon>contact_phone</mat-icon>
-              Información de Contacto
+              {{ 'hospital.profileEdit.sections.contact.title' | translate }}
             </h3>
+
             <div class="form-grid">
               <mat-form-field appearance="outline">
-                <mat-label>Teléfono Principal</mat-label>
-                <input matInput formControlName="phone" placeholder="987654321" />
+                <mat-label>{{ 'hospital.profileEdit.fields.phone.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="phone"
+                  [placeholder]="'hospital.profileEdit.fields.phone.placeholder' | translate" />
                 <mat-icon matPrefix>phone</mat-icon>
+
                 @if (hospitalForm.get('phone')?.hasError('required')) {
-                  <mat-error>El teléfono es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.phone.required' | translate }}</mat-error>
                 }
                 @if (hospitalForm.get('phone')?.hasError('pattern')) {
-                  <mat-error>Formato inválido (9-10 dígitos)</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.phone.pattern' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Email Institucional</mat-label>
-                <input matInput type="email" formControlName="email" placeholder="contacto@hospital.com" />
+                <mat-label>{{ 'hospital.profileEdit.fields.institutionalEmail.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  [placeholder]="'hospital.profileEdit.fields.institutionalEmail.placeholder' | translate" />
                 <mat-icon matPrefix>email</mat-icon>
+
                 @if (hospitalForm.get('email')?.hasError('required')) {
-                  <mat-error>El email es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.email.required' | translate }}</mat-error>
                 }
                 @if (hospitalForm.get('email')?.hasError('email')) {
-                  <mat-error>Email inválido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.email.email' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Sitio Web (opcional)</mat-label>
-                <input matInput formControlName="website" placeholder="https://www.hospital.com" />
+                <mat-label>{{ 'hospital.profileEdit.fields.website.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="website"
+                  [placeholder]="'hospital.profileEdit.fields.website.placeholder' | translate" />
                 <mat-icon matPrefix>language</mat-icon>
               </mat-form-field>
             </div>
@@ -139,27 +180,27 @@
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="hospitalForm.invalid || saving()">
-              @if (saving()) {
-                <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+              [disabled]="hospitalForm.invalid || savingHospital()">
+              @if (savingHospital()) {
+                <mat-spinner diameter="20" style="display:inline-block;margin-right:8px;"></mat-spinner>
               } @else {
                 <mat-icon>save</mat-icon>
               }
-              Guardar Información del Hospital
+              {{ 'hospital.profileEdit.actions.saveHospital' | translate }}
             </button>
           </div>
         </form>
       </mat-card>
 
-      <!-- Admin Profile Card -->
+      <!-- Admin Card -->
       <mat-card class="info-card admin-card">
         <div class="card-header">
           <div class="header-icon admin-icon">
             <mat-icon>person</mat-icon>
           </div>
           <div>
-            <h2>Mi Perfil Personal</h2>
-            <p class="card-subtitle">Información de tu cuenta como administrador</p>
+            <h2>{{ 'hospital.profileEdit.adminCard.title' | translate }}</h2>
+            <p class="card-subtitle">{{ 'hospital.profileEdit.adminCard.subtitle' | translate }}</p>
           </div>
         </div>
 
@@ -169,48 +210,66 @@
           <div class="form-section">
             <h3 class="section-title">
               <mat-icon>badge</mat-icon>
-              Datos Personales
+              {{ 'hospital.profileEdit.sections.personal.title' | translate }}
             </h3>
+
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Nombre Completo</mat-label>
-                <input matInput formControlName="fullName" placeholder="Dr. Juan Pérez" />
+                <mat-label>{{ 'hospital.profileEdit.fields.fullName.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="fullName"
+                  [placeholder]="'hospital.profileEdit.fields.fullName.placeholder' | translate" />
                 <mat-icon matPrefix>person</mat-icon>
+
                 @if (adminForm.get('fullName')?.hasError('required')) {
-                  <mat-error>El nombre es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.fullName.required' | translate }}</mat-error>
                 }
                 @if (adminForm.get('fullName')?.hasError('minlength')) {
-                  <mat-error>Mínimo 3 caracteres</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.fullName.minlength' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Email Personal</mat-label>
-                <input matInput type="email" formControlName="email" placeholder="admin@hospital.com" />
+                <mat-label>{{ 'hospital.profileEdit.fields.personalEmail.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  [placeholder]="'hospital.profileEdit.fields.personalEmail.placeholder' | translate" />
                 <mat-icon matPrefix>alternate_email</mat-icon>
+
                 @if (adminForm.get('email')?.hasError('required')) {
-                  <mat-error>El email es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.email.required' | translate }}</mat-error>
                 }
                 @if (adminForm.get('email')?.hasError('email')) {
-                  <mat-error>Email inválido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.email.email' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Teléfono Personal</mat-label>
-                <input matInput formControlName="phone" placeholder="987654321" />
+                <mat-label>{{ 'hospital.profileEdit.fields.personalPhone.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="phone"
+                  [placeholder]="'hospital.profileEdit.fields.personalPhone.placeholder' | translate" />
                 <mat-icon matPrefix>phone_iphone</mat-icon>
+
                 @if (adminForm.get('phone')?.hasError('pattern')) {
-                  <mat-error>Formato inválido (9-10 dígitos)</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.phone.pattern' | translate }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Cargo</mat-label>
-                <input matInput formControlName="position" placeholder="Administrador del Hospital" />
+                <mat-label>{{ 'hospital.profileEdit.fields.position.label' | translate }}</mat-label>
+                <input
+                  matInput
+                  formControlName="position"
+                  [placeholder]="'hospital.profileEdit.fields.position.placeholder' | translate" />
                 <mat-icon matPrefix>work</mat-icon>
+
                 @if (adminForm.get('position')?.hasError('required')) {
-                  <mat-error>El cargo es requerido</mat-error>
+                  <mat-error>{{ 'hospital.profileEdit.errors.position.required' | translate }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -221,13 +280,13 @@
               mat-raised-button
               color="accent"
               type="submit"
-              [disabled]="adminForm.invalid || saving()">
-              @if (saving()) {
-                <mat-spinner diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+              [disabled]="adminForm.invalid || savingAdmin()">
+              @if (savingAdmin()) {
+                <mat-spinner diameter="20" style="display:inline-block;margin-right:8px;"></mat-spinner>
               } @else {
                 <mat-icon>save</mat-icon>
               }
-              Guardar Mi Perfil
+              {{ 'hospital.profileEdit.actions.saveAdmin' | translate }}
             </button>
           </div>
         </form>

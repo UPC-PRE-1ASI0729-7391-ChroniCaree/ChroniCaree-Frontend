@@ -1,10 +1,10 @@
 /**
  * Patients List View
  * Doctors Bounded Context - Presentation Layer
- * 
+ *
  * Vista de lista de pacientes asignados al doctor
  */
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { UserStore } from '../../../../iam/application/user.store';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -12,11 +12,17 @@ import { AssignedPatientsStore } from '../../../application/assigned-patients.st
 import { PatientHealthStatus } from '../../../domain/model/patient-health-summary.entity';
 import { DoctorApiEndpoint } from '../../../infrastructure/doctor-api.endpoint';
 import { RequestPatientModalComponent } from '../../components/request-patient-modal/request-patient-modal';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-patients-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RequestPatientModalComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    RequestPatientModalComponent,
+    TranslateModule
+  ],
   templateUrl: './patients-list.html',
   styleUrls: ['./patients-list.css']
 })
@@ -24,29 +30,28 @@ export class PatientsListComponent implements OnInit {
   private readonly patientsStore = inject(AssignedPatientsStore);
   private readonly doctorApi = inject(DoctorApiEndpoint);
   private readonly userStore = inject(UserStore);
-  
+
   // Exponer el enum para el template
   readonly PatientHealthStatus = PatientHealthStatus;
-  
+
   // Signals del store
   readonly patients = this.patientsStore.patients;
   readonly loading = this.patientsStore.loading;
   readonly error = this.patientsStore.error;
-  
+
   // Stats computados
   readonly totalPatients = this.patientsStore.totalPatients;
   readonly criticalCount = this.patientsStore.criticalCount;
   readonly atRiskCount = this.patientsStore.atRiskCount;
   readonly totalCriticalAlerts = this.patientsStore.totalCriticalAlerts;
-  
+
   // Doctor ID signal (lo obtenemos del API)
   private readonly doctorId = signal<number | null>(null);
-  
+
   // Modal state
   readonly showModal = signal(false);
-  
+
   ngOnInit(): void {
-    // Obtener el usuario actual desde UserStore o fallback a localStorage
     const cur = (this.userStore && this.userStore.currentUser$ && this.userStore.currentUser$()) || (() => {
       const s = localStorage.getItem('currentUser');
       return s ? JSON.parse(s) : null;
@@ -59,12 +64,11 @@ export class PatientsListComponent implements OnInit {
 
     const userId = cur.id;
     console.log(`🔍 Current user ID: ${userId}, looking for associated doctor...`);
-    
-    // Buscar el doctor asociado a este userId
+
     this.doctorApi.getAll().subscribe({
       next: (doctors) => {
         const doctor = doctors.find(d => d.userId === userId);
-        
+
         if (doctor) {
           console.log(`✅ Doctor found: ID ${doctor.id}, Name: ${doctor.firstName} ${doctor.lastName}`);
           this.doctorId.set(doctor.id);
@@ -77,7 +81,7 @@ export class PatientsListComponent implements OnInit {
         console.error('❌ Error fetching doctors:', err);
       }
     });
-    
+
     // Listen for patient assignment events
     window.addEventListener('patient-assigned', () => {
       const currentDoctorId = this.doctorId();
@@ -85,7 +89,7 @@ export class PatientsListComponent implements OnInit {
         this.patientsStore.refresh(currentDoctorId);
       }
     });
-    
+
     // React to user changes
     try {
       window.addEventListener('userChanged', (ev: any) => {
@@ -108,23 +112,20 @@ export class PatientsListComponent implements OnInit {
     } catch (e) {
       // ignore
     }
-    
+
     // Listen for modal close events
     window.addEventListener('close-modal', () => {
       this.showModal.set(false);
     });
   }
-  
+
   /**
    * Abre el modal de solicitud de paciente
    */
   openRequestModal(): void {
     this.showModal.set(true);
   }
-  
-  /**
-   * Obtiene la clase CSS según el estado de salud
-   */
+
   getHealthStatusClass(status: PatientHealthStatus): string {
     switch (status) {
       case PatientHealthStatus.CRITICAL:
@@ -139,25 +140,22 @@ export class PatientsListComponent implements OnInit {
         return '';
     }
   }
-  
-  /**
-   * Obtiene el texto del badge según el estado
-   */
+
   getHealthStatusText(status: PatientHealthStatus): string {
     switch (status) {
       case PatientHealthStatus.CRITICAL:
-        return '🔴 Crítico';
+        return 'doctors.patients.status.critical';
       case PatientHealthStatus.AT_RISK:
-        return '🟡 En Riesgo';
+        return 'doctors.patients.status.atRisk';
       case PatientHealthStatus.CONTROLLED:
-        return '🔵 Controlado';
+        return 'doctors.patients.status.controlled';
       case PatientHealthStatus.STABLE:
-        return '🟢 Estable';
+        return 'doctors.patients.status.stable';
       default:
-        return '';
+        return status;
     }
   }
-  
+
   /**
    * Formatea la fecha
    */
@@ -169,7 +167,7 @@ export class PatientsListComponent implements OnInit {
       day: 'numeric'
     });
   }
-  
+
   /**
    * Calcula la edad del paciente
    */
@@ -178,14 +176,14 @@ export class PatientsListComponent implements OnInit {
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    
+
     return age;
   }
-  
+
   /**
    * Refresca la lista de pacientes
    */

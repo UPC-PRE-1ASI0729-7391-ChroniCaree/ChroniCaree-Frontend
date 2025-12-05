@@ -618,6 +618,19 @@
       "isUrgent": false,
       "attachments": [],
       "id": 14
+    },
+    {
+      "senderId": "3",
+      "receiverId": "1",
+      "senderRole": "PATIENT",
+      "receiverRole": "doctor",
+      "subject": "xd",
+      "content": "de la nada",
+      "timestamp": "2025-11-28T18:05:27.073Z",
+      "read": false,
+      "isUrgent": false,
+      "attachments": [],
+      "id": 15
     }
   ],
   "diagnoses": [
@@ -674,6 +687,7 @@
   ],
   "nudges": [
     {
+      "id": 1,
       "patientId": 1,
       "type": "medication_reminder",
       "priority": "medium",
@@ -682,7 +696,8 @@
       "actionLabel": "Ver",
       "actionRoute": "/patient/dashboard",
       "icon": "notifications",
-      "id": 1
+      "isDismissed": true,
+      "dismissedAt": "2025-11-28T17:12:42.690Z"
     }
   ],
   "alerts": [

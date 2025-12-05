@@ -1,33 +1,32 @@
 <div class="patient-detail-container">
   <ng-container *ngIf="patient(); else loadingTpl">
     <div class="header">
-      <button class="btn btn-ghost back-btn" (click)="goBack()">← Volver</button>
+      <button class="btn btn-ghost back-btn" (click)="goBack()">← {{ 'common.back' | translate }}</button>
       <div class="avatar">{{ patient().firstName.charAt(0) }}{{ patient().lastName.charAt(0) }}</div>
       <div class="title">
         <h2>{{ patient().firstName }} {{ patient().lastName }}</h2>
-        <p class="meta">DNI: {{ patient().dni }} • Edad: {{ calculateAge(patient().birthDate) }} años</p>
+        <p class="meta">{{ 'patientDetail.dni' | translate }}: {{ patient().dni }} • {{ 'doctors.patients.card.age' | translate: { age: calculateAge(patient().birthDate) } }}</p>
       </div>
     </div>
 
     <div class="patient-summary">
       <div class="left">
-        <p><strong>Sexo:</strong> {{ patient().gender || 'N/D' }}</p>
-        <p><strong>Teléfono:</strong> {{ patient().phone || '—' }}</p>
-        <p><strong>Dirección:</strong> {{ patient().address || '—' }}</p>
+        <p><strong>{{ 'patientOnboarding.personal.gender.label' | translate }}:</strong> {{ patient().gender || ('common.na' | translate) }}</p>
+        <p><strong>{{ 'common.phone' | translate }}:</strong> {{ patient().phone || '—' }}</p>
+        <p><strong>{{ 'common.address' | translate }}:</strong> {{ patient().address || '—' }}</p>
       </div>
       <div class="right">
-        <p><strong>Asignado desde:</strong> {{ formatDate(patient().assignedSince) }}</p>
-        <p *ngIf="patient().assignedDoctorId"><strong>Médico asignado:</strong> {{ patient().assignedDoctorName || patient().assignedDoctorId }}</p>
+        <p><strong>{{ 'doctors.patients.footer.assignedSince' | translate }}:</strong> {{ formatDate(patient().assignedSince) }}</p>
+        <p *ngIf="patient().assignedDoctorId"><strong>{{ 'patientDetail.sections.assignedDoctor' | translate }}:</strong> {{ patient().assignedDoctorName || patient().assignedDoctorId }}</p>
       </div>
     </div>
 
     <div class="two-column">
-      <!-- Left: Medications column -->
       <aside class="col meds-col">
         <mat-card class="medications-card">
           <mat-card-header>
-            <mat-card-title>Medicamentos</mat-card-title>
-            <mat-card-subtitle class="muted small">Prescritos y activos</mat-card-subtitle>
+            <mat-card-title>{{ 'patientDetail.sections.currentMedications' | translate }}</mat-card-title>
+            <mat-card-subtitle class="muted small">{{ 'medications.history.subtitle' | translate }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <p class="muted small">(debug) total meds: {{ allMeds().length }} • meds paciente: {{ medicationsForPatient().length }}</p>
@@ -39,15 +38,15 @@
                       <div *ngIf="editingMedicationId() !== m.id">
                         <div class="med-name">{{ m.name }}</div>
                         <div class="med-dosage muted">{{ m.dosage }}</div>
-                        <div class="med-meta muted">Prescrito: {{ m.prescribedDate | date:'shortDate' }} • {{ m.prescribedBy || '—' }}</div>
+                        <div class="med-meta muted">{{ 'medications.history.prescribed' | translate }} {{ m.prescribedDate | date:'shortDate' }} • {{ m.prescribedBy || '—' }}</div>
                       </div>
                       <div *ngIf="editingMedicationId() === m.id" class="edit-fields">
-                        <input [(ngModel)]="editName" placeholder="Nombre" />
-                        <input [(ngModel)]="editDosage" placeholder="Dosis" />
+                        <input [(ngModel)]="editName" [placeholder]="'medications.history.quickAdd.name' | translate" />
+                        <input [(ngModel)]="editDosage" [placeholder]="'medications.history.quickAdd.dosage' | translate" />
                         <select [(ngModel)]="editFrequency">
-                          <option value="once_daily">Una vez al día</option>
-                          <option value="twice_daily">Dos veces al día</option>
-                          <option value="three_times_daily">Tres veces al día</option>
+                          <option value="once_daily">{{ 'patientDetail.medications.frequencies.once_daily' | translate }}</option>
+                          <option value="twice_daily">{{ 'patientDetail.medications.frequencies.twice_daily' | translate }}</option>
+                          <option value="three_times_daily">{{ 'patientDetail.medications.frequencies.three_times_daily' | translate }}</option>
                         </select>
                       </div>
                     </div>
@@ -56,139 +55,138 @@
                         <span class="chip status-chip">{{ m.status }}</span>
                       </div>
                       <div class="med-actions">
-                        <button *ngIf="editingMedicationId() !== m.id" mat-icon-button (click)="startEditMedication(m)" aria-label="Editar medicamento">
+                        <button *ngIf="editingMedicationId() !== m.id" mat-icon-button (click)="startEditMedication(m)" [attr.aria-label]="'common.edit' | translate">
                           <mat-icon>edit</mat-icon>
                         </button>
-                        <button *ngIf="editingMedicationId() === m.id" mat-icon-button color="primary" (click)="saveMedicationEdit(m)" aria-label="Guardar medicamento">
+                        <button *ngIf="editingMedicationId() === m.id" mat-icon-button color="primary" (click)="saveMedicationEdit(m)" [attr.aria-label]="'common.saveChanges' | translate">
                           <mat-icon>save</mat-icon>
                         </button>
-                        <button *ngIf="editingMedicationId() === m.id" mat-icon-button (click)="cancelEditMedication()" aria-label="Cancelar edición">
+                        <button *ngIf="editingMedicationId() === m.id" mat-icon-button (click)="cancelEditMedication()" [attr.aria-label]="'common.cancel' | translate">
                           <mat-icon>cancel</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="toggleMedicationDetails(m.id)" aria-label="Detalles medicamento">
+                        <button mat-icon-button (click)="toggleMedicationDetails(m.id)" [attr.aria-label]="'doctors.patients.footer.viewDetails' | translate">
                           <mat-icon>more_horiz</mat-icon>
                         </button>
                       </div>
                     </div>
                   </mat-card-content>
                   <mat-card-content *ngIf="isMedicationExpanded(m.id)" class="med-details">
-                    <p class="muted">Horario: {{ m.schedule || '—' }}</p>
-                    <p class="muted">Indicaciones: {{ m.instructions || '—' }}</p>
+                    <p class="muted">{{ 'medications.history.schedules' | translate }}: {{ m.schedule || '—' }}</p>
+                    <p class="muted">{{ 'medications.history.instructions' | translate }}: {{ m.instructions || '—' }}</p>
                   </mat-card-content>
                 </mat-card>
               </div>
             </ng-container>
             <ng-template #noMeds>
               <div class="no-meds">
-                <p class="muted">No hay medicamentos prescritos.</p>
+                <p class="muted">{{ 'patientDetail.medications.empty' | translate }}</p>
               </div>
             </ng-template>
           </mat-card-content>
           <mat-card-actions class="prescribe-actions">
             <button mat-flat-button color="primary" (click)="togglePrescribe()">
               <mat-icon>add</mat-icon>
-              <span *ngIf="!prescribing()">Prescribir</span>
-              <span *ngIf="prescribing()">Cancelar</span>
+              <span *ngIf="!prescribing()">{{ 'medications.history.addMedication' | translate }}</span>
+              <span *ngIf="prescribing()">{{ 'common.cancel' | translate }}</span>
             </button>
           </mat-card-actions>
 
-          <!-- Single prescribe form (left column) -->
           <div *ngIf="prescribing()" class="prescribe-form mat-elevation-z1">
             <div class="form-grid">
               <mat-form-field appearance="fill" class="form-field">
-                <mat-label>Nombre</mat-label>
+                <mat-label>{{ 'medications.history.quickAdd.name' | translate }}</mat-label>
                 <input matInput #nameInput placeholder="Ej. Metformina" />
               </mat-form-field>
               <mat-form-field appearance="fill" class="form-field">
-                <mat-label>Dosis</mat-label>
+                <mat-label>{{ 'medications.history.quickAdd.dosage' | translate }}</mat-label>
                 <input matInput #dosageInput placeholder="Ej. 500 mg" />
               </mat-form-field>
               <mat-form-field appearance="fill" class="form-field full-width">
-                <mat-label>Frecuencia</mat-label>
+                <mat-label>{{ 'patientDetail.medications.frequencies.unknown' | translate }}</mat-label>
                 <mat-select #freqSelect>
-                  <mat-option value="once_daily">Una vez al día</mat-option>
-                  <mat-option value="twice_daily">Dos veces al día</mat-option>
-                  <mat-option value="three_times_daily">Tres veces al día</mat-option>
+                  <mat-option value="once_daily">{{ 'patientDetail.medications.frequencies.once_daily' | translate }}</mat-option>
+                  <mat-option value="twice_daily">{{ 'patientDetail.medications.frequencies.twice_daily' | translate }}</mat-option>
+                  <mat-option value="three_times_daily">{{ 'patientDetail.medications.frequencies.three_times_daily' | translate }}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field appearance="fill" class="form-field full-width">
-                <mat-label>Notas (opcional)</mat-label>
-                <input matInput #notesInput placeholder="Indicaciones / observaciones" />
+                <mat-label>{{ 'clinical.notes' | translate }} ({{ 'appointments.scheduler.notes.label' | translate }})</mat-label>
+                <input matInput #notesInput [placeholder]="'appointments.scheduler.notes.placeholder' | translate" />
               </mat-form-field>
             </div>
             <div class="form-actions">
-              <button mat-flat-button color="accent" (click)="prescribe(nameInput.value, dosageInput.value, freqSelect.value, notesInput.value)">Prescribir</button>
-              <button mat-button (click)="togglePrescribe()">Cancelar</button>
+              <button mat-flat-button color="accent" (click)="prescribe(nameInput.value, dosageInput.value, freqSelect.value, notesInput.value)">{{ 'medications.history.quickAdd.add' | translate }}</button>
+              <button mat-button (click)="togglePrescribe()">{{ 'common.cancel' | translate }}</button>
             </div>
           </div>
         </mat-card>
       </aside>
 
-      <!-- Right: Records column -->
       <aside class="col records-col">
         <mat-card class="records-card mat-elevation-z1">
           <mat-card-header>
-            <mat-card-title>Historial Médico</mat-card-title>
-            <mat-card-subtitle class="muted small">Últimos registros y detalles</mat-card-subtitle>
+            <mat-card-title>{{ 'navigation.patient.medicalRecord' | translate }}</mat-card-title>
+            <mat-card-subtitle class="muted small">{{ 'patientDetail.sections.appointmentsHistory' | translate }}</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <div *ngIf="loading(); else recordsTpl">
-              <p class="muted">Cargando historial...</p>
+              <p class="muted">{{ 'patients.loading' | translate }}</p>
             </div>
 
             <ng-template #recordsTpl>
               <div *ngIf="records().length === 0">
-                <p class="muted">No hay registros médicos para este paciente.</p>
+                <p class="muted">{{ 'patientDetail.appointments.empty' | translate }}</p>
               </div>
 
               <ul class="records-list" *ngIf="records().length > 0">
                 <li class="record-item" *ngFor="let r of (showAll() ? records() : records().slice(0,10)); trackBy: trackById">
                   <div class="record-left">
-                    <div class="record-type">{{ recordTypeLabel(r.type) }}</div>
+                    <div class="record-type">{{ recordTypeLabel(r.type) | translate }}</div>
                     <div class="record-date">{{ formatDate(r.date) }}</div>
                   </div>
                   <div class="record-right">
                     <div class="record-summary">
-                      <div *ngIf="r.type === RecordType.SYMPTOMS">Síntomas: {{ r.notes || '—' }}</div>
-                      <div *ngIf="r.type === RecordType.VITAL_SIGNS">Signos vitales registrados</div>
-                      <div *ngIf="r.type !== RecordType.SYMPTOMS && r.type !== RecordType.VITAL_SIGNS">Consulta/diagnóstico</div>
+                      <div *ngIf="r.type === RecordType.SYMPTOMS">{{ 'clinical.registerSymptoms' | translate }}: {{ r.notes || '—' }}</div>
+                      <div *ngIf="r.type === RecordType.VITAL_SIGNS">{{ 'clinical.vitalSigns' | translate }}</div>
+                      <div *ngIf="r.type !== RecordType.SYMPTOMS && r.type !== RecordType.VITAL_SIGNS">{{ 'appointments.types.consultation' | translate }}</div>
                     </div>
                     <div class="record-actions">
-                      <button mat-button class="btn-sm" (click)="toggleRecord(r.id)">{{ isExpanded(r.id) ? 'Ocultar' : 'Más' }}</button>
+                      <button mat-button class="btn-sm" (click)="toggleRecord(r.id)">
+                        {{ isExpanded(r.id) ? ('common.cancel' | translate) : ('doctors.patients.footer.viewDetails' | translate) }}
+                      </button>
                       <span class="status" *ngIf="r.reviewStatus">{{ r.reviewStatus }}</span>
                     </div>
                   </div>
                   <div class="record-details" *ngIf="isExpanded(r.id)">
                     <div *ngIf="r.type === RecordType.VITAL_SIGNS">
-                      <p><strong>Glucosa:</strong> {{ r.glucose ?? '—' }} mg/dL</p>
-                      <p><strong>Presión:</strong> {{ r.bloodPressure || '—' }}</p>
-                      <p><strong>Pulso:</strong> {{ r.heartRate ?? '—' }} bpm</p>
+                      <p><strong>{{ 'doctors.patients.vitals.glucose' | translate }}:</strong> {{ r.glucose ?? '—' }} {{ 'common.units.glucose' | translate }}</p>
+                      <p><strong>{{ 'doctors.patients.vitals.bloodPressure' | translate }}:</strong> {{ r.bloodPressure || '—' }}</p>
+                      <p><strong>{{ 'doctors.patients.vitals.heartRate' | translate }}:</strong> {{ r.heartRate ?? '—' }} {{ 'common.units.heartRate' | translate }}</p>
                     </div>
                     <div *ngIf="r.type === RecordType.SYMPTOMS">
-                      <p><strong>Fatiga:</strong> {{ r.fatigue ?? '—' }}</p>
+                      <p><strong>{{ 'clinical.fatigue' | translate }}:</strong> {{ r.fatigue ?? '—' }}</p>
                     </div>
                     <div *ngIf="r.type === RecordType.CONSULTATION">
-                      <p><strong>Diagnóstico:</strong> {{ r.diagnosis || '—' }}</p>
+                      <p><strong>{{ 'diagnoses.timeline.diagnosed' | translate }}:</strong> {{ r.diagnosis || '—' }}</p>
                     </div>
-                    <div *ngIf="r.notes"><p><strong>Notas:</strong> {{ r.notes }}</p></div>
+                    <div *ngIf="r.notes"><p><strong>{{ 'clinical.notes' | translate }}:</strong> {{ r.notes }}</p></div>
                   </div>
                 </li>
               </ul>
 
               <div *ngIf="records().length > 10" class="show-more">
-                <button mat-button (click)="toggleShowAll()">{{ showAll() ? 'Mostrar menos' : 'Mostrar todos (' + records().length + ')' }}</button>
+                <button mat-button (click)="toggleShowAll()">
+                  {{ showAll() ? ('alerts.viewAll' | translate) : ('alerts.viewAll' | translate) + ' (' + records().length + ')' }}
+                </button>
               </div>
             </ng-template>
           </mat-card-content>
         </mat-card>
       </aside>
     </div>
-
-    <!-- Removed duplicate non-Material records section (kept Material-styled records card above) -->
   </ng-container>
 
   <ng-template #loadingTpl>
-    <p class="muted">Cargando paciente...</p>
+    <p class="muted">{{ 'patientDetail.loadingPatientInfo' | translate }}</p>
   </ng-template>
 </div>
-

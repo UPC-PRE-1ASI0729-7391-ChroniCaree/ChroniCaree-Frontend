@@ -34,7 +34,7 @@
     @if (currentStep() === 1) {
       <div class="form-step">
         <h2>Información de la Cuenta</h2>
-        
+
         <div class="form-group">
           <label for="email">Correo Electrónico</label>
           <input
@@ -86,7 +86,7 @@
     @if (currentStep() === 2) {
       <div class="form-step">
         <h2>Datos Personales</h2>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="firstName">Nombres</label>
@@ -180,9 +180,9 @@
           <button type="button" class="btn-secondary" (click)="previousStep()">
             Atrás
           </button>
-          <button 
-            type="button" 
-            class="btn-primary" 
+          <button
+            type="button"
+            class="btn-primary"
             (click)="onNextStep()"
           >
             Siguiente

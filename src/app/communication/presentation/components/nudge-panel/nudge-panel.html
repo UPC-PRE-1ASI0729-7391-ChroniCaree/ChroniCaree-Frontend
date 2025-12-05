@@ -3,7 +3,7 @@
     @if (loading()) {
       <div class="loading-state">
         <mat-icon>hourglass_empty</mat-icon>
-        <p>Cargando recordatorios...</p>
+        <p>{{ 'nudges.loading' | translate }}</p>
       </div>
     } @else if (activeNudges().length === 0) {
       <div class="empty-state">
@@ -42,15 +42,15 @@
               <button
                 mat-button
                 (click)="snoozeNudge(nudge.id, $event)"
-                matTooltip="Posponer 1 hora">
+                [matTooltip]="'nudges.snooze1h' | translate">
                 <mat-icon>schedule</mat-icon>
-                Más tarde
+                {{ 'nudges.later' | translate }}
               </button>
 
               <button
                 mat-icon-button
                 (click)="dismissNudge(nudge.id)"
-                matTooltip="Descartar"
+                [matTooltip]="'nudges.dismiss' | translate"
                 class="dismiss-btn">
                 <mat-icon>close</mat-icon>
               </button>

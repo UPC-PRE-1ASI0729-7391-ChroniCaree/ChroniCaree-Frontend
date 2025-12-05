@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -9,6 +10,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+
+import { TranslateModule } from '@ngx-translate/core';
+
 import { PatientService } from '../../../../patients/infrastructure/patient.service';
 import { DoctorService } from '../../../../doctors/infrastructure/doctor.service';
 import { PatientEntity } from '../../../../patients/domain/model/patient.entity';
@@ -51,7 +55,8 @@ interface Appointment {
     MatChipsModule,
     MatTabsModule,
     MatProgressSpinnerModule,
-    MatDividerModule
+    MatDividerModule,
+    TranslateModule,
   ],
   templateUrl: './hospital-patient-detail.view.html',
   styleUrls: ['./hospital-patient-detail.view.css']
@@ -62,27 +67,22 @@ export class HospitalPatientDetailView implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly patientService = inject(PatientService);
   private readonly doctorService = inject(DoctorService);
+
   private readonly baseUrl = environment.apiBaseUrl;
 
   loading = signal(true);
   patient = signal<PatientEntity | null>(null);
   assignedDoctor = signal<DoctorEntity | null>(null);
-  
-  // Medical data signals
+
   vitalSigns = signal<VitalSign[]>([]);
   medications = signal<Medication[]>([]);
   appointments = signal<Appointment[]>([]);
 
-  // Computed properties
-  patientAge = computed(() => {
-    const p = this.patient();
-    return p ? p.age : 0;
-  });
+  patientAge = computed(() => this.patient()?.age ?? 0);
 
   bmiStatus = computed(() => {
-    const p = this.patient();
-    if (!p) return 'normal';
-    const bmi = p.bmi;
+    const bmi = this.patient()?.bmi;
+    if (typeof bmi !== 'number') return 'normal';
     if (bmi < 18.5) return 'underweight';
     if (bmi < 25) return 'normal';
     if (bmi < 30) return 'overweight';
@@ -102,9 +102,7 @@ export class HospitalPatientDetailView implements OnInit {
 
   ngOnInit(): void {
     const patientId = this.route.snapshot.paramMap.get('id');
-    if (patientId) {
-      this.loadPatientDetails(Number(patientId));
-    }
+    if (patientId) this.loadPatientDetails(Number(patientId));
   }
 
   private loadPatientDetails(patientId: number): void {
@@ -113,89 +111,90 @@ export class HospitalPatientDetailView implements OnInit {
     this.patientService.getById(patientId).subscribe({
       next: (patient) => {
         this.patient.set(patient);
-        
-        // Load assigned doctor if exists
+
         if (patient.assignedDoctorId) {
           this.doctorService.getById(patient.assignedDoctorId).subscribe({
             next: (doctor) => this.assignedDoctor.set(doctor),
             error: (err) => console.error('Error loading doctor:', err)
           });
+        } else {
+          this.assignedDoctor.set(null);
         }
 
-        // Load medical data from DB
         this.loadVitalSigns(patientId);
         this.loadMedications(patientId);
         this.loadAppointments(patientId);
-        
+
         this.loading.set(false);
       },
       error: (err) => {
         console.error('Error loading patient:', err);
+        this.patient.set(null);
         this.loading.set(false);
       }
     });
   }
 
   private loadVitalSigns(patientId: number): void {
-    // Load latest vital signs from records
-    this.http.get<any[]>(`${this.baseUrl}${environment.medicalRecordsEndpointPath}?patientId=${patientId}`).subscribe({
+    this.http.get<any[]>(
+      `${this.baseUrl}${environment.medicalRecordsEndpointPath}?patientId=${patientId}`
+    ).subscribe({
       next: (records) => {
-        if (records && records.length > 0) {
-          // Get the most recent record with vital signs
-          const latestRecord = records
-            .filter(r => r.type === 'vital_signs')
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+        if (!records?.length) return;
 
-          if (latestRecord) {
-            const vitals: VitalSign[] = [];
-            
-            if (latestRecord.bloodPressure) {
-              vitals.push({
-                type: 'Presión Arterial',
-                value: latestRecord.bloodPressure,
-                unit: 'mmHg',
-                status: this.getBloodPressureStatus(latestRecord.bloodPressure),
-                icon: 'favorite',
-                date: latestRecord.date
-              });
-            }
-            
-            if (latestRecord.heartRate) {
-              vitals.push({
-                type: 'Frecuencia Cardíaca',
-                value: latestRecord.heartRate.toString(),
-                unit: 'bpm',
-                status: latestRecord.heartRate >= 60 && latestRecord.heartRate <= 100 ? 'normal' : 'warning',
-                icon: 'monitor_heart',
-                date: latestRecord.date
-              });
-            }
-            
-            if (latestRecord.temperature) {
-              vitals.push({
-                type: 'Temperatura',
-                value: latestRecord.temperature.toString(),
-                unit: '°C',
-                status: latestRecord.temperature >= 36 && latestRecord.temperature <= 37.5 ? 'normal' : 'warning',
-                icon: 'thermostat',
-                date: latestRecord.date
-              });
-            }
-            
-            if (latestRecord.glucose) {
-              vitals.push({
-                type: 'Glucosa',
-                value: latestRecord.glucose.toString(),
-                unit: 'mg/dL',
-                status: latestRecord.glucose >= 70 && latestRecord.glucose <= 140 ? 'normal' : 'warning',
-                icon: 'water_drop',
-                date: latestRecord.date
-              });
-            }
-            
-            this.vitalSigns.set(vitals);
-          }
+        const latestRecord = records
+          .filter(r => r.type === 'vital_signs')
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+
+        if (!latestRecord) return;
+
+        const vitals: VitalSign[] = [];
+
+        if (latestRecord.bloodPressure) {
+          vitals.push({
+            type: 'hospital.patientDetail.vitals.types.bloodPressure',
+            value: latestRecord.bloodPressure,
+            unit: 'mmHg',
+            status: this.getBloodPressureStatus(latestRecord.bloodPressure),
+            icon: 'favorite',
+            date: latestRecord.date
+          });
         }
+
+        if (latestRecord.heartRate) {
+          vitals.push({
+            type: 'hospital.patientDetail.vitals.types.heartRate',
+            value: String(latestRecord.heartRate),
+            unit: 'bpm',
+            status: latestRecord.heartRate >= 60 && latestRecord.heartRate <= 100 ? 'normal' : 'warning',
+            icon: 'monitor_heart',
+            date: latestRecord.date
+          });
+        }
+
+        if (latestRecord.temperature) {
+          vitals.push({
+            type: 'hospital.patientDetail.vitals.types.temperature',
+            value: String(latestRecord.temperature),
+            unit: '°C',
+            status: latestRecord.temperature >= 36 && latestRecord.temperature <= 37.5 ? 'normal' : 'warning',
+            icon: 'thermostat',
+            date: latestRecord.date
+          });
+        }
+
+        if (latestRecord.glucose) {
+          vitals.push({
+            type: 'hospital.patientDetail.vitals.types.glucose',
+            value: String(latestRecord.glucose),
+            unit: 'mg/dL',
+            status: latestRecord.glucose >= 70 && latestRecord.glucose <= 140 ? 'normal' : 'warning',
+            icon: 'water_drop',
+            date: latestRecord.date
+          });
+        }
+
+        this.vitalSigns.set(vitals);
       },
       error: (err) => console.error('Error loading vital signs:', err)
     });
@@ -209,18 +208,21 @@ export class HospitalPatientDetailView implements OnInit {
   }
 
   private loadMedications(patientId: number): void {
-    this.http.get<any[]>(`${this.baseUrl}${environment.medicationsEndpointPath}?patientId=${patientId}`).subscribe({
-      next: (medications) => {
-        const formattedMeds: Medication[] = medications
+    this.http.get<any[]>(
+      `${this.baseUrl}${environment.medicationsEndpointPath}?patientId=${patientId}`
+    ).subscribe({
+      next: (meds) => {
+        const formatted: Medication[] = (meds ?? [])
           .filter(med => med.status === 'active')
           .map(med => ({
             name: med.name || 'N/A',
             dosage: med.dosage || 'N/A',
-            frequency: this.formatFrequency(med.schedule?.frequency) || 'N/A',
-            prescribedDate: med.prescribedDate ? new Date(med.prescribedDate).toISOString().split('T')[0] : 'N/A',
-            prescribedBy: med.prescribedBy || 'Sin información'
+            frequency: this.frequencyKey(med.schedule?.frequency),
+            prescribedDate: med.prescribedDate ? med.prescribedDate : new Date().toISOString(),
+            prescribedBy: med.prescribedBy || 'N/A'
           }));
-        this.medications.set(formattedMeds);
+
+        this.medications.set(formatted);
       },
       error: (err) => {
         console.error('Error loading medications:', err);
@@ -229,33 +231,33 @@ export class HospitalPatientDetailView implements OnInit {
     });
   }
 
-  private formatFrequency(frequency: string): string {
-    const frequencies: Record<string, string> = {
-      'once_daily': 'Una vez al día',
-      'twice_daily': 'Dos veces al día',
-      'three_times_daily': 'Tres veces al día',
-      'four_times_daily': 'Cuatro veces al día',
-      'every_8_hours': 'Cada 8 horas',
-      'every_12_hours': 'Cada 12 horas'
+  private frequencyKey(freq: string): string {
+    const map: Record<string, string> = {
+      once_daily: 'hospital.patientDetail.medications.frequencies.once_daily',
+      twice_daily: 'hospital.patientDetail.medications.frequencies.twice_daily',
+      three_times_daily: 'hospital.patientDetail.medications.frequencies.three_times_daily',
+      four_times_daily: 'hospital.patientDetail.medications.frequencies.four_times_daily',
+      every_8_hours: 'hospital.patientDetail.medications.frequencies.every_8_hours',
+      every_12_hours: 'hospital.patientDetail.medications.frequencies.every_12_hours'
     };
-    return frequencies[frequency] || frequency || 'N/A';
+    return map[freq] || 'hospital.patientDetail.medications.frequencies.unknown';
   }
 
   private loadAppointments(patientId: number): void {
-    this.http.get<any[]>(`${this.baseUrl}${environment.appointmentsEndpointPath}?patientId=${patientId}`).subscribe({
-      next: (appointments) => {
-        const formattedAppointments: Appointment[] = appointments.map(apt => ({
-          date: apt.date || 'N/A',
-          type: this.formatAppointmentType(apt.type) || 'Consulta',
-          doctor: this.assignedDoctor()?.fullName || 'Sin asignar',
-          notes: apt.notes || 'Sin notas',
+    this.http.get<any[]>(
+      `${this.baseUrl}${environment.appointmentsEndpointPath}?patientId=${patientId}`
+    ).subscribe({
+      next: (apts) => {
+        const formatted: Appointment[] = (apts ?? []).map(apt => ({
+          date: apt.date || new Date().toISOString(),
+          type: this.appointmentTypeKey(apt.type),
+          doctor: this.assignedDoctor()?.fullName || '—',
+          notes: apt.notes || '—',
           status: this.normalizeAppointmentStatus(apt.status)
         }));
-        
-        // Sort by date descending (most recent first)
-        formattedAppointments.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        
-        this.appointments.set(formattedAppointments);
+
+        formatted.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        this.appointments.set(formatted);
       },
       error: (err) => {
         console.error('Error loading appointments:', err);
@@ -270,17 +272,14 @@ export class HospitalPatientDetailView implements OnInit {
     return 'cancelled';
   }
 
-  private formatAppointmentType(type: string): string {
-    const types: Record<string, string> = {
-      'CONSULTATION': 'Consulta General',
-      'FOLLOW_UP': 'Seguimiento',
-      'EMERGENCY': 'Emergencia',
-      'ROUTINE_CHECKUP': 'Chequeo de Rutina',
-      'Chequeo de rutina': 'Chequeo de Rutina',
-      'Seguimiento': 'Seguimiento',
-      'Emergencia': 'Emergencia'
+  private appointmentTypeKey(type: string): string {
+    const map: Record<string, string> = {
+      CONSULTATION: 'hospital.patientDetail.appointments.types.consultation',
+      FOLLOW_UP: 'hospital.patientDetail.appointments.types.followUp',
+      EMERGENCY: 'hospital.patientDetail.appointments.types.emergency',
+      ROUTINE_CHECKUP: 'hospital.patientDetail.appointments.types.routineCheck'
     };
-    return types[type] || type;
+    return map[type] || 'hospital.patientDetail.appointments.types.consultation';
   }
 
   getVitalSignColor(status: string): string {
@@ -303,10 +302,10 @@ export class HospitalPatientDetailView implements OnInit {
 
   getAppointmentStatusLabel(status: string): string {
     switch (status) {
-      case 'completed': return 'Completada';
-      case 'scheduled': return 'Programada';
-      case 'cancelled': return 'Cancelada';
-      default: return status;
+      case 'completed': return 'hospital.patientDetail.appointments.status.completed';
+      case 'scheduled': return 'hospital.patientDetail.appointments.status.scheduled';
+      case 'cancelled': return 'hospital.patientDetail.appointments.status.cancelled';
+      default: return 'hospital.patientDetail.appointments.status.cancelled';
     }
   }
 
@@ -315,26 +314,12 @@ export class HospitalPatientDetailView implements OnInit {
   }
 
   editPatient(): void {
-    const patient = this.patient();
-    if (patient) {
-      // TODO: Navigate to edit patient view
-      console.log('Edit patient:', patient.id);
-    }
+    const p = this.patient();
+    if (p) console.log('Edit patient:', p.id);
   }
 
   scheduleAppointment(): void {
-    const patient = this.patient();
-    if (patient) {
-      // TODO: Navigate to appointment scheduling
-      console.log('Schedule appointment for patient:', patient.id);
-    }
-  }
-
-  prescribeMedication(): void {
-    const patient = this.patient();
-    if (patient) {
-      // TODO: Navigate to medication prescription
-      console.log('Prescribe medication for patient:', patient.id);
-    }
+    const p = this.patient();
+    if (p) console.log('Schedule appointment for patient:', p.id);
   }
 }

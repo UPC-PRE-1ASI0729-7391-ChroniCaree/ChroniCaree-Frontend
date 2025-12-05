@@ -5,17 +5,19 @@
       <div class="title-section">
         <h1>
           <mat-icon>people</mat-icon>
-          Gestión de Pacientes
+          {{ 'hospital.patients.header.title' | translate }}
         </h1>
-        <p class="subtitle">Visualiza y administra todos los pacientes del hospital</p>
+        <p class="subtitle">{{ 'hospital.patients.header.subtitle' | translate }}</p>
       </div>
+
       <a
         routerLink="/hospital/patient-onboarding"
         mat-raised-button
         color="primary"
-        class="add-patient-btn">
+        class="add-patient-btn"
+      >
         <mat-icon>person_add</mat-icon>
-        Registrar Paciente
+        {{ 'hospital.patients.actions.registerPatient' | translate }}
       </a>
     </div>
 
@@ -25,21 +27,23 @@
         <mat-icon class="stat-icon">people</mat-icon>
         <div class="stat-info">
           <span class="stat-value">{{ totalPatients() }}</span>
-          <span class="stat-label">Total Pacientes</span>
+          <span class="stat-label">{{ 'hospital.patients.stats.total' | translate }}</span>
         </div>
       </div>
+
       <div class="stat-card active">
         <mat-icon class="stat-icon">check_circle</mat-icon>
         <div class="stat-info">
           <span class="stat-value">{{ activePatients() }}</span>
-          <span class="stat-label">Activos</span>
+          <span class="stat-label">{{ 'hospital.patients.stats.active' | translate }}</span>
         </div>
       </div>
+
       <div class="stat-card critical">
         <mat-icon class="stat-icon">warning</mat-icon>
         <div class="stat-info">
           <span class="stat-value">{{ criticalPatients() }}</span>
-          <span class="stat-label">Críticos</span>
+          <span class="stat-label">{{ 'hospital.patients.stats.critical' | translate }}</span>
         </div>
       </div>
     </div>
@@ -48,11 +52,15 @@
     <div class="search-section">
       <mat-form-field appearance="outline" class="search-field">
         <mat-icon matPrefix>search</mat-icon>
-        <mat-label>Buscar paciente, condición o doctor...</mat-label>
+
+        <mat-label>{{ 'hospital.patients.search.label' | translate }}</mat-label>
+
         <input
           matInput
-          [(ngModel)]="searchTerm"
-          placeholder="Ej: María, Diabetes, Dr. Pérez">
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          [placeholder]="'hospital.patients.search.placeholder' | translate"
+        />
       </mat-form-field>
     </div>
   </div>
@@ -60,31 +68,34 @@
   <!-- Patients List -->
   <div class="patients-list">
     @for (patient of filteredPatients(); track patient.id) {
-      <div
-        class="patient-card"
-        (click)="viewPatientDetails(patient.id)">
+      <div class="patient-card" (click)="viewPatientDetails(patient.id)">
         <div class="patient-header">
           <div class="patient-avatar">
             <mat-icon>person</mat-icon>
           </div>
+
           <div class="patient-main-info">
             <h3>{{ patient.name }}</h3>
+
             <div class="patient-meta">
               <span class="meta-item">
                 <mat-icon>cake</mat-icon>
-                {{ patient.age }} años
+                {{ 'hospital.patients.card.age' | translate:{ age: patient.age } }}
               </span>
+
               <span class="meta-item">
-                <mat-icon>{{ patient.gender === 'Masculino' ? 'male' : 'female' }}</mat-icon>
+                <mat-icon>{{ patient.gender === genderMaleLabel ? 'male' : 'female' }}</mat-icon>
                 {{ patient.gender }}
               </span>
             </div>
           </div>
+
           <mat-chip
             class="status-chip"
             [style.background-color]="getStatusColor(patient.status) + '20'"
-            [style.color]="getStatusColor(patient.status)">
-            {{ getStatusLabel(patient.status) }}
+            [style.color]="getStatusColor(patient.status)"
+          >
+            {{ ('hospital.patients.statuses.' + patient.status) | translate }}
           </mat-chip>
         </div>
 
@@ -93,14 +104,15 @@
             <div class="detail-item">
               <mat-icon class="detail-icon">medical_information</mat-icon>
               <div class="detail-content">
-                <span class="detail-label">Condición</span>
+                <span class="detail-label">{{ 'hospital.patients.card.conditionLabel' | translate }}</span>
                 <span class="detail-value">{{ patient.condition }}</span>
               </div>
             </div>
+
             <div class="detail-item">
               <mat-icon class="detail-icon doctor-icon">medical_services</mat-icon>
               <div class="detail-content">
-                <span class="detail-label">Doctor Asignado</span>
+                <span class="detail-label">{{ 'hospital.patients.card.assignedDoctorLabel' | translate }}</span>
                 <span class="detail-value">{{ patient.assignedDoctor }}</span>
                 <span class="detail-specialty">{{ patient.doctorSpecialty }}</span>
               </div>
@@ -111,17 +123,19 @@
             <div class="detail-item">
               <mat-icon class="detail-icon">event</mat-icon>
               <div class="detail-content">
-                <span class="detail-label">Última Visita</span>
+                <span class="detail-label">{{ 'hospital.patients.card.lastVisitLabel' | translate }}</span>
                 <span class="detail-value">{{ patient.lastVisit | date: 'dd/MM/yyyy' }}</span>
               </div>
             </div>
+
             <div class="detail-actions">
               <button
                 mat-button
                 color="primary"
-                (click)="$event.stopPropagation(); viewPatientDetails(patient.id)">
+                (click)="$event.stopPropagation(); viewPatientDetails(patient.id)"
+              >
                 <mat-icon>visibility</mat-icon>
-                Ver Detalles
+                {{ 'hospital.patients.actions.viewDetails' | translate }}
               </button>
             </div>
           </div>
@@ -131,27 +145,27 @@
       @if (searchTerm()) {
         <div class="empty-state">
           <mat-icon>search_off</mat-icon>
-          <h3>No se encontraron pacientes</h3>
-          <p>No hay pacientes que coincidan con "{{ searchTerm() }}"</p>
-          <button
-            mat-button
-            color="primary"
-            (click)="searchTerm.set('')">
+          <h3>{{ 'hospital.patients.empty.search.title' | translate }}</h3>
+          <p>{{ 'hospital.patients.empty.search.subtitle' | translate:{ term: searchTerm() } }}</p>
+
+          <button mat-button color="primary" (click)="searchTerm.set('')">
             <mat-icon>clear</mat-icon>
-            Limpiar búsqueda
+            {{ 'hospital.patients.empty.search.clear' | translate }}
           </button>
         </div>
       } @else {
         <div class="empty-state">
           <mat-icon>people</mat-icon>
-          <h3>No hay pacientes registrados</h3>
-          <p>Comienza registrando el primer paciente del hospital</p>
+          <h3>{{ 'hospital.patients.empty.initial.title' | translate }}</h3>
+          <p>{{ 'hospital.patients.empty.initial.subtitle' | translate }}</p>
+
           <a
             routerLink="/hospital/patient-onboarding"
             mat-raised-button
-            color="primary">
+            color="primary"
+          >
             <mat-icon>person_add</mat-icon>
-            Registrar Primer Paciente
+            {{ 'hospital.patients.empty.initial.cta' | translate }}
           </a>
         </div>
       }
@@ -162,11 +176,12 @@
   <div class="quick-actions">
     <a routerLink="/hospital/assignments" mat-button color="primary">
       <mat-icon>assignment</mat-icon>
-      Ver Asignaciones
+      {{ 'hospital.patients.quickActions.assignments' | translate }}
     </a>
+
     <a routerLink="/hospital/doctors" mat-button color="primary">
       <mat-icon>medical_services</mat-icon>
-      Ver Doctores
+      {{ 'hospital.patients.quickActions.doctors' | translate }}
     </a>
   </div>
 </div>

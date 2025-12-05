@@ -69,9 +69,9 @@
             autocomplete="off"
             [disabled]="vmx.sending || data.status === 'CLOSED'"
             (keypress)="handleKeyPress($event)" />
-          <button 
-            type="submit" 
-            class="btn-send" 
+          <button
+            type="submit"
+            class="btn-send"
             [disabled]="vmx.sending || !replyText().trim() || data.status === 'CLOSED'"
             [class.btn-sending]="vmx.sending">
             <span *ngIf="!vmx.sending" class="send-icon">➤</span>
@@ -79,12 +79,12 @@
           </button>
         </div>
       </form>
-      
+
       <!-- Close Thread Button (only for doctors and open threads) -->
       <div class="action-bar" *ngIf="vmx.canClose && data.status === 'OPEN'">
-        <button 
-          class="btn-resolve" 
-          (click)="closeThread()" 
+        <button
+          class="btn-resolve"
+          (click)="closeThread()"
           [disabled]="vmx.closing">
           <span *ngIf="!vmx.closing">✓ Marcar como Resuelta</span>
           <span *ngIf="vmx.closing">Cerrando...</span>

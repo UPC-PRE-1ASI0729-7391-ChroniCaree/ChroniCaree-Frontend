@@ -4,20 +4,23 @@
     <div class="title-section">
       <h1>
         <mat-icon>assignment</mat-icon>
-        Asignaciones Doctor-Paciente
+        {{ 'hospitalAssignments.header.title' | translate }}
       </h1>
-      <p class="subtitle">Gestiona las asignaciones de pacientes a doctores</p>
+      <p class="subtitle">{{ 'hospitalAssignments.header.subtitle' | translate }}</p>
     </div>
-
 
     <div class="quick-stats">
       <div class="stat-badge unassigned">
         <mat-icon>person_off</mat-icon>
-        <span>{{ unassignedPatients().length }} Sin Asignar</span>
+        <span>
+          {{ unassignedPatients().length }} {{ 'hospitalAssignments.stats.unassigned' | translate }}
+        </span>
       </div>
       <div class="stat-badge assigned">
         <mat-icon>check_circle</mat-icon>
-        <span>{{ assignedPatients().length }} Asignados</span>
+        <span>
+          {{ assignedPatients().length }} {{ 'hospitalAssignments.stats.assigned' | translate }}
+        </span>
       </div>
     </div>
   </div>
@@ -29,7 +32,7 @@
       <div class="section-header">
         <h2>
           <mat-icon>person_add</mat-icon>
-          Pacientes Sin Asignar
+          {{ 'hospitalAssignments.sections.unassignedTitle' | translate }}
         </h2>
         <mat-chip class="count-chip">{{ unassignedPatients().length }}</mat-chip>
       </div>
@@ -42,16 +45,18 @@
                 <mat-icon class="patient-icon">person</mat-icon>
                 <div>
                   <h3>{{ patient.name }}</h3>
-                  <p class="patient-meta">{{ patient.age }} años • {{ patient.condition }}</p>
+                  <p class="patient-meta">
+                    {{ patient.age }} {{ 'hospitalAssignments.patient.years' | translate }} • {{ patient.condition }}
+                  </p>
                 </div>
               </div>
             </div>
 
             <div class="assignment-control">
               <mat-form-field appearance="outline" class="doctor-select">
-                <mat-label>Asignar a doctor</mat-label>
-                <mat-select 
-                  placeholder="Seleccione un doctor"
+                <mat-label>{{ 'hospitalAssignments.assign.label' | translate }}</mat-label>
+                <mat-select
+                  [placeholder]="'hospitalAssignments.assign.placeholder' | translate"
                   (selectionChange)="assignPatientToDoctor(patient.id, $event.value)">
                   @for (doctor of doctors(); track doctor.id) {
                     <mat-option [value]="doctor.id">
@@ -59,7 +64,7 @@
                         <span class="doctor-name">{{ doctor.name }}</span>
                         <span class="doctor-specialty">{{ doctor.specialty }}</span>
                         <mat-chip class="patient-count-chip">
-                          {{ doctor.patientCount }} pacientes
+                          {{ 'hospitalAssignments.assign.patientsCount' | translate:{ count: doctor.patientCount } }}
                         </mat-chip>
                       </div>
                     </mat-option>
@@ -71,7 +76,7 @@
         } @empty {
           <div class="empty-state-small">
             <mat-icon>check_circle</mat-icon>
-            <p>¡Excelente! Todos los pacientes están asignados</p>
+            <p>{{ 'hospitalAssignments.empty.allAssigned' | translate }}</p>
           </div>
         }
       </div>
@@ -82,7 +87,7 @@
       <div class="section-header">
         <h2>
           <mat-icon>assignment_turned_in</mat-icon>
-          Asignaciones Actuales
+          {{ 'hospitalAssignments.sections.assignedTitle' | translate }}
         </h2>
       </div>
 
@@ -99,7 +104,7 @@
                   </div>
                 </div>
                 <mat-chip class="patient-count-chip">
-                  {{ getPatientsByDoctor(doctor.id).length }} pacientes
+                  {{ 'hospitalAssignments.assign.patientsCount' | translate:{ count: getPatientsByDoctor(doctor.id).length } }}
                 </mat-chip>
               </div>
 
@@ -110,14 +115,16 @@
                       <mat-icon class="patient-icon">person</mat-icon>
                       <div class="patient-details">
                         <h4>{{ patient.name }}</h4>
-                        <p class="patient-meta">{{ patient.age }} años • {{ patient.condition }}</p>
+                        <p class="patient-meta">
+                          {{ patient.age }} {{ 'hospitalAssignments.patient.years' | translate }} • {{ patient.condition }}
+                        </p>
                       </div>
                     </div>
-                    <button 
-                      mat-icon-button 
+                    <button
+                      mat-icon-button
                       color="warn"
                       (click)="unassignPatient(patient.id)"
-                      matTooltip="Desasignar paciente">
+                      [matTooltip]="'hospitalAssignments.tooltips.unassign' | translate">
                       <mat-icon>link_off</mat-icon>
                     </button>
                   </div>
@@ -128,8 +135,8 @@
         } @empty {
           <div class="empty-state">
             <mat-icon>assignment</mat-icon>
-            <h3>No hay asignaciones aún</h3>
-            <p>Comienza asignando pacientes a los doctores</p>
+            <h3>{{ 'hospitalAssignments.empty.noAssignmentsTitle' | translate }}</h3>
+            <p>{{ 'hospitalAssignments.empty.noAssignmentsSubtitle' | translate }}</p>
           </div>
         }
       </div>
@@ -140,15 +147,15 @@
   <div class="quick-actions">
     <a routerLink="/hospital/doctors" mat-button color="primary">
       <mat-icon>medical_services</mat-icon>
-      Ver Doctores
+      {{ 'hospitalAssignments.actions.viewDoctors' | translate }}
     </a>
     <a routerLink="/hospital/patients" mat-button color="primary">
       <mat-icon>people</mat-icon>
-      Ver Pacientes
+      {{ 'hospitalAssignments.actions.viewPatients' | translate }}
     </a>
     <a routerLink="/hospital/patient-onboarding" mat-raised-button color="primary">
       <mat-icon>person_add</mat-icon>
-      Registrar Nuevo Paciente
+      {{ 'hospitalAssignments.actions.registerNewPatient' | translate }}
     </a>
   </div>
 </div>
