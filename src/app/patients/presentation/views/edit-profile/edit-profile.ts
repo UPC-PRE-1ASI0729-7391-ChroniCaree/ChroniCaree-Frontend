@@ -13,15 +13,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PatientStore } from '../../../application/patient.store';
 import { Patient } from '../../../domain/model/patient.entity';
 import { SubscriptionService } from '../../../../subscriptions/infrastructure/subscription.service';
 import { SubscriptionEntity } from '../../../../subscriptions/domain/model/subscription.entity';
+import { TotpValidatorService } from '../../../../shared/infrastructure/totp-validator.service';
 import { firstValueFrom } from 'rxjs';
 
-/**
- * Edit Profile View - US20: Actualizar perfil del paciente
- */
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
@@ -37,8 +37,10 @@ import { firstValueFrom } from 'rxjs';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatDatepickerModule,
-    MatNativeDateModule
-    ,TranslateModule
+    MatNativeDateModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    TranslateModule
   ],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css'
@@ -47,6 +49,13 @@ export class EditProfileComponent implements OnInit {
   profileForm!: FormGroup;
   currentSubscription = signal<SubscriptionEntity | null>(null);
   loadingSubscription = signal(false);
+  
+  // 2FA Configuration
+  twoFactorSecret = signal<string>('');
+  twoFactorQRCode = signal<string>('');
+  showTwoFactorSetup = signal(false);
+  twoFactorVerified = signal(false);
+  verificationForm!: FormGroup;
   
   // Computed BMI
   calculatedBMI = computed(() => {
@@ -105,7 +114,8 @@ export class EditProfileComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog,
     private translate: TranslateService,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private totpValidator: TotpValidatorService
   ) {}
   
   get loading() {
@@ -118,6 +128,7 @@ export class EditProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.initializeVerificationForm();
     this.loadCurrentPatient();
     this.loadSubscription();
   }
@@ -130,12 +141,18 @@ export class EditProfileComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       weight: [null, [Validators.required, Validators.min(20), Validators.max(300)]],
-      height: [null, [Validators.required, Validators.min(50), Validators.max(250)]]
+      height: [null, [Validators.required, Validators.min(50), Validators.max(250)]],
+      twoFactorEnabled: [false]
+    });
+  }
+
+  private initializeVerificationForm(): void {
+    this.verificationForm = this.fb.group({
+      verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
     });
   }
 
   private loadCurrentPatient(): void {
-    // TODO: Get patient ID from auth service
     const patientId = 1;
     
     this.patientStore.loadPatientById(patientId).subscribe({
@@ -149,9 +166,15 @@ export class EditProfileComponent implements OnInit {
           weight: patient.weight,
           height: patient.height
         });
+        
+        const saved2FA = localStorage.getItem(`patient_${patientId}_2fa_verified`);
+        if (saved2FA === 'true') {
+          this.twoFactorVerified.set(true);
+          this.profileForm.patchValue({ twoFactorEnabled: true });
+        }
       },
       error: (error) => {
-        this.snackBar.open('❌ Error al cargar perfil', 'Cerrar', {
+        this.snackBar.open('Error al cargar perfil', 'Cerrar', {
           duration: 3000
         });
         console.error('Error loading patient:', error);
@@ -165,13 +188,12 @@ export class EditProfileComponent implements OnInit {
       const patient = this.currentPatient();
       
       if (!patient) {
-        this.snackBar.open('❌ No se encontró el paciente', 'Cerrar', {
+        this.snackBar.open('No se encontró el paciente', 'Cerrar', {
           duration: 3000
         });
         return;
       }
 
-      // Check for unusual values
       const warnings = this.checkUnusualValues(formValue);
       
       if (warnings.length > 0) {
@@ -180,7 +202,7 @@ export class EditProfileComponent implements OnInit {
         this.saveProfile(patient, formValue);
       }
     } else {
-      this.snackBar.open('⚠️ Por favor, revisa los campos del formulario', 'Cerrar', {
+      this.snackBar.open('Por favor, revisa los campos del formulario', 'Cerrar', {
         duration: 3000
       });
     }
@@ -189,21 +211,18 @@ export class EditProfileComponent implements OnInit {
   private checkUnusualValues(formValue: any): string[] {
     const warnings: string[] = [];
     
-    // Weight warnings
     if (formValue.weight < 40) {
       warnings.push('El peso ingresado es inusualmente bajo (< 40 kg)');
     } else if (formValue.weight > 200) {
       warnings.push('El peso ingresado es inusualmente alto (> 200 kg)');
     }
     
-    // Height warnings
     if (formValue.height < 100) {
       warnings.push('La altura ingresada es inusualmente baja (< 100 cm)');
     } else if (formValue.height > 220) {
       warnings.push('La altura ingresada es inusualmente alta (> 220 cm)');
     }
     
-    // BMI warnings
     const bmi = this.calculatedBMI();
     if (bmi < 16) {
       warnings.push('El IMC calculado es extremadamente bajo (< 16)');
@@ -211,7 +230,6 @@ export class EditProfileComponent implements OnInit {
       warnings.push('El IMC calculado es extremadamente alto (> 40)');
     }
     
-    // Age warnings
     const age = this.calculatedAge();
     if (age < 18) {
       warnings.push('La fecha de nacimiento indica que eres menor de edad');
@@ -245,7 +263,7 @@ export class EditProfileComponent implements OnInit {
 
     this.patientStore.updatePatient(updatedPatient).subscribe({
       next: () => {
-        this.snackBar.open('✅ Perfil actualizado exitosamente', 'Cerrar', {
+        this.snackBar.open('Perfil actualizado exitosamente', 'Cerrar', {
           duration: 3000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -255,7 +273,7 @@ export class EditProfileComponent implements OnInit {
         }, 1500);
       },
       error: (error) => {
-        this.snackBar.open('❌ Error al actualizar perfil', 'Cerrar', {
+        this.snackBar.open('Error al actualizar perfil', 'Cerrar', {
           duration: 4000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -306,5 +324,154 @@ export class EditProfileComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/patient/dashboard']);
+  }
+
+  onTwoFactorToggle(): void {
+    const isEnabled = this.profileForm.get('twoFactorEnabled')?.value;
+    if (isEnabled) {
+      if (!this.twoFactorVerified()) {
+        this.generateTwoFactorSecret();
+        this.showTwoFactorSetup.set(true);
+      }
+    } else {
+      if (confirm('¿Estás seguro de que deseas desactivar la autenticación en dos pasos? Esto reducirá la seguridad de tu cuenta.')) {
+        this.twoFactorVerified.set(false);
+        this.showTwoFactorSetup.set(false);
+        this.twoFactorSecret.set('');
+        this.twoFactorQRCode.set('');
+        this.verificationForm.reset();
+        
+        const patient = this.currentPatient();
+        if (patient) {
+          localStorage.removeItem(`patient_${patient.id}_2fa_verified`);
+          localStorage.removeItem(`patient_${patient.id}_2fa_secret`);
+        }
+        
+        this.snackBar.open('Autenticación en dos pasos desactivada', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      } else {
+        this.profileForm.patchValue({ twoFactorEnabled: true });
+      }
+    }
+  }
+
+  private generateTwoFactorSecret(): void {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+      secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    const formattedSecret = secret.match(/.{1,4}/g)?.join(' ') || secret;
+    this.twoFactorSecret.set(formattedSecret);
+
+    const patient = this.currentPatient();
+    const accountName = patient 
+      ? `${patient.firstName} ${patient.lastName}`.replace(/\s+/g, ' ')
+      : 'Usuario ChroniCare';
+    const issuer = 'ChroniCare';
+    const totpUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
+    
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(totpUri)}`;
+    this.twoFactorQRCode.set(qrCodeUrl);
+  }
+
+  onVerifyCode(): void {
+    if (this.verificationForm.valid) {
+      const code = this.verificationForm.get('verificationCode')?.value;
+      const secret = this.twoFactorSecret().replace(/\s/g, '');
+      
+      if (!code || code.length !== 6) {
+        this.snackBar.open('Código inválido. Por favor, ingresa un código de 6 dígitos.', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        return;
+      }
+      
+      if (!secret) {
+        this.snackBar.open('Error: No se encontró el secreto de autenticación', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        return;
+      }
+      
+      const isValid = this.totpValidator.validateToken(code, secret);
+      
+      if (isValid) {
+        this.twoFactorVerified.set(true);
+        this.showTwoFactorSetup.set(false);
+        
+        const patient = this.currentPatient();
+        if (patient) {
+          localStorage.setItem(`patient_${patient.id}_2fa_verified`, 'true');
+          localStorage.setItem(`patient_${patient.id}_2fa_secret`, secret);
+        }
+        
+        this.snackBar.open('Autenticación en dos pasos configurada correctamente', 'Cerrar', {
+          duration: 4000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        
+        console.log('2FA Secret saved:', secret);
+      } else {
+        this.snackBar.open('Código de verificación inválido. Por favor, verifica el código en Google Authenticator e inténtalo de nuevo.', 'Cerrar', {
+          duration: 4000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        this.verificationForm.patchValue({ verificationCode: '' });
+      }
+    } else {
+      this.snackBar.open('Por favor, ingresa un código de verificación válido', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top'
+      });
+    }
+  }
+
+  onCopySecret(): void {
+    const secret = this.twoFactorSecret().replace(/\s/g, '');
+    navigator.clipboard.writeText(secret).then(() => {
+      this.snackBar.open('Código secreto copiado al portapapeles', 'Cerrar', {
+        duration: 2000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top'
+      });
+    }).catch(() => {
+      this.snackBar.open('Error al copiar el código', 'Cerrar', {
+        duration: 2000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top'
+      });
+    });
+  }
+
+  onCancelTwoFactorSetup(): void {
+    this.showTwoFactorSetup.set(false);
+    this.profileForm.patchValue({ twoFactorEnabled: false });
+    this.twoFactorSecret.set('');
+    this.twoFactorQRCode.set('');
+    this.verificationForm.reset();
+    
+    this.snackBar.open('Configuración de autenticación cancelada', 'Cerrar', {
+      duration: 2000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top'
+    });
+  }
+
+  onVerificationCodeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.verificationForm.patchValue({ verificationCode: input.value });
   }
 }

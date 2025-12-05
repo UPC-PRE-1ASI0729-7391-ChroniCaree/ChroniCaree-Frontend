@@ -243,7 +243,7 @@
 }
 
 .form-group:has(#password)::before {
-  content: '🔒';
+  content: '';
   font-size: 1.2rem;
 }
 
@@ -291,6 +291,80 @@
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
+}
+
+/* Two Factor Verification Styles */
+.two-factor-verification {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.two-factor-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+  margin-bottom: 2rem;
+}
+
+.info-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.info-text {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.two-factor-form {
+  margin-top: 1.5rem;
+}
+
+.two-factor-form .form-group input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  padding: 1rem;
+}
+
+.two-factor-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-secondary {
+  flex: 1;
+  padding: 1rem;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.two-factor-actions .btn-primary {
+  flex: 1;
 }
 
 .btn-primary::before {

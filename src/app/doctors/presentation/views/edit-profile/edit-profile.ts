@@ -10,14 +10,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DoctorStore } from '../../../application/doctor.store';
 import { UserStore } from '../../../../iam/application/user.store';
+import { TotpValidatorService } from '../../../../shared/infrastructure/totp-validator.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-/**
- * Edit Profile View - Doctor Profile Management
- * Permite al doctor actualizar su información profesional
- */
 @Component({
   selector: 'app-edit-profile-doctor',
   standalone: true,
@@ -32,6 +32,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatSlideToggleModule,
+    MatCheckboxModule,
+    MatTooltipModule
     TranslateModule
   ],
   templateUrl: './edit-profile.html',
@@ -39,13 +42,18 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 })
 export class EditProfileDoctorComponent implements OnInit {
   profileForm!: FormGroup;
+  verificationForm!: FormGroup;
+  
+  // 2FA Configuration
+  twoFactorSecret = signal<string>('');
+  twoFactorQRCode = signal<string>('');
+  showTwoFactorSetup = signal(false);
+  twoFactorVerified = signal(false);
   private translate = inject(TranslateService);
-
   // Getters para evitar errores de inicialización
   get loading() { return this.doctorStore.loading$; }
   get currentDoctor() { return this.doctorStore.selectedDoctor$; }
 
-  // Años de experiencia calculados
   yearsOfExperience = computed(() => {
     const licenseDate = this.profileForm?.get('licenseDate')?.value;
     if (licenseDate) {
@@ -55,7 +63,6 @@ export class EditProfileDoctorComponent implements OnInit {
     return 0;
   });
 
-  // Especialidades médicas disponibles
   specialties = [
     'Cardiología',
     'Dermatología',
@@ -77,32 +84,54 @@ export class EditProfileDoctorComponent implements OnInit {
     private doctorStore: DoctorStore,
     private snackBar: MatSnackBar,
     private router: Router,
-    private userStore: UserStore
+    private userStore: UserStore,
+    private totpValidator: TotpValidatorService
   ) {
     this.initializeForm();
+    this.initializeVerificationForm();
   }
 
   ngOnInit(): void {
     this.loadDoctorData();
+    this.loadTwoFactorStatus();
   }
 
   private initializeForm(): void {
     this.profileForm = this.fb.group({
-
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
       phone: ['', [Validators.required, Validators.pattern(/^\+?\d{9,15}$/)]],
-
       specialty: ['', Validators.required],
       licenseNumber: ['', [Validators.required, Validators.minLength(5)]],
       licenseDate: ['', Validators.required],
-
       professionalBio: ['', [Validators.maxLength(500)]],
       consultationFee: [0, [Validators.min(0)]],
       languages: ['Español'],
-      availableForEmergencies: [false]
+      availableForEmergencies: [false],
+      twoFactorEnabled: [false]
     });
+  }
+
+  private initializeVerificationForm(): void {
+    this.verificationForm = this.fb.group({
+      verificationCode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+    });
+  }
+
+  private loadTwoFactorStatus(): void {
+    const user = this.userStore.currentUser$();
+    if (user && user.role === 'doctor') {
+      const doctor = this.currentDoctor();
+      if (doctor) {
+        const doctorId = doctor.id;
+        const has2FA = localStorage.getItem(`doctor_${doctorId}_2fa_verified`) === 'true';
+        if (has2FA) {
+          this.twoFactorVerified.set(true);
+          this.profileForm.patchValue({ twoFactorEnabled: true });
+        }
+      }
+    }
   }
 
   private loadDoctorData(): void {
@@ -164,7 +193,6 @@ export class EditProfileDoctorComponent implements OnInit {
       return;
     }
 
-    // Preparar datos actualizados
     const updatedDoctor = {
       ...doctor,
       firstName: formValue.firstName,
@@ -175,9 +203,9 @@ export class EditProfileDoctorComponent implements OnInit {
       licenseNumber: formValue.licenseNumber
     };
 
-    // Guardar cambios
     this.doctorStore.updateDoctor(updatedDoctor).subscribe({
       next: () => {
+
         this.showNotification(
           this.translate.instant('doctors.profileEdit.snack.updateSuccess'),
           'success'
@@ -196,6 +224,7 @@ export class EditProfileDoctorComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating doctor profile:', error);
+
         this.showNotification(
           this.translate.instant('doctors.profileEdit.snack.updateError'),
           'error'
@@ -213,6 +242,7 @@ export class EditProfileDoctorComponent implements OnInit {
 
     if (fee && (fee < 50 || fee > 1000)) {
       this.showNotification(
+
         this.translate.instant('doctors.profileEdit.snack.unusualFee'),
         'warning'
       );
@@ -225,6 +255,7 @@ export class EditProfileDoctorComponent implements OnInit {
       verticalPosition: 'top' as const,
       panelClass: [`snackbar-${type}`]
     };
+
 
     this.snackBar.open(message, this.translate.instant('common.close') || 'Cerrar', config);
   }
@@ -250,5 +281,116 @@ export class EditProfileDoctorComponent implements OnInit {
     }
 
     return '';
+  }
+
+  onTwoFactorToggle(): void {
+    const isEnabled = this.profileForm.get('twoFactorEnabled')?.value;
+    if (isEnabled) {
+      if (!this.twoFactorVerified()) {
+        this.generateTwoFactorSecret();
+        this.showTwoFactorSetup.set(true);
+      }
+    } else {
+      if (confirm('¿Estás seguro de que deseas desactivar la autenticación en dos pasos? Esto reducirá la seguridad de tu cuenta.')) {
+        this.twoFactorVerified.set(false);
+        this.showTwoFactorSetup.set(false);
+        this.twoFactorSecret.set('');
+        this.twoFactorQRCode.set('');
+        this.verificationForm.reset();
+        
+        const doctor = this.currentDoctor();
+        if (doctor) {
+          localStorage.removeItem(`doctor_${doctor.id}_2fa_verified`);
+          localStorage.removeItem(`doctor_${doctor.id}_2fa_secret`);
+        }
+        
+        this.showNotification('Autenticación en dos pasos desactivada', 'warning');
+      } else {
+        this.profileForm.patchValue({ twoFactorEnabled: true });
+      }
+    }
+  }
+
+  private generateTwoFactorSecret(): void {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+      secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    const formattedSecret = secret.match(/.{1,4}/g)?.join(' ') || secret;
+    this.twoFactorSecret.set(formattedSecret);
+
+    const doctor = this.currentDoctor();
+    const accountName = doctor 
+      ? `Dr. ${doctor.firstName} ${doctor.lastName}`.replace(/\s+/g, ' ')
+      : 'Doctor ChroniCare';
+    const issuer = 'ChroniCare';
+    const totpUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}`;
+    
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(totpUri)}`;
+    this.twoFactorQRCode.set(qrCodeUrl);
+  }
+
+  onVerifyCode(): void {
+    if (this.verificationForm.valid) {
+      const code = this.verificationForm.get('verificationCode')?.value;
+      const secret = this.twoFactorSecret().replace(/\s/g, '');
+      
+      if (!code || code.length !== 6) {
+        this.showNotification('Código inválido. Por favor, ingresa un código de 6 dígitos.', 'error');
+        return;
+      }
+      
+      if (!secret) {
+        this.showNotification('Error: No se encontró el secreto de autenticación', 'error');
+        return;
+      }
+      
+      const isValid = this.totpValidator.validateToken(code, secret);
+      
+      if (isValid) {
+        this.twoFactorVerified.set(true);
+        this.showTwoFactorSetup.set(false);
+        
+        const doctor = this.currentDoctor();
+        if (doctor) {
+          localStorage.setItem(`doctor_${doctor.id}_2fa_verified`, 'true');
+          localStorage.setItem(`doctor_${doctor.id}_2fa_secret`, secret);
+        }
+        
+        this.showNotification('Autenticación en dos pasos configurada correctamente', 'success');
+        console.log('2FA Secret saved for doctor:', secret);
+      } else {
+        this.showNotification('Código de verificación inválido. Por favor, verifica el código en Google Authenticator e inténtalo de nuevo.', 'error');
+        this.verificationForm.patchValue({ verificationCode: '' });
+      }
+    } else {
+      this.showNotification('Por favor, ingresa un código de verificación válido', 'warning');
+    }
+  }
+
+  onCopySecret(): void {
+    const secret = this.twoFactorSecret().replace(/\s/g, '');
+    navigator.clipboard.writeText(secret).then(() => {
+      this.showNotification('Código secreto copiado al portapapeles', 'success');
+    }).catch(() => {
+      this.showNotification('Error al copiar el código', 'error');
+    });
+  }
+
+  onCancelTwoFactorSetup(): void {
+    this.showTwoFactorSetup.set(false);
+    this.profileForm.patchValue({ twoFactorEnabled: false });
+    this.twoFactorSecret.set('');
+    this.twoFactorQRCode.set('');
+    this.verificationForm.reset();
+    this.showNotification('Configuración de autenticación cancelada', 'warning');
+  }
+
+  onVerificationCodeInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.verificationForm.patchValue({ verificationCode: input.value });
   }
 }

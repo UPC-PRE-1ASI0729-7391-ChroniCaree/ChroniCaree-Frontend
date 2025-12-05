@@ -1,24 +1,87 @@
 <div class="login-container">
   <div class="login-card">
-    <div class="login-header">
-      <div class="login-logo">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-        </svg>
+    <!-- Two Factor Verification View -->
+    @if (showTwoFactorVerification()) {
+      <div class="two-factor-verification">
+        <div class="login-header">
+          <div class="login-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <h1>Verificación en Dos Pasos</h1>
+          <p>Ingresa el código de tu aplicación de autenticación</p>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="error-message">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <div class="two-factor-info">
+          <div class="info-icon"></div>
+          <p class="info-text">
+            Abre Google Authenticator en tu dispositivo y ingresa el código de 6 dígitos que aparece.
+          </p>
+        </div>
+
+        <form (ngSubmit)="onVerifyTwoFactorCode()" class="two-factor-form">
+          <div class="form-group">
+            <label for="twoFactorCode">Código de Verificación</label>
+            <input
+              type="text"
+              id="twoFactorCode"
+              [value]="twoFactorCode()"
+              (input)="onTwoFactorCodeInput($event)"
+              placeholder="000000"
+              maxlength="6"
+              autocomplete="off"
+              required
+              autofocus
+            />
+          </div>
+
+          <div class="two-factor-actions">
+            <button 
+              type="button"
+              class="btn-secondary"
+              (click)="onCancelTwoFactorVerification()"
+              [disabled]="verifyingCode()"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn-primary"
+              [disabled]="twoFactorCode().length !== 6 || verifyingCode()"
+            >
+              {{ verifyingCode() ? 'Verificando...' : 'Verificar' }}
+            </button>
+          </div>
+        </form>
       </div>
-      <h1>Bienvenido de nuevo</h1>
-      <p>Ingresa tus credenciales para continuar</p>
-    </div>
-
-    @if (errorMessage()) {
-      <div class="error-message">
-        {{ errorMessage() }}
+    } @else {
+      <!-- Normal Login View -->
+      <div class="login-header">
+        <div class="login-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <h1>Bienvenido de nuevo</h1>
+        <p>Ingresa tus credenciales para continuar</p>
       </div>
-    }
 
-    <!-- Quick Access Buttons removed per request -->
+      @if (errorMessage()) {
+        <div class="error-message">
+          {{ errorMessage() }}
+        </div>
+      }
 
-    <form (ngSubmit)="onSubmit()">
+      <!-- Quick Access Buttons removed per request -->
+
+      <form (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label for="email">Correo Electrónico</label>
         <input
@@ -64,9 +127,10 @@
       </button>
     </form>
 
-    <div class="login-footer">
-      <p>¿No tienes cuenta? <a [routerLink]="['/iam/register']">Regístrate aquí</a></p>
-      <p><a [routerLink]="['/home']">Volver al inicio</a></p>
-    </div>
+      <div class="login-footer">
+        <p>¿No tienes cuenta? <a [routerLink]="['/iam/register']">Regístrate aquí</a></p>
+        <p><a [routerLink]="['/home']">Volver al inicio</a></p>
+      </div>
+    }
   </div>
 </div>
