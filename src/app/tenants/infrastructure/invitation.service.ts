@@ -88,16 +88,50 @@ export class InvitationService {
    * Obtiene todas las invitaciones de un tenant
    */
   getByTenantId(tenantId: number): Observable<InvitationEntity[]> {
-    return this.http.get<InvitationResource[]>(`${INVITATION_API}?tenantId=${tenantId}`)
-      .pipe(map(resources => resources.map(r => this.toEntity(r))));
+    const url = `${INVITATION_API}?tenantId=${tenantId}`;
+    console.log(`🌐 [InvitationService] getByTenantId(${tenantId}) - URL: ${url}`);
+    
+    return this.http.get<InvitationResource[]>(url)
+      .pipe(
+        map(resources => {
+          console.log('📦 [InvitationService] Response raw:', resources);
+          const entities = resources.map(r => this.toEntity(r));
+          console.log('📦 [InvitationService] Entities mapped:', entities.length);
+          return entities;
+        }),
+        catchError(error => {
+          console.error('❌ [InvitationService] getByTenantId error:', error);
+          console.error('  → status:', error.status);
+          console.error('  → message:', error.message);
+          console.error('  → error:', error.error);
+          throw error;
+        })
+      );
   }
 
   /**
    * Obtiene invitaciones pendientes de un tenant
    */
   getPendingByTenantId(tenantId: number): Observable<InvitationEntity[]> {
-    return this.http.get<InvitationResource[]>(`${INVITATION_API}?tenantId=${tenantId}&status=pending`)
-      .pipe(map(resources => resources.map(r => this.toEntity(r))));
+    const url = `${INVITATION_API}?tenantId=${tenantId}&status=pending`;
+    console.log(`🌐 [InvitationService] getPendingByTenantId(${tenantId}) - URL: ${url}`);
+    
+    return this.http.get<InvitationResource[]>(url)
+      .pipe(
+        map(resources => {
+          console.log('📦 [InvitationService] Response raw:', resources);
+          const entities = resources.map(r => this.toEntity(r));
+          console.log('📦 [InvitationService] Entities mapped:', entities.length, 'pending invitations');
+          return entities;
+        }),
+        catchError(error => {
+          console.error('❌ [InvitationService] getPendingByTenantId error:', error);
+          console.error('  → status:', error.status);
+          console.error('  → message:', error.message);
+          console.error('  → error:', error.error);
+          throw error;
+        })
+      );
   }
 
   /**

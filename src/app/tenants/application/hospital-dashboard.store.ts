@@ -37,6 +37,7 @@ export interface RegisterDoctorFromHospitalRequest {
   licenseNumber: string;
   specialty: string;
   phone?: string;
+  dni?: string; // DNI requerido por backend (mínimo 8 caracteres)
 }
 
 /**
@@ -97,34 +98,107 @@ export class HospitalDashboardStore {
     this._loading.set(true);
     this._error.set(null);
 
+    console.log('🏥 [HospitalDashboardStore] loadDashboardStats() iniciado');
+    console.log('  📍 tenantId recibido:', tenantId);
+
     return this.tenantService.getById(tenantId).pipe(
       switchMap(tenant => {
+        console.log('🏥 [HospitalDashboardStore] Tenant obtenido:', tenant);
+        console.log('  📍 tenant.id:', tenant.id);
+        console.log('  📍 tenant.status:', tenant.status);
+        console.log('  📍 tenant.subscriptionId:', tenant.subscriptionId);
+        
         // Validar que el tenant esté activo
         if (tenant.status !== 'active') {
+          console.error('❌ [HospitalDashboardStore] Hospital no está activo. Status:', tenant.status);
           return throwError(() => new Error('Hospital no está activo'));
         }
 
         // Validar que tenga suscripción
         if (!tenant.subscriptionId) {
+          console.error('❌ [HospitalDashboardStore] Hospital no tiene subscriptionId');
           return throwError(() => new Error('Hospital no tiene suscripción'));
         }
 
-        // Obtener subscription, doctores, pacientes e invitaciones en paralelo
-        return forkJoin({
-          tenant: of(tenant),
-          subscription: this.subscriptionService.getById(tenant.subscriptionId),
-          subscriptionPlan: this.subscriptionService.getPlanById(tenant.subscriptionId.toString()),
-          doctorsCount: this.doctorService.countByTenantId(tenantId),
-          doctors: this.doctorService.getByTenantId(tenantId),
-          // Nota: getPatientsByTenantId no existe, se calcula por doctores
-          pendingInvitations: this.invitationService.getPendingByTenantId(tenantId).pipe(
-            catchError(() => of([]))  // Si falla (404), retornar array vacío
-          )
-        });
+        console.log('🌐 [HospitalDashboardStore] Iniciando carga de datos...');
+        console.log('  → subscriptionService.getById(' + tenant.subscriptionId + ')');
+        console.log('  → doctorService.countByTenantId(' + tenantId + ')');
+        console.log('  → doctorService.getByTenantId(' + tenantId + ')');
+        console.log('  → invitationService.getPendingByTenantId(' + tenantId + ')');
+
+        // Primero obtener subscription para tener el planId correcto
+        return this.subscriptionService.getById(tenant.subscriptionId).pipe(
+          tap(sub => console.log('  ✅ subscription loaded:', sub)),
+          catchError(err => {
+            console.error('  ❌ subscription error:', err);
+            return throwError(() => err);
+          }),
+          switchMap(subscription => {
+            console.log('  → subscriptionService.getPlanById(' + subscription.planId + ') [CORREGIDO: usando planId de subscription]');
+            
+            // Ahora cargar plan y demás datos en paralelo
+            return forkJoin({
+              tenant: of(tenant),
+              subscription: of(subscription),
+              subscriptionPlan: this.subscriptionService.getPlanById(subscription.planId).pipe(
+                tap(plan => console.log('  ✅ subscriptionPlan loaded:', plan)),
+                catchError(err => {
+                  console.error('  ❌ subscriptionPlan error:', err);
+                  return of(null);
+                })
+              ),
+              doctorsCount: this.doctorService.countByTenantId(tenantId).pipe(
+                tap(count => console.log('  ✅ doctorsCount loaded:', count)),
+                catchError(err => {
+                  console.error('  ❌ doctorsCount error:', err);
+                  return of(0);
+                })
+              ),
+              doctors: this.doctorService.getByTenantId(tenantId).pipe(
+                tap(docs => console.log('  ✅ doctors loaded:', docs.length, 'doctors')),
+                catchError(err => {
+                  console.error('  ❌ doctors error:', err);
+                  return of([]);
+                })
+              ),
+              // Nota: getPatientsByTenantId no existe, se calcula por doctores
+              pendingInvitations: this.invitationService.getPendingByTenantId(tenantId).pipe(
+                tap(inv => console.log('  ✅ pendingInvitations loaded:', inv.length, 'invitations')),
+                catchError(err => {
+                  console.error('  ⚠️ pendingInvitations error (usando array vacío):', err);
+                  return of([]);  // Si falla (404 o 500), retornar array vacío
+                })
+              )
+            });
+          })
+        );
       }),
       switchMap(result => {
-        // Si no hay suscripción, permitir acceso limitado
-        if (!result.subscription || !result.subscription.isActive) {
+        console.log('🏥 [HospitalDashboardStore] forkJoin completado, procesando resultado...');
+        console.log('  📦 result.tenant:', result.tenant);
+        console.log('  📦 result.subscription:', result.subscription);
+        console.log('  📦 result.subscriptionPlan:', result.subscriptionPlan);
+        console.log('  📦 result.doctorsCount:', result.doctorsCount);
+        console.log('  📦 result.doctors.length:', result.doctors.length);
+        console.log('  📦 result.pendingInvitations.length:', result.pendingInvitations.length);
+        
+        // Verificar si la suscripción es válida (activa o pending después de pago)
+        const validStatuses = ['active', 'ACTIVE', 'pending', 'PENDING', 'trial'];
+        const hasValidSubscription = result.subscription && 
+          (result.subscription.isActive || validStatuses.includes(result.subscription.status));
+        
+        console.log('  📦 hasValidSubscription check:');
+        console.log('    → subscription exists:', !!result.subscription);
+        console.log('    → subscription.status:', result.subscription?.status);
+        console.log('    → subscription.isActive:', result.subscription?.isActive);
+        console.log('    → hasValidSubscription:', hasValidSubscription);
+        
+        // Si no hay suscripción válida, permitir acceso limitado
+        if (!hasValidSubscription) {
+          console.warn('⚠️ [HospitalDashboardStore] Suscripción inactiva o no existe');
+          console.log('  → subscription:', result.subscription);
+          console.log('  → subscription.isActive:', result.subscription?.isActive);
+          
           // Dashboard con acceso limitado (sin suscripción activa)
           const limitedStats: HospitalDashboardStats = {
             totalDoctors: 0,
@@ -139,6 +213,8 @@ export class HospitalDashboardStore {
 
           this._stats.set(limitedStats);
           this._doctors.set([]);
+          
+          console.log('📊 [HospitalDashboardStore] Stats LIMITED:', limitedStats);
 
           return of({
             success: true,
@@ -149,6 +225,8 @@ export class HospitalDashboardStore {
 
         // Validar que el plan exista
         if (!result.subscriptionPlan) {
+          console.warn('⚠️ [HospitalDashboardStore] Plan no encontrado, usando valores por defecto');
+          
           // Permitir dashboard sin plan específico
           const limitedStats: HospitalDashboardStats = {
             totalDoctors: result.doctorsCount,
@@ -156,13 +234,15 @@ export class HospitalDashboardStore {
             availableDoctorSlots: 5 - result.doctorsCount,
             totalPatients: 0,
             pendingInvitations: result.pendingInvitations.length,
-            activeSubscription: result.subscription.isActive,
+            activeSubscription: hasValidSubscription, // Usar la verificación correcta
             planName: 'Plan Básico',
             subscriptionStatus: result.subscription.status
           };
 
           this._stats.set(limitedStats);
           this._doctors.set(result.doctors);
+          
+          console.log('📊 [HospitalDashboardStore] Stats (sin plan):', limitedStats);
 
           return of({
             success: true,
@@ -170,6 +250,8 @@ export class HospitalDashboardStore {
             data: limitedStats
           });
         }
+        
+        console.log('✅ [HospitalDashboardStore] Suscripción y plan válidos, calculando pacientes...');
 
         // Calcular pacientes asociados a los doctores del hospital
         const patientCountObservables = result.doctors.map(doctor =>
@@ -190,7 +272,7 @@ export class HospitalDashboardStore {
               availableDoctorSlots: maxDoctors - result.doctorsCount,
               totalPatients,
               pendingInvitations: result.pendingInvitations.length,
-              activeSubscription: result.subscription.isActive,
+              activeSubscription: hasValidSubscription, // Usar la verificación correcta
               planName: result.subscriptionPlan!.name,
               subscriptionStatus: result.subscription.status
             };
@@ -234,17 +316,31 @@ export class HospitalDashboardStore {
           return throwError(() => new Error('Hospital no tiene suscripción'));
         }
 
-        // Obtener subscription, plan y contar doctores
-        return forkJoin({
-          tenant: of(tenant),
-          subscription: this.subscriptionService.getById(tenant.subscriptionId),
-          subscriptionPlan: this.subscriptionService.getPlanById(tenant.subscriptionId.toString()),
-          doctorsCount: this.doctorService.countByTenantId(request.tenantId)
-        });
+        // Primero obtener subscription para tener el planId correcto
+        return this.subscriptionService.getById(tenant.subscriptionId).pipe(
+          switchMap(subscription => {
+            // Ahora obtener plan con el planId correcto y contar doctores
+            return forkJoin({
+              tenant: of(tenant),
+              subscription: of(subscription),
+              subscriptionPlan: this.subscriptionService.getPlanById(subscription.planId),
+              doctorsCount: this.doctorService.countByTenantId(request.tenantId)
+            });
+          })
+        );
       }),
       switchMap(result => {
-        // Validar suscripción activa
-        if (!result.subscription.isActive) {
+        // Validar suscripción activa (incluye status 'pending' como válido temporalmente)
+        const validStatuses = ['active', 'ACTIVE', 'pending', 'PENDING', 'trial'];
+        const hasValidSubscription = result.subscription && 
+          (result.subscription.isActive || validStatuses.includes(result.subscription.status));
+        
+        console.log('👨‍⚕️ [HospitalDashboardStore] registerDoctor - subscription check:');
+        console.log('  → status:', result.subscription.status);
+        console.log('  → isActive:', result.subscription.isActive);
+        console.log('  → hasValidSubscription:', hasValidSubscription);
+        
+        if (!hasValidSubscription) {
           return throwError(() => new Error(
             'No se pueden registrar doctores con suscripción inactiva'
           ));
@@ -346,7 +442,7 @@ export class HospitalDashboardStore {
               tenantId: request.tenantId,
               firstName: request.firstName,
               lastName: request.lastName,
-              dni: 'N/A',
+              dni: request.dni || '00000000', // Backend requiere mínimo 8 caracteres
               licenseNumber: request.licenseNumber,
               specialty: request.specialty,
               phone: request.phone || ''
@@ -387,13 +483,18 @@ export class HospitalDashboardStore {
           return throwError(() => new Error('Hospital no tiene suscripción'));
         }
 
-        // Obtener subscription, plan y contar doctores
-        return forkJoin({
-          tenant: of(tenant),
-          subscription: this.subscriptionService.getById(tenant.subscriptionId),
-          subscriptionPlan: this.subscriptionService.getPlanById(tenant.subscriptionId.toString()),
-          doctorsCount: this.doctorService.countByTenantId(request.tenantId)
-        });
+        // Primero obtener subscription para tener el planId correcto
+        return this.subscriptionService.getById(tenant.subscriptionId).pipe(
+          switchMap(subscription => {
+            // Ahora obtener plan con el planId correcto y contar doctores
+            return forkJoin({
+              tenant: of(tenant),
+              subscription: of(subscription),
+              subscriptionPlan: this.subscriptionService.getPlanById(subscription.planId),
+              doctorsCount: this.doctorService.countByTenantId(request.tenantId)
+            });
+          })
+        );
       }),
       switchMap(result => {
         // Validar suscripción activa

@@ -281,6 +281,11 @@ export const routes: Routes = [
         title: `${baseTitle} - Mis Citas`,
       },
       {
+        path: 'appointments/schedule',
+        loadComponent: () => import('./doctors/presentation/components/appointment-scheduler/appointment-scheduler.component').then(m => m.AppointmentSchedulerComponent),
+        title: `${baseTitle} - Agendar Nueva Cita`,
+      },
+      {
         path: 'records',
         loadComponent: () => import('./doctors/presentation/views/medical-records-list/medical-records-list').then(m => m.MedicalRecordsListComponent),
         title: `${baseTitle} - Historiales Médicos`,

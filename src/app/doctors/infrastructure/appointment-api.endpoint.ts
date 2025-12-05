@@ -38,10 +38,14 @@ export class AppointmentApiEndpoint {
 
   /**
    * Obtiene todas las citas de un doctor con datos enriquecidos del paciente
+   * @param doctorId ID del doctor
+   * @param date Fecha en formato YYYY-MM-DD (requerido por backend)
    */
-  getAppointmentsByDoctor(doctorId: number): Observable<Appointment[]> {
-    return this.http.get<AppointmentResource[]>(this.appointmentsUrl).pipe(
-      map(appointments => appointments.filter(apt => apt.doctorId === doctorId)),
+  getAppointmentsByDoctor(doctorId: number, date?: string): Observable<Appointment[]> {
+    // Si no se proporciona fecha, usar la actual
+    const queryDate = date || new Date().toISOString().split('T')[0];
+    
+    return this.http.get<AppointmentResource[]>(`${this.appointmentsUrl}/doctor/${doctorId}?date=${queryDate}`).pipe(
       switchMap(appointments => {
         if (appointments.length === 0) {
           return of([]);
@@ -111,8 +115,7 @@ export class AppointmentApiEndpoint {
    * ⭐ Obtiene todas las citas de un paciente
    */
   getAppointmentsByPatient(patientId: number): Observable<Appointment[]> {
-    return this.http.get<AppointmentResource[]>(this.appointmentsUrl).pipe(
-      map(appointments => appointments.filter(apt => apt.patientId === patientId)),
+    return this.http.get<AppointmentResource[]>(`${this.appointmentsUrl}/patient/${patientId}`).pipe(
       map(appointments => appointments.map(resource => AppointmentAssembler.toDomain(resource))),
       catchError(error => {
         console.error('Error fetching patient appointments:', error);

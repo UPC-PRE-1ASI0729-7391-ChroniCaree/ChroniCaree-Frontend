@@ -22,7 +22,13 @@ export class SubscriptionApiEndpoint {
   }
 
   static getActiveByPayerId(payerType: 'patient' | 'tenant', payerId: number): string {
-    return `${this.BASE_URL}?payerType=${payerType}&payerId=${payerId}&status=active`;
+    // NOTE: Backend should return status='active' after payment, not 'pending'
+    // For now, we query without status filter and filter on frontend
+    return `${this.BASE_URL}?payerType=${payerType}&payerId=${payerId}`;
+  }
+
+  static getActiveByPayerIdWithStatus(payerType: 'patient' | 'tenant', payerId: number, status: string): string {
+    return `${this.BASE_URL}?payerType=${payerType}&payerId=${payerId}&status=${status}`;
   }
 
   static create(): string {
@@ -46,6 +52,7 @@ export class SubscriptionApiEndpoint {
   }
 
   static getSubscriptionPlansByType(type: 'patient' | 'tenant'): string {
+    // Backend expects lowercase type: patient or tenant
     return `${this.PLANS_URL}?type=${type}`;
   }
 }

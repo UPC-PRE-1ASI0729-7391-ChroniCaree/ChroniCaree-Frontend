@@ -1,21 +1,54 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { tap, map, catchError } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../../environments/environment';
-import { User } from '../domain/model/user.entity';
 
-export interface AuthResponse {
-  accessToken: string;
+// ============================================================================
+// INTERFACES - Según documentación del backend
+// ============================================================================
+
+// Respuesta del backend para sign-in y sign-up
+// El backend SIEMPRE responde con esta estructura:
+// { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant, doctorId } }
+export interface BackendAuthResponse {
+  accessToken: string;      // ← NO es "token"
   refreshToken: string;
-  user: any;
-  tenant?: any; // Para el endpoint de hospital admin sign-up
+  user: BackendUserInfo;    // ← Los datos están DENTRO de "user"
 }
 
+export interface BackendUserInfo {
+  id: number;
+  email: string;
+  name: string;
+  role: string;             // 'patient' | 'doctor' | 'hospital_admin'
+  tenantId: number | null;
+  tenant: BackendTenantInfo | null;
+  doctorId: number | null;
+}
+
+export interface BackendTenantInfo {
+  id: number;
+  name: string;
+  status: string;
+  subscriptionId: number | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  allowIndependentDoctors: boolean;
+  requirePatientApproval: boolean;
+  maxDoctors: number;
+}
+
+// Alias para compatibilidad
+export type AuthResponse = BackendAuthResponse;
+export type BackendTenantResponse = BackendTenantInfo;
+export type BackendRegisterResponse = BackendUserInfo;
+
 export interface DecodedToken {
-  sub: string; // Usually the username or email
+  sub: string;
   id: number;
   role: string;
   exp: number;
@@ -26,8 +59,8 @@ export interface DecodedToken {
   providedIn: 'root'
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
   // API Endpoint configuration
   // Using the path specified by the user: /api/v1/authentication
@@ -37,12 +70,12 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly USER_KEY = 'currentUser';
 
-  // State management
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  // State management - usando BackendUserInfo para el usuario actual
+  private readonly currentUserSubject = new BehaviorSubject<BackendUserInfo | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   
   // Signal for modern Angular components
-  public currentUserSignal = signal<User | null>(null);
+  public currentUserSignal = signal<BackendUserInfo | null>(null);
 
   constructor() {
     this.loadSession();
@@ -50,19 +83,38 @@ export class AuthService {
 
   /**
    * Sign in with email and password
+   * Backend responde: { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant, doctorId } }
    */
   signIn(signInRequest: any): Observable<AuthResponse> {
     console.log('🔑 [AuthService] signIn() called');
     console.log('📧 Email:', signInRequest.email);
     console.log('🌐 Endpoint:', `${this.API_URL}/sign-in`);
     
-    return this.http.post<AuthResponse>(`${this.API_URL}/sign-in`, signInRequest).pipe(
+    return this.http.post<BackendAuthResponse>(`${this.API_URL}/sign-in`, signInRequest).pipe(
       tap(response => {
         console.log('✅ [AuthService] signIn() successful');
-        console.log('📦 [AuthService] FULL RESPONSE:', response);
-        console.log('🎫 Token received:', response.accessToken?.substring(0, 50) + '...');
-        console.log('👤 User in response:', response.user);
-        console.log('🏥 Tenant in response.user:', response.user?.tenant);
+        console.log('📦 [AuthService] Backend response:', response);
+        console.log('🎫 AccessToken:', response.accessToken ? 'Present' : 'Missing');
+        console.log('🔄 RefreshToken:', response.refreshToken ? 'Present' : 'Missing');
+        console.log('👤 User ID:', response.user?.id);
+        console.log('📧 User Email:', response.user?.email);
+        console.log('👔 User Role:', response.user?.role);
+        console.log('🏥 Tenant ID:', response.user?.tenantId);
+        console.log('🏥 Tenant:', response.user?.tenant);
+      }),
+      map(response => {
+        // Normalizar el rol
+        const normalizedResponse: AuthResponse = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          user: {
+            ...response.user,
+            role: this.normalizeRole(response.user.role)
+          }
+        };
+        return normalizedResponse;
+      }),
+      tap(response => {
         this.setSession(response);
       }),
       catchError(error => {
@@ -70,8 +122,7 @@ export class AuthService {
         console.error('Error status:', error.status);
         console.error('Error:', error);
         
-        if (error.status === 404) {
-          // Backend returns 404 for invalid credentials
+        if (error.status === 404 || error.status === 401) {
           return throwError(() => new Error('Correo electrónico o contraseña incorrectos.'));
         }
         return throwError(() => error);
@@ -80,14 +131,26 @@ export class AuthService {
   }
 
   /**
-   * Sign up a new user
+   * Sign up a new user (patient)
+   * Backend endpoint: POST /authentication/sign-up
+   * Request: { email, password, firstName, lastName }
+   * Response: { accessToken, refreshToken, user: {...} }
    */
-  signUp(signUpRequest: any): Observable<any> {
+  signUp(signUpRequest: any): Observable<AuthResponse> {
     console.log('🔐 [AuthService] signUp() called');
-    console.log('📧 Request:', { email: signUpRequest.email, role: signUpRequest.role });
+    console.log('📧 Request:', { email: signUpRequest.email });
     console.log('🌐 Endpoint:', `${this.API_URL}/sign-up`);
     
-    return this.http.post(`${this.API_URL}/sign-up`, signUpRequest).pipe(
+    // Formato según documentación del backend
+    const backendRequest = {
+      email: signUpRequest.email,
+      password: signUpRequest.password,
+      firstName: signUpRequest.firstName || signUpRequest.name?.split(' ')[0] || '',
+      lastName: signUpRequest.lastName || signUpRequest.name?.split(' ').slice(1).join(' ') || ''
+    };
+    console.log('📤 Backend request:', { ...backendRequest, password: '***' });
+    
+    return this.http.post<BackendAuthResponse>(`${this.API_URL}/sign-up`, backendRequest).pipe(
       tap({
         next: (response) => {
           console.log('✅ [AuthService] signUp() successful');
@@ -102,24 +165,87 @@ export class AuthService {
   }
 
   /**
-   * Sign up a Hospital Admin with their Hospital in ONE atomic transaction
-   * This endpoint creates User + Tenant + updates user.tenantId in a single request
+   * Sign up a Hospital Admin with their Hospital
+   * Backend endpoint: POST /authentication/sign-up/hospital-admin
+   * 
+   * Respuesta del backend (estructura anidada):
+   * {
+   *   accessToken: string,
+   *   refreshToken: string,
+   *   user: { id, email, name, role, tenantId, tenant: {...}, doctorId }
+   * }
    */
   signUpHospitalAdmin(data: {
     email: string;
     password: string;
     name: string;
     hospitalName: string;
-    hospitalEmail: string;
-    hospitalPhone: string;
-    hospitalAddress: string;
+    hospitalEmail?: string;
+    hospitalPhone?: string;
+    hospitalAddress?: string;
+    ruc?: string;
   }): Observable<AuthResponse> {
     console.log('🏥 [AuthService] signUpHospitalAdmin() called');
     console.log('  📧 Email:', data.email);
     console.log('  🏥 Hospital Name:', data.hospitalName);
-    console.log('  🌐 Endpoint:', `${this.API_URL}/sign-up/hospital-admin`);
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/sign-up/hospital-admin`, data).pipe(
+    // Request según documentación del backend
+    const hospitalAdminRequest: any = {
+      adminName: (data.name || '').trim(),
+      adminEmail: (data.email || '').trim(),
+      adminPassword: data.password,
+      hospitalName: (data.hospitalName || '').trim(),
+      address: (data.hospitalAddress || '').trim(),
+      phone: (data.hospitalPhone || '').trim(),
+      ruc: (data.ruc || '').trim()
+    };
+    
+    console.log('📤 Registering hospital admin:', { ...hospitalAdminRequest, adminPassword: '***' });
+    console.log('🌐 Endpoint:', `${this.API_URL}/sign-up/hospital-admin`);
+
+    // El backend responde con estructura anidada:
+    // { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant, doctorId } }
+    return this.http.post<{
+      accessToken: string;
+      refreshToken: string;
+      user: {
+        id: number;
+        email: string;
+        name: string;
+        role: string;
+        tenantId: number;
+        tenant: any;
+        doctorId: number | null;
+      };
+    }>(
+      `${this.API_URL}/sign-up/hospital-admin`, 
+      hospitalAdminRequest
+    ).pipe(
+      tap(response => {
+        console.log('✅ Hospital admin created, raw response:', response);
+      }),
+      // Mapear la respuesta al formato AuthResponse interno
+      map(response => {
+        console.log('📦 Mapping response to AuthResponse...');
+        
+        // Construir respuesta normalizada desde la estructura anidada
+        const authResponse: AuthResponse = {
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken || '',
+          user: {
+            id: response.user.id,
+            email: response.user.email,
+            name: response.user.name,
+            role: this.normalizeRole(response.user.role),
+            tenantId: response.user.tenantId,
+            tenant: response.user.tenant,
+            doctorId: response.user.doctorId
+          }
+        };
+        
+        console.log('📦 [AuthService] Auth response:', authResponse);
+        return authResponse;
+      }),
       tap({
         next: (response) => {
           console.log('✅ [AuthService] Hospital admin registration successful!');
@@ -128,43 +254,76 @@ export class AuthService {
           console.log('  👤 User Email:', response.user?.email);
           console.log('  👤 User Role:', response.user?.role);
           console.log('  🏥 User tenantId:', response.user?.tenantId);
-          console.log('  🏥 Tenant ID:', response.tenant?.id);
-          console.log('  🏥 Tenant Name:', response.tenant?.name);
-          console.log('  🎫 Token length:', response.accessToken?.length);
+          console.log('  🏥 Tenant:', response.user?.tenant);
+          console.log('  🎫 AccessToken:', response.accessToken ? 'Present' : 'Missing');
+          console.log('  🔄 RefreshToken:', response.refreshToken ? 'Present' : 'Missing');
           
-          // Guardar sesión con el tenant incluido
+          // Guardar sesión con el token
           console.log('💾 [AuthService] Saving session to localStorage...');
           this.setSession(response);
           console.log('✅ [AuthService] Session saved successfully');
-          
-          // Verificar lo que se guardó en localStorage
-          console.log('🔍 [AuthService] Verifying localStorage after save:');
-          console.log('  - currentUser:', localStorage.getItem('currentUser'));
-          console.log('  - userRole:', localStorage.getItem('userRole'));
         },
         error: (error) => {
           console.error('❌ [AuthService] Hospital admin registration failed');
           console.error('  Status:', error.status);
           console.error('  Error:', error);
+          if (error?.error?.details) {
+            console.error('  Details:', error.error.details);
+          }
         }
+      }),
+      catchError(error => {
+        console.error('❌ [AuthService] Registration error:', error);
+        // Prefer detailed backend validation messages if available
+        if (error.status === 400) {
+          const details = error.error?.details;
+          const message = error.error?.message || 'Datos de entrada inválidos';
+          if (details && typeof details === 'object') {
+            // Build a concise message from field errors
+            const fieldErrors = Object.entries(details)
+              .map(([field, msg]) => `${field}: ${msg}`)
+              .join('; ');
+            const suffix = fieldErrors ? ' – ' + fieldErrors : '';
+            return throwError(() => new Error(message + suffix));
+          }
+        }
+
+        // Specific duplicates
+        if (error.status === 409) {
+          return throwError(() => new Error('El usuario o hospital ya existe'));
+        }
+
+        // Fallback
+        return throwError(() => error);
       })
     );
   }
 
   /**
    * Refresh the access token using the refresh token
+   * Backend endpoint: POST /authentication/refresh-token
+   * Request: { refreshToken }
+   * Response: { accessToken, refreshToken }
    */
-  refreshToken(): Observable<AuthResponse> {
+  refreshToken(): Observable<{ accessToken: string; refreshToken: string }> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, { refreshToken }).pipe(
+    console.log('🔄 [AuthService] Refreshing token...');
+    return this.http.post<{ accessToken: string; refreshToken: string }>(
+      `${this.API_URL}/refresh-token`, 
+      { refreshToken }
+    ).pipe(
       tap(response => {
-        this.setSession(response);
+        console.log('✅ [AuthService] Token refreshed successfully');
+        // Actualizar tokens en localStorage
+        localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
+        localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
       }),
       catchError(error => {
+        console.error('❌ [AuthService] Token refresh failed:', error);
         this.logout();
         return throwError(() => error);
       })
@@ -188,6 +347,7 @@ export class AuthService {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem('userRole');
     localStorage.removeItem('isAuthenticated'); // Legacy support
 
     // Update state
@@ -229,7 +389,7 @@ export class AuthService {
       const decoded: DecodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       return decoded.exp > currentTime;
-    } catch (e) {
+    } catch {
       return false;
     }
   }
@@ -244,9 +404,40 @@ export class AuthService {
     try {
       const decoded: any = jwtDecode(token);
       return decoded.role || null;
-    } catch (e) {
+    } catch {
       return null;
     }
+  }
+
+  /**
+   * Normaliza el rol del backend (MAYÚSCULAS) al formato del frontend
+   * Backend: TENANT_ADMIN, DOCTOR, PATIENT
+   * Frontend: hospital_admin, doctor, patient
+   */
+  private normalizeRole(backendRole: string): string {
+    const roleMapping: Record<string, string> = {
+      'TENANT_ADMIN': 'hospital_admin',
+      'HOSPITAL_ADMIN': 'hospital_admin',
+      'DOCTOR': 'doctor',
+      'PATIENT': 'patient',
+      'ADMIN': 'admin'
+    };
+    return roleMapping[backendRole?.toUpperCase()] || backendRole?.toLowerCase() || 'patient';
+  }
+
+  /**
+   * Convierte el rol del frontend al formato del backend (MAYÚSCULAS)
+   * Frontend: hospital_admin, doctor, patient
+   * Backend: TENANT_ADMIN, DOCTOR, PATIENT
+   */
+  private toBackendRole(frontendRole: string): string {
+    const roleMapping: Record<string, string> = {
+      'hospital_admin': 'TENANT_ADMIN',
+      'doctor': 'DOCTOR',
+      'patient': 'PATIENT',
+      'admin': 'ADMIN'
+    };
+    return roleMapping[frontendRole?.toLowerCase()] || frontendRole?.toUpperCase() || 'PATIENT';
   }
 
   /**
@@ -262,17 +453,8 @@ export class AuthService {
     console.log('✅ [AuthService] Tokens saved to localStorage');
     
     // Store user info if provided, otherwise decode from token
-    let user = authResult.user;
-    if (!user) {
-      console.log('👤 [AuthService] No user in response, decoding from token...');
-      const decoded: any = jwtDecode(authResult.accessToken);
-      user = {
-        id: decoded.id,
-        email: decoded.sub,
-        role: decoded.role
-      };
-      console.log('👤 [AuthService] Decoded user from token:', user);
-    } else {
+    let user: any = authResult.user;
+    if (user) {
       console.log('👤 [AuthService] User provided in response:', user);
       console.log('  - ID:', user.id);
       console.log('  - Email:', user.email);
@@ -280,6 +462,19 @@ export class AuthService {
       console.log('  - Role:', user.role);
       console.log('  - TenantId:', user.tenantId);
       console.log('  - Tenant object:', user.tenant);
+    } else {
+      console.log('👤 [AuthService] No user in response, decoding from token...');
+      const decoded: any = jwtDecode(authResult.accessToken);
+      user = {
+        id: decoded.id,
+        email: decoded.sub,
+        name: decoded.name || '',
+        role: this.normalizeRole(decoded.role),
+        tenantId: decoded.tenantId || null,
+        tenant: null,
+        doctorId: decoded.doctorId || null
+      };
+      console.log('👤 [AuthService] Decoded user from token:', user);
     }
 
     console.log('💾 [AuthService] Saving user to localStorage...');

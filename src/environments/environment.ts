@@ -52,7 +52,7 @@ export const environment = {
   
   // === Subscriptions Bounded Context ===
   subscriptionsEndpointPath: '/subscriptions',
-  plansEndpointPath: '/subscriptionPlans',
+  plansEndpointPath: '/subscription-plans',
   
   // === Payments Bounded Context ===
   paymentsEndpointPath: '/payments',
