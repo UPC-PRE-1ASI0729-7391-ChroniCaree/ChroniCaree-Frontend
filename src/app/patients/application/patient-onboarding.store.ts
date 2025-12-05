@@ -176,11 +176,15 @@ export class PatientOnboardingStore {
 
           const diagnosisRequests: CreateDiagnosisRequest[] = selectedConditions.map(condition => ({
             patientId: result.patient.id,
+            doctorId: 1,  // REQUIRED by backend - TODO: assign actual doctor
+            icd10Code: 'Z00.0',  // REQUIRED - general examination code
             diagnosisName: this.getConditionDisplayName(condition),
-            status: 'pending_confirmation',
-            source: 'patient_reported',
-            diagnosisDate: new Date().toISOString(),
-            notes: 'Auto-reportado durante el registro del paciente (hospital)'
+            status: 'MONITORING' as any, // Backend valid: ACTIVE, CONTROLLED, RESOLVED, MONITORING
+            severity: 'MODERATE' as any, // Backend valid: LOW, MODERATE, HIGH, CRITICAL
+            // source field removed - NOT SUPPORTED BY BACKEND
+            diagnosedDate: new Date().toISOString().split('T')[0],  // YYYY-MM-DD format
+            notes: 'Auto-reportado durante el registro del paciente (hospital)',
+            followUpRequired: true
           }));
 
           const diagnosisObservables = diagnosisRequests.map(req =>
@@ -194,20 +198,20 @@ export class PatientOnboardingStore {
                 const fallback = {
                   id: Date.now(),
                   patientId: req.patientId,
-                  doctorId: (req as any).doctorId || null,
-                  icd10Code: '',
+                  doctorId: req.doctorId,
+                  icd10Code: req.icd10Code,
                   diagnosisName: req.diagnosisName,
                   status: req.status,
-                  severity: 'moderate',
-                  diagnosedDate: req.diagnosisDate,
+                  severity: 'MODERATE',
+                  diagnosedDate: req.diagnosedDate,
                   resolvedDate: null,
                   notes: req.notes || '',
                   treatment: '',
-                  followUpRequired: false,
+                  followUpRequired: true,
                   lastReviewDate: now,
                   createdAt: now,
-                  updatedAt: now,
-                  source: req.source as any
+                  updatedAt: now
+                  // source removed - NOT SUPPORTED BY BACKEND
                 } as any;
                 return of(fallback);
               })
@@ -286,11 +290,15 @@ export class PatientOnboardingStore {
 
                 const diagnosisRequests: CreateDiagnosisRequest[] = selectedConditions.map(condition => ({
                   patientId: result.patient.id,
+                  doctorId: 1,  // REQUIRED by backend - TODO: assign actual doctor
+                  icd10Code: 'Z00.0',  // REQUIRED - general examination code
                   diagnosisName: this.getConditionDisplayName(condition),
-                  status: 'pending_confirmation',
-                  source: 'patient_reported',
-                  diagnosisDate: new Date().toISOString(),
-                  notes: 'Auto-reportado durante el registro del paciente'
+                  status: 'MONITORING' as any, // Backend valid: ACTIVE, CONTROLLED, RESOLVED, MONITORING
+                  severity: 'MODERATE' as any, // Backend valid: LOW, MODERATE, HIGH, CRITICAL
+                  // source field removed - NOT SUPPORTED BY BACKEND
+                  diagnosedDate: new Date().toISOString().split('T')[0],  // YYYY-MM-DD format
+                  notes: 'Auto-reportado durante el registro del paciente',
+                  followUpRequired: true
                 }));
 
                 // Crear todos los diagnósticos en paralelo (resiliente ante fallos de red)
@@ -302,20 +310,20 @@ export class PatientOnboardingStore {
                       const fallback = {
                         id: Date.now(),
                         patientId: req.patientId,
-                        doctorId: (req as any).doctorId || null,
-                        icd10Code: '',
+                        doctorId: req.doctorId,
+                        icd10Code: req.icd10Code,
                         diagnosisName: req.diagnosisName,
                         status: req.status,
-                        severity: 'moderate',
-                        diagnosedDate: req.diagnosisDate,
+                        severity: 'MODERATE',
+                        diagnosedDate: req.diagnosedDate,
                         resolvedDate: null,
                         notes: req.notes || '',
                         treatment: '',
-                        followUpRequired: false,
+                        followUpRequired: true,
                         lastReviewDate: now,
                         createdAt: now,
-                        updatedAt: now,
-                        source: req.source as any
+                        updatedAt: now
+                        // source removed - NOT SUPPORTED BY BACKEND
                       } as any;
                       return of(fallback);
                     })

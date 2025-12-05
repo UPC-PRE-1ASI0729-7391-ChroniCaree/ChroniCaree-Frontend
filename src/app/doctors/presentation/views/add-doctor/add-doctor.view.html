@@ -114,6 +114,28 @@
             />
           </div>
         </div>
+
+        <!-- Campo DNI requerido por backend (mínimo 8 caracteres) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dni">
+              DNI / Documento de Identidad
+              <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="dni"
+              [value]="form().dni"
+              (input)="updateForm('dni', $any($event.target).value)"
+              placeholder="12345678"
+              minlength="8"
+              maxlength="20"
+              [disabled]="submitting()"
+              required
+            />
+            <small class="form-hint">Mínimo 8 caracteres, máximo 20</small>
+          </div>
+        </div>
       </div>
 
       <div class="form-section">
