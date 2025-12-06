@@ -77,7 +77,15 @@ export class PatientStore {
         error: (err) => {
           this.error.set('Error al crear paciente');
           this.loading.set(false);
+          // If we have the full HttpErrorResponse, log details
           console.error('❌ [PatientStore] Error creating patient:', err);
+          try {
+            console.error('  → Status:', err?.status);
+            console.error('  → Server body:', err?.error);
+            console.error('  → Message:', err?.message || err?.error?.message);
+          } catch (e) {
+            console.error('  → Could not log additional error details:', e);
+          }
         }
       })
     );

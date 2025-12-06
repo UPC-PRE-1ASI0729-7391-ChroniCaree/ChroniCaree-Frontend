@@ -158,7 +158,7 @@ export class PatientService {
         } catch (e) {
           console.error('  → Could not log full error body:', e);
         }
-        return throwError(() => new Error('Failed to create patient'));
+        return throwError(() => error);
       })
     );
   }
