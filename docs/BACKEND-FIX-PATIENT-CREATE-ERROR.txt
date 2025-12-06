@@ -1,0 +1,528 @@
+================================================================================
+🔴 REPORTE DE ERROR CRÍTICO: POST /api/v1/patients devuelve 500
+================================================================================
+Fecha: 2025-12-06
+Prioridad: CRÍTICA (bloquea registro de pacientes)
+Endpoint: POST /api/v1/patients
+Contexto: Flujo de registro de paciente (user → patient → subscription)
+
+================================================================================
+1) DESCRIPCIÓN DEL PROBLEMA
+================================================================================
+
+Durante el registro de paciente (register-patient), después de:
+1. Crear user (POST /authentication/signup) ✅
+2. Login automático (POST /authentication/signin) ✅
+3. Obtener último doctor para asignar (GET /doctors) ✅
+
+El frontend intenta crear el perfil de paciente:
+→ POST http://localhost:11083/api/v1/patients
+→ Response: 500 Internal Server Error
+
+Log observado en consola frontend:
+```
+✅ [UserService] User created successfully: {id: 3, email: 'jose@1.com', name: 'jose perez', firstName: 'jose', lastName: 'perez', ...}
+❌ POST http://localhost:11083/api/v1/patients 500 (Internal Server Error)
+```
+
+IMPACTO:
+- El user queda creado en la BD PERO sin perfil de paciente asociado.
+- El usuario no puede acceder al dashboard (requiere tener Patient).
+- Los pacientes huérfanos (users sin patient) pueden causar inconsistencias.
+
+================================================================================
+2) PAYLOAD ENVIADO POR FRONTEND
+================================================================================
+
+El frontend envía un POST con la estructura completa de Patient (JSON):
+
+```json
+{
+  "id": 0,
+  "userId": 3,
+  "assignedDoctorId": 5,
+  "tenantId": null,
+  "subscriptionId": null,
+  "firstName": "jose",
+  "lastName": "perez",
+  "dni": "12345678",
+  "birthDate": "1990-05-15",
+  "gender": "male",
+  "phone": "987654321",
+  "address": "Av. Lima 123",
+  "weight": 0,
+  "height": 0,
+  "bmi": 0,
+  "emergencyContact": {
+    "name": "",
+    "relationship": "",
+    "phone": ""
+  }
+}
+```
+
+CAMPOS OBLIGATORIOS:
+- `userId`: FK al user recién creado (DEBE existir en tabla users)
+- `firstName`, `lastName`: datos del paciente
+- `dni`: documento de identidad (único por paciente)
+- `birthDate`: fecha de nacimiento (ISO 8601 o YYYY-MM-DD)
+- `gender`: "male" | "female" | "other"
+- `phone`: teléfono de contacto
+- `address`: dirección
+
+CAMPOS OPCIONALES (pueden ser null o 0):
+- `assignedDoctorId`: FK al doctor (puede ser null si no hay asignación)
+- `tenantId`: FK al hospital/tenant (null para pacientes independientes B2C)
+- `subscriptionId`: FK a subscription (null hasta que pague)
+- `weight`, `height`, `bmi`: pueden ser 0 o null inicialmente
+- `emergencyContact`: puede tener campos vacíos inicialmente
+
+CAMPO PROBLEMÁTICO:
+- `id: 0` — algunos backends rechazan si ven un `id` en el body de un POST create.
+
+================================================================================
+3) CAUSAS PROBABLES DEL ERROR 500
+================================================================================
+
+Analiza TU BACKEND y revisa si alguna de estas causas aplica:
+
+[ ] 3.1 — Campo `id` en body causa conflicto
+    - Algunos frameworks (Spring Data REST, Rails) rechazan POST con `id` presente.
+    - Solución: ignorar el campo `id` en el DTO de creación, o validar que sea 0/null.
+
+[ ] 3.2 — Constraint violations (base de datos)
+    - ¿Tienes unique constraint en `dni` y el DNI ya existe?
+    - ¿Tienes FK constraint en `userId` y el ID 3 no existe en tabla users?
+    - ¿Tienes FK constraint en `assignedDoctorId` y el ID 5 no existe en tabla doctors?
+    - Solución: validar FKs antes de INSERT; retornar 400 con mensaje claro.
+
+[ ] 3.3 — Campo `emergencyContact` como JSON/JSONB
+    - ¿Tu backend acepta campo `emergencyContact` como objeto JSON en Postgres/MySQL?
+    - ¿Falla la deserialización del objeto anidado?
+    - Solución: asegurar que el DTO/Entity mapee correctamente `emergencyContact` a JSON column.
+
+[ ] 3.4 — Validaciones de entrada fallando
+    - ¿Tu DTO valida que `firstName`, `lastName`, `dni` no estén vacíos?
+    - ¿Validas formato de `birthDate` (debe ser fecha válida)?
+    - ¿Validas que `gender` sea uno de los valores permitidos?
+    - Solución: retornar 400 Bad Request con mensaje claro si validación falla.
+
+[ ] 3.5 — Tipo de dato incorrecto
+    - Frontend envía `assignedDoctorId`, `tenantId`, `subscriptionId` como NUMBER o null.
+    - ¿Tu backend espera UUID/String en lugar de INTEGER?
+    - Solución: si son UUIDs, frontend debe enviar strings; o backend debe aceptar int/null.
+
+[ ] 3.6 — Campos opcionales como null vs ausentes
+    - ¿Tu backend requiere que los campos opcionales estén AUSENTES en lugar de null?
+    - Por ejemplo, si `tenantId: null`, ¿tu ORM intenta validar una FK que no existe?
+    - Solución: configurar nullable en el Entity/DTO correctamente:
+      ```java
+      @Column(name = "tenant_id", nullable = true)
+      private Long tenantId; // acepta null
+      ```
+
+[ ] 3.7 — Cálculo de BMI falla
+    - Si tu backend calcula BMI automáticamente y `weight=0` o `height=0`, puede lanzar ArithmeticException (división por 0).
+    - Solución: validar que weight > 0 y height > 0 ANTES de calcular BMI; o permitir BMI=0 para perfiles incompletos.
+
+[ ] 3.8 — Campo `birthDate` formato incorrecto
+    - Frontend envía: "1990-05-15" (YYYY-MM-DD).
+    - ¿Tu backend espera otro formato o falla al parsear?
+    - Solución: aceptar ISO 8601 estándar (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss.sssZ).
+
+[ ] 3.9 — Errores de logging/stack trace ocultos
+    - Tu backend devuelve 500 pero NO logea el stack trace completo.
+    - Solución: revisar logs del servidor, activar modo debug, capturar exception y loguear mensaje + stack trace.
+
+================================================================================
+4) CÓMO REPRODUCIR EL ERROR (BACKEND)
+================================================================================
+
+Usa este curl para simular el request exacto que envía el frontend:
+
+```bash
+curl -X POST "http://localhost:11083/api/v1/patients" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN_AQUI>" \
+  -d '{
+    "id": 0,
+    "userId": 3,
+    "assignedDoctorId": 5,
+    "tenantId": null,
+    "subscriptionId": null,
+    "firstName": "jose",
+    "lastName": "perez",
+    "dni": "12345678",
+    "birthDate": "1990-05-15",
+    "gender": "male",
+    "phone": "987654321",
+    "address": "Av. Lima 123",
+    "weight": 0,
+    "height": 0,
+    "bmi": 0,
+    "emergencyContact": {
+      "name": "",
+      "relationship": "",
+      "phone": ""
+    }
+  }'
+```
+
+ESPERADO: 201 Created con patient creado.
+ACTUAL: 500 Internal Server Error.
+
+PASOS:
+1. Asegúrate de que:
+   - User con userId=3 EXISTE en la base de datos.
+   - Doctor con assignedDoctorId=5 EXISTE (o ajusta el id, o envía null).
+   - DNI "12345678" NO existe previamente (si hay unique constraint).
+2. Ejecuta el curl y captura:
+   - El código de respuesta HTTP.
+   - El body de la respuesta (JSON con error message si hay).
+   - El log del servidor (stack trace).
+3. Identifica la línea exacta del código backend que lanza la exception.
+
+================================================================================
+5) SOLUCIÓN RECOMENDADA (BACKEND)
+================================================================================
+
+OPCIÓN A — Corregir el endpoint POST existente
+--------------------------------------------
+1. Revisa tu controller/handler de POST /api/v1/patients.
+2. Asegúrate de que:
+   - Ignora el campo `id` del body (o valida que sea 0/null y no lo uses).
+   - Acepta el DTO completo con todos los campos (incluido `emergencyContact` como objeto JSON).
+   - Valida que las FKs (`userId`, `assignedDoctorId`) existan antes de persistir (o acepta null).
+   - Retorna 400 Bad Request con mensaje claro si validación falla.
+   - Retorna 404 Not Found si el userId no existe.
+   - Retorna 409 Conflict si el DNI ya existe (unique constraint).
+   - Retorna 201 Created con el patient creado si todo ok.
+
+3. Si usas JPA/Hibernate (Java Spring Boot):
+   ```java
+   @PostMapping
+   public ResponseEntity<PatientResource> createPatient(
+       @RequestBody @Valid CreatePatientRequest request
+   ) {
+       // Validate userId exists
+       User user = userRepository.findById(request.getUserId())
+           .orElseThrow(() -> new BadRequestException("User not found: " + request.getUserId()));
+       
+       // Validate assignedDoctorId if provided
+       if (request.getAssignedDoctorId() != null) {
+           doctorRepository.findById(request.getAssignedDoctorId())
+               .orElseThrow(() -> new BadRequestException("Doctor not found: " + request.getAssignedDoctorId()));
+       }
+       
+       // Check if DNI already exists
+       if (patientRepository.existsByDni(request.getDni())) {
+           throw new ConflictException("DNI already exists: " + request.getDni());
+       }
+       
+       // Create patient entity (WITHOUT id field)
+       Patient patient = new Patient();
+       patient.setUserId(request.getUserId());
+       patient.setAssignedDoctorId(request.getAssignedDoctorId()); // can be null
+       patient.setTenantId(request.getTenantId()); // can be null
+       patient.setSubscriptionId(request.getSubscriptionId()); // can be null
+       patient.setFirstName(request.getFirstName());
+       patient.setLastName(request.getLastName());
+       patient.setDni(request.getDni());
+       patient.setBirthDate(LocalDate.parse(request.getBirthDate())); // parse to LocalDate
+       patient.setGender(request.getGender());
+       patient.setPhone(request.getPhone());
+       patient.setAddress(request.getAddress());
+       patient.setWeight(request.getWeight());
+       patient.setHeight(request.getHeight());
+       
+       // Calculate BMI safely (avoid division by 0)
+       if (request.getHeight() > 0 && request.getWeight() > 0) {
+           double bmi = request.getWeight() / (request.getHeight() * request.getHeight());
+           patient.setBmi(Math.round(bmi * 10.0) / 10.0);
+       } else {
+           patient.setBmi(0.0);
+       }
+       
+       patient.setEmergencyContact(request.getEmergencyContact()); // ensure JSONB mapping
+       
+       Patient saved = patientRepository.save(patient);
+       return ResponseEntity.status(HttpStatus.CREATED).body(toResource(saved));
+   }
+   ```
+
+4. Asegúrate de que tu Entity mapee correctamente `emergencyContact`:
+   ```java
+   @Entity
+   @Table(name = "patients")
+   public class Patient {
+       @Id
+       @GeneratedValue(strategy = GenerationType.IDENTITY)
+       private Long id;
+       
+       @Column(name = "user_id", nullable = false)
+       private Long userId;
+       
+       @Column(name = "assigned_doctor_id", nullable = true)
+       private Long assignedDoctorId;
+       
+       @Column(name = "tenant_id", nullable = true)
+       private Long tenantId;
+       
+       @Column(name = "subscription_id", nullable = true)
+       private Long subscriptionId;
+       
+       @Column(name = "first_name", nullable = false)
+       private String firstName;
+       
+       @Column(name = "last_name", nullable = false)
+       private String lastName;
+       
+       @Column(name = "dni", nullable = false, unique = true)
+       private String dni;
+       
+       @Column(name = "birth_date", nullable = false)
+       private LocalDate birthDate;
+       
+       @Enumerated(EnumType.STRING)
+       @Column(name = "gender", nullable = false)
+       private Gender gender;
+       
+       @Column(name = "phone", nullable = false)
+       private String phone;
+       
+       @Column(name = "address", nullable = false)
+       private String address;
+       
+       @Column(name = "weight")
+       private Double weight;
+       
+       @Column(name = "height")
+       private Double height;
+       
+       @Column(name = "bmi")
+       private Double bmi;
+       
+       @Type(type = "jsonb") // Postgres
+       @Column(columnDefinition = "jsonb", name = "emergency_contact")
+       private EmergencyContact emergencyContact;
+       
+       // ... getters/setters ...
+   }
+   ```
+
+5. DTO de creación (CreatePatientRequest) NO debe incluir `id`:
+   ```java
+   public class CreatePatientRequest {
+       // NO incluir campo id
+       @NotNull
+       private Long userId;
+       
+       private Long assignedDoctorId; // nullable
+       private Long tenantId; // nullable
+       private Long subscriptionId; // nullable
+       
+       @NotBlank
+       private String firstName;
+       
+       @NotBlank
+       private String lastName;
+       
+       @NotBlank
+       private String dni;
+       
+       @NotBlank
+       private String birthDate; // YYYY-MM-DD
+       
+       @NotNull
+       private String gender; // "male" | "female" | "other"
+       
+       @NotBlank
+       private String phone;
+       
+       @NotBlank
+       private String address;
+       
+       private Double weight; // nullable
+       private Double height; // nullable
+       
+       private EmergencyContact emergencyContact; // nullable
+       
+       // ... getters/setters ...
+   }
+   ```
+
+OPCIÓN B — Frontend quita el campo `id` del payload (ALTERNATIVA)
+-------------------------------------------------------------------
+Si el backend NO puede ignorar el campo `id`, el frontend puede omitirlo:
+
+En `registration.facade.ts`, cambiar:
+```typescript
+const newPatient = {
+  // id: 0, // ❌ Remover esta línea
+  userId: user.id,
+  assignedDoctorId: lastDoctor ? lastDoctor.id : null,
+  // ... resto de campos ...
+};
+```
+
+Ventaja: evita que backend vea un campo `id` que no debe procesar.
+Desventaja: no resuelve otros problemas (FKs, constraints, validaciones).
+
+================================================================================
+6) VALIDACIONES QUE DEBE HACER EL BACKEND
+================================================================================
+
+✅ Validar que userId existe en tabla users (400 si no).
+✅ Validar que assignedDoctorId existe en tabla doctors SI no es null (400 si no).
+✅ Validar que tenantId existe en tabla tenants SI no es null (400 si no).
+✅ Validar que subscriptionId existe en tabla subscriptions SI no es null (400 si no).
+✅ Validar que DNI no esté vacío y cumpla formato (mín 8 caracteres).
+✅ Validar que DNI no exista previamente (409 Conflict si existe).
+✅ Validar que `firstName` y `lastName` no estén vacíos (mín 2 caracteres).
+✅ Validar formato de `birthDate` (debe ser fecha válida YYYY-MM-DD).
+✅ Validar que `gender` sea "male" | "female" | "other".
+✅ Validar que `phone` no esté vacío (formato libre o regex).
+✅ Calcular BMI solo si weight > 0 y height > 0 (evitar división por 0).
+✅ Retornar mensajes de error claros (JSON) en caso de fallo:
+   ```json
+   {
+     "timestamp": "2025-12-06T10:30:00.000Z",
+     "status": 400,
+     "error": "Bad Request",
+     "message": "User with id 3 does not exist",
+     "path": "/api/v1/patients"
+   }
+   ```
+
+================================================================================
+7) CONFIGURACIÓN DE CORS (IMPORTANTE)
+================================================================================
+
+Asegúrate de que tu backend acepte requests desde el frontend:
+
+Origen permitido: http://localhost:4200 (desarrollo)
+Origen permitido: https://tu-frontend-production.vercel.app (producción)
+
+Métodos permitidos: GET, POST, PUT, PATCH, DELETE, OPTIONS
+Headers permitidos: Content-Type, Authorization
+
+Spring Boot ejemplo:
+```java
+@Configuration
+public class CorsConfig {
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                    .allowedOrigins("http://localhost:4200", "https://your-frontend.vercel.app")
+                    .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true);
+            }
+        };
+    }
+}
+```
+
+================================================================================
+8) RESPUESTA ESPERADA (SUCCESS CASE)
+================================================================================
+
+Cuando el POST /api/v1/patients funcione correctamente, debe retornar:
+
+HTTP 201 Created
+Content-Type: application/json
+Location: /api/v1/patients/123
+
+Body:
+```json
+{
+  "id": 123,
+  "userId": 3,
+  "assignedDoctorId": 5,
+  "tenantId": null,
+  "subscriptionId": null,
+  "firstName": "jose",
+  "lastName": "perez",
+  "dni": "12345678",
+  "birthDate": "1990-05-15",
+  "gender": "male",
+  "phone": "987654321",
+  "address": "Av. Lima 123",
+  "weight": 0,
+  "height": 0,
+  "bmi": 0,
+  "emergencyContact": {
+    "name": "",
+    "relationship": "",
+    "phone": ""
+  }
+}
+```
+
+IMPORTANTE: El frontend espera recibir el objeto completo con el `id` generado por el backend.
+
+================================================================================
+9) CHECKLIST DE IMPLEMENTACIÓN BACKEND
+================================================================================
+
+[ ] 1. Revisar logs del servidor para identificar el stack trace exacto del error 500.
+[ ] 2. Verificar que el Entity/DTO mapee correctamente el campo `emergencyContact` (JSONB).
+[ ] 3. Validar que las FKs (userId, assignedDoctorId) existan antes de persistir (o acepta null).
+[ ] 4. Asegurar que el endpoint ignora el campo `id` del body (no debe usarlo).
+[ ] 5. Retornar mensajes de error claros (JSON) con status codes apropiados (400, 404, 409).
+[ ] 6. Configurar CORS para permitir POST desde http://localhost:4200.
+[ ] 7. Validar unique constraint en `dni` y retornar 409 si ya existe.
+[ ] 8. Calcular BMI solo si weight > 0 y height > 0 (evitar división por 0).
+[ ] 9. Probar el curl de reproducción y verificar que retorna 201 Created.
+[ ] 10. Documentar el endpoint en OpenAPI/Swagger con ejemplos de request/response.
+
+================================================================================
+10) ALTERNATIVA: CAMBIO EN EL FLUJO (SI BACKEND NO PUEDE CORREGIR RÁPIDO)
+================================================================================
+
+Si el backend NO puede corregir el endpoint POST rápidamente, considera:
+
+OPCIÓN TEMPORAL:
+- Frontend omite el campo `id: 0` del payload (ver OPCIÓN B arriba).
+- Frontend omite campos opcionales con valores por defecto (weight: 0, height: 0).
+- Frontend envía solo campos requeridos inicialmente.
+
+OPCIÓN IDEAL (requiere endpoint nuevo en backend):
+- Implementar POST /authentication/signup-patient que haga TODA la operación atómicamente:
+  1. Crear user.
+  2. Crear patient asociado.
+  3. (Opcional) Asignar doctor.
+  4. (Opcional) Crear subscription.
+  5. Retornar todo en una sola respuesta.
+
+Ventajas: evita múltiples requests, garantiza consistencia, menos puntos de fallo.
+
+================================================================================
+11) CONTACTO Y SEGUIMIENTO
+================================================================================
+
+Frontend: ChroniCaree-Frontend (Angular)
+Backend: ChroniCaree-Backend (Spring Boot / Node / etc.)
+
+Si después de implementar las correcciones el error persiste:
+1. Pega aquí el stack trace completo del servidor.
+2. Pega el response body del error 500 (si hay).
+3. Confirma que el curl de reproducción funciona correctamente.
+4. Verifica que CORS esté configurado (revisa Network tab → Response Headers).
+
+================================================================================
+FIN DEL REPORTE
+================================================================================
+
+Resumen ejecutivo:
+- POST /api/v1/patients devuelve 500 al intentar crear perfil de paciente.
+- Frontend envía payload completo con `id: 0` (puede causar conflicto).
+- Backend debe ignorar `id`, validar FKs (userId, assignedDoctorId), y mapear `emergencyContact` como JSON.
+- Retornar mensajes de error claros (400/404/409) en lugar de 500.
+- Configurar CORS correctamente para desarrollo y producción.
+
+Prioridad: CRÍTICA — bloquea registro de pacientes.
+Tiempo estimado de fix: 1-2 horas.

@@ -1,0 +1,1317 @@
+================================================================================
+📘 ESPECIFICACIÓN COMPLETA DE API BACKEND - CHRONICAREE
+================================================================================
+Fecha: 2025-12-06
+Versión: 1.0
+Propósito: Documento maestro con TODOS los endpoints críticos para que el 
+          frontend funcione al 100% (authentication, payments, tenants, patients)
+
+Base URL Desarrollo: http://localhost:11083/api/v1
+Base URL Producción: https://chornicare-backend-production.up.railway.app/api/v1
+
+================================================================================
+ÍNDICE
+================================================================================
+1. AUTHENTICATION BOUNDED CONTEXT
+   1.1 POST /authentication/sign-up (paciente/doctor genérico)
+   1.2 POST /authentication/sign-up/hospital-admin (hospital admin + tenant)
+   1.3 POST /authentication/sign-in (login)
+   1.4 POST /authentication/refresh-token
+
+2. PATIENTS BOUNDED CONTEXT
+   2.1 POST /patients (crear perfil de paciente)
+   2.2 GET /patients/{id}
+   2.3 PUT /patients/{id}
+   2.4 GET /patients/by-tenant/{tenantId}
+
+3. TENANTS BOUNDED CONTEXT
+   3.1 POST /tenants (crear tenant/hospital)
+   3.2 GET /tenants/{id}
+   3.3 PUT /tenants/{id} (actualizar tenant - CRÍTICO)
+   3.4 GET /tenants/by-admin/{adminUserId}
+
+4. SUBSCRIPTIONS BOUNDED CONTEXT
+   4.1 GET /subscription-plans?type=tenant|patient
+   4.2 POST /subscriptions (crear suscripción)
+   4.3 GET /subscriptions/{id}
+   4.4 PUT /subscriptions/{id}
+
+5. PAYMENTS BOUNDED CONTEXT
+   5.1 POST /payments (registrar pago)
+   5.2 GET /payments/by-subscription/{subscriptionId}
+   5.3 POST /payments/webhook (Stripe webhook)
+
+6. CONFIGURACIÓN GENERAL
+   6.1 CORS
+   6.2 Formato de errores
+   6.3 Autenticación JWT
+   6.4 Validaciones globales
+
+================================================================================
+1. AUTHENTICATION BOUNDED CONTEXT
+================================================================================
+
+1.1 POST /authentication/sign-up
+---------------------------------
+Propósito: Crear user genérico (paciente o doctor independiente)
+URL: POST /api/v1/authentication/sign-up
+
+Request Body:
+```json
+{
+  "email": "usuario@email.com",
+  "password": "password123",
+  "firstName": "Juan",
+  "lastName": "Pérez",
+  "role": "patient"
+}
+```
+
+Campos:
+- email (string, required): correo único
+- password (string, required): mínimo 8 caracteres
+- firstName (string, required): nombre
+- lastName (string, required): apellido
+- role (string, required): "patient" | "doctor" | "hospital_admin"
+
+Response Success (201 Created):
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 123,
+    "email": "usuario@email.com",
+    "name": "Juan Pérez",
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "role": "patient",
+    "tenantId": null,
+    "doctorId": null
+  }
+}
+```
+
+Validaciones Backend:
+✅ Email único (retornar 409 si ya existe)
+✅ Password mínimo 8 caracteres
+✅ Email formato válido (regex)
+✅ Role debe ser valor válido
+✅ Hashear password antes de guardar (bcrypt)
+✅ Generar tokens JWT con exp time apropiado
+
+Response Errors:
+- 400: Validación falla (campo faltante, formato inválido)
+- 409: Email ya existe
+- 500: Error interno
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/authentication/sign-up" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "password123",
+    "firstName": "Test",
+    "lastName": "User",
+    "role": "patient"
+  }'
+```
+
+--------------------------------------------------------------------------------
+1.2 POST /authentication/sign-up/hospital-admin
+--------------------------------------------------------------------------------
+Propósito: Crear user admin + tenant (hospital) en UNA SOLA operación atómica
+URL: POST /api/v1/authentication/sign-up/hospital-admin
+
+Request Body:
+```json
+{
+  "adminName": "Dr. Carlos López",
+  "adminEmail": "admin@hospital.com",
+  "adminPassword": "securepass123",
+  "hospitalName": "Hospital San Juan",
+  "address": "Av. Principal 123, Lima",
+  "phone": "987654321",
+  "ruc": "20123456789"
+}
+```
+
+Campos:
+- adminName (string, required): nombre completo del admin
+- adminEmail (string, required): correo único del admin
+- adminPassword (string, required): contraseña (min 8 chars)
+- hospitalName (string, required): nombre del hospital/tenant (único)
+- address (string, required): dirección del hospital
+- phone (string, required): teléfono de contacto
+- ruc (string, optional): RUC/Tax ID del hospital
+
+Response Success (201 Created):
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 456,
+    "email": "admin@hospital.com",
+    "name": "Dr. Carlos López",
+    "role": "hospital_admin",
+    "tenantId": 789,
+    "tenant": {
+      "id": 789,
+      "name": "Hospital San Juan",
+      "address": "Av. Principal 123, Lima",
+      "phone": "987654321",
+      "email": "admin@hospital.com",
+      "status": "pending_subscription",
+      "subscriptionId": null,
+      "settings": {
+        "allowIndependentDoctors": false,
+        "requirePatientApproval": true,
+        "maxDoctors": 5
+      }
+    },
+    "doctorId": null
+  }
+}
+```
+
+IMPORTANTE - Lógica Backend (TRANSACCIÓN ATÓMICA):
+1. Validar que adminEmail no exista
+2. Validar que hospitalName no exista
+3. BEGIN TRANSACTION
+4. Crear User con role="hospital_admin"
+5. Crear Tenant asociado al User (adminUserId = user.id)
+6. COMMIT TRANSACTION
+7. Generar JWT tokens con user.id, tenantId incluido en claims
+8. Retornar todo en una sola respuesta
+
+Validaciones Backend:
+✅ adminEmail único (409 si existe)
+✅ hospitalName único (409 si existe)
+✅ adminPassword min 8 caracteres
+✅ Hashear password antes de guardar
+✅ Crear tenant.status = "pending_subscription" (cambiará a "active" al pagar)
+✅ tenant.subscriptionId = null inicialmente
+✅ settings con valores por defecto según plan (p. ej. maxDoctors: 5 para básico)
+
+Response Errors:
+- 400: Validación falla
+- 409: Email o hospitalName ya existen
+- 500: Error interno (rollback transacción)
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/authentication/sign-up/hospital-admin" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "adminName": "Dr. Carlos López",
+    "adminEmail": "admin@hospital.com",
+    "adminPassword": "securepass123",
+    "hospitalName": "Hospital San Juan",
+    "address": "Av. Principal 123",
+    "phone": "987654321",
+    "ruc": "20123456789"
+  }'
+```
+
+--------------------------------------------------------------------------------
+1.3 POST /authentication/sign-in
+--------------------------------------------------------------------------------
+Propósito: Login de usuario existente
+URL: POST /api/v1/authentication/sign-in
+
+Request Body:
+```json
+{
+  "email": "usuario@email.com",
+  "password": "password123"
+}
+```
+
+Response Success (200 OK):
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 123,
+    "email": "usuario@email.com",
+    "name": "Juan Pérez",
+    "role": "patient",
+    "tenantId": null,
+    "doctorId": null
+  }
+}
+```
+
+Validaciones Backend:
+✅ Email existe (401 si no)
+✅ Password coincide con hash (bcrypt.compare) (401 si no)
+✅ User no está suspendido/bloqueado
+✅ Generar nuevos tokens JWT
+
+Response Errors:
+- 400: Campos faltantes
+- 401: Credenciales inválidas
+- 403: Usuario suspendido
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/authentication/sign-in" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "test@example.com",
+    "password": "password123"
+  }'
+```
+
+--------------------------------------------------------------------------------
+1.4 POST /authentication/refresh-token
+--------------------------------------------------------------------------------
+Propósito: Renovar accessToken usando refreshToken
+URL: POST /api/v1/authentication/refresh-token
+
+Request Body:
+```json
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+Response Success (200 OK):
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+Validaciones Backend:
+✅ refreshToken válido y no expirado
+✅ refreshToken no está en blacklist (si implementas revocación)
+✅ Generar nuevo accessToken
+✅ Opcionalmente rotar refreshToken
+
+Response Errors:
+- 401: refreshToken inválido o expirado
+
+================================================================================
+2. PATIENTS BOUNDED CONTEXT
+================================================================================
+
+2.1 POST /patients
+------------------
+Propósito: Crear perfil de paciente (después de crear user)
+URL: POST /api/v1/patients
+Headers: Authorization: Bearer <token>
+
+Request Body:
+```json
+{
+  "userId": 123,
+  "assignedDoctorId": 5,
+  "tenantId": null,
+  "subscriptionId": null,
+  "firstName": "Jose",
+  "lastName": "Perez",
+  "dni": "12345678",
+  "birthDate": "1990-05-15",
+  "gender": "male",
+  "phone": "987654321",
+  "address": "Av. Lima 123",
+  "weight": 70,
+  "height": 1.75,
+  "bmi": 22.9,
+  "emergencyContact": {
+    "name": "Maria Perez",
+    "relationship": "Hermana",
+    "phone": "987654322"
+  }
+}
+```
+
+Campos Obligatorios:
+- userId (number, required): FK al user (DEBE existir)
+- firstName (string, required)
+- lastName (string, required)
+- dni (string, required, unique): documento de identidad
+- birthDate (string, required): YYYY-MM-DD
+- gender (string, required): "male" | "female" | "other"
+- phone (string, required)
+- address (string, required)
+
+Campos Opcionales:
+- assignedDoctorId (number, nullable): FK al doctor (null si sin asignar)
+- tenantId (number, nullable): FK al hospital (null para B2C)
+- subscriptionId (number, nullable): FK a subscription (null hasta que pague)
+- weight (number, nullable): peso en kg (puede ser 0 o null)
+- height (number, nullable): altura en metros (puede ser 0 o null)
+- bmi (number, nullable): calculado automáticamente o 0
+- emergencyContact (object, nullable): contacto de emergencia (puede tener campos vacíos)
+
+IMPORTANTE - NO enviar campo `id` en el request (backend lo genera)
+
+Response Success (201 Created):
+```json
+{
+  "id": 999,
+  "userId": 123,
+  "assignedDoctorId": 5,
+  "tenantId": null,
+  "subscriptionId": null,
+  "firstName": "Jose",
+  "lastName": "Perez",
+  "dni": "12345678",
+  "birthDate": "1990-05-15",
+  "gender": "male",
+  "phone": "987654321",
+  "address": "Av. Lima 123",
+  "weight": 70,
+  "height": 1.75,
+  "bmi": 22.9,
+  "emergencyContact": {
+    "name": "Maria Perez",
+    "relationship": "Hermana",
+    "phone": "987654322"
+  }
+}
+```
+
+Validaciones Backend:
+✅ Ignorar campo `id` si viene en request (o validar que sea 0)
+✅ userId existe en tabla users (400 si no)
+✅ assignedDoctorId existe SI no es null (400 si no)
+✅ tenantId existe SI no es null (400 si no)
+✅ dni único (409 si ya existe)
+✅ birthDate formato válido (YYYY-MM-DD)
+✅ gender valor válido ("male" | "female" | "other")
+✅ Calcular BMI solo si weight > 0 y height > 0 (evitar división por 0)
+✅ emergencyContact mapear como JSON/JSONB column
+
+Entity Mapping (Java Spring Boot ejemplo):
+```java
+@Entity
+@Table(name = "patients")
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // AUTO GENERADO
+    
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+    
+    @Column(name = "assigned_doctor_id", nullable = true)
+    private Long assignedDoctorId;
+    
+    @Column(name = "tenant_id", nullable = true)
+    private Long tenantId;
+    
+    @Column(name = "subscription_id", nullable = true)
+    private Long subscriptionId;
+    
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+    
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+    
+    @Column(name = "dni", nullable = false, unique = true)
+    private String dni;
+    
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = false)
+    private Gender gender; // enum: MALE, FEMALE, OTHER
+    
+    @Column(name = "phone", nullable = false)
+    private String phone;
+    
+    @Column(name = "address", nullable = false)
+    private String address;
+    
+    @Column(name = "weight")
+    private Double weight;
+    
+    @Column(name = "height")
+    private Double height;
+    
+    @Column(name = "bmi")
+    private Double bmi;
+    
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb", name = "emergency_contact")
+    private EmergencyContact emergencyContact;
+    
+    // getters/setters...
+}
+```
+
+Response Errors:
+- 400: Validación falla (userId no existe, campos faltantes)
+- 401: Token inválido o ausente
+- 409: DNI ya existe
+- 500: Error interno
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/patients" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "userId": 3,
+    "firstName": "Jose",
+    "lastName": "Perez",
+    "dni": "12345678",
+    "birthDate": "1990-05-15",
+    "gender": "male",
+    "phone": "987654321",
+    "address": "Av. Lima 123",
+    "weight": 70,
+    "height": 1.75,
+    "emergencyContact": {
+      "name": "Maria",
+      "relationship": "Hermana",
+      "phone": "987654322"
+    }
+  }'
+```
+
+--------------------------------------------------------------------------------
+2.2 GET /patients/{id}
+2.3 PUT /patients/{id}
+2.4 GET /patients/by-tenant/{tenantId}
+--------------------------------------------------------------------------------
+(Endpoints estándar CRUD - similar estructura a POST pero con validaciones apropiadas)
+
+================================================================================
+3. TENANTS BOUNDED CONTEXT
+================================================================================
+
+3.1 POST /tenants
+-----------------
+(Normalmente NO se usa directamente - se crea via sign-up/hospital-admin)
+(Incluir si quieres endpoint separado para testing)
+
+--------------------------------------------------------------------------------
+3.2 GET /tenants/{id}
+---------------------
+URL: GET /api/v1/tenants/{id}
+Headers: Authorization: Bearer <token>
+
+Response Success (200 OK):
+```json
+{
+  "id": 1,
+  "adminUserId": 5,
+  "name": "Hospital San Juan",
+  "address": "Av. Principal 123",
+  "phone": "987654321",
+  "email": "admin@hospital.com",
+  "status": "active",
+  "subscriptionId": 42,
+  "registrationDate": "2025-12-06T10:00:00Z",
+  "settings": {
+    "allowIndependentDoctors": false,
+    "requirePatientApproval": true,
+    "maxDoctors": 10
+  }
+}
+```
+
+Response Errors:
+- 401: No autenticado
+- 404: Tenant no encontrado
+- 403: Sin permisos (si no es admin del tenant)
+
+--------------------------------------------------------------------------------
+3.3 PUT /tenants/{id} 🔴 CRÍTICO - ESTE ENDPOINT FALLA ACTUALMENTE
+---------------------------------------------------------------------
+Propósito: Actualizar tenant (especialmente para asociar subscriptionId)
+URL: PUT /api/v1/tenants/{id}
+Headers: Authorization: Bearer <token>
+
+Request Body (COMPLETO):
+```json
+{
+  "id": 1,
+  "adminUserId": 5,
+  "name": "Hospital San Juan",
+  "address": "Av. Principal 123",
+  "phone": "987654321",
+  "email": "admin@hospital.com",
+  "status": "active",
+  "subscriptionId": 42,
+  "registrationDate": "2025-12-06T10:00:00Z",
+  "settings": {
+    "allowIndependentDoctors": false,
+    "requirePatientApproval": true,
+    "maxDoctors": 10
+  }
+}
+```
+
+IMPORTANTE - Esto es un PUT (reemplazo completo), NO un PATCH
+- Frontend envía TODOS los campos del tenant
+- Backend debe aceptar payload completo
+- Campo `id` en body debe coincidir con id en URL (o ser ignorado)
+- Campo `settings` es un objeto JSON/JSONB
+
+Response Success (200 OK):
+```json
+{
+  "id": 1,
+  "adminUserId": 5,
+  "name": "Hospital San Juan",
+  "address": "Av. Principal 123",
+  "phone": "987654321",
+  "email": "admin@hospital.com",
+  "status": "active",
+  "subscriptionId": 42,
+  "registrationDate": "2025-12-06T10:00:00Z",
+  "settings": {
+    "allowIndependentDoctors": false,
+    "requirePatientApproval": true,
+    "maxDoctors": 10
+  }
+}
+```
+
+Validaciones Backend (CRÍTICAS):
+✅ Tenant con {id} existe (404 si no)
+✅ IGNORAR campo `id` del body - usar SOLO el de la URL
+✅ Validar adminUserId existe SI cambió (400 si no)
+✅ Validar subscriptionId existe SI no es null (400 si no)
+✅ Validar que `name` no esté vacío
+✅ Validar que `email` formato válido
+✅ Validar que `status` sea valor válido: "pending_subscription" | "active" | "suspended" | "cancelled"
+✅ settings mapear correctamente como JSON/JSONB column
+✅ NO lanzar 500 por campos faltantes - usar valores actuales si no vienen
+✅ Retornar 200 OK con tenant actualizado
+
+Entity Mapping (Java Spring Boot):
+```java
+@Entity
+@Table(name = "tenants")
+public class Tenant {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(name = "admin_user_id", nullable = false)
+    private Long adminUserId;
+    
+    @Column(name = "name", nullable = false)
+    private String name;
+    
+    @Column(name = "address", nullable = false)
+    private String address;
+    
+    @Column(name = "phone", nullable = false)
+    private String phone;
+    
+    @Column(name = "email", nullable = false)
+    private String email;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TenantStatus status; // enum
+    
+    @Column(name = "subscription_id", nullable = true)
+    private Long subscriptionId;
+    
+    @Column(name = "registration_date", nullable = false)
+    private Instant registrationDate;
+    
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb", name = "settings")
+    private TenantSettings settings;
+    
+    // getters/setters...
+}
+```
+
+Controller Example (Java Spring Boot):
+```java
+@PutMapping("/{id}")
+public ResponseEntity<TenantResource> updateTenant(
+    @PathVariable Long id,
+    @RequestBody @Valid UpdateTenantRequest request
+) {
+    // 1. Buscar tenant existente
+    Tenant tenant = tenantRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Tenant not found"));
+    
+    // 2. Validar FKs si cambiaron
+    if (request.getSubscriptionId() != null) {
+        subscriptionRepository.findById(request.getSubscriptionId())
+            .orElseThrow(() -> new BadRequestException("Subscription not found"));
+    }
+    
+    // 3. Actualizar campos (NO usar id del body, usar el de la URL)
+    tenant.setName(request.getName());
+    tenant.setAddress(request.getAddress());
+    tenant.setPhone(request.getPhone());
+    tenant.setEmail(request.getEmail());
+    tenant.setStatus(request.getStatus());
+    tenant.setSubscriptionId(request.getSubscriptionId());
+    tenant.setSettings(request.getSettings());
+    // adminUserId y registrationDate NO deberían cambiar
+    
+    // 4. Persistir
+    Tenant updated = tenantRepository.save(tenant);
+    
+    // 5. Retornar
+    return ResponseEntity.ok(toResource(updated));
+}
+```
+
+Response Errors:
+- 400: Validación falla (FK no existe, status inválido)
+- 401: No autenticado
+- 404: Tenant no encontrado
+- 500: Error interno (EVITAR - retornar 400 con mensaje claro)
+
+Ejemplo curl:
+```bash
+curl -X PUT "http://localhost:11083/api/v1/tenants/1" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "id": 1,
+    "adminUserId": 5,
+    "name": "Hospital San Juan",
+    "address": "Av. Principal 123",
+    "phone": "987654321",
+    "email": "admin@hospital.com",
+    "status": "active",
+    "subscriptionId": 42,
+    "registrationDate": "2025-12-06T10:00:00Z",
+    "settings": {
+      "allowIndependentDoctors": false,
+      "requirePatientApproval": true,
+      "maxDoctors": 10
+    }
+  }'
+```
+
+--------------------------------------------------------------------------------
+3.4 GET /tenants/by-admin/{adminUserId}
+----------------------------------------
+URL: GET /api/v1/tenants/by-admin/{adminUserId}
+Headers: Authorization: Bearer <token>
+
+Response Success (200 OK):
+```json
+{
+  "id": 1,
+  "adminUserId": 5,
+  "name": "Hospital San Juan",
+  ...
+}
+```
+
+Response Errors:
+- 401: No autenticado
+- 404: No se encontró tenant para ese admin
+
+================================================================================
+4. SUBSCRIPTIONS BOUNDED CONTEXT
+================================================================================
+
+4.1 GET /subscription-plans?type=tenant|patient
+------------------------------------------------
+URL: GET /api/v1/subscription-plans?type=tenant
+Headers: NO requiere auth (público)
+
+Response Success (200 OK):
+```json
+[
+  {
+    "id": "plan-tenant-basic",
+    "name": "Plan Básico Hospital",
+    "type": "tenant",
+    "price": 99.99,
+    "currency": "USD",
+    "billingCycle": "monthly",
+    "features": {
+      "maxDoctors": 5,
+      "maxPatients": 100,
+      "advancedAnalytics": false,
+      "customBranding": false,
+      "support": "email"
+    },
+    "description": "Plan ideal para clínicas pequeñas"
+  },
+  {
+    "id": "plan-tenant-premium",
+    "name": "Plan Premium Hospital",
+    "type": "tenant",
+    "price": 299.99,
+    "currency": "USD",
+    "billingCycle": "monthly",
+    "features": {
+      "maxDoctors": -1,
+      "maxPatients": -1,
+      "advancedAnalytics": true,
+      "customBranding": true,
+      "support": "priority"
+    },
+    "description": "Plan ilimitado para hospitales grandes"
+  }
+]
+```
+
+Nota: maxDoctors: -1 significa ilimitado
+
+--------------------------------------------------------------------------------
+4.2 POST /subscriptions
+-----------------------
+Propósito: Crear suscripción (después de procesar pago)
+URL: POST /api/v1/subscriptions
+Headers: Authorization: Bearer <token>
+
+Request Body:
+```json
+{
+  "payerType": "tenant",
+  "payerId": 1,
+  "planId": "plan-tenant-basic",
+  "autoRenew": true,
+  "paymentMethod": "credit_card",
+  "billingEmail": "admin@hospital.com"
+}
+```
+
+Campos:
+- payerType (string, required): "tenant" | "patient"
+- payerId (number, required): ID del tenant o patient
+- planId (string, required): ID del plan (debe existir)
+- autoRenew (boolean, optional): default true
+- paymentMethod (string, required): "credit_card" | "bank_transfer" | etc
+- billingEmail (string, required): email para facturas
+
+IMPORTANTE - NO enviar campo `id` en el request
+
+Response Success (201 Created):
+```json
+{
+  "id": 42,
+  "payerType": "tenant",
+  "payerId": 1,
+  "planId": "plan-tenant-basic",
+  "status": "active",
+  "startDate": "2025-12-06T10:00:00Z",
+  "endDate": "2026-01-06T10:00:00Z",
+  "autoRenew": true,
+  "paymentMethod": "credit_card",
+  "billingEmail": "admin@hospital.com",
+  "nextBillingDate": "2026-01-06T10:00:00Z",
+  "lastPaymentDate": "2025-12-06T10:00:00Z",
+  "lastPaymentAmount": 99.99
+}
+```
+
+Validaciones Backend:
+✅ Ignorar campo `id` si viene
+✅ payerId existe según payerType (tenant o patient) (400 si no)
+✅ planId existe (400 si no)
+✅ Plan.type coincide con payerType (tenant plan para tenant, patient plan para patient)
+✅ Calcular startDate = ahora
+✅ Calcular endDate = startDate + 1 mes (o según plan.billingCycle)
+✅ status = "active" inicialmente
+✅ Obtener price del plan y guardarlo en lastPaymentAmount
+
+Response Errors:
+- 400: Validación falla
+- 401: No autenticado
+- 404: Plan no encontrado
+- 500: Error interno
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/subscriptions" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "payerType": "tenant",
+    "payerId": 1,
+    "planId": "plan-tenant-basic",
+    "autoRenew": true,
+    "paymentMethod": "credit_card",
+    "billingEmail": "admin@hospital.com"
+  }'
+```
+
+--------------------------------------------------------------------------------
+4.3 GET /subscriptions/{id}
+4.4 PUT /subscriptions/{id}
+----------------------------
+(Endpoints estándar CRUD)
+
+================================================================================
+5. PAYMENTS BOUNDED CONTEXT
+================================================================================
+
+5.1 POST /payments
+------------------
+Propósito: Registrar pago procesado (después de validar con Stripe)
+URL: POST /api/v1/payments
+Headers: Authorization: Bearer <token>
+
+Request Body:
+```json
+{
+  "subscriptionId": 42,
+  "payerType": "tenant",
+  "payerId": 1,
+  "amount": 99.99,
+  "currency": "USD",
+  "status": "completed",
+  "paymentMethod": "credit_card",
+  "transactionId": "tok_1234567890",
+  "stripePaymentIntentId": "pi_1234567890"
+}
+```
+
+Campos:
+- subscriptionId (number, required): FK a subscription
+- payerType (string, required): "tenant" | "patient"
+- payerId (number, required): ID del tenant o patient
+- amount (number, required): monto pagado
+- currency (string, required): "USD" | "EUR" | etc
+- status (string, required): "pending" | "completed" | "failed" | "refunded"
+- paymentMethod (string, required): "credit_card" | "bank_transfer"
+- transactionId (string, optional): ID del token/transacción de Stripe
+- stripePaymentIntentId (string, optional): Payment Intent ID de Stripe
+
+Response Success (201 Created):
+```json
+{
+  "id": 888,
+  "subscriptionId": 42,
+  "payerType": "tenant",
+  "payerId": 1,
+  "amount": 99.99,
+  "currency": "USD",
+  "status": "completed",
+  "paymentMethod": "credit_card",
+  "transactionId": "tok_1234567890",
+  "stripePaymentIntentId": "pi_1234567890",
+  "paymentDate": "2025-12-06T10:00:00Z",
+  "createdAt": "2025-12-06T10:00:00Z"
+}
+```
+
+Validaciones Backend:
+✅ subscriptionId existe (400 si no)
+✅ payerId existe según payerType (400 si no)
+✅ amount > 0
+✅ currency válida
+✅ status valor válido
+✅ Guardar paymentDate = now()
+
+Response Errors:
+- 400: Validación falla
+- 401: No autenticado
+- 404: Subscription no encontrada
+- 500: Error interno
+
+Ejemplo curl:
+```bash
+curl -X POST "http://localhost:11083/api/v1/payments" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "subscriptionId": 42,
+    "payerType": "tenant",
+    "payerId": 1,
+    "amount": 99.99,
+    "currency": "USD",
+    "status": "completed",
+    "paymentMethod": "credit_card",
+    "transactionId": "tok_xyz",
+    "stripePaymentIntentId": "pi_xyz"
+  }'
+```
+
+--------------------------------------------------------------------------------
+5.2 GET /payments/by-subscription/{subscriptionId}
+---------------------------------------------------
+URL: GET /api/v1/payments/by-subscription/{subscriptionId}
+Headers: Authorization: Bearer <token>
+
+Response Success (200 OK):
+```json
+[
+  {
+    "id": 888,
+    "subscriptionId": 42,
+    "amount": 99.99,
+    "status": "completed",
+    "paymentDate": "2025-12-06T10:00:00Z"
+  }
+]
+```
+
+--------------------------------------------------------------------------------
+5.3 POST /payments/webhook (Stripe Webhook)
+--------------------------------------------
+Propósito: Recibir notificaciones de Stripe cuando un pago es procesado
+URL: POST /api/v1/payments/webhook
+Headers: Stripe-Signature (validar webhook signature)
+
+(Implementar según documentación de Stripe Webhooks)
+(Validar signature con webhook secret)
+(Actualizar payment.status según event.type)
+
+================================================================================
+6. CONFIGURACIÓN GENERAL
+================================================================================
+
+6.1 CORS
+--------
+Configuración CORS para desarrollo y producción:
+
+Orígenes permitidos:
+- http://localhost:4200 (desarrollo frontend)
+- https://chornicare-frontend-production.vercel.app (producción frontend)
+- https://tu-dominio-custom.com (si aplica)
+
+Métodos permitidos: GET, POST, PUT, PATCH, DELETE, OPTIONS
+
+Headers permitidos: Content-Type, Authorization, Stripe-Signature
+
+Credentials: true (para enviar cookies si las usas)
+
+Spring Boot ejemplo:
+```java
+@Configuration
+public class CorsConfig {
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                    .allowedOrigins(
+                        "http://localhost:4200",
+                        "https://chornicare-frontend-production.vercel.app"
+                    )
+                    .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true)
+                    .maxAge(3600);
+            }
+        };
+    }
+}
+```
+
+Node.js/Express ejemplo:
+```javascript
+const cors = require('cors');
+
+app.use(cors({
+  origin: [
+    'http://localhost:4200',
+    'https://chornicare-frontend-production.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Stripe-Signature'],
+  credentials: true
+}));
+```
+
+--------------------------------------------------------------------------------
+6.2 Formato de Errores
+-----------------------
+Todos los endpoints deben retornar errores en formato JSON consistente:
+
+```json
+{
+  "timestamp": "2025-12-06T10:30:00.000Z",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "User with id 3 does not exist",
+  "path": "/api/v1/patients",
+  "details": {
+    "field": "userId",
+    "rejectedValue": 3
+  }
+}
+```
+
+Campos:
+- timestamp (string): ISO 8601
+- status (number): código HTTP
+- error (string): nombre del error
+- message (string): mensaje descriptivo (user-friendly)
+- path (string): endpoint que falló
+- details (object, optional): detalles adicionales
+
+IMPORTANTE:
+- NUNCA exponer stack traces en producción
+- Loguear stack traces completos en logs del servidor
+- Retornar mensajes claros y accionables al frontend
+- Usar códigos HTTP apropiados:
+  - 400: Bad Request (validación falla, datos inválidos)
+  - 401: Unauthorized (no autenticado, token inválido)
+  - 403: Forbidden (autenticado pero sin permisos)
+  - 404: Not Found (recurso no existe)
+  - 409: Conflict (unique constraint violation, email/dni ya existe)
+  - 422: Unprocessable Entity (violación de reglas de negocio)
+  - 500: Internal Server Error (error inesperado del servidor)
+
+--------------------------------------------------------------------------------
+6.3 Autenticación JWT
+----------------------
+Todos los endpoints protegidos requieren JWT en header:
+Authorization: Bearer <token>
+
+JWT Payload (claims) debe incluir:
+```json
+{
+  "sub": 123,
+  "email": "user@example.com",
+  "role": "patient",
+  "tenantId": 1,
+  "doctorId": null,
+  "iat": 1701878400,
+  "exp": 1701882000
+}
+```
+
+Claims:
+- sub (subject): user.id
+- email: user.email
+- role: user.role ("patient" | "doctor" | "hospital_admin")
+- tenantId: user.tenantId (null si no aplica)
+- doctorId: user.doctorId (null si no es doctor)
+- iat (issued at): timestamp de emisión
+- exp (expiration): timestamp de expiración
+
+Tiempos de expiración recomendados:
+- accessToken: 15 minutos a 1 hora
+- refreshToken: 7 días a 30 días
+
+Validación en cada request:
+✅ Token presente en header
+✅ Token válido (firma correcta)
+✅ Token no expirado
+✅ User existe y no está suspendido
+✅ Permisos apropiados para el endpoint
+
+--------------------------------------------------------------------------------
+6.4 Validaciones Globales
+--------------------------
+Para todos los endpoints que crean o actualizan recursos:
+
+Emails:
+✅ Formato válido: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+✅ Único donde aplique (users, tenants)
+✅ Case-insensitive (guardar lowercase)
+
+Passwords:
+✅ Mínimo 8 caracteres
+✅ Hashear con bcrypt (rounds: 10-12)
+✅ NUNCA guardar plaintext
+✅ NUNCA retornar password en responses
+
+Teléfonos:
+✅ Solo dígitos (permitir espacios/guiones opcionales)
+✅ Longitud 6-15 caracteres
+
+DNI/RUC:
+✅ Solo dígitos o alfanumérico según país
+✅ Longitud apropiada (8-11 para Perú)
+✅ Único por tipo de documento
+
+Fechas:
+✅ Formato ISO 8601: YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss.sssZ
+✅ Validar que sean fechas reales (no 2025-02-30)
+
+Enums:
+✅ Validar valores permitidos
+✅ Case-sensitive o normalizar a uppercase/lowercase
+
+FKs:
+✅ Validar que existan antes de INSERT/UPDATE
+✅ Permitir null donde sea opcional
+✅ Retornar 400 con mensaje claro si no existe
+
+Unique Constraints:
+✅ Validar antes de INSERT
+✅ Retornar 409 Conflict si ya existe
+✅ Incluir en mensaje qué campo es duplicado
+
+================================================================================
+7. FLUJO COMPLETO DE REGISTRO (SECUENCIA)
+================================================================================
+
+FLUJO HOSPITAL ADMIN (B2B)
+---------------------------
+1. Frontend: POST /authentication/sign-up/hospital-admin
+   - Backend crea User + Tenant en transacción atómica
+   - Retorna accessToken, refreshToken, user (con tenantId)
+   - Frontend guarda tokens y user en localStorage
+
+2. Frontend: Muestra planes disponibles
+   - GET /subscription-plans?type=tenant (público, no auth)
+
+3. Frontend: Usuario ingresa datos de tarjeta y selecciona plan
+
+4. Frontend: Valida tarjeta con Stripe
+   - Stripe.createToken() → retorna token
+
+5. Frontend: POST /payments
+   - Envía token, amount, subscriptionId=0 (temporal)
+   - Backend registra pago con status="completed"
+
+6. Frontend: POST /subscriptions
+   - Envía payerType="tenant", payerId=tenantId, planId
+   - Backend crea subscription con status="active"
+   - Retorna subscription con id=42
+
+7. Frontend: PUT /tenants/{tenantId}
+   - Envía tenant completo con subscriptionId=42, status="active"
+   - Backend actualiza tenant
+   - Retorna tenant actualizado
+
+8. Frontend: Redirige a /iam/login o dashboard
+
+FLUJO PACIENTE (B2C)
+--------------------
+1. Frontend: POST /authentication/sign-up
+   - Backend crea User con role="patient"
+   - Retorna accessToken, refreshToken, user
+
+2. Frontend: Auto-login con tokens
+
+3. Frontend: POST /patients
+   - Crea perfil de paciente asociado al user
+   - Retorna patient con id
+
+4. Frontend: Redirige a /patient/subscription para elegir plan
+
+5-7. (Similar a hospital: mostrar planes, pagar, crear subscription)
+
+8. Frontend: PUT /patients/{patientId}
+   - Actualiza patient con subscriptionId
+
+9. Frontend: Redirige a dashboard
+
+================================================================================
+8. TESTING Y VALIDACIÓN
+================================================================================
+
+Checklist de Testing Backend:
+------------------------------
+[ ] 1. Todos los endpoints retornan JSON válido
+[ ] 2. CORS configurado correctamente (probar desde localhost:4200)
+[ ] 3. JWT tokens generados correctamente con exp y claims
+[ ] 4. Validación de FKs funciona (retorna 400 si no existe)
+[ ] 5. Unique constraints funcionan (retorna 409 si duplicado)
+[ ] 6. Campos JSON/JSONB mapean correctamente (settings, emergencyContact)
+[ ] 7. Endpoints PUT aceptan payload completo sin 500
+[ ] 8. Campos opcionales aceptan null sin fallar
+[ ] 9. Errores retornan status codes apropiados (no siempre 500)
+[ ] 10. Mensajes de error son claros y útiles
+[ ] 11. Stack traces NO se exponen en responses (solo en logs)
+[ ] 12. Transacciones atómicas funcionan (sign-up/hospital-admin)
+[ ] 13. Passwords hasheadas correctamente (bcrypt)
+[ ] 14. BMI calculado correctamente (evita división por 0)
+[ ] 15. Fechas parseadas correctamente (ISO 8601)
+
+Herramientas recomendadas:
+- Postman/Insomnia para testing manual
+- curl para scripts de testing automatizado
+- JUnit/Mocha para tests unitarios
+- Database migrations para esquema consistente
+
+================================================================================
+9. TROUBLESHOOTING COMÚN
+================================================================================
+
+Problema: PUT /tenants devuelve 500
+Causa: Backend rechaza campo `id` en body, o falla al mapear `settings` JSON
+Solución: Ignorar `id` del body; mapear `settings` como JSONB; validar FKs
+
+Problema: POST /patients devuelve 500
+Causa: Campo `id: 0` causa conflicto; o emergencyContact no mapea
+Solución: Ignorar `id` del body; mapear emergencyContact como JSONB
+
+Problema: CORS error en frontend
+Causa: Backend no acepta origen http://localhost:4200
+Solución: Configurar CORS con origen permitido
+
+Problema: JWT inválido o expirado
+Causa: Token exp pasado; o refresh token no implementado
+Solución: Implementar refresh token endpoint; frontend debe renovar token
+
+Problema: Unique constraint violation no retorna 409
+Causa: Backend retorna 500 genérico
+Solución: Catch ConstraintViolationException y retornar 409 con mensaje
+
+Problema: FK violation no retorna 400
+Causa: Backend retorna 500 genérico
+Solución: Validar FKs ANTES de INSERT/UPDATE; retornar 400 si no existe
+
+================================================================================
+10. PRIORIDADES DE IMPLEMENTACIÓN
+================================================================================
+
+PRIORIDAD 1 (CRÍTICO - BLOQUEANTE):
+✅ POST /authentication/sign-up/hospital-admin (transacción atómica)
+✅ PUT /tenants/{id} (aceptar payload completo, mapear settings)
+✅ POST /patients (ignorar id, mapear emergencyContact)
+✅ POST /subscriptions (ignorar id, validar plan/payer)
+✅ POST /payments (registrar pago)
+✅ CORS configurado correctamente
+
+PRIORIDAD 2 (IMPORTANTE):
+✅ GET /subscription-plans?type=tenant|patient
+✅ POST /authentication/sign-in
+✅ POST /authentication/sign-up
+✅ GET /tenants/{id}
+✅ GET /patients/{id}
+
+PRIORIDAD 3 (DESEABLE):
+✅ POST /authentication/refresh-token
+✅ GET /payments/by-subscription/{subscriptionId}
+✅ PUT /patients/{id}
+✅ PUT /subscriptions/{id}
+✅ Webhook Stripe
+
+================================================================================
+11. CONTACTO Y SEGUIMIENTO
+================================================================================
+
+Frontend Repository: ChroniCaree-Frontend (Angular)
+Backend Repository: ChroniCaree-Backend
+
+Este documento debe ser implementado al 100% para que el frontend funcione.
+
+Después de implementar:
+1. Ejecutar curls de ejemplo para cada endpoint
+2. Verificar que responses coinciden con estructura documentada
+3. Verificar que errores retornan status codes correctos
+4. Validar CORS desde http://localhost:4200
+5. Confirmar que transacciones atómicas funcionan
+6. Probar flujo completo end-to-end (registro → pago → dashboard)
+
+Si algún endpoint sigue fallando:
+- Pegar aquí stack trace completo del servidor
+- Pegar request/response exactos (curl)
+- Indicar qué validación específica está fallando
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+Versión: 1.0 - 2025-12-06
+Autor: GitHub Copilot (Claude Sonnet 4.5)
+Propósito: Especificación completa y definitiva para implementar backend
+          compatible al 100% con ChroniCaree Frontend

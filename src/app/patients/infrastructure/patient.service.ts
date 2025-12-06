@@ -11,7 +11,7 @@ const PATIENT_API = `${environment.apiBaseUrl}${environment.patientsEndpointPath
   providedIn: 'root',
 })
 export class PatientService {
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {}
 
   /**
    * Obtiene un paciente por ID
@@ -145,10 +145,19 @@ export class PatientService {
    * Crea un nuevo paciente
    */
   create(request: any): Observable<PatientEntity> {
+    console.log('📤 [PatientService] Creating patient - URL:', PATIENT_API, 'payload:', request);
     return this.http.post<any>(PATIENT_API, request).pipe(
       map((resource) => this.toEntity(resource)),
       catchError((error) => {
-        console.error('Error creating patient:', error);
+        console.error('❌ [PatientService] Error creating patient:', error);
+        try {
+          // Print server response body if available
+          console.error('  → Status:', error?.status);
+          console.error('  → Message:', error?.message);
+          console.error('  → Body:', error?.error);
+        } catch (e) {
+          console.error('  → Could not log full error body:', e);
+        }
         return throwError(() => new Error('Failed to create patient'));
       })
     );

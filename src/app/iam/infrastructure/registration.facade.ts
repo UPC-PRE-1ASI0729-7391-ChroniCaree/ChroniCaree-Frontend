@@ -7,6 +7,7 @@ import { TenantStore } from '../../tenants/application/tenant.store';
 import { DoctorService } from '../../doctors/infrastructure/doctor.service';
 import { SubscriptionService } from '../../subscriptions/infrastructure/subscription.service';
 import { PaymentStore } from '../../payments/application/payment.store';
+import { Patient } from '../../patients/domain/model/patient.entity';
 
 export interface PatientRegistrationData {
   // User data
@@ -57,12 +58,12 @@ export interface RegistrationResult {
   providedIn: 'root'
 })
 export class RegistrationFacade {
-  private authService = inject(AuthService);
-  private patientStore = inject(PatientStore);
-  private tenantStore = inject(TenantStore);
-  private subscriptionService = inject(SubscriptionService);
-  private paymentStore = inject(PaymentStore);
-  private doctorService = inject(DoctorService);
+  private readonly authService = inject(AuthService);
+  private readonly patientStore = inject(PatientStore);
+  private readonly tenantStore = inject(TenantStore);
+  private readonly subscriptionService = inject(SubscriptionService);
+  private readonly paymentStore = inject(PaymentStore);
+  private readonly doctorService = inject(DoctorService);
 
   /**
    * Register patient with complete flow: User → Patient → Subscription
@@ -92,7 +93,7 @@ export class RegistrationFacade {
         return this.doctorService.getAll().pipe(
           map((doctors) => ({ 
             user, 
-            lastDoctor: (doctors && doctors.length) ? doctors.reduce((a, b) => new Date(a.joinedAt) > new Date(b.joinedAt) ? a : b) : null 
+            lastDoctor: (doctors && doctors.length) ? doctors.reduce((a, b) => new Date(a.joinedAt) > new Date(b.joinedAt) ? a : b, doctors[0]) : null 
           })),
           catchError(() => {
              // If fetching doctors fails, proceed without assigning one
@@ -101,11 +102,18 @@ export class RegistrationFacade {
         );
       }),
       switchMap(({ user, lastDoctor }) => {
-        // Step 2: Create patient profile
-        const newPatient = {
-          id: 0, // Backend will generate ID
+        console.log('🧾 [RegistrationFacade] Creating patient: user=', user?.id, 'lastDoctor=', lastDoctor);
+        // Defensive validation: ensure assignedDoctorId is a valid positive integer
+        let assignedDoctorId: number | null = null;
+        if (lastDoctor && typeof lastDoctor.id === 'number' && lastDoctor.id > 0) {
+          assignedDoctorId = lastDoctor.id;
+        } else if (lastDoctor) {
+          console.warn('⚠️ [RegistrationFacade] Ignoring invalid lastDoctor id:', lastDoctor?.id);
+        }
+        // Step 2: Create patient profile (sin campo 'id' - lo genera el backend)
+        const newPatient: Omit<Patient, 'id'> = {
           userId: user.id,
-          assignedDoctorId: lastDoctor ? lastDoctor.id : null,
+          assignedDoctorId: assignedDoctorId,
           tenantId: null,
           subscriptionId: null,
           firstName: data.firstName,
@@ -125,6 +133,7 @@ export class RegistrationFacade {
           }
         };
 
+        console.log('📤 [RegistrationFacade] Patient payload', newPatient);
         return this.patientStore.createPatient(newPatient).pipe(
           switchMap((patient) => {
             // Step 3: If a planId was provided, get plan details

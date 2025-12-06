@@ -17,7 +17,7 @@ export class PatientStore {
   readonly loading$ = this.loading.asReadonly();
   readonly error$ = this.error.asReadonly();
 
-  constructor(private patientService: PatientService) {}
+  constructor(private readonly patientService: PatientService) {}
 
   loadAllPatients(): Observable<Patient[]> {
     this.loading.set(true);
@@ -57,11 +57,18 @@ export class PatientStore {
     );
   }
 
-  createPatient(patient: Patient): Observable<Patient> {
+  createPatient(patient: Omit<Patient, 'id'>): Observable<Patient> {
     this.loading.set(true);
     this.error.set(null);
-    
-    return this.patientService.create(patient).pipe(
+    console.log('🧾 [PatientStore] createPatient called with payload:', patient);
+    // Defensive check: assignedDoctorId should be a valid number or null
+    const payload = { ...patient } as any;
+    if (payload.assignedDoctorId && (typeof payload.assignedDoctorId !== 'number' || payload.assignedDoctorId <= 0)) {
+      console.warn('⚠️ [PatientStore] assignedDoctorId invalid, forcing to null:', payload.assignedDoctorId);
+      payload.assignedDoctorId = null;
+    }
+
+    return this.patientService.create(payload).pipe(
       tap({
         next: (newPatient) => {
           this.patients.update(patients => [...patients, newPatient]);
@@ -70,7 +77,7 @@ export class PatientStore {
         error: (err) => {
           this.error.set('Error al crear paciente');
           this.loading.set(false);
-          console.error('Error creating patient:', err);
+          console.error('❌ [PatientStore] Error creating patient:', err);
         }
       })
     );
