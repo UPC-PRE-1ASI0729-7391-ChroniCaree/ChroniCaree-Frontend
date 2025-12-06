@@ -102,58 +102,58 @@ export class HospitalDashboardView implements OnInit {
 
       this.dashboardStore.loadDashboardStats(tenantId).subscribe({
         next: async (result) => {
+          try {
+            if (result.success && result.data) {
+              const stats = result.data;
+              
+              // Cargar suscripción y plan
+              let subscription: SubscriptionEntity | null = null;
+              let plan: SubscriptionPlanEntity | null = null;
 
-          if (result.success && result.data) {
-            const stats = result.data;
-            
-            // Cargar suscripción y plan
-            let subscription: SubscriptionEntity | null = null;
-            let plan: SubscriptionPlanEntity | null = null;
+              console.log('🔍 [HospitalDashboard] Loading subscription data...');
+              console.log('  📊 stats.activeSubscription:', stats.activeSubscription);
+              console.log('  🏥 tenantId:', tenantId);
 
-            console.log('🔍 [HospitalDashboard] Loading subscription data...');
-            console.log('  📊 stats.activeSubscription:', stats.activeSubscription);
-            console.log('  🏥 tenantId:', tenantId);
-
-            if (stats.activeSubscription) {
-              // Buscar suscripción activa del tenant usando el tenantId actual
-              try {
-                console.log('  🌐 Calling subscriptionService.getActiveByPayerId("tenant", ' + tenantId + ')');
-                const subs = await firstValueFrom(this.subscriptionService.getActiveByPayerId('tenant', tenantId));
-                console.log('  📦 Subscription response:', subs);
-                
-                if (subs) {
-                  subscription = subs;
-                  console.log('  ✅ Subscription found:', subscription);
-                  console.log('    - ID:', subscription.id);
-                  console.log('    - Status:', subscription.status);
-                  console.log('    - Plan ID:', subscription.planId);
+              if (stats.activeSubscription) {
+                // Buscar suscripción activa del tenant usando el tenantId actual
+                try {
+                  console.log('  🌐 Calling subscriptionService.getActiveByPayerId("tenant", ' + tenantId + ')');
+                  const subs = await firstValueFrom(this.subscriptionService.getActiveByPayerId('tenant', tenantId));
+                  console.log('  📦 Subscription response:', subs);
                   
-                  // Obtener el plan
-                  try {
-                    console.log('  🌐 Calling subscriptionService.getPlanById(' + subs.planId + ')');
-                    const planResult = await firstValueFrom(this.subscriptionService.getPlanById(subs.planId));
-                    console.log('  📦 Plan response:', planResult);
-                    plan = planResult ?? null;
+                  if (subs) {
+                    subscription = subs;
+                    console.log('  ✅ Subscription found:', subscription);
+                    console.log('    - ID:', subscription.id);
+                    console.log('    - Status:', subscription.status);
+                    console.log('    - Plan ID:', subscription.planId);
                     
-                    if (plan) {
-                      console.log('  ✅ Plan found:', plan);
-                      console.log('    - Name:', plan.name);
-                      console.log('    - Price:', plan.price);
-                    } else {
-                      console.warn('  ⚠️ Plan not found for planId:', subs.planId);
+                    // Obtener el plan
+                    try {
+                      console.log('  🌐 Calling subscriptionService.getPlanById(' + subs.planId + ')');
+                      const planResult = await firstValueFrom(this.subscriptionService.getPlanById(subs.planId));
+                      console.log('  📦 Plan response:', planResult);
+                      plan = planResult ?? null;
+                      
+                      if (plan) {
+                        console.log('  ✅ Plan found:', plan);
+                        console.log('    - Name:', plan.name);
+                        console.log('    - Price:', plan.price);
+                      } else {
+                        console.warn('  ⚠️ Plan not found for planId:', subs.planId);
+                      }
+                    } catch (err) {
+                      console.error('❌ [HospitalDashboard] Error loading plan for subscription:', err);
                     }
-                  } catch (err) {
-                    console.error('❌ [HospitalDashboard] Error loading plan for subscription:', err);
+                  } else {
+                    console.warn('  ⚠️ No active subscription found for tenant:', tenantId);
                   }
-                } else {
-                  console.warn('  ⚠️ No active subscription found for tenant:', tenantId);
+                } catch (err) {
+                  console.error('❌ [HospitalDashboard] Error loading subscription:', err);
                 }
-              } catch (err) {
-                console.error('❌ [HospitalDashboard] Error loading subscription:', err);
+              } else {
+                console.warn('  ⚠️ stats.activeSubscription is false/null');
               }
-            } else {
-              console.warn('  ⚠️ stats.activeSubscription is false/null');
-            }
 
               // Monthly patients
               const monthlyData = await this.loadMonthlyPatientData(tenantId, this.selectedYear());
@@ -179,13 +179,13 @@ export class HospitalDashboardView implements OnInit {
           } catch (e: any) {
             console.error('Dashboard next() error:', e);
             this.error.set(this.translate.instant('hospitalDashboard.errors.loadError'));
+          } finally {
+            this.loading.set(false);
           }
         },
         error: (err) => {
           console.error('Error loading dashboard:', err);
           this.error.set(err?.message || this.translate.instant('hospitalDashboard.errors.loadError'));
-        },
-        complete: () => {
           this.loading.set(false);
         }
       });

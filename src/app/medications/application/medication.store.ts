@@ -196,7 +196,11 @@ export class MedicationStore {
         const nextId = maxId + 1;
         
         // Create a new object with the new ID, preserving other properties
-        const newMedication = Object.assign(new Medication(), medication, { id: nextId });
+        const newMedication = Object.assign(new Medication(), medication, {
+          id: nextId,
+          sideEffects: medication.sideEffects ?? [],
+          contraindications: medication.contraindications ?? []
+        });
 
         return this.medicationApi.create(newMedication);
       }),
@@ -220,7 +224,12 @@ export class MedicationStore {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.medicationApi.update(id, medication).pipe(
+    const safeMedication = Object.assign(new Medication(), medication, {
+      sideEffects: medication.sideEffects ?? [],
+      contraindications: medication.contraindications ?? []
+    });
+
+    return this.medicationApi.update(id, safeMedication).pipe(
       tap(updated => {
         this._medications.update(meds =>
           meds.map(med => med.id === id ? updated : med)

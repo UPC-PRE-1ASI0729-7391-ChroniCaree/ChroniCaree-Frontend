@@ -193,8 +193,9 @@ export class SubscriptionService {
         endDate.setMonth(endDate.getMonth() + 1); // 1 mes por defecto
 
         // Crear objeto de suscripción sin ID (el backend debe generarlo)
+        // NOTE: omitimos la propiedad `id` deliberadamente para evitar errores
+        //  en backends que no aceptan IDs en POST create payloads.
         const subscriptionResource: Partial<SubscriptionResource> = {
-          id: 0, // Placeholder, backend should generate real ID
           payerType: request.payerType,
           payerId: request.payerId,
           patientId: request.patientId,
@@ -213,16 +214,27 @@ export class SubscriptionService {
         console.log('📋 [SubscriptionService] Creating subscription with:', subscriptionResource);
         console.log('📋 [SubscriptionService] POST URL:', `${this.baseUrl}${SubscriptionApiEndpoint.create()}`);
 
-        return this.http
-          .post<SubscriptionResource>(`${this.baseUrl}${SubscriptionApiEndpoint.create()}`, subscriptionResource)
+        // Use POST helper that can attempt fallback to alternative base URL in dev
+        return this.postWithFallback<SubscriptionResource>(SubscriptionApiEndpoint.create(), subscriptionResource)
           .pipe(
             map((resource) => {
               console.log('✅ [SubscriptionService] Subscription created:', resource);
               return SubscriptionAssembler.toEntity(resource);
             }),
             catchError((error) => {
+              // Try to surface server-side message if available
+              let msg = 'Error creating subscription';
+              try {
+                if (error?.error && typeof error.error === 'object') {
+                  msg = error.error.message || JSON.stringify(error.error);
+                } else if (error?.message) {
+                  msg = error.message;
+                }
+              } catch (e) {
+                msg = String(error);
+              }
               console.error('❌ [SubscriptionService] Error creating subscription:', error);
-              return throwError(() => new Error(`Error creating subscription: ${error.message}`));
+              return throwError(() => new Error(`Error creating subscription: ${msg}`));
             })
           );
       }),
@@ -292,12 +304,18 @@ export class SubscriptionService {
    * Obtiene planes por tipo (patient o tenant)
    */
   getPlansByType(type: 'patient' | 'tenant'): Observable<SubscriptionPlanEntity[]> {
-    return this.http
-      .get<SubscriptionPlanResource[]>(`${this.baseUrl}${SubscriptionApiEndpoint.getSubscriptionPlansByType(type)}`)
-      .pipe(
-        map((resources) => SubscriptionAssembler.planToEntityList(resources)),
-        catchError((error) => throwError(() => new Error(`Error fetching ${type} plans: ${error.message}`)))
-      );
+    const path = SubscriptionApiEndpoint.getSubscriptionPlansByType(type);
+    console.log('🌐 [SubscriptionService] getPlansByType:', type, 'URL:', `${this.baseUrl}${path}`);
+    return this.getWithFallback<SubscriptionPlanResource[]>(path).pipe(
+      map((resources) => {
+        console.log('✅ [SubscriptionService] Plans loaded:', resources.length);
+        return SubscriptionAssembler.planToEntityList(resources);
+      }),
+      catchError((error) => {
+        console.error('❌ [SubscriptionService] Error fetching plans:', error);
+        return throwError(() => new Error(`Error fetching ${type} plans: ${error.message}`));
+      })
+    );
   }
 
   /**
@@ -313,6 +331,59 @@ export class SubscriptionService {
         return 1;
       }),
       catchError(() => of(1))
+    );
+  }
+
+  /**
+   * GET helper que reintenta con apiBaseUrlFallback si hay error de red (status 0)
+   * Similar al helper de AuthService, para manejar puertos alternativos en desarrollo
+   */
+  private getWithFallback<T>(path: string): Observable<T> {
+    const primaryUrl = `${this.baseUrl}${path}`;
+    console.log('📤 [SubscriptionService] GET primary:', primaryUrl);
+    return this.http.get<T>(primaryUrl).pipe(
+      catchError(err => {
+        // Network-level error (connection refused, CORS, etc.)
+        if (!err?.status || err.status === 0) {
+          const fallbackBaseUrl = (environment as any).apiBaseUrlFallback;
+          if (fallbackBaseUrl && !this.baseUrl.includes(fallbackBaseUrl)) {
+            const fallbackUrl = `${fallbackBaseUrl}${path}`;
+            console.warn('⚠️ [SubscriptionService] Primary API unreachable, attempting fallback:', fallbackUrl);
+            return this.http.get<T>(fallbackUrl);
+          }
+        }
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /**
+   * POST helper that attempts an alternate base URL when primary fails.
+   * Useful for local development when backend might run on alternate port.
+   */
+  private postWithFallback<T>(path: string, body: any, options?: any): Observable<T> {
+    const primaryUrl = `${this.baseUrl}${path}`;
+    console.log('📤 [SubscriptionService] POST primary:', primaryUrl);
+    const primaryCall = this.http.post<T>(primaryUrl, body, options as any) as Observable<T>;
+    return primaryCall.pipe(
+      catchError(err => {
+        // Network-level error (connection refused, CORS, etc.)
+        const fallbackBaseUrl = (environment as any).apiBaseUrlFallback;
+        if ((!err?.status || err.status === 0) && fallbackBaseUrl && !this.baseUrl.includes(fallbackBaseUrl)) {
+          const fallbackUrl = `${fallbackBaseUrl}${path}`;
+          console.warn('⚠️ [SubscriptionService] Primary API unreachable, attempting POST fallback:', fallbackUrl);
+          return this.http.post<T>(fallbackUrl, body, options as any) as Observable<T>;
+        }
+
+        // If server returned 5xx, attempt fallback once if configured
+        if (err?.status && err.status >= 500 && fallbackBaseUrl && !this.baseUrl.includes(fallbackBaseUrl)) {
+          const fallbackUrl = `${fallbackBaseUrl}${path}`;
+          console.warn('⚠️ [SubscriptionService] Server error on primary POST, attempting POST fallback:', fallbackUrl);
+          return this.http.post<T>(fallbackUrl, body, options as any) as Observable<T>;
+        }
+
+        return throwError(() => err);
+      })
     );
   }
 }

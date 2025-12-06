@@ -3,6 +3,7 @@ import {BaseResource, BaseResponse} from './base-response';
 import {BaseAssembler} from './base-assembler';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, map, Observable, throwError} from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export abstract class BaseApiEndpoint<
   TEntity extends BaseEntity,
@@ -66,7 +67,8 @@ export abstract class BaseApiEndpoint<
    */
   update(entity: TEntity, id: number): Observable<TEntity>{
     const resource = this.assembler.toResourceFromEntity(entity);
-    return this.http.put<TResource>(`${this.endpointUrl}/${id}`, resource).pipe(
+    const resourceUrl = `${this.endpointUrl}/${id}`;
+    return this.putWithFallback<TResource>(resourceUrl, resource).pipe(
       map(updated => this.assembler.toEntityFromResource(updated)),
       catchError(this.handleError('Failed to updated entity'))
     )
@@ -85,16 +87,75 @@ export abstract class BaseApiEndpoint<
 
   protected handleError(operation: string){
     return (error: HttpErrorResponse) : Observable<never> => {
-      let errorMessage =  operation;
-      if (error.status === 404) {
-        errorMessage = `${operation}: Resource not found.`;
-      } else if (error.error instanceof ErrorEvent) {
-        errorMessage = `${operation}: ${error.error.message}.`;
-      } else {
-        errorMessage = `${operation}:  ${error.statusText || 'Unexpected error'}`;
+      let errorMessage = `${operation}`;
+
+      // If server returned a body with message, prefer that
+      try {
+        if (error?.error) {
+          if (typeof error.error === 'string') {
+            // sometimes backend returns plain text
+            errorMessage = `${operation}: ${error.error}`;
+          } else if (typeof error.error === 'object' && error.error.message) {
+            errorMessage = `${operation}: ${error.error.message}`;
+          }
+        }
+      } catch (e) {
+        // ignore parse errors
       }
+
+      if (!errorMessage || errorMessage === `${operation}`) {
+        if (error.status === 404) {
+          errorMessage = `${operation}: Resource not found (404).`;
+        } else if (error.error instanceof ErrorEvent) {
+          errorMessage = `${operation}: ${error.error.message}.`;
+        } else {
+          const statusText = error.statusText || 'Unexpected error';
+          errorMessage = `${operation}: ${error.status} ${statusText}`;
+        }
+      }
+
+      console.error(`🔴 [BaseApiEndpoint] ${operation} failed:`, {
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        body: error.error,
+      });
+
       return throwError(() => new Error(errorMessage));
     };
+  }
+
+  /**
+   * PUT helper that tries an alternate base URL when the primary fails (network errors or 5xx).
+   * This mirrors the fallback behavior used elsewhere for GET/POST in the codebase.
+   */
+  private putWithFallback<T>(resourceUrl: string, body: any, options?: any): Observable<T> {
+    const primaryCall = this.http.put<T>(resourceUrl, body, options as any) as Observable<T>;
+    return primaryCall.pipe(
+      catchError(err => {
+        const fallbackBaseUrl = (environment as any).apiBaseUrlFallback;
+        // If network-level error or 5xx and fallback is configured, attempt once
+        if ((!err?.status || err.status === 0 || (err?.status && err.status >= 500)) && fallbackBaseUrl) {
+          try {
+            let fallbackUrl = resourceUrl;
+            if (resourceUrl.startsWith(environment.apiBaseUrl)) {
+              fallbackUrl = resourceUrl.replace(environment.apiBaseUrl, fallbackBaseUrl);
+            } else if (!resourceUrl.startsWith('http')) {
+              // relative path, prefix with fallback
+              fallbackUrl = `${fallbackBaseUrl}${resourceUrl.startsWith('/') ? '' : '/'}${resourceUrl}`;
+            } else {
+              // resourceUrl is absolute but not matching primary base; attempt prefixing
+              fallbackUrl = `${fallbackBaseUrl}${resourceUrl}`;
+            }
+            console.warn('⚠️ [BaseApiEndpoint] Primary PUT failed, attempting fallback PUT:', fallbackUrl);
+            return this.http.put<T>(fallbackUrl, body, options as any) as Observable<T>;
+          } catch (e) {
+            // fall through to rethrow original error
+          }
+        }
+        return throwError(() => err);
+      })
+    );
   }
 
 }

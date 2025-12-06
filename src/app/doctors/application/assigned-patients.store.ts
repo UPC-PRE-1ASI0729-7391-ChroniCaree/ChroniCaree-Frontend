@@ -123,8 +123,8 @@ export class AssignedPatientsStore {
    */
   loadPatientById(patientId: number): void {
     this.setLoading(true);
-    
-    this.apiEndpoint.getPatientById(patientId).subscribe({
+    // Prefer the composite health summary endpoint if available for a single patient.
+    this.apiEndpoint.getPatientHealthSummaryById(patientId).subscribe({
       next: (patient) => {
         if (patient) {
           console.log(`✅ [AssignedPatientsStore] Paciente ${patientId} cargado`);

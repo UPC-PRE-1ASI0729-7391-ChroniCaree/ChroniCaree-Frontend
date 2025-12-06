@@ -8,6 +8,8 @@ export const environment = {
   
   // Base API URL
   apiBaseUrl: 'http://localhost:11083/api/v1',
+  // Optional fallback for local development when backend is running on alternative ports
+  apiBaseUrlFallback: 'http://localhost:8080/api/v1',
   
   // === IAM Bounded Context ===
   usersEndpointPath: '/users',

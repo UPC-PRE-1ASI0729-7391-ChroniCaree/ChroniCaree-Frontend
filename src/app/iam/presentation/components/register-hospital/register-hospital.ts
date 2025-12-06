@@ -307,6 +307,13 @@ export class RegisterHospitalComponent implements AfterViewInit {
         console.error('Error body:', err.error);
         
         // Manejo de errores específicos
+        if (!err?.status || err.status === 0) {
+          // Network error suggests backend unreachable or CORS/network problem
+          const backendUrl = this.authService.apiUrl || 'unknown';
+          this.errorMessage.set('❌ No se pudo conectar al servidor de API: ' + backendUrl + '. Verifica que el backend esté corriendo y que CORS esté configurado.');
+          console.error('📋 [RegisterHospital] Network/connection error to backend:', backendUrl, err);
+          return;
+        }
         const errorMsg = err.error?.message || err.error?.error || err.message || 'Error desconocido';
         
         if (errorMsg.includes('Email already exists') || errorMsg.includes('ya está registrado')) {

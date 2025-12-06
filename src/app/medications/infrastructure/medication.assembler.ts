@@ -33,11 +33,11 @@ export class MedicationAssembler {
       prescribedDate: new Date(resource.prescribedDate),
       status: resource.status,
       instructions: resource.instructions,
-      sideEffects: resource.sideEffects,
-      contraindications: resource.contraindications,
+      sideEffects: resource.sideEffects ?? [],
+      contraindications: resource.contraindications ?? [],
       purpose: resource.purpose,
       refillDate: resource.refillDate ? new Date(resource.refillDate) : undefined,
-      logs: resource.logs.map(log => this.logToDomain(log)),
+      logs: (resource.logs ?? []).map(log => this.logToDomain(log)),
       createdAt: new Date(resource.createdAt),
       updatedAt: new Date(resource.updatedAt)
     });
@@ -71,8 +71,8 @@ export class MedicationAssembler {
       prescribedDate: prescribedDate,
       status: status,
       instructions: medication.instructions,
-      sideEffects: medication.sideEffects,
-      contraindications: medication.contraindications,
+      sideEffects: medication.sideEffects ?? [],
+      contraindications: medication.contraindications ?? [],
       purpose: medication.purpose,
       refillDate: refillDate
     };
@@ -99,11 +99,11 @@ export class MedicationAssembler {
       prescribedDate: medication.prescribedDate.toISOString(),
       status: medication.status,
       instructions: medication.instructions,
-      sideEffects: medication.sideEffects,
-      contraindications: medication.contraindications,
+      sideEffects: medication.sideEffects ?? [],
+      contraindications: medication.contraindications ?? [],
       purpose: medication.purpose,
       refillDate: medication.refillDate?.toISOString(),
-      logs: medication.logs.map(log => this.logToResource(log)),
+      logs: (medication.logs ?? []).map(log => this.logToResource(log)),
       createdAt: medication.createdAt.toISOString(),
       updatedAt: medication.updatedAt.toISOString()
     };

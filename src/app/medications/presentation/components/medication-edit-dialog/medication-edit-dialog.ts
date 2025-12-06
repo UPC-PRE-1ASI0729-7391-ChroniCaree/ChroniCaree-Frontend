@@ -61,7 +61,9 @@ export class MedicationEditDialogComponent {
           name: formValues.name!,
           dosage: formValues.dosage!,
           instructions: formValues.instructions || undefined,
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          sideEffects: this.data?.medication?.sideEffects ?? [],
+          contraindications: this.data?.medication?.contraindications ?? []
         });
 
         this.medicationStore.updateMedication(this.data!.medication!.id, updatedMedication).subscribe({
@@ -94,7 +96,9 @@ export class MedicationEditDialogComponent {
           dosage: formValues.dosage!,
           instructions: formValues.instructions || undefined,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          sideEffects: [],
+          contraindications: []
         });
 
         this.medicationStore.createMedication(newMed).subscribe({

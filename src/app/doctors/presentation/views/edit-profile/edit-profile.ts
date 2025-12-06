@@ -34,7 +34,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatSelectModule,
     MatSlideToggleModule,
     MatCheckboxModule,
-    MatTooltipModule
+    MatTooltipModule,
     TranslateModule
   ],
   templateUrl: './edit-profile.html',

@@ -123,6 +123,8 @@ export class DoctorsPatientDetailComponent implements OnInit {
       prescribedDate: new Date(),
       status: MedicationStatus.ACTIVE,
       instructions: notes || undefined,
+      sideEffects: [],
+      contraindications: [],
     });
 
     this.medicationStore.createMedication(med).subscribe({

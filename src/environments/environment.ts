@@ -6,8 +6,8 @@
 export const environment = {
   production: true,
   
-  // Base API URL - Production backend
-  apiBaseUrl: 'https://chronicaree-api.onrender.com/api/v1',
+  // Base API URL - Production backend (updated)
+  apiBaseUrl: 'https://chornicare-backend-production.up.railway.app/api/v1',
   
   // === IAM Bounded Context ===
   usersEndpointPath: '/users',

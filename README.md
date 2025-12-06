@@ -149,6 +149,36 @@ server/
 
 ## 🐛 Solución de Problemas
 
+### Error: "ERR_CONNECTION_REFUSED" o "Failed to fetch"
+Este error ocurre cuando el frontend no puede conectarse al backend. **Solución:**
+
+1. **Verificar que el backend esté corriendo:**
+   ```powershell
+   # Verificar si el backend responde
+   curl http://localhost:8080/api/v1/health
+   ```
+
+2. **Verificar el puerto del backend:**
+   - El frontend espera el backend en: `http://localhost:11083` (desarrollo)
+   - Si tu backend corre en puerto 8080, actualiza `src/environments/environment.development.ts`:
+   ```typescript
+   apiBaseUrl: 'http://localhost:8080/api/v1',
+   ```
+   - **O** corre el backend en el puerto esperado:
+   ```powershell
+   mvn spring-boot:run -Dserver.port=11083
+   ```
+
+3. **Fallback automático (ya implementado):**
+   - El frontend automáticamente reintenta con `http://localhost:8080` si `11083` falla
+   - Revisa la consola del navegador para ver los mensajes de fallback
+
+4. **Configurar CORS en el backend:**
+   - Agrega el puerto del frontend a `application.properties`:
+   ```properties
+   cors.allowed.origins=http://localhost:4200,http://localhost:11083
+   ```
+
 ### Error: "Stripe.js no está cargado"
 - Verificar que el script esté en `src/index.html`:
   ```html

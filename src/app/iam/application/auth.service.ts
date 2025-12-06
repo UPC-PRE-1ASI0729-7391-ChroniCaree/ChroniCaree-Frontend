@@ -82,6 +82,13 @@ export class AuthService {
   }
 
   /**
+   * Returns the configured API URL for debugging and informational purposes
+   */
+  public get apiUrl(): string {
+    return this.API_URL;
+  }
+
+  /**
    * Sign in with email and password
    * Backend responde: { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant, doctorId } }
    */
@@ -205,7 +212,7 @@ export class AuthService {
 
     // El backend responde con estructura anidada:
     // { accessToken, refreshToken, user: { id, email, name, role, tenantId, tenant, doctorId } }
-    return this.http.post<{
+    return this.postWithFallback<{
       accessToken: string;
       refreshToken: string;
       user: {
@@ -218,7 +225,7 @@ export class AuthService {
         doctorId: number | null;
       };
     }>(
-      `${this.API_URL}/sign-up/hospital-admin`, 
+      '/sign-up/hospital-admin', 
       hospitalAdminRequest
     ).pipe(
       tap(response => {
@@ -274,6 +281,12 @@ export class AuthService {
       }),
       catchError(error => {
         console.error('❌ [AuthService] Registration error:', error);
+        // Network-level error, like connection refused or CORS issues in development
+        if (!error?.status || error.status === 0) {
+          const msg = `Network error: Unable to reach API at ${this.API_URL}. Verify backend is running and CORS is configured. (status: ${error?.status || 0})`;
+          console.error('❌ [AuthService] Network error:', msg);
+          return throwError(() => new Error(msg));
+        }
         // Prefer detailed backend validation messages if available
         if (error.status === 400) {
           const details = error.error?.details;
@@ -295,6 +308,30 @@ export class AuthService {
 
         // Fallback
         return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * POST helper that retries on a network-level error (status === 0) using the
+   * optional `apiBaseUrlFallback` from the environment. Useful in development when
+   * backend might run on a different port.
+   */
+  private postWithFallback<T>(path: string, body: any): Observable<T> {
+    const primaryUrl = `${this.API_URL}${path}`;
+    console.log('📤 [AuthService] POST primary:', primaryUrl);
+    return this.http.post<T>(primaryUrl, body).pipe(
+      catchError(err => {
+        if (!err?.status || err.status === 0) {
+          // network-level error, attempt fallback
+          const fallbackUrl = (environment as any).apiBaseUrlFallback;
+          if (fallbackUrl && !this.API_URL.includes(fallbackUrl)) {
+            const url = `${fallbackUrl}${environment.authEndpointPath}${path}`;
+            console.warn('[AuthService] Primary API unreachable, attempting fallback:', url);
+            return this.http.post<T>(url, body);
+          }
+        }
+        return throwError(() => err);
       })
     );
   }
@@ -404,6 +441,39 @@ export class AuthService {
     try {
       const decoded: any = jwtDecode(token);
       return decoded.role || null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Get the current user's ID from the token or stored user
+   */
+  getCurrentUserId(): string | null {
+    // First try to get from current user
+    const currentUser = this.currentUserSubject.value;
+    if (currentUser?.id) {
+      return currentUser.id.toString();
+    }
+
+    // Fallback to stored user
+    const storedUser = localStorage.getItem(this.USER_KEY);
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        return user?.id?.toString() || null;
+      } catch {
+        // Continue to token fallback
+      }
+    }
+
+    // Last resort: decode token
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.id?.toString() || decoded.sub || null;
     } catch {
       return null;
     }

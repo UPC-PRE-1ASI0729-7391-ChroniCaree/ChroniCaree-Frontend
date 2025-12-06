@@ -190,8 +190,15 @@ export class MedicationHistoryComponent implements OnInit {
       [MedicationStatus.MISSED]: 'medications.history.status.missed',
       [MedicationStatus.DISCONTINUED]: 'medications.history.status.discontinued'
     };
-    const key = keyMap[status];
-    return this.translate.instant(key);
+    // Guard against undefined/null status and missing keys
+    const defaultKey = 'medications.history.status.unknown';
+    const key = status ? keyMap[status] ?? defaultKey : defaultKey;
+    try {
+      return this.translate.instant(key);
+    } catch (e) {
+      // Fallback to a safe human readable string if Translate service fails
+      return 'Desconocido';
+    }
   }
 
   /**
@@ -344,7 +351,9 @@ export class MedicationHistoryComponent implements OnInit {
       name,
       dosage,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      sideEffects: [],
+      contraindications: []
     });
 
     this.medicationStore.createMedication(med).subscribe({

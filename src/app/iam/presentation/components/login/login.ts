@@ -91,6 +91,14 @@ export class LoginComponent implements OnInit {
         const userId = this.authService.getCurrentUserId();
         console.log('Login successful. Detected role:', role);
 
+        // Validate userId
+        if (!userId) {
+          console.error('No userId available after login');
+          this.submitting.set(false);
+          this.errorMessage.set('⚠️ Error al obtener información del usuario.');
+          return;
+        }
+
         // Normalize role to lowercase for comparison
         const normalizedRole = role ? role.toLowerCase() : '';
 
@@ -126,7 +134,7 @@ export class LoginComponent implements OnInit {
   private checkPatient2FA(userId: string, email: string): void {
     this.patientStore.loadAllPatients().subscribe({
       next: (patients) => {
-        const patient = patients.find(p => p.userId === userId);
+        const patient = patients.find(p => p.userId === Number(userId));
         const patientId = patient?.id;
         
         if (patientId) {
@@ -157,7 +165,7 @@ export class LoginComponent implements OnInit {
   private checkDoctor2FA(userId: string, email: string): void {
     this.doctorStore.loadAllDoctors().subscribe({
       next: (doctors) => {
-        const doctor = doctors.find(d => d.userId === userId);
+        const doctor = doctors.find(d => d.userId === Number(userId));
         const doctorId = doctor?.id;
         
         if (doctorId) {
